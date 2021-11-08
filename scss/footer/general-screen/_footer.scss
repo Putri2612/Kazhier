@@ -1,0 +1,27 @@
+footer{
+    background: $lightdark;
+    color: $white;
+    .kakaflex-item{
+        width: 100%;
+        margin-bottom: 50px;
+    }
+    .bot-menu{
+        padding-top: 40px;
+        padding-left: 5%;
+        padding-right: 5%;
+        ul{
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            li, a{
+                color: $white;
+            }
+        }
+    }
+    .legal{
+        background-color: $dark;
+        .legal-container{
+            padding-top: 40px;
+        }
+    }
+}

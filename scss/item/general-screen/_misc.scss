@@ -1,0 +1,12 @@
+.kakatrial{
+    color: $white;
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%
+}
+
+.kakaanim-fast{
+    transition: linear 0.2s;
+}

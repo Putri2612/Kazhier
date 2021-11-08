@@ -1,0 +1,11 @@
+.benefit-item{
+    max-width: 320px;
+    .benefit-icon{
+        transition: .4s;
+        filter: grayscale(100%) brightness(175%);
+    }
+    &:hover{
+        .title{color: $blue}
+        .benefit-icon{filter: grayscale(0) brightness(100%);}
+    }
+}

@@ -1,0 +1,17 @@
+*{
+    box-sizing: border-box;
+    user-select: none;
+    &:not(pre) &:not(code){
+        font-family: $sans-serif;
+    }
+    &:not(dialog){
+        position: relative;
+    }
+}
+body{
+    padding: 0;
+    margin: 0;
+}
+main{
+    margin: 0;
+}

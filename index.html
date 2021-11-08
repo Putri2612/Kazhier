@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge, chrome=1"/>
+    <meta name="robots" content="none">
+    <link rel="shortcut icon" href="favicon.png" type="image/png"/>
+    <link href="./css/main.css" rel="stylesheet"/>
+    <link rel="preload" href="https://biz.kakatoo.id/app/assets/modules/fontawesome/css/all.min.css" as="style">
+    <link rel="preload" href="./css/custom-element.css" as="style"/>
+    <title>Kakabiz</title>
+</head>
+<body>
+    <header id="page-header" class="stick-top">
+        <div class="header-container">
+            <div class="logo-container"><img src="./images/props/logo.svg" alt="Logo Kakabiz" height="36"></div>
+            <div class="nav-container">
+                <nav>
+                    <div id="nav-btn" class="nav-btn">
+                        <div id="navburg-00" class="btn-burg-top"></div>
+                        <div id="navburg-01" class="btn-burg-mid"></div>
+                        <div id="navburg-02" class="btn-burg-bot"></div>
+                    </div>
+                    <ul id="nav-list" class="nav-list kakaflex-col-gap-sm-lg kakaflex-align-right-lg">
+                        <a class="nav-item active kakaflex-item" href="."><li>Beranda</li></a>
+                        <a class="nav-item kakaflex-item" href="#fitur"><li>Fitur Lengkap</li></a>
+                        <a class="nav-item kakaflex-item" href="#price"><li>Harga</li></a>
+                        <a class="nav-item kakaflex-item" href="./app/login"><li>Login</li></a>
+                        <a class="nav-item highlights kakaflex-item" href="./app/register"><li>Daftar</li></a>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div style="height:80px; width:100%"></div>
+    <main>
+        <section id="headline" class="kakabg-00">
+            <div class="kakakonten-xl kakapadding-atas-lg kakapadding-sisi-sm kakaflex kakaflex-hori kakaflex-row-gap-sm">
+                <div class="kakapanel-1-per-3-lg kakaflex-item txt-just">
+                    <h2>Akuntansi menjadi <br/>mudah & cepat <br/>dengan Kakabiz</h2>
+                    <p>Memudahkan pencatatan keuangan dan memberikan laporan dalam waktu singkat.</p>
+                    <a href="./app/register" id="trial" class="btn-primary txt-center"><span>Daftar Sekarang!</span></a>
+                </div>
+                <div class="kakapanel-2-per-3-lg kakaflex-item kakaflex kakaflex-align-right-lg kakaflex-align-center">
+                    <img class="" id="headline-card" src="./images/props/headline.png" alt="Kakabiz" style="width: 80%; max-width: 1000px; height: auto;">
+                </div>
+            </div>
+        </section>
+        <section id="overview" class="kakakonten-md txt-center kakapadding-atas-md kakapadding-sisi-sm">
+                <h1 class="txt-spotlight" id="punchline-card">Kakabiz adalah solusi akuntansi untuk UKM di Indonesia</h1>
+        </section>
+        <section id="penjabaran" class="kakakonten-sm kakaflex kakaflex-reverse-hori kakaflex-row-gap-sm kakapadding-sisi-sm">
+            <div class="kakapanel-1-per-4-lg kakapadding-sisi-xs kakaflex-item">
+                <h2>Proses Bisnis Lengkap untuk Usaha Anda</h2>
+                <p class="txt-just">Kakabiz dapat membantu usaha Anda menjadi efisien, apapun bentuk usaha yang Anda jalankan. Buat penawaran penjualan, pengiriman pesanan, faktur penjualan, hingga penerimaan pembayaran dengan mudah dan cepat.</p>
+            </div>
+            <div class="kakapanel-3-per-4-lg kakaflex-item kakaflex kakaflex-align-left-lg kakaflex-align-center">
+                <img class="" id="service-card" src="./images/props/service.png" alt="service" style="width:100%; max-width: 1024px; height:auto">
+            </div>
+        </section>
+        <section id="fitur" class="kakakonten-xl kakapadding-atas-md kakapadding-sisi-sm txt-center">
+            <h2>Selesaikan pekerjaan lebih cepat dengan tepat</h2>
+            <p>Dengan beragam fitur Kakabiz, Anda dapat mengoptimalkan kinerja usaha Anda.</p>
+            <feature-list>
+                <feature-item icon="./images/icon/keuntungan.svg" is-icon-image="true" name="Laba/Rugi"></feature-item>
+                <feature-item icon="./images/icon/aliranUang.svg" is-icon-image="true" name="Arus Kas"></feature-item>
+                <feature-item icon="./images/icon/laporan.svg" is-icon-image="true" name="Jurnal"></feature-item>
+                <feature-item icon="./images/icon/buku.svg" is-icon-image="true" name="Buku Besar"></feature-item>
+                <feature-item icon="./images/icon/neraca.svg" is-icon-image="true" name="Neraca"></feature-item>
+                <feature-item icon="ellipsis" is-icon-image="false" is-FA="false" name="Laporan-laporan Lainnya"></feature-item>
+            </feature-list>
+        </section>
+        <section id="price" class="kakakonten-md kakapadding-atas-md kakapadding-sisi-sm txt-center">
+            <h2>Berlangganan</h2>
+            <p>Tingkatkan produktivitas dengan paket yang sesuai dengan kebutuhan Anda.</p>
+            <plan-display url="./data.json"></plan-display>
+        </section>
+        <section id="benefits" class="kakakonten-lg kakapadding-atas-md kakapadding-sisi-sm">
+            <div class="benefit-container kakaflex kakaflex-hori kakaflex-col-gap-lg-lg kakaflex-align-center" id="benefit-card">
+                <div class="benefit-item kakaflex-item txt-center">
+                    <div class="benefit-icon"><img src="./images/icon/team.svg" alt="tim handal" height="96px" width="auto"></div>
+                    <p class="title">Percayakan tugas Anda kepada tim</p>
+                    <p>Serahkan kegiatan Administrasi pada tim dan Anda dapat fokus mengembangkan bisnis. Dengan akses multi-user, Anda dapat membagi tugas kepada anggota tim sesuai dengan kebutuhan.</p>
+                </div>
+                <div class="benefit-item kakaflex-item txt-center">
+                    <div class="benefit-icon"><img src="./images/icon/anywhere.svg" alt="dimanapun" height="96px" width="auto"></div>
+                    <p class="title">Kerja tanpa batasan ruang</p>
+                    <p>Selesaikan pekerjaan Anda dari mana saja untuk memberikan hasil kerja yang lebih efisien seperti membuat faktur penjualan dan pembelian, cek stok barang, hingga persetujuan transaksi</p>
+                </div>
+                <div class="benefit-item kakaflex-item txt-center">
+                    <div class="benefit-icon"><img src="./images/icon/anytime.svg" alt="kapanpun" height="96px" width="auto"></div>
+                    <p class="title">Lihat laporan keuangan setiap saat</p>
+                    <p>Tidak perlu menunggu hingga akhir bulan untuk mengetahui kondisi keuangan perusahaan. Lakukan analisa dan pengambilan keputusan lebih cepat untuk kemajuan bisnis Anda.</p>
+                </div>
+            </div>
+        </section>
+        <section id="partner" class="kakakonten-md txt-center kakapadding-atas-sm kakapadding-sisi-sm">
+            <h1>Partner Kami</h1>
+            <ul class="partner-list">
+                <li><img src="./images/partner/ayam geprek.png" alt="ayam geprek Mr.D"></li>
+                <li><img src="./images/partner/nasgorbas.jpeg" alt="nasgorbas"></li>
+                <li><img src="./images/partner/tumbasgo.png" alt="tumbasgo"></li>
+                <li><img src="./images/partner/Logo.jpg" alt="HuHus"></li>
+            </ul>
+        </section>
+        <section id="trial" class="kakabg-01">
+            <div class="kakakonten-xl">
+                <div class="txt-center kakapadding-atas-md kakapadding-sisi-sm kakatrial" id="try-card">
+                    <h1>Kelola Bisnis Anda dengan Mudah dengan Kakabiz</h1>
+                    <div class="kakapadding-atas-sm">
+                        <a href="./app/register" class="btn-secondary">Daftar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <section id="footer-menu" class="kakakonten-sm bot-menu">
+            <div class="kakapanel-2-per-3-lg kakaflex kakaflex-hori kakaflex-col-gap-sm-lg">
+                <section id="support" class="kakaflex-item">
+                    <h3>Dukungan</h3>
+                    <ul>
+                        <li><a href="#support">Pusat Bantuan</a></li>
+                    </ul>
+                </section>
+                <section id="about" class="kakaflex-item">
+                    <h3>Tentang Kakatoo</h3>
+                    <ul>
+                        <li><a href="#about">Perusahaan</a></li>
+                        <li><a href="#about">Kegiatan</a></li>
+                        <li><a href="#about">Blog</a></li>
+                    </ul>
+                </section>
+                <section id="contact" class="kakaflex-item">
+                    <h3>Kontak</h3>
+                    <ul>
+                        <li><a href="#contact">Hubungi Kami</a></li>
+                    </ul>
+                </section>
+            </div>
+            <div class="kakapanel-1-per-3-lg"></div>
+        </section>
+    </footer>
+    <script src="./js/main-debug.js"></script>
+    <script src="./js/custom-element.js"></script>
+</body>
+</html>

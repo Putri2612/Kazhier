@@ -1,0 +1,99 @@
+nav{
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nav-btn{
+    width: 31px;
+    height: 20px;
+    z-index: 3;
+    cursor: pointer;
+    margin: 5% 0;
+    
+    [class^="btn-burg"]{
+        width: 31px;
+        height: 3px;
+        background-color: $gray;
+        position:absolute;
+        transition: linear .2s;
+        &.close{
+            height: 5px;
+        }
+    }
+    .btn-burg-top{
+        top:0%;
+        &.close{
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+        }
+    }
+    .btn-burg-mid{
+        top:50%;
+        transform: translateY(-50%);
+        &.close{
+            opacity: 0;
+        }
+    }
+    .btn-burg-bot{
+        bottom: 0%;
+        &.close{
+            bottom: 50%;
+            transform: translateY(50%) rotate(-45deg);
+        }
+    }
+}
+
+.nav-list{
+    width: 100%;
+    list-style: none;
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 0;
+    overflow: hidden;
+    margin: 0;
+    z-index: 2;
+    opacity: 0;
+    background-color: $light;
+    box-shadow: 0 1px 5px -5px $gray;
+    border-radius: 15px 0 15px 15px;
+    transform: translateY(-200%);
+    transition: linear .2s;
+    &.open{
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nav-item{
+    text-align: center;
+    display: block;
+    padding: 1rem;
+    border-bottom: 1px solid darken(#f8f9fa, 10%);
+    transition: linear 0.3s;
+    &:hover{
+        background: darken(#f8f9fa, 2%)
+    }
+    &:focus{
+        background: darken(#f8f9fa, 20%);
+    }
+
+    &.highlights{
+        background: $blue;
+        color: $white;
+        font-weight: bold;
+        text-transform: uppercase;
+        &:hover{
+            background: mix($blue-blend, $red-blend, 40%);
+            &::before{
+                display: none;
+            }
+        }
+        &:focus, &:active{
+            background: $red;
+        }
+    }
+}

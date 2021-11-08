@@ -1,0 +1,9 @@
+@media screen and (min-width: $big-screen){
+    @import "./common/common-lg";
+    @import "./layout/layout-lg";
+
+    @import "./heading/heading-lg";
+    @import "./footer/footer-lg";
+    @import "./item/item-lg";
+
+}

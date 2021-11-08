@@ -1,0 +1,22 @@
+.kaka-hidden-left{
+    opacity: 0;
+    transform: translateX(-75%);
+}
+.kaka-hidden-right{
+    opacity: 0;
+    transform: translateX(75%);
+}
+
+.kaka-hidden{
+    opacity: 0;
+}
+
+.kaka-hidden-top{
+    opacity: 0;
+    transform: translateY(-50%);
+}
+
+.kaka-hidden-bottom{
+    opacity: 0;
+    transform: translateY(50%);
+}

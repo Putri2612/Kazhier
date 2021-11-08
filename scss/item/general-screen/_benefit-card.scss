@@ -1,0 +1,18 @@
+.benefit-item{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    max-width: 90%;
+    margin-bottom: 20px;
+    .title{
+        font-weight: bold;
+        transition: .4s;
+    }
+    &:last-child{
+        margin-right: 0;
+    }
+    &:hover{
+        .title{color: $blue}
+    }
+}

@@ -1,0 +1,26 @@
+header{
+    background: #fff;
+    box-shadow: 0 0 5px 0 $gray;
+    width: 100%;
+    padding: 0 30px;
+    &.stick-top{
+        position: fixed;
+        z-index: 2;
+    }
+}
+.header-container{
+    max-width: 1024px;
+    margin: auto;
+    display: flex; 
+}
+
+.logo-container{
+    width: 40%;
+    padding: 20px 0;
+}
+
+.nav-container{
+    width: 60%;
+    display: flex;
+    justify-content: flex-end;
+}
