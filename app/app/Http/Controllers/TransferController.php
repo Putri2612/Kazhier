@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\BankAccount;
 use App\Models\PaymentMethod;
 use App\Models\Transfer;
+use App\Traits\CanManageBalance;
 use Illuminate\Http\Request;
 use File;
 
 class TransferController extends Controller
 {
+    use CanManageBalance;
 
     public function index(Request $request)
     {
@@ -91,8 +93,7 @@ class TransferController extends Controller
             $transfer->description    = $request->description;
             $transfer->created_by     = \Auth::user()->creatorId();
 
-            \Auth::user()->addBalance($request->date, -$request->amount, $request->from_account);
-            \Auth::user()->addBalance($request->date, $request->amount, $request->to_account);
+            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $request->input('amount'), $request->input('date'));
 
             if(!empty($request->reference)){
                 $originalRefName      = $request->file('reference')->getClientOriginalName();
@@ -164,8 +165,8 @@ class TransferController extends Controller
                 $path                 = $request->file('reference')->storeAs('public/reference', $referenceImageName);
                 $transfer->reference  = $referenceImageName;
             }
-            \Auth::user()->addBalance($transfer->date, $transfer->amount, $transfer->from_account);
-            \Auth::user()->addBalance($transfer->date, -$transfer->amount, $transfer->to_account);
+
+            $this->TransferBalance($request->input('to_account'), $request->input('from_account'), $request->input('amount'), $request->input('date'));
 
             $transfer->from_account   = $request->from_account;
             $transfer->to_account     = $request->to_account;
@@ -175,8 +176,7 @@ class TransferController extends Controller
             $transfer->description    = $request->description;
             $transfer->save();
 
-            \Auth::user()->addBalance($request->date, -$request->amount, $request->from_account);
-            \Auth::user()->addBalance($request->date, $request->amount, $request->to_account);
+            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $request->input('amount'), $request->input('date'));
 
             return redirect()->route('transfer.index')->with('success', __('Amount successfully transfer updated.'));
         }
@@ -200,8 +200,9 @@ class TransferController extends Controller
                 if(File::exists($imgPath) && $transfer->reference != 'nofile.svg'){
                     File::delete($imgPath);
                 }
-                \Auth::user()->addBalance($transfer->date, $transfer->amount, $transfer->from_account);
-                \Auth::user()->addBalance($transfer->date, -$transfer->amount, $transfer->to_account);
+
+                $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date);
+
                 $transfer->delete();
 
                 return redirect()->route('transfer.index')->with('success', __('Amount transfer successfully deleted.'));

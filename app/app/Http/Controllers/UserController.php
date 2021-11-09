@@ -29,6 +29,7 @@ use App\Models\Tax;
 use App\Models\Transfer;
 use App\Models\Transaction;
 use App\Models\Vender;
+use App\Traits\CanManageBalance;
 use Auth;
 use File;
 use Illuminate\Http\Request;
@@ -39,6 +40,7 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
+    use CanManageBalance;
 
     public function index()
     {
@@ -550,28 +552,28 @@ class UserController extends Controller
 
                 $revenues = Revenue::where('created_by', '=', $usr->id)->get();
                 foreach($revenues as $revenue){
-                    $usr->addBalance($revenue->date, $revenue->amount, $revenue->account_id);
+                    $this->addBalance($revenue->date, $revenue->amount, $revenue->account_id);
                 }
 
                 $payments = Payment::where('created_by', '=', $usr->id)->get();
                 foreach($payments as $payment){
-                    $usr->addBalance($payment->date, -$payment->amount, $payment->account_id);
+                    $this->addBalance($payment->date, -$payment->amount, $payment->account_id);
                 }
 
                 $invoicePayments = InvoicePayment::where('created_by', '=', $usr->id)->get();
                 foreach($invoicePayments as $invoicePayment){
-                    $usr->addBalance($invoicePayment->date, $invoicePayment->amount, $invoicePayment->account_id);
+                    $this->addBalance($invoicePayment->date, $invoicePayment->amount, $invoicePayment->account_id);
                 }
 
                 $billPayments = BillPayment::where('created_by', '=', $usr->id)->get();
                 foreach($billPayments as $billPayment){
-                    $usr->addBalance($billPayment->date, -$billPayment->amount, $billPayment->account_id);
+                    $this->addBalance($billPayment->date, -$billPayment->amount, $billPayment->account_id);
                 }
 
                 $transfers = Transfer::where('created_by', '=', $usr->id)->get();
                 foreach($transfers as $transfer){
-                    $usr->addBalance($transfer->date, -$transfer->amount, $transfer->from_account);
-                    $usr->addBalance($transfer->date, $transfer->amount, $transfer->to_account);
+                    $this->addBalance($transfer->date, -$transfer->amount, $transfer->from_account);
+                    $this->addBalance($transfer->date, $transfer->amount, $transfer->to_account);
                 }
             }
             return redirect()->back()->with('success', __('Data synchronized.'));
