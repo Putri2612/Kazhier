@@ -71,16 +71,32 @@
         day: '{{__('day')}}',
         list: '{{__('list')}}'
     };
+</script>
 
+@if ( Auth::user()->currentLanguage() == 'id' )
+<script>
     const validateCurrencyInput = (form) => {        
         const inputs = form.querySelectorAll('input[is-currency="true"]');
         let error = false;
-        console.log('a');
         inputs.forEach(input => {
-            let pattern = /^[0-9\.]*,?[0-9]*$/;    
-            console.log(input.value);
+            let pattern = /^[0-9\.]*,?[0-9]*$/;   
+            if(!pattern.test(input.value)) error = true;
+        });
+        if(error){
+            toastrs('Error', '{{ __("Invalid currency format.") }}', 'error');
+            return false;
+        }
+        return true;
+    }
+</script>
+@else
+<script>
+    const validateCurrencyInput = (form) => {        
+        const inputs = form.querySelectorAll('input[is-currency="true"]');
+        let error = false;
+        inputs.forEach(input => {
+            let pattern = /^[0-9,]*\.?[0-9]*$/;   
             if(!pattern.test(input.value)){
-                console.log(input.value);
                 error = true;
             }
         });
@@ -91,6 +107,7 @@
         return true;
     }
 </script>
+@endif
 
 @if ($message = Session::get('success'))
     <script>
