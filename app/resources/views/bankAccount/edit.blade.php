@@ -1,4 +1,4 @@
-{{ Form::model($bankAccount, array('route' => array('bank-account.update', $bankAccount->id), 'method' => 'PUT')) }}
+{{ Form::model($bankAccount, array('route' => array('bank-account.update', $bankAccount->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('holder_name', __('Bank Holder Name')) }}
@@ -41,7 +41,7 @@
                     <i class="fas fa-dollar-sign"></i>
                 </div>
             </div>
-            {{ Form::number('opening_balance', null, array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+            {{ Form::text('opening_balance', null, array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
         </div>
     </div>
     <div class="form-group  col-md-6">
