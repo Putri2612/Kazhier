@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'productservice')) }}
+{{ Form::open(array('url' => 'productservice', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">
@@ -39,7 +39,7 @@
                         <i class="far fa-money-bill-alt"></i>
                     </div>
                 </div>
-                {{ Form::number('sale_price', '', array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+                {{ Form::text('sale_price', '', array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@
                         <i class="far fa-money-bill-alt"></i>
                     </div>
                 </div>
-                {{ Form::number('purchase_price', '', array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+                {{ Form::text('purchase_price', '', array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
             </div>
         </div>
     </div>

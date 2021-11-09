@@ -7,10 +7,12 @@ use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 
 class ProductServiceController extends Controller
 {
+    use CanProcessNumber;
     public function index(Request $request)
     {
 
@@ -20,7 +22,7 @@ class ProductServiceController extends Controller
             if(!empty($request->category))
             {
 
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->category)->get();
+                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->input('category'))->get();
             }
             else
             {
@@ -63,8 +65,8 @@ class ProductServiceController extends Controller
             $rules = [
                 'name' => 'required',
                 'sku' => 'required',
-                'sale_price' => 'required|numeric',
-                'purchase_price' => 'required|numeric',
+                'sale_price' => 'required',
+                'purchase_price' => 'required',
                 'tax_id' => 'required',
                 'category_id' => 'required',
                 'unit_id' => 'required',
@@ -80,19 +82,22 @@ class ProductServiceController extends Controller
                 return redirect()->route('productservice.index')->with('error', $messages->first());
             }
 
+            $sale_price     = $this->ReadableNumberToFloat($request->input('sale_price'));
+            $purchase_price = $this->ReadableNumberToFloat($request->input('purchase_price'));
+
             $productService                 = new ProductService();
-            $productService->name           = $request->name;
-            $productService->description    = $request->description;
-            $productService->sku            = $request->sku;
-            $productService->sale_price     = $request->sale_price;
-            $productService->purchase_price = $request->purchase_price;
-            $productService->tax_id         = $request->tax_id;
-            $productService->unit_id        = $request->unit_id;
-            $productService->type           = $request->type;
-            $productService->category_id    = $request->category_id;
+            $productService->name           = $request->input('name');
+            $productService->description    = $request->input('description');
+            $productService->sku            = $request->input('sku');
+            $productService->sale_price     = $sale_price;
+            $productService->purchase_price = $purchase_price;
+            $productService->tax_id         = $request->input('tax_id');
+            $productService->unit_id        = $request->input('unit_id');
+            $productService->type           = $request->input('type');
+            $productService->category_id    = $request->input('category_id');
             $productService->created_by     = \Auth::user()->creatorId();
             $productService->save();
-            CustomField::saveData($productService, $request->customField);
+            CustomField::saveData($productService, $request->input('customField'));
 
             return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
         }
@@ -143,8 +148,8 @@ class ProductServiceController extends Controller
                 $rules = [
                     'name' => 'required',
                     'sku' => 'required',
-                    'sale_price' => 'required|numeric',
-                    'purchase_price' => 'required|numeric',
+                    'sale_price' => 'required',
+                    'purchase_price' => 'required',
                     'tax_id' => 'required',
                     'category_id' => 'required',
                     'unit_id' => 'required',
@@ -160,18 +165,21 @@ class ProductServiceController extends Controller
                     return redirect()->route('expenses.index')->with('error', $messages->first());
                 }
 
-                $productService->name           = $request->name;
-                $productService->description    = $request->description;
-                $productService->sku            = $request->sku;
-                $productService->sale_price     = $request->sale_price;
-                $productService->purchase_price = $request->purchase_price;
-                $productService->tax_id         = $request->tax_id;
-                $productService->unit_id        = $request->unit_id;
-                $productService->type           = $request->type;
-                $productService->category_id    = $request->category_id;
+                $sale_price     = $this->ReadableNumberToFloat($request->input('sale_price'));
+                $purchase_price = $this->ReadableNumberToFloat($request->input('purchase_price'));
+
+                $productService->name           = $request->input('name');
+                $productService->description    = $request->input('description');
+                $productService->sku            = $request->input('sku');
+                $productService->sale_price     = $sale_price;
+                $productService->purchase_price = $purchase_price;
+                $productService->tax_id         = $request->input('tax_id');
+                $productService->unit_id        = $request->input('unit_id');
+                $productService->type           = $request->input('type');
+                $productService->category_id    = $request->input('category_id');
                 $productService->created_by     = \Auth::user()->creatorId();
                 $productService->save();
-                CustomField::saveData($productService, $request->customField);
+                CustomField::saveData($productService, $request->input('customField'));
 
                 return redirect()->route('productservice.index')->with('success', __('Product successfully updated.'));
             }

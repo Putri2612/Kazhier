@@ -20,16 +20,16 @@ class ProductService extends Model
 
     public function taxes()
     {
-        return $this->hasOne('App\Tax', 'id', 'tax_id')->first();
+        return $this->hasOne(Tax::class, 'id', 'tax_id')->first();
     }
 
     public function unit()
     {
-        return $this->hasOne('App\ProductServiceUnit', 'id', 'unit_id')->first();
+        return $this->hasOne(ProductServiceUnit::class, 'id', 'unit_id')->first();
     }
 
     public function category()
     {
-        return $this->hasOne('App\ProductServiceCategory', 'id', 'category_id');
+        return $this->hasOne(ProductServiceCategory::class, 'id', 'category_id');
     }
 }
