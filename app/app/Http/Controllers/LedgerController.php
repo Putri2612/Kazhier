@@ -12,11 +12,14 @@ use App\Models\Payment;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transfer;
+use App\Traits\CanManageBalance;
+use App\Traits\DataGetter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 
 class LedgerController extends Controller
 {
+    use CanManageBalance, DataGetter;
     
     public function index(Request $request){
         if(\Auth::user()->can('view ledger')){
@@ -47,120 +50,42 @@ class LedgerController extends Controller
             }
             $accountList   = collect($accountList);
 
-            
-            $balanceQuery  = \DB::table('balance')->where('created_by', '=', \Auth::user()->creatorId());
-
-            $revenuesQuery = Revenue::where('created_by', '=', \Auth::user()->creatorId());
-            $invoicesQuery = InvoicePayment::where('created_by', '=', \Auth::user()->creatorId());
-            $paymentsQuery = Payment::where('created_by', '=', \Auth::user()->creatorId());
-            $billsQuery    = BillPayment::where('created_by', '=', \Auth::user()->creatorId());
-            $transferQuery = Transfer::where('created_by', '=', \Auth::user()->creatorId());
-            
             // akun bank yang mana
             $isCategory = false;
             if(!empty($request->account)){
                 $contents = explode('-', $request->account);
-                if($contents[0] == 'category'){
-                    $isCategory = true;
-                    $billsId = Bill::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', '=', $contents[1])->pluck('id');
-                    $invoicesId = Invoice::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', '=', $contents[1])->pluck('id');
-                }
+                if( $contents[0] == 'category' ) { $isCategory = true; }
                 $account_id = $contents[1];
             } else {
                 $account_id = $defaultAccount->id;
             }
 
             // Pilih tahun berapa
-            if(!empty($request->year)){ $selected_year = $request->year; } 
+            if( !empty($request->year) ){ $selected_year = $request->year; } 
             else { $selected_year = date('Y'); }
             
             // Pilih bulan apa
-            if(!empty($request->month)){ $selected_month = $request->month; } 
+            if( !empty($request->month) ){ $selected_month = $request->month; } 
             else { $selected_month = date('m'); }
 
             // masukkan querynya
             if($isCategory){
-                $revenuesQuery->where('category_id', '=', $account_id);
-                $paymentsQuery->where('category_id', '=', $account_id);
-                $count = 0;
-                if(!count($billsId)){
-                    $billsQuery->where('bill_id', '=', 0);
-                }
-                foreach($billsId as $id){
-                    if(!$count){
-                        $billsQuery->where('bill_id', '=', $id);
-                    } else {
-                        $billsQuery->orWhere('bill_id', '=', $id);
-                    }
-                    $billsQuery->where('year(`date`) = ?', array($selected_year));
-                    $billsQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                }
-                $count = 0;
-                if(!count($invoicesId)){
-                    $invoicesQuery->where('invoice_id', '=', 0);
-                }
-                foreach($invoicesId as $id){
-                    if(!$count){
-                        $invoicesQuery->where('invoice_id', '=', $id);
-                    } else {
-                        $invoicesQuery->orWhere('invoice_id', '=', $id);
-                    }
-                    $invoicesQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                    $invoicesQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                }
-
-                $revenuesQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                $paymentsQuery->whereRaw('year(`date`) = ?', array($selected_year));
-
-                $revenuesQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                $paymentsQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                
-                $revenues  = $revenuesQuery->get();
-                $invoices  = $invoicesQuery->get();
-                $payments  = $paymentsQuery->get();
-                $bills     = $billsQuery->get();
+                $revenues  = $this->GetRevenuesWithCategory($account_id, $selected_month, $selected_year);
+                $invoices  = $this->GetInvoicePaymentsWithCategory($account_id, $selected_month, $selected_year);
+                $payments  = $this->GetPaymentsWithCategory($account_id, $selected_month, $selected_year);
+                $bills     = $this->GetBillPaymentsWithCategory($account_id, $selected_month, $selected_year);
                 
                 $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills);
                 $prevBalance = $this->getCategoryBalance($account_id, $selected_month, $selected_year);
             } else {
-                $balanceQuery->where('account_id', '=', $account_id);
-                $revenuesQuery->where('account_id', '=', $account_id);
-                $invoicesQuery->where('account_id', '=', $account_id);
-                $paymentsQuery->where('account_id', '=', $account_id);
-                $billsQuery->where('account_id', '=', $account_id);
-                $transferQuery->where('from_account', '=', $account_id);
+                $date = Carbon::createFromFormat('Y m', "{$selected_year} {$selected_month}")->firstOfMonth();
+                $prevBalance    =  $this->GetBalanceBefore($date, $defaultAccount);
 
-                $balanceQuery->whereRaw('year(`date`) = ?', array($selected_year));
-
-                $revenuesQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                $invoicesQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                $paymentsQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                $billsQuery->whereRaw('year(`date`) = ?', array($selected_year));
-                $transferQuery->whereRaw('year(`date`) = ?', array($selected_year));
-
-                $balanceQuery->whereRaw('month(`date`) = ?', array($selected_month));
-
-                $revenuesQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                $invoicesQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                $paymentsQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                $billsQuery->whereRaw('month(`date`) = ?', array($selected_month));
-                $transferQuery->whereRaw('month(`date`) = ?', array($selected_month));
-
-                $transferQuery->orWhere('to_account', '=', $account_id)->whereRaw('year(`date`) = ?', array($selected_year))->whereRaw('month(`date`) = ?', array($selected_month));
-                
-                // dapetin data dari db
-                $prevBalance  = $balanceQuery->get();
-                if(count($prevBalance) == 0){
-                    $prevBalance = $defaultAccount->opening_balance;
-                } else {
-                    $prevBalance = ((array)$prevBalance->first())['previous_month'];
-                }
-
-                $revenues  = $revenuesQuery->get();
-                $invoices  = $invoicesQuery->get();
-                $payments  = $paymentsQuery->get();
-                $bills     = $billsQuery->get();
-                $transfers = $transferQuery->get();
+                $revenues  = $this->GetRevenues($selected_month, $selected_year, $account_id);
+                $invoices  = $this->GetInvoicePayments($selected_month, $selected_year, $account_id);
+                $payments  = $this->GetPayments($selected_month, $selected_year, $account_id);
+                $bills     = $this->GetBillPayments($selected_month, $selected_year, $account_id);
+                $transfers = $this->GetTransfers($selected_month, $selected_year, $account_id);
                 
                 // sort data
                 $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills)->merge($transfers);
@@ -224,53 +149,11 @@ class LedgerController extends Controller
     }
 
     private function getCategoryBalance($id, $month, $year){
-        $billsId = Bill::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', '=', $id)->pluck('id');
-        $invoicesId = Invoice::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', '=', $id)->pluck('id');
-        $revenuesQuery = Revenue::where('created_by', '=', \Auth::user()->creatorId());
-        $invoicesQuery = InvoicePayment::where('created_by', '=', \Auth::user()->creatorId());
-        $paymentsQuery = Payment::where('created_by', '=', \Auth::user()->creatorId());
-        $billsQuery    = BillPayment::where('created_by', '=', \Auth::user()->creatorId());
-        
-        $revenuesQuery->where('category_id', '=', $id);
-        $paymentsQuery->where('category_id', '=', $id);
+        $revenues   = $this->GetRevenuesWithCategoryBefore($id, $month, $year)->pluck('amount')->sum();
+        $payments   = $this->GetPaymentsWithCategoryBefore($id, $month, $year)->pluck('amount')->sum();
+        $invoices   = $this->GetInvoicePaymentsWithCategoryBefore($id, $month, $year)->pluck('amount')->sum();
+        $bills      = $this->GetBillPaymentsWithCategoryBefore($id, $month, $year)->pluck('amount')->sum();
 
-        $date = date("Y-m-d", mktime(null,null,null,$month,01,$year));
-
-        $count = 0;
-        if(!count($billsId)){
-            $billsQuery->where('bill_id', '=', 0);
-        }
-        foreach($billsId as $billId){
-            if(!$count){
-                $billsQuery->where('bill_id', '=', $billId);
-            } else {
-                $billsQuery->orWhere('bill_id', '=', $billId);
-            }
-            $billsQuery->where('date', '<', $date);
-        }
-        $count = 0;
-        if(!count($invoicesId)){
-            $invoicesQuery->where('invoice_id', '=', 0);
-        }
-        foreach($invoicesId as $id){
-            if(!$count){
-                $invoicesQuery->where('invoice_id', '=', $id);
-            } else {
-                $invoicesQuery->orWhere('invoice_id', '=', $id);
-            }
-            $invoicesQuery->where('date', '<', $date);
-        }
-
-        $revenuesQuery->where('date', '<', $date);
-        $paymentsQuery->where('date', '<', $date);
-        $revenues = $revenuesQuery->sum('amount');
-        $payments = $paymentsQuery->sum('amount');
-        $invoices = $invoicesQuery->sum('amount');
-        $bills = $billsQuery->sum('amount');
-
-        $total = (!empty($revenues) ? $revenues : 0) + (!empty($invoices) ? $invoices : 0);
-        $total -= (!empty($payments) ? $payments : 0) - (!empty($bills) ? $bills : 0);
-        
-        return abs($total);
+        return $revenues + $invoices - $payments - $bills;
     }
 }
