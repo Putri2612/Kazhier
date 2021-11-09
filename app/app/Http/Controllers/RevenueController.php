@@ -11,12 +11,14 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transaction;
+use App\Traits\CanManageBalance;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class RevenueController extends Controller
 {
+    use CanManageBalance;
     
     public function index(Request $request)
     {
@@ -133,7 +135,7 @@ class RevenueController extends Controller
             }
             $revenue->save();
 
-            \Auth::user()->addBalance($request->date, $request->amount, $request->account_id);
+            $this->addBalance($request->date, $request->amount, $request->account_id);
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
             $revenue->payment_id = $revenue->id;
@@ -226,7 +228,7 @@ class RevenueController extends Controller
                 $revenue->reference      = $referenceImageName;
             }
             $difference = $revenue->amount - $request->amount;
-            \Auth::user()->addBalance($request->date, $difference, $request->account_id);
+            $this->addBalance($request->date, $difference, $request->account_id);
             
             $revenue->date           = $request->date;
             $revenue->amount         = $request->amount;
@@ -268,7 +270,7 @@ class RevenueController extends Controller
                 if(File::exists($imgPath) && $revenue->reference != "nofile.svg"){
                     File::delete($imgPath);
                 }
-                \Auth::user()->addBalance($revenue->date, -($revenue->amount), $revenue->account_id);
+                $this->addBalance($revenue->date, -($revenue->amount), $revenue->account_id);
                 $revenue->delete();
                 $type = 'Payment';
                 $user = 'Customer';

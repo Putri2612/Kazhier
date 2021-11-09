@@ -17,6 +17,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
+use App\Traits\CanManageBalance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Storage;
 
 class BillController extends Controller
 {
+    use CanManageBalance;
 
     public function index(Request $request)
     {
@@ -105,16 +107,16 @@ class BillController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            $bill            = new Bill();
-            $bill->bill_id   = $this->billNumber();
-            $bill->vender_id = $request->vender_id;;
-            $bill->bill_date      = $request->bill_date;
-            $bill->status         = 0;
-            $bill->due_date       = $request->due_date;
-            $bill->category_id    = $request->category_id;
-            $bill->order_number   = !empty($request->order_number) ? $request->order_number : 0;
-            $bill->discount_apply = isset($request->discount_apply) ? 1 : 0;
-            $bill->created_by     = \Auth::user()->creatorId();
+            $bill                   = new Bill();
+            $bill->bill_id          = $this->billNumber();
+            $bill->vender_id        = $request->vender_id;;
+            $bill->bill_date        = $request->bill_date;
+            $bill->status           = 0;
+            $bill->due_date         = $request->due_date;
+            $bill->category_id      = $request->category_id;
+            $bill->order_number     = !empty($request->order_number) ? $request->order_number : 0;
+            $bill->discount_apply   = isset($request->discount_apply) ? 1 : 0;
+            $bill->created_by       = \Auth::user()->creatorId();
             $bill->save();
             CustomField::saveData($bill, $request->customField);
             $products = $request->items;
@@ -404,7 +406,7 @@ class BillController extends Controller
             $billPayment->description    = $request->description;
             $billPayment->created_by     = \Auth::user()->creatorId();
             $billPayment->save();
-            \Auth::user()->addBalance($request->date, -($request->amount), $request->account_id);
+            $this->addBalance($request->date, -($request->amount), $request->account_id);
 
             $bill  = Bill::where('id', $bill_id)->first();
             $due   = $bill->getDue();
@@ -465,7 +467,7 @@ class BillController extends Controller
         if(\Auth::user()->can('delete payment bill'))
         {
             $billPayment = BillPayment::where('id', '=', $payment_id)->first();
-            \Auth::user()->addBalance($billPayment->date, $billPayment->amount, $billPayment->account_id);
+            $this->addBalance($billPayment->date, $billPayment->amount, $billPayment->account_id);
             $billPayment->delete();
             
             $bill = Bill::where('id', $bill_id)->first();

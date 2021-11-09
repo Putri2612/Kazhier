@@ -11,12 +11,14 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Vender;
+use App\Traits\CanManageBalance;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
+    use CanManageBalance;
 
     public function index(Request $request)
     {
@@ -134,7 +136,7 @@ class PaymentController extends Controller
 
             $payment->save();
 
-            \Auth::user()->addBalance($request->date, -($request->amount), $request->account_id);
+            $this->addBalance($request->date, -($request->amount), $request->account_id);
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
             $payment->payment_id = $payment->id;
@@ -230,7 +232,7 @@ class PaymentController extends Controller
                 $payment->reference      = $referenceImageName;
             }
             $difference = $request->amount - $payment->amount;
-            \Auth::user()->addBalance($request->date, -($difference), $request->account_id);
+            $this->addBalance($request->date, -($difference), $request->account_id);
 
             $payment->date           = $request->date;
             $payment->amount         = $request->amount;
@@ -270,7 +272,7 @@ class PaymentController extends Controller
                     File::delete($imgPath);
                 }
 
-                \Auth::user()->addBalance($payment->date, $payment->amount, $payment->account_id);
+                $this->addBalance($payment->date, $payment->amount, $payment->account_id);
 
                 $payment->delete();
                 $type = 'Payment';
