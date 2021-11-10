@@ -96,7 +96,7 @@ class BankAccountController extends Controller
                 }
                 else
                 {
-                    return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+                    return redirect()->back()->with('error', __('Your bank account limit is over, Please upgrade plan.'));
                 }
 
         }
