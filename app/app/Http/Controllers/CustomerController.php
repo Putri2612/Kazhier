@@ -7,9 +7,9 @@ use App\Models\CustomField;
 use App\Mail\UserCreate;
 use App\Models\Plan;
 use App\Models\Transaction;
-use Auth;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
@@ -19,16 +19,16 @@ class CustomerController extends Controller
 
     public function dashboard()
     {
-        $data['invoiceChartData'] = \Auth::user()->invoiceChartData();
+        $data['invoiceChartData'] = Auth::user()->invoiceChartData();
 
         return view('customer.dashboard', $data);
     }
 
     public function index()
     {
-        if(\Auth::user()->can('manage customer'))
+        if(Auth::user()->can('manage customer'))
         {
-            $customers = Customer::where('created_by', \Auth::user()->creatorId())->get();
+            $customers = Customer::where('created_by', Auth::user()->creatorId())->get();
 
             return view('customer.index', compact('customers'));
         }
@@ -40,7 +40,7 @@ class CustomerController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create customer'))
+        if(Auth::user()->can('create customer'))
         {
             $customFields = CustomField::where('module', '=', 'customer')->get();
 
@@ -55,27 +55,24 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create customer'))
+        if(Auth::user()->can('create customer'))
         {
 
             $rules = [
                 'name' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => 'required|email|unique:customers',
-                'password' => 'required',
+                'contact' => 'required',
+                'email' => 'email',
                 'billing_name' => 'required',
                 'billing_country' => 'required',
                 'billing_state' => 'required',
                 'billing_city' => 'required',
-                'billing_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'billing_zip' => 'required',
+                'billing_phone' => 'required',
                 'billing_address' => 'required',
                 'shipping_name' => 'required',
                 'shipping_country' => 'required',
                 'shipping_state' => 'required',
                 'shipping_city' => 'required',
-                'shipping_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'shipping_zip' => 'required',
+                'shipping_phone' => 'required',
                 'shipping_address' => 'required',
             ];
 
@@ -90,32 +87,32 @@ class CustomerController extends Controller
 
             $customer                   = new Customer();
             $customer->customer_id      = $this->customerNumber();
-            $customer->name             = $request->name;
-            $customer->contact          = $request->contact;
-            $customer->email            = $request->email;
-            $customer->password         = Hash::make($request->password);
-            $customer->created_by       = \Auth::user()->creatorId();
-            $customer->billing_name     = $request->billing_name;
-            $customer->billing_country  = $request->billing_country;
-            $customer->billing_state    = $request->billing_state;
-            $customer->billing_city     = $request->billing_city;
-            $customer->billing_phone    = $request->billing_phone;
-            $customer->billing_zip      = $request->billing_zip;
-            $customer->billing_address  = $request->billing_address;
-            $customer->shipping_name    = $request->shipping_name;
-            $customer->shipping_country = $request->shipping_country;
-            $customer->shipping_state   = $request->shipping_state;
-            $customer->shipping_city    = $request->shipping_city;
-            $customer->shipping_phone   = $request->shipping_phone;
-            $customer->shipping_zip     = $request->shipping_zip;
-            $customer->shipping_address = $request->shipping_address;
+            $customer->name             = $request->input('name');
+            $customer->contact          = $request->input('contact');
+            $customer->email            = $request->input('email');
+            $customer->password         = Hash::make($request->input('password'));
+            $customer->created_by       = Auth::user()->creatorId();
+            $customer->billing_name     = $request->input('billing_name');
+            $customer->billing_country  = $request->input('billing_country');
+            $customer->billing_state    = $request->input('billing_state');
+            $customer->billing_city     = $request->input('billing_city');
+            $customer->billing_phone    = $request->input('billing_phone');
+            $customer->billing_zip      = $request->input('billing_zip');
+            $customer->billing_address  = $request->input('billing_address');
+            $customer->shipping_name    = $request->input('shipping_name');
+            $customer->shipping_country = $request->input('shipping_country');
+            $customer->shipping_state   = $request->input('shipping_state');
+            $customer->shipping_city    = $request->input('shipping_city');
+            $customer->shipping_phone   = $request->input('shipping_phone');
+            $customer->shipping_zip     = $request->input('shipping_zip');
+            $customer->shipping_address = $request->input('shipping_address');
             $customer->save();
-            CustomField::saveData($customer, $request->customField);
+            CustomField::saveData($customer, $request->input('customField'));
 
             $role_r = Role::where('name', '=', 'customer')->firstOrFail();
             $customer->assignRole($role_r);
 
-            $customer->password = $request->password;
+            $customer->password = $request->input('password');
             $customer->type     = 'Customer';
             try
             {
@@ -145,7 +142,7 @@ class CustomerController extends Controller
 
     public function edit($id)
     {
-        if(\Auth::user()->can('edit customer'))
+        if(Auth::user()->can('edit customer'))
         {
             $customer              = Customer::find($id);
             $customer->customField = CustomField::getData($customer, 'customer');
@@ -164,25 +161,23 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
 
-        if(\Auth::user()->can('edit customer'))
+        if(Auth::user()->can('edit customer'))
         {
 
             $rules = [
                 'name' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                'contact' => 'required',
                 'billing_name' => 'required',
                 'billing_country' => 'required',
                 'billing_state' => 'required',
                 'billing_city' => 'required',
-                'billing_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'billing_zip' => 'required',
+                'billing_phone' => 'required',
                 'billing_address' => 'required',
                 'shipping_name' => 'required',
                 'shipping_country' => 'required',
                 'shipping_state' => 'required',
                 'shipping_city' => 'required',
-                'shipping_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'shipping_zip' => 'required',
+                'shipping_phone' => 'required',
                 'shipping_address' => 'required',
             ];
 
@@ -195,26 +190,26 @@ class CustomerController extends Controller
                 return redirect()->route('customer.index')->with('error', $messages->first());
             }
 
-            $customer->name             = $request->name;
-            $customer->contact          = $request->contact;
-            $customer->created_by       = \Auth::user()->creatorId();
-            $customer->billing_name     = $request->billing_name;
-            $customer->billing_country  = $request->billing_country;
-            $customer->billing_state    = $request->billing_state;
-            $customer->billing_city     = $request->billing_city;
-            $customer->billing_phone    = $request->billing_phone;
-            $customer->billing_zip      = $request->billing_zip;
-            $customer->billing_address  = $request->billing_address;
-            $customer->shipping_name    = $request->shipping_name;
-            $customer->shipping_country = $request->shipping_country;
-            $customer->shipping_state   = $request->shipping_state;
-            $customer->shipping_city    = $request->shipping_city;
-            $customer->shipping_phone   = $request->shipping_phone;
-            $customer->shipping_zip     = $request->shipping_zip;
-            $customer->shipping_address = $request->shipping_address;
+            $customer->name             = $request->input('name');
+            $customer->contact          = $request->input('contact');
+            $customer->created_by       = Auth::user()->creatorId();
+            $customer->billing_name     = $request->input('billing_name');
+            $customer->billing_country  = $request->input('billing_country');
+            $customer->billing_state    = $request->input('billing_state');
+            $customer->billing_city     = $request->input('billing_city');
+            $customer->billing_phone    = $request->input('billing_phone');
+            $customer->billing_zip      = $request->input('billing_zip');
+            $customer->billing_address  = $request->input('billing_address');
+            $customer->shipping_name    = $request->input('shipping_name');
+            $customer->shipping_country = $request->input('shipping_country');
+            $customer->shipping_state   = $request->input('shipping_state');
+            $customer->shipping_city    = $request->input('shipping_city');
+            $customer->shipping_phone   = $request->input('shipping_phone');
+            $customer->shipping_zip     = $request->input('shipping_zip');
+            $customer->shipping_address = $request->input('shipping_address');
             $customer->save();
 
-            CustomField::saveData($customer, $request->customField);
+            CustomField::saveData($customer, $request->input('customField'));
 
             return redirect()->route('customer.index')->with('success', __('Customer successfully updated.'));
         }
@@ -227,9 +222,9 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
-        if(\Auth::user()->can('delete customer'))
+        if(Auth::user()->can('delete customer'))
         {
-            if($customer->created_by == \Auth::user()->creatorId())
+            if($customer->created_by == Auth::user()->creatorId())
             {
                 $customer->delete();
 
@@ -248,7 +243,7 @@ class CustomerController extends Controller
 
     function customerNumber()
     {
-        $latest = Customer::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
+        $latest = Customer::where('created_by', '=', Auth::user()->creatorId())->latest()->first();
         if(!$latest)
         {
             return 1;
@@ -259,7 +254,7 @@ class CustomerController extends Controller
 
     public function customerLogout(Request $request)
     {
-        \Auth::guard('customer')->logout();
+        Auth::guard('customer')->logout();
 
         $request->session()->invalidate();
 
@@ -269,7 +264,7 @@ class CustomerController extends Controller
     public function payment(Request $request)
     {
 
-        if(\Auth::user()->can('manage customer payment'))
+        if(Auth::user()->can('manage customer payment'))
         {
             $category = [
                 'Invoice' => 'Invoice',
@@ -277,7 +272,7 @@ class CustomerController extends Controller
                 'Sales' => 'Sales',
             ];
 
-            $query = Transaction::where('user_id', \Auth::user()->id)->where('user_type', 'Customer')->where('type', 'Payment');
+            $query = Transaction::where('user_id', Auth::user()->id)->where('user_type', 'Customer')->where('type', 'Payment');
             if(!empty($request->date))
             {
                 $date_range = explode(' - ', $request->date);
@@ -301,7 +296,7 @@ class CustomerController extends Controller
     public function transaction(Request $request)
     {
 
-        if(\Auth::user()->can('manage customer payment'))
+        if(Auth::user()->can('manage customer payment'))
         {
 
             $category = [
@@ -310,7 +305,7 @@ class CustomerController extends Controller
                 'Sales' => 'Sales',
             ];
 
-            $query = Transaction::where('user_id', \Auth::user()->id)->where('user_type', 'Customer');
+            $query = Transaction::where('user_id', Auth::user()->id)->where('user_type', 'Customer');
 
             if(!empty($request->date))
             {
@@ -334,9 +329,9 @@ class CustomerController extends Controller
 
     public function profile()
     {
-        if(\Auth::user()->can('manage account'))
+        if(Auth::user()->can('manage account'))
         {
-            $userDetail              = \Auth::user();
+            $userDetail              = Auth::user();
             $userDetail->customField = CustomField::getData($userDetail, 'customer');
             $customFields            = CustomField::where('module', '=', 'customer')->get();
 
@@ -350,9 +345,9 @@ class CustomerController extends Controller
 
     public function editprofile(Request $request)
     {
-        if(\Auth::user()->can('edit account'))
+        if(Auth::user()->can('edit account'))
         {
-            $userDetail = \Auth::user();
+            $userDetail = Auth::user();
             $user       = Customer::findOrFail($userDetail['id']);
 
             $this->validate(
@@ -409,9 +404,9 @@ class CustomerController extends Controller
 
     public function editBilling(Request $request)
     {
-        if(\Auth::user()->can('edit account'))
+        if(Auth::user()->can('edit account'))
         {
-            $userDetail = \Auth::user();
+            $userDetail = Auth::user();
             $user       = Customer::findOrFail($userDetail['id']);
             $this->validate(
                 $request, [
@@ -439,9 +434,9 @@ class CustomerController extends Controller
 
     public function editShipping(Request $request)
     {
-        if(\Auth::user()->can('edit account'))
+        if(Auth::user()->can('edit account'))
         {
-            $userDetail = \Auth::user();
+            $userDetail = Auth::user();
             $user       = Customer::findOrFail($userDetail['id']);
             $this->validate(
                 $request, [
@@ -469,7 +464,7 @@ class CustomerController extends Controller
 
     public function updatePassword(Request $request)
     {
-        if(\Auth::user()->can('change password account'))
+        if(Auth::user()->can('change password account'))
         {
             if(Auth::Check())
             {
@@ -511,7 +506,7 @@ class CustomerController extends Controller
 
     public function changeLanquage($lang)
     {
-        if(\Auth::user()->can('manage language'))
+        if(Auth::user()->can('manage language'))
         {
             $user       = Auth::user();
             $user->lang = $lang;

@@ -114,7 +114,7 @@
                         <i class="fas fa-crosshairs"></i>
                     </div>
                 </div>
-                {{Form::text('billing_zip',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('billing_zip',null,array('class'=>'form-control'))}}
             </div>
         </div>
     </div>
@@ -211,7 +211,7 @@
                         <i class="fas fa-crosshairs"></i>
                     </div>
                 </div>
-                {{Form::text('shipping_zip',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('shipping_zip',null,array('class'=>'form-control'))}}
             </div>
         </div>
     </div>
