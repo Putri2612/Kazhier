@@ -20,22 +20,22 @@ class Payment extends Model
 
     public function category()
     {
-        return $this->hasOne('App\ProductServiceCategory', 'id', 'category_id');
+        return $this->hasOne(ProductServiceCategory::class, 'id', 'category_id');
     }
 
     public function vender()
     {
-        return $this->hasOne('App\Vender', 'id', 'vender_id');
+        return $this->hasOne(Vender::class, 'id', 'vender_id');
     }
 
     public function paymentMethod()
     {
-        return $this->hasOne('App\PaymentMethod', 'id', 'payment_method');
+        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method');
     }
 
     public function bankAccount()
     {
-        return $this->hasOne('App\BankAccount', 'id', 'account_id');
+        return $this->hasOne(BankAccount::class, 'id', 'account_id');
     }
 
 }

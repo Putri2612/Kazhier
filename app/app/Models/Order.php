@@ -64,7 +64,7 @@ class Order extends Model
 
     public function total_coupon_used()
     {
-        return $this->hasOne('App\UserCoupon', 'order', 'order_id');
+        return $this->hasOne(UserCoupon::class, 'order', 'order_id');
     }
 
     public function plan(){

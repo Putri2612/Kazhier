@@ -31,17 +31,17 @@ class Proposal extends Model
 
     public function tax()
     {
-        return $this->hasOne('App\Tax', 'id', 'tax_id');
+        return $this->hasOne(Tax::class, 'id', 'tax_id');
     }
 
     public function items()
     {
-        return $this->hasMany('App\ProposalProduct', 'proposal_id', 'id');
+        return $this->hasMany(ProposalProduct::class, 'proposal_id', 'id');
     }
 
     public function customer()
     {
-        return $this->hasOne('App\Customer', 'id', 'customer_id');
+        return $this->hasOne(Customer::class, 'id', 'customer_id');
     }
 
     public function getSubTotal()
@@ -103,7 +103,7 @@ class Proposal extends Model
 
     public function category()
     {
-        return $this->hasOne('App\ProductServiceCategory', 'id', 'category_id');
+        return $this->hasOne(ProductServiceCategory::class, 'id', 'category_id');
     }
 
 }

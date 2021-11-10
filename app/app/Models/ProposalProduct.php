@@ -17,6 +17,6 @@ class ProposalProduct extends Model
 
     public function product()
     {
-        return $this->hasOne('App\ProductService', 'id', 'product_id');
+        return $this->hasOne(ProductService::class, 'id', 'product_id');
     }
 }

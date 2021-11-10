@@ -40,7 +40,7 @@ class User extends Authenticatable
     ];
 
     public function user(){
-        return $this->belongsTo('App\ProductServiceCategory');
+        return $this->belongsTo(ProductServiceCategory::class);
     }
 
     public function order_request(){
@@ -122,7 +122,7 @@ class User extends Authenticatable
 
     public function getPlan()
     {
-        return $this->hasOne('App\Plan', 'id', 'plan');
+        return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
     public function assignPlan($planID)
@@ -689,7 +689,7 @@ class User extends Authenticatable
 
     public function currentPlan()
     {
-        return $this->hasOne('App\Plan', 'id', 'plan');
+        return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
     public function weeklyInvoice()

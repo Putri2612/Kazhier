@@ -15,6 +15,6 @@ class DebitNote extends Model
 
     public function vendor()
     {
-        return $this->hasOne('App\Vender', 'vender_id', 'vendor');
+        return $this->hasOne(Vender::class, 'vender_id', 'vendor');
     }
 }

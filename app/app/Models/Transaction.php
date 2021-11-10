@@ -28,7 +28,7 @@ class Transaction extends Model
 
     public function bankAccount()
     {
-        return $this->hasOne('App\BankAccount', 'id', 'account')->first();
+        return $this->hasOne(BankAccount::class, 'id', 'account')->first();
     }
 
 
@@ -70,10 +70,10 @@ class Transaction extends Model
 
     public function payment()
     {
-        return $this->hasOne('App\InvoicePayment', 'id', 'payment_id');
+        return $this->hasOne(InvoicePayment::class, 'id', 'payment_id');
     }
     public function billPayment()
     {
-        return $this->hasOne('App\BillPayment', 'id', 'payment_id');
+        return $this->hasOne(BillPayment::class, 'id', 'payment_id');
     }
 }

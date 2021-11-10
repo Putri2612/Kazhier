@@ -11,12 +11,12 @@ class Expense extends Model
     ];
 
     public function category(){
-        return $this->hasOne('App\ExpensesCategory','id','category_id');
+        return $this->hasOne(ExpensesCategory::class,'id','category_id');
     }
     public function projects(){
-        return $this->hasOne('App\Projects','id','project');
+        return $this->hasOne(Projects::class,'id','project');
     }
     public function user(){
-        return $this->hasOne('App\User','id','user_id');
+        return $this->hasOne(User::class,'id','user_id');
     }
 }

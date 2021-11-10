@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Goal extends Model
 {
@@ -28,27 +29,27 @@ class Goal extends Model
         $total    = 0;
         $fromDate = $from . '-01';
         $toDate   = $to . '-01';
-        if(\App\Goal::$goalType[$type] == 'Invoice')
+        if(Goal::$goalType[$type] == 'Invoice')
         {
-            $invoices = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->where('issue_date', '>=', $fromDate)->where('issue_date', '<=', $toDate)->get();
+            $invoices = Invoice:: select('*')->where('created_by', Auth::user()->creatorId())->where('issue_date', '>=', $fromDate)->where('issue_date', '<=', $toDate)->get();
             $total    = 0;
             foreach($invoices as $invoice)
             {
                 $total += $invoice->getTotal();
             }
         }
-        elseif(\App\Goal::$goalType[$type] == 'Bill')
+        elseif(Goal::$goalType[$type] == 'Bill')
         {
-            $bills = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->where('bill_date', '>=', $fromDate)->where('bill_date', '<=', $toDate)->get();
+            $bills = Bill:: select('*')->where('created_by', Auth::user()->creatorId())->where('bill_date', '>=', $fromDate)->where('bill_date', '<=', $toDate)->get();
             $total = 0;
             foreach($bills as $bill)
             {
                 $total += $bill->getTotal();
             }
         }
-        elseif(\App\Goal::$goalType[$type] == 'Revenue')
+        elseif(Goal::$goalType[$type] == 'Revenue')
         {
-            $revenues = Revenue:: select('*')->where('created_by', \Auth::user()->creatorId())->where('date', '>=', $fromDate)->where('date', '<=', $toDate)->get();
+            $revenues = Revenue:: select('*')->where('created_by', Auth::user()->creatorId())->where('date', '>=', $fromDate)->where('date', '<=', $toDate)->get();
             $total    = 0;
 
             foreach($revenues as $revenue)
@@ -56,9 +57,9 @@ class Goal extends Model
                 $total += $revenue->amount;
             }
         }
-        elseif(\App\Goal::$goalType[$type] == 'Payment')
+        elseif(Goal::$goalType[$type] == 'Payment')
         {
-            $payments = Payment:: select('*')->where('created_by', \Auth::user()->creatorId())->where('date', '>=', $fromDate)->where('date', '<=', $toDate)->get();
+            $payments = Payment:: select('*')->where('created_by', Auth::user()->creatorId())->where('date', '>=', $fromDate)->where('date', '<=', $toDate)->get();
             $total    = 0;
 
             foreach($payments as $payment)

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CustomField extends Model
 {
@@ -40,7 +41,7 @@ class CustomField extends Model
             $RecordId = $obj->id;
             foreach($data as $fieldId => $value)
             {
-                \DB::insert(
+                DB::insert(
                     'insert into custom_field_values (`record_id`, `field_id`,`value`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`),`updated_at` = VALUES(`updated_at`) ', [
                                                                                                                                                                                                                                    $RecordId,
                                                                                                                                                                                                                                    $fieldId,
@@ -55,7 +56,7 @@ class CustomField extends Model
 
     public static function getData($obj, $module)
     {
-        return \DB::table('custom_field_values')->select(
+        return DB::table('custom_field_values')->select(
             [
                 'custom_field_values.value',
                 'custom_fields.id',

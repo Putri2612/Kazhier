@@ -72,9 +72,5 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
         {{Form::submit(__('Create'),array('class'=>'btn btn-primary'))}}
     </div>
-    @php
-        $nom = '1.000.000.000,00';
-    @endphp
-    {{\Auth::user()->formatNumber($nom)}}
 </div>
 {{ Form::close() }}

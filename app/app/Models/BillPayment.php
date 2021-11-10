@@ -17,16 +17,16 @@ class BillPayment extends Model
     ];
 
     public function bill(){
-        return $this->hasOne('App\Bill', 'id', 'bill_id');
+        return $this->hasOne(Bill::class, 'id', 'bill_id');
     }
 
     public function paymentMethod()
     {
-        return $this->hasOne('App\PaymentMethod', 'id', 'payment_method');
+        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method');
     }
 
     public function bankAccount()
     {
-        return $this->hasOne('App\BankAccount', 'id', 'account_id');
+        return $this->hasOne(BankAccount::class, 'id', 'account_id');
     }
 }
