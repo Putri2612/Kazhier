@@ -307,6 +307,15 @@ $(function() {
     $(".selectric").selectric({
       disableOnMobile: false,
       nativeOnMobile: false
+    }).on('change', event => {
+      if(event.target.value.includes('new')){
+        let url     = window.location.href,
+            pos     = url.indexOf('/app/'),
+            target  = event.target.value.split('.')[1],
+            destination = url.substring(0, pos + 5) + target;
+
+        window.location.href = destination;
+      }
     });
   }
 

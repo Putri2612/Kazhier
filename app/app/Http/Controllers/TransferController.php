@@ -6,12 +6,13 @@ use App\Models\BankAccount;
 use App\Models\PaymentMethod;
 use App\Models\Transfer;
 use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 use File;
 
 class TransferController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanProcessNumber;
 
     public function index(Request $request)
     {
@@ -51,8 +52,14 @@ class TransferController extends Controller
     {
         if(\Auth::user()->can('create transfer'))
         {
-            $bankAccount   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $paymentMethod = PaymentMethod::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $bankAccount    = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $paymentMethod  = PaymentMethod::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+
+            $bankAccount->prepend(__('Select Bank Account'), '');
+            $paymentMethod->prepend(__('Select Payment Method'), '');
+
+            $bankAccount    = $bankAccount->union(['new.bank-account' => __('Create new bank account')]);
+            $paymentMethod  = $paymentMethod->union(['new.payment-method' => __('Create new payment method')]);
 
             return view('transfer.create', compact('bankAccount', 'paymentMethod'));
         }
@@ -71,7 +78,7 @@ class TransferController extends Controller
                 $request->all(), [
                                    'from_account' => 'required|numeric',
                                    'to_account' => 'required|numeric',
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                    'payment_method' => 'required',
                                    'reference' => 'mimes:png,jpg,jpeg,pdf',
@@ -83,17 +90,18 @@ class TransferController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
             $transfer                 = new Transfer();
-            $transfer->from_account   = $request->from_account;
-            $transfer->to_account     = $request->to_account;
-            $transfer->amount         = $request->amount;
-            $transfer->date           = $request->date;
-            $transfer->payment_method = $request->payment_method;
-            $transfer->description    = $request->description;
+            $transfer->from_account   = $request->input('from_account');
+            $transfer->to_account     = $request->input('to_account');
+            $transfer->amount         = $amount;
+            $transfer->date           = $request->input('date');
+            $transfer->payment_method = $request->input('payment_method');
+            $transfer->description    = $request->input('description');
             $transfer->created_by     = \Auth::user()->creatorId();
 
-            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $request->input('amount'), $request->input('date'));
+            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $amount, $request->input('date'));
 
             if(!empty($request->reference)){
                 $originalRefName      = $request->file('reference')->getClientOriginalName();
@@ -123,6 +131,11 @@ class TransferController extends Controller
             $bankAccount   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $paymentMethod = PaymentMethod::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
+            $bankAccount    = $bankAccount->union(['new.bank-account' => __('Create new bank account')]);
+            $paymentMethod  = $paymentMethod->union(['new.payment-method' => __('Create new payment method')]);
+
+            $transfer->amount = $this->FloatToReadableNumber($transfer->amount);
+
             return view('transfer.edit', compact('bankAccount', 'paymentMethod', 'transfer'));
         }
         else
@@ -139,7 +152,7 @@ class TransferController extends Controller
                 $request->all(), [
                                    'from_account' => 'required|numeric',
                                    'to_account' => 'required|numeric',
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                    'payment_method' => 'required',
                                    'reference' => 'mimes:png,jpg,jpeg,pdf',
@@ -166,17 +179,19 @@ class TransferController extends Controller
                 $transfer->reference  = $referenceImageName;
             }
 
-            $this->TransferBalance($request->input('to_account'), $request->input('from_account'), $request->input('amount'), $request->input('date'));
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
-            $transfer->from_account   = $request->from_account;
-            $transfer->to_account     = $request->to_account;
-            $transfer->amount         = $request->amount;
-            $transfer->date           = $request->date;
-            $transfer->payment_method = $request->payment_method;
-            $transfer->description    = $request->description;
+            $this->TransferBalance($request->input('to_account'), $request->input('from_account'), $amount, $request->input('date'));
+
+            $transfer->from_account   = $request->input('from_account');
+            $transfer->to_account     = $request->input('to_account');
+            $transfer->amount         = $amount;
+            $transfer->date           = $request->input('date');
+            $transfer->payment_method = $request->input('payment_method');
+            $transfer->description    = $request->input('description');
             $transfer->save();
 
-            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $request->input('amount'), $request->input('date'));
+            $this->TransferBalance($request->input('from_account'), $request->input('to_account'), $amount, $request->input('date'));
 
             return redirect()->route('transfer.index')->with('success', __('Amount successfully transfer updated.'));
         }

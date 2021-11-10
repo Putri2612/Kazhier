@@ -83,7 +83,7 @@
             if(!pattern.test(input.value)) error = true;
         });
         if(error){
-            toastrs('Error', '{{ __("Invalid currency format.") }}', 'error');
+            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
             return false;
         }
         return true;
@@ -101,13 +101,30 @@
             }
         });
         if(error){
-            toastrs('Error', '{{ __("Invalid currency format.") }}', 'error');
+            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
             return false;
         }
         return true;
     }
 </script>
 @endif
+
+<script>
+    document.addEventListener('change', event => {
+        let target = event.target;
+
+        if(target.classList.contains('form-control') && target.tagName == 'SELECT'){
+            if(target.value.includes('new')){
+                let url     = window.location.href,
+                    pos     = url.indexOf('/app/'),
+                    location    = target.value.split('.')[1],
+                    destination = url.substring(0, pos + 5) + location;
+
+                window.location.href = destination;
+            }
+        }
+    })
+</script>
 
 @if ($message = Session::get('success'))
     <script>

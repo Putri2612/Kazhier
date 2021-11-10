@@ -19,7 +19,7 @@ class ProductServiceController extends Controller
         if(\Auth::user()->can('manage product & service'))
         {
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name', 'id');
-            if(!empty($request->category))
+            if(!empty($request->input('category')))
             {
 
                 $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->input('category'))->get();
@@ -46,6 +46,10 @@ class ProductServiceController extends Controller
             $category     = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name', 'id');
             $unit         = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $tax          = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+
+            $category   = $category->union(['new.product-category' => __('Create new category')]);
+            $unit       = $unit->union(['new.product-unit' => __('Create new unit')]);
+            $tax        = $tax->union(['new.taxes' => __('Create new tax')]);
 
             return view('productservice.create', compact('category', 'unit', 'tax', 'customFields'));
         }
@@ -121,6 +125,10 @@ class ProductServiceController extends Controller
 
                 $productService->customField = CustomField::getData($productService, 'product');
                 $customFields                = CustomField::where('module', '=', 'product')->get();
+
+                $category   = $category->union(['new.product-category' => __('Create new category')]);
+                $unit       = $unit->union(['new.product-unit' => __('Create new unit')]);
+                $tax        = $tax->union(['new.taxes' => __('Create new tax')]);
 
                 return view('productservice.edit', compact('category', 'unit', 'tax', 'productService', 'customFields'));
             }

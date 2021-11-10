@@ -7,6 +7,38 @@
 
 "use strict";
 
+const ReadableToProcessable = input => input.replace(/\./g, '').replace(/,/g, '.');
+const ProcessableToReadable = input => input.toFixed(2).toString().replace(/\./g, ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+const UpdateSubTotal        = () => {
+    let inputs = document.querySelectorAll(".amount"),
+        subTotal = 0;
+    inputs.forEach(input => {
+        subTotal = parseFloat(subTotal) + parseFloat(ReadableToProcessable(input.innerHTML));
+    });
+    
+    subTotal = ProcessableToReadable(subTotal);
+    document.querySelector('.subTotal').innerHTML = subTotal;
+    document.querySelector('.totalAmount').innerHTML = subTotal;
+}
+
+const UpdateInvoiceAndBillItemData  = target => {
+    let element = target;
+    while(!element.getAttribute('data-is-item')) element = element.parentNode;
+
+    let quantity    = ReadableToProcessable(element.querySelector('.quantity').value),
+        price       = ReadableToProcessable(element.querySelector('.price').value),
+        tax         = ReadableToProcessable(element.querySelector('.tax').value),
+        discount    = ReadableToProcessable(element.querySelector('.discount').value),
+        totalPrice  = (quantity * price),
+        taxPrice    = (tax / 100) * (totalPrice),
+        amount      = ProcessableToReadable((totalPrice + taxPrice) - discount);
+    
+    element.querySelector('.amount').innerHTML = amount;
+
+    UpdateSubTotal();
+}
+
 $(function () {
     $(".custom-scroll").niceScroll();
     $(".custom-scroll-horizontal").niceScroll();
@@ -169,7 +201,16 @@ function common_bind_select(selector = "body") {
     if (jQuery().selectric) {
         $(".selectric").selectric({
             disableOnMobile: false,
-            nativeOnMobile: false
+            nativeOnMobile: false,
+        }).on('change', event => {
+            if(event.target.value.includes('new')){
+                let url     = window.location.href,
+                    pos     = url.indexOf('/app/'),
+                    target  = event.target.value.split('.')[1],
+                    destination = url.substring(0, pos + 5) + target;
+
+                window.location.href = destination;
+            }
         });
     }
     if ($(".jscolor").length) {
