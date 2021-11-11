@@ -1,4 +1,4 @@
-{{ Form::open(array('route' => array('bill.custom.debit.note'),'mothod'=>'post')) }}
+{{ Form::open(array('route' => array('bill.custom.debit.note'),'method'=>'post', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
 <div class="row">
     <div class="col-md-12">
         <div class="input-group">
@@ -19,7 +19,7 @@
                     <i class="far fa-money-bill-alt"></i>
                 </div>
             </div>
-            {{ Form::number('amount', null, array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+            {{ Form::text('amount', null, array('class' => 'form-control','required'=>'required','data-is-number')) }}
         </div>
     </div>
     <div class="form-group  col-md-6">

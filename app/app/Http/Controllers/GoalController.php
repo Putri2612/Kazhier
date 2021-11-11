@@ -57,13 +57,15 @@ class GoalController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
             $goal             = new Goal();
-            $goal->name       = $request->name;
-            $goal->type       = $request->type;
-            $goal->from       = $request->from;
-            $goal->to         = $request->to;
-            $goal->amount     = $request->amount;
-            $goal->is_display = isset($request->is_display) ? 1 : 0;
+            $goal->name       = $request->input('name');
+            $goal->type       = $request->input('type');
+            $goal->from       = $request->input('from');
+            $goal->to         = $request->input('to');
+            $goal->amount     = $amount;
+            $goal->is_display = $request->has('is_display') ? 1 : 0;
             $goal->created_by = \Auth::user()->creatorId();
             $goal->save();
 
@@ -119,12 +121,14 @@ class GoalController extends Controller
                     return redirect()->back()->with('error', $messages->first());
                 }
 
-                $goal->name       = $request->name;
-                $goal->type       = $request->type;
-                $goal->from       = $request->from;
-                $goal->to         = $request->to;
-                $goal->amount     = $request->amount;
-                $goal->is_display = isset($request->is_display) ? 1 : 0;
+                $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+                $goal->name       = $request->input('name');
+                $goal->type       = $request->input('type');
+                $goal->from       = $request->input('from');
+                $goal->to         = $request->input('to');
+                $goal->amount     = $amount;
+                $goal->is_display = $request->has('is_display') ? 1 : 0;
                 $goal->save();
 
                 return redirect()->route('goal.index')->with('success', __('Goal successfully updated.'));

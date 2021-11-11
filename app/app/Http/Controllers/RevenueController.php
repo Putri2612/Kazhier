@@ -12,13 +12,16 @@ use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transaction;
 use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
+use App\Traits\CanUploadFile;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class RevenueController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanProcessNumber, CanUploadFile;
     
     public function index(Request $request)
     {
@@ -100,7 +103,7 @@ class RevenueController extends Controller
         if(\Auth::user()->can('create revenue'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'date' => 'required',
                                    'amount' => 'required',
@@ -110,34 +113,32 @@ class RevenueController extends Controller
                                    'reference' => 'mimes:png,jpeg,jpg,pdf',
                                ]
             );
-            if($validator->fails())
-            {
+            if($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
                 return redirect()->back()->with('error', $messages->first());
             }
 
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
             $revenue                 = new Revenue();
-            $revenue->date           = $request->date;
-            $revenue->amount         = $request->amount;
-            $revenue->account_id     = $request->account_id;
-            $revenue->customer_id    = $request->customer_id;
-            $revenue->category_id    = $request->category_id;
-            $revenue->payment_method = $request->payment_method;
-            $revenue->description    = $request->description;
+            $revenue->date           = $request->input('date');
+            $revenue->amount         = $amount;
+            $revenue->account_id     = $request->input('account_id');
+            $revenue->customer_id    = $request->input('customer_id');
+            $revenue->category_id    = $request->input('category_id');
+            $revenue->payment_method = $request->input('payment_method');
+            $revenue->description    = $request->input('description');
             $revenue->created_by     = \Auth::user()->creatorId();
 
-            if(!empty($request->reference)){
-                $originalRefName         = $request->file('reference')->getClientOriginalName();
-                $referenceImageName      = \Auth::user()->creatorId() . '_R_' . uniqid() . '_' . $originalRefName;
-                $path                    = $request->file('reference')->storeAs('public/reference', $referenceImageName);
-                $revenue->reference      = $referenceImageName;
+            if($request->hasFile('reference')){
+                $revenue->reference      = $this->UploadFile($request->file('reference'), 'reference');
             }
             $revenue->save();
 
-            $this->addBalance($request->date, $request->amount, $request->account_id);
+            $this->addBalance($request->input('date'), $amount, $request->input('account_id'));
 
-            $category            = ProductServiceCategory::where('id', $request->category_id)->first();
+            $category            = ProductServiceCategory::where('id', $request->input('category_id'))->first();
             $revenue->payment_id = $revenue->id;
             $revenue->type       = 'Payment';
             $revenue->category   = $category->name;
@@ -146,11 +147,11 @@ class RevenueController extends Controller
 
             Transaction::addTransaction($revenue);
 
-            $customer = Customer::where('id',  $request->customer_id)->first();
+            $customer = Customer::where('id',  $request->input('customer_id'))->first();
             $payment          = new InvoicePayment();
             $payment->name    = $customer['name'];
-            $payment->date    = \Auth::user()->dateFormat($request->date);
-            $payment->amount  = \Auth::user()->priceFormat($request->amount);
+            $payment->date    = \Auth::user()->dateFormat($request->input('date'));
+            $payment->amount  = \Auth::user()->priceFormat($amount);
             $payment->invoice = '';
 
             try
@@ -195,8 +196,7 @@ class RevenueController extends Controller
 
     public function update(Request $request, Revenue $revenue)
     {
-        if(\Auth::user()->can('edit revenue'))
-        {
+        if(\Auth::user()->can('edit revenue')) {
 
             $validator = \Validator::make(
                 $request->all(), [
@@ -214,30 +214,26 @@ class RevenueController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            if(!empty($request->reference)){
-                $dir                     = storage_path('app/public/reference/');
-                $imgPath                 = $dir . $revenue->reference;
-
-                if(File::exists($imgPath) && $revenue->reference != 'nofile.svg'){
-                    File::delete($imgPath);
+            if($request->hasFile('reference')){
+                if($revenue->reference != 'nofile.svg'){
+                    $revenue->reference = $this->ReplaceFile($revenue->reference, $request->file('reference'), 'reference');
+                } else {
+                    $revenue->reference = $this->UploadFile($request->file('reference'), 'reference');
                 }
-
-                $originalRefName         = $request->file('reference')->getClientOriginalName();
-                $referenceImageName      = \Auth::user()->creatorId() . '_R_' . uniqid() . '_' . $originalRefName;
-                $path                    = $request->file('reference')->storeAs('public/reference', $referenceImageName);
-                $revenue->reference      = $referenceImageName;
             }
-            $difference = $revenue->amount - $request->amount;
-            $this->addBalance($request->date, $difference, $request->account_id);
+
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+            $difference = $revenue->amount - $amount;
+            $this->addBalance($request->input('date'), $difference, $request->input('account_id'));
             
-            $revenue->date           = $request->date;
-            $revenue->amount         = $request->amount;
-            $revenue->account_id     = $request->account_id;
-            $revenue->customer_id    = $request->customer_id;
-            $revenue->category_id    = $request->category_id;
-            $revenue->payment_method = $request->payment_method;
+            $revenue->date           = $request->input('date');
+            $revenue->amount         = $amount;
+            $revenue->account_id     = $request->input('account_id');
+            $revenue->customer_id    = $request->input('customer_id');
+            $revenue->category_id    = $request->input('category_id');
+            $revenue->payment_method = $request->input('payment_method');
             
-            $revenue->description    = $request->description;
+            $revenue->description    = $request->input('description');
             $revenue->save();
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
@@ -249,9 +245,7 @@ class RevenueController extends Controller
             Transaction::editTransaction($revenue);
 
             return redirect()->route('revenue.index')->with('success', __('Revenue successfully updated.'));
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }
@@ -260,16 +254,12 @@ class RevenueController extends Controller
     public function destroy(Revenue $revenue)
     {
 
-        if(\Auth::user()->can('delete revenue'))
-        {
-            if($revenue->created_by == \Auth::user()->creatorId())
-            {
-                $dir                     = storage_path('app/public/reference/');
-                $imgPath                 = $dir . $revenue->reference;
-                
-                if(File::exists($imgPath) && $revenue->reference != "nofile.svg"){
-                    File::delete($imgPath);
+        if(\Auth::user()->can('delete revenue')) {
+            if($revenue->created_by == \Auth::user()->creatorId()) {
+                if($revenue->reference != "nofile.svg"){
+                    $this->DeleteFile($revenue->reference, 'reference');
                 }
+
                 $this->addBalance($revenue->date, -($revenue->amount), $revenue->account_id);
                 $revenue->delete();
                 $type = 'Payment';
@@ -277,14 +267,10 @@ class RevenueController extends Controller
                 Transaction::destroyTransaction($revenue->id, $type, $user);
 
                 return redirect()->route('revenue.index')->with('success', __('Revenue successfully deleted.'));
-            }
-            else
-            {
+            } else {
                 return redirect()->back()->with('error', __('Permission denied.'));
             }
-        }
-        else
-        {
+        } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
     }

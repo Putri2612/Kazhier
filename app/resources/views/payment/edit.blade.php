@@ -1,4 +1,4 @@
-{{ Form::model($payment, array('route' => array('payment.update', $payment->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data')) }}
+{{ Form::model($payment, array('route' => array('payment.update', $payment->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
 
 @php
     $ref = asset(Storage::url('reference/'));
@@ -27,7 +27,7 @@
                     <i class="far fa-money-bill-alt"></i>
                 </div>
             </div>
-            {{ Form::number('amount', null, array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+            {{ Form::text('amount', null, array('class' => 'form-control','required'=>'required','data-is-number')) }}
         </div>
     </div>
     <div class="form-group  col-md-6">

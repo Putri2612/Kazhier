@@ -26,7 +26,9 @@ class ProductServiceCategoryController extends Controller
     {
         if(\Auth::user()->can('create constant category'))
         {
-            $types = ProductServiceCategory::$categoryType;
+            foreach(ProductServiceCategory::$categoryType as $type){
+                $types[] = __($type);
+            }
 
             return view('productServiceCategory.create', compact('types'));
         }

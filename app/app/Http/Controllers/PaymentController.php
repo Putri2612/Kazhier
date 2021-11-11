@@ -12,13 +12,15 @@ use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
+use App\Traits\CanUploadFile;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanProcessNumber, CanUploadFile;
 
     public function index(Request $request)
     {
@@ -116,29 +118,27 @@ class PaymentController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
             $payment                 = new Payment();
-            $payment->date           = $request->date;
-            $payment->amount         = $request->amount;
-            $payment->account_id     = $request->account_id;
-            $payment->vender_id      = $request->vender_id;
-            $payment->category_id    = $request->category_id;
-            $payment->payment_method = $request->payment_method;
-            $payment->description    = $request->description;
+            $payment->date           = $request->input('date');
+            $payment->amount         = $amount;
+            $payment->account_id     = $request->input('account_id');
+            $payment->vender_id      = $request->input('vender_id');
+            $payment->category_id    = $request->input('category_id');
+            $payment->payment_method = $request->input('payment_method');
+            $payment->description    = $request->input('description');
             $payment->created_by     = \Auth::user()->creatorId();
 
-            if(!empty($request->reference)){
-                $originalRefName         = $request->file('reference')->getClientOriginalName();
-                $referenceImageName      = \Auth::user()->creatorId() . '_P_' . uniqid() . '_' . $originalRefName;
-                $path                    = $request->file('reference')->storeAs('public/reference', $referenceImageName);
-                $payment->reference      = $referenceImageName;
+            if($request->hasFile('reference')){
+                $payment->reference  = $this->UploadFile($request->file('reference'), 'reference');
             }
 
             $payment->save();
 
-            $this->addBalance($request->date, -($request->amount), $request->account_id);
+            $this->addBalance($request->input('date'), -($amount), $request->input('account_id'));
 
-            $category            = ProductServiceCategory::where('id', $request->category_id)->first();
+            $category            = ProductServiceCategory::where('id', $request->input('category_id'))->first();
             $payment->payment_id = $payment->id;
             $payment->type       = 'Payment';
             $payment->category   = $category->name;
@@ -147,13 +147,13 @@ class PaymentController extends Controller
 
             Transaction::addTransaction($payment);
 
-            $vender          = Vender::where('id', $request->vender_id)->first();
-            $payment_method  = PaymentMethod::where('id', $request->payment_method)->first();
+            $vender          = Vender::where('id', $request->input('vender_id'))->first();
+            $payment_method  = PaymentMethod::where('id', $request->input('payment_method'))->first();
             $payment         = new BillPayment();
             $payment->name   = $vender['name'];
             $payment->method = $payment_method['name'];
-            $payment->date   = \Auth::user()->dateFormat($request->date);
-            $payment->amount = \Auth::user()->priceFormat($request->amount);
+            $payment->date   = \Auth::user()->dateFormat($request->input('date'));
+            $payment->amount = \Auth::user()->priceFormat($amount);
             $payment->bill   = '';
 
             try
@@ -218,30 +218,26 @@ class PaymentController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            if(!empty($request->reference)){
-                $dir                     = storage_path('app/public/reference/');
-                $imgPath                 = $dir . $payment->reference;
-
-                if(File::exists($imgPath) && $payment->reference != 'nofile.svg'){
-                    File::delete($imgPath);
+            if($request->hasFile('reference')){
+                if($payment->reference != 'nofile.svg'){
+                    $payment->reference = $this->ReplaceFile($payment->reference, $request->file('reference'), 'reference');
+                } else {
+                    $payment->reference = $this->UploadFile($request->file('reference'), 'reference');
                 }
-
-                $originalRefName         = $request->file('reference')->getClientOriginalName();
-                $referenceImageName      = \Auth::user()->creatorId() . '_P_' . uniqid() . '_' . $originalRefName;
-                $path                    = $request->file('reference')->storeAs('public/reference', $referenceImageName);
-                $payment->reference      = $referenceImageName;
             }
-            $difference = $request->amount - $payment->amount;
-            $this->addBalance($request->date, -($difference), $request->account_id);
 
-            $payment->date           = $request->date;
-            $payment->amount         = $request->amount;
-            $payment->account_id     = $request->account_id;
-            $payment->vender_id      = $request->vender_id;
-            $payment->category_id    = $request->category_id;
-            $payment->payment_method = $request->payment_method;
-            $payment->reference      = $request->reference;
-            $payment->description    = $request->description;
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+            $difference = $amount - $payment->amount;
+            $this->addBalance($request->input('date'), -($difference), $request->input('account_id'));
+
+            $payment->date           = $request->input('date');
+            $payment->amount         = $amount;
+            $payment->account_id     = $request->input('account_id');
+            $payment->vender_id      = $request->input('vender_id');
+            $payment->category_id    = $request->input('category_id');
+            $payment->payment_method = $request->input('payment_method');
+            $payment->reference      = $request->input('reference');
+            $payment->description    = $request->input('description');
             $payment->save();
 
             $category            = ProductServiceCategory::where('id', $request->category_id)->first();
@@ -265,11 +261,8 @@ class PaymentController extends Controller
         {
             if($payment->created_by == \Auth::user()->creatorId())
             {
-                $dir                     = storage_path('app/public/reference/');
-                $imgPath                 = $dir . $payment->reference;
-
-                if(File::exists($imgPath) && $payment->reference != "nofile.svg"){
-                    File::delete($imgPath);
+                if($payment->reference != "nofile.svg"){
+                    $this->DeleteFile($payment->reference, 'reference');
                 }
 
                 $this->addBalance($payment->date, $payment->amount, $payment->account_id);

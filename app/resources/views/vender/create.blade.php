@@ -36,11 +36,11 @@
                         <i class="far fa-envelope"></i>
                     </div>
                 </div>
-                {{Form::text('email',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('email',null,array('class'=>'form-control'))}}
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-6">
+    {{-- <div class="col-lg-4 col-md-4 col-sm-6">
         <div class="form-group">
             {{Form::label('password',__('Password'))}}
             <div class="input-group">
@@ -52,7 +52,7 @@
                 {{Form::password('password',array('class'=>'form-control','required'=>'required','minlength'=>"6"))}}
             </div>
         </div>
-    </div>
+    </div> --}}
     @if(!$customFields->isEmpty())
         <div class="col-lg-4 col-md-4 col-sm-6">
             <div class="tab-pane fade show" id="tab-2" role="tabpanel">
@@ -140,7 +140,7 @@
                         <i class="fas fa-crosshairs"></i>
                     </div>
                 </div>
-                {{Form::text('billing_zip',null,array('class'=>'form-control','placeholder'=>__('Enter User Email'),'required'=>'required'))}}
+                {{Form::text('billing_zip',null,array('class'=>'form-control'))}}
             </div>
         </div>
     </div>
@@ -237,7 +237,7 @@
                         <i class="fas fa-crosshairs"></i>
                     </div>
                 </div>
-                {{Form::text('shipping_zip',null,array('class'=>'form-control','placeholder'=>__('Enter User Email'),'required'=>'required'))}}
+                {{Form::text('shipping_zip',null,array('class'=>'form-control'))}}
             </div>
         </div>
     </div>

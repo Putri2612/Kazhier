@@ -39,7 +39,7 @@
                         <i class="far fa-money-bill-alt"></i>
                     </div>
                 </div>
-                {{ Form::text('sale_price', null, array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
+                {{ Form::text('sale_price', null, array('class' => 'form-control','required'=>'required', 'data-is-number')) }}
             </div>
         </div>
     </div>
@@ -52,7 +52,7 @@
                         <i class="far fa-money-bill-alt"></i>
                     </div>
                 </div>
-                {{ Form::text('purchase_price', null, array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
+                {{ Form::text('purchase_price', null, array('class' => 'form-control','required'=>'required', 'data-is-number')) }}
             </div>
         </div>
     </div>

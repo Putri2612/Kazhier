@@ -20,8 +20,8 @@ trait CanManageBalance{
                             ->first();
             if($balance){
                 DB::table('balance')
-                    ->where('id', '=', $balance['id'])
-                    ->update(['amount' => $balance['amount'] + $amount]);
+                    ->where('id', '=', $balance->id)
+                    ->update(['amount' => $balance->amount + $amount]);
             } else {
                 DB::table('balance')->insert([
                     'date'          => $date,
@@ -46,7 +46,7 @@ trait CanManageBalance{
                         ->get();
         $total      = $account->opening_balance;
         foreach($balances as $balance){
-            $total += $balance['amount'];
+            $total += $balance->amount;
         }
 
         return $total;
@@ -59,7 +59,7 @@ trait CanManageBalance{
                         ->get();
         $total      = $account->opening_balance;
         foreach($balances as $balance){
-            $total += $balance['amount'];
+            $total += $balance->amount;
         }
 
         return $total;

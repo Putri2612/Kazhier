@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Bill;
 use App\Models\CreditNote;
 use App\Models\DebitNote;
+use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 
 class DebitNoteController extends Controller
 {
+    use CanManageBalance, CanProcessNumber;
     public function __construct()
     {
         $this->middleware('auth');
@@ -62,18 +65,18 @@ class DebitNoteController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
             $billDue = Bill::where('id', $bill_id)->first();
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
-            if($request->amount > $billDue->getDue())
-            {
+            if($amount > $billDue->getDue()) {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
             }
             $bill                = Bill::where('id', $bill_id)->first();
             $credit              = new DebitNote();
             $credit->bill        = $bill_id;
             $credit->vendor      = $bill->vender_id;
-            $credit->date        = $request->date;
-            $credit->amount      = $request->amount;
-            $credit->description = $request->description;
+            $credit->date        = $request->input('date');
+            $credit->amount      = $amount;
+            $credit->description = $request->input('description');
             $credit->save();
 
             return redirect()->back()->with('success', __('Credit Note successfully created.'));
@@ -120,15 +123,16 @@ class DebitNoteController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
             $billDue = Bill::where('id', $bill_id)->first();
-            if($request->amount > $billDue->getDue())
-            {
+
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+            if($amount > $billDue->getDue()) {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
             }
 
             $debit              = DebitNote::find($debitNote_id);
-            $debit->date        = $request->date;
-            $debit->amount      = $request->amount;
-            $debit->description = $request->description;
+            $debit->date        = $request->input('date');
+            $debit->amount      = $amount;
+            $debit->description = $request->input('description');
             $debit->save();
 
             return redirect()->back()->with('success', __('Debit Note successfully updated.'));
@@ -191,7 +195,9 @@ class DebitNoteController extends Controller
             $bill_id = $request->bill;
             $billDue = Bill::where('id', $bill_id)->first();
 
-            if($request->amount > $billDue->getDue())
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+            if($amount > $billDue->getDue())
             {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
             }
@@ -199,9 +205,9 @@ class DebitNoteController extends Controller
             $debit              = new DebitNote();
             $debit->bill        = $bill_id;
             $debit->vendor      = $bill->vender_id;
-            $debit->date        = $request->date;
-            $debit->amount      = $request->amount;
-            $debit->description = $request->description;
+            $debit->date        = $request->input('date');
+            $debit->amount      = $amount;
+            $debit->description = $request->input('description');
             $debit->save();
 
             return redirect()->back()->with('success', __('Debit Note successfully created.'));

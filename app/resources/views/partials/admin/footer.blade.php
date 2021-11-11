@@ -73,14 +73,13 @@
     };
 </script>
 
-@if ( Auth::user()->currentLanguage() == 'id' )
 <script>
     const validateCurrencyInput = (form) => {        
-        const inputs = form.querySelectorAll('input[is-currency="true"]');
+        const inputs = form.querySelectorAll('input[data-is-number]');
         let error = false;
         inputs.forEach(input => {
             let pattern = /^[0-9\.]*,?[0-9]*$/;   
-            if(!pattern.test(input.value)) error = true;
+            if(!pattern.test(input.value)  && input.value !== null) error = true;
         });
         if(error){
             toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
@@ -89,25 +88,6 @@
         return true;
     }
 </script>
-@else
-<script>
-    const validateCurrencyInput = (form) => {        
-        const inputs = form.querySelectorAll('input[is-currency="true"]');
-        let error = false;
-        inputs.forEach(input => {
-            let pattern = /^[0-9,]*\.?[0-9]*$/;   
-            if(!pattern.test(input.value)){
-                error = true;
-            }
-        });
-        if(error){
-            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
-            return false;
-        }
-        return true;
-    }
-</script>
-@endif
 
 <script>
     document.addEventListener('change', event => {

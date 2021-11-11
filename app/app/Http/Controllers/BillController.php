@@ -18,15 +18,18 @@ use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanProcessNumber;
 
     public function index(Request $request)
     {
@@ -92,7 +95,7 @@ class BillController extends Controller
     {
         if(\Auth::user()->can('create bill'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'vender_id' => 'required',
                                    'bill_date' => 'required',
@@ -109,27 +112,30 @@ class BillController extends Controller
             }
             $bill                   = new Bill();
             $bill->bill_id          = $this->billNumber();
-            $bill->vender_id        = $request->vender_id;;
-            $bill->bill_date        = $request->bill_date;
+            $bill->vender_id        = $request->input('vender_id');;
+            $bill->bill_date        = $request->input('bill_date');
             $bill->status           = 0;
-            $bill->due_date         = $request->due_date;
-            $bill->category_id      = $request->category_id;
-            $bill->order_number     = !empty($request->order_number) ? $request->order_number : 0;
-            $bill->discount_apply   = isset($request->discount_apply) ? 1 : 0;
+            $bill->due_date         = $request->input('due_date');
+            $bill->category_id      = $request->input('category_id');
+            $bill->order_number     = $request->has('order_number') ? $request->input('order_number') : 0;
+            $bill->discount_apply   = $request->has('discount_apply') ? 1 : 0;
             $bill->created_by       = \Auth::user()->creatorId();
             $bill->save();
-            CustomField::saveData($bill, $request->customField);
-            $products = $request->items;
+            CustomField::saveData($bill, $request->input('customField'));
+            $products = $request->input('items');
 
-            for($i = 0; $i < count($products); $i++)
-            {
+            foreach ($products as $product) {
+                $quantity   = $this->ReadableNumberToFloat($product['quantity']);
+                $tax        = $this->ReadableNumberToFloat($product['tax']);
+                $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
+                $price      = $this->ReadableNumberToFloat($product['price']);
                 $billProduct             = new BillProduct();
                 $billProduct->bill_id    = $bill->id;
-                $billProduct->product_id = $products[$i]['item'];
-                $billProduct->quantity   = $products[$i]['quantity'];
-                $billProduct->tax        = $products[$i]['tax'];
-                $billProduct->discount   = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                $billProduct->price      = $products[$i]['price'];
+                $billProduct->product_id = $product['item'];
+                $billProduct->quantity   = $quantity;
+                $billProduct->tax        = $tax;
+                $billProduct->discount   = $discount;
+                $billProduct->price      = $price;
                 $billProduct->save();
             }
 
@@ -207,7 +213,7 @@ class BillController extends Controller
 
             if($bill->created_by == \Auth::user()->creatorId())
             {
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'vender_id' => 'required',
                                        'bill_date' => 'required',
@@ -221,29 +227,32 @@ class BillController extends Controller
 
                     return redirect()->route('bill.index')->with('error', $messages->first());
                 }
-                $bill->vender_id      = $request->vender_id;
-                $bill->bill_date      = $request->bill_date;
-                $bill->due_date       = $request->due_date;
-                $bill->order_number   = $request->order_number;
-                $bill->discount_apply = isset($request->discount_apply) ? 1 : 0;
-                $bill->category_id    = $request->category_id;
+                $bill->vender_id      = $request->input('vender_id');
+                $bill->bill_date      = $request->input('bill_date');
+                $bill->due_date       = $request->input('due_date');
+                $bill->order_number   = $request->input('order_number');
+                $bill->discount_apply = $request->has('discount_apply') ? 1 : 0;
+                $bill->category_id    = $request->input('category_id');
                 $bill->save();
-                CustomField::saveData($bill, $request->customField);
-                $products = $request->items;
+                CustomField::saveData($bill, $request->input('customField'));
+                $products = $request->input('items');
 
-                for($i = 0; $i < count($products); $i++)
-                {
-                    $billProduct = BillProduct::find($products[$i]['id']);
+                foreach($products as $product){
+                    $quantity   = $this->ReadableNumberToFloat($product['quantity']);
+                    $tax        = $this->ReadableNumberToFloat($product['tax']);
+                    $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
+                    $price      = $this->ReadableNumberToFloat($product['price']);
+                    $billProduct = BillProduct::find($product['id']);
                     if($billProduct == null)
                     {
                         $billProduct = new BillProduct();
                     }
                     $billProduct->bill_id    = $bill->id;
-                    $billProduct->product_id = $products[$i]['item'];
-                    $billProduct->quantity   = $products[$i]['quantity'];
-                    $billProduct->tax        = $products[$i]['tax'];
-                    $billProduct->discount   = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                    $billProduct->price      = $products[$i]['price'];
+                    $billProduct->product_id = $product['item'];
+                    $billProduct->quantity   = $quantity;
+                    $billProduct->tax        = $tax;
+                    $billProduct->discount   = $discount;
+                    $billProduct->price      = $price;
                     $billProduct->save();
                 }
 
@@ -298,12 +307,13 @@ class BillController extends Controller
     public function product(Request $request)
     {
         $data['product']     = $product = ProductService::find($request->product_id);
-        $data['unit']        = !empty($product->unit()) ? $product->unit()->name : '';
-        $data['taxRate']     = $taxRate = $taxRate = $product->taxes()->rate;
+        $data['unit']        = (!empty($product->unit())) ? $product->unit()->name : '';
+        $data['taxRate']     = $taxRate = (!empty($product->taxes())) ? $product->taxes()->rate : 0;
         $salePrice           = $product->sale_price;
         $quantity            = 1;
         $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
-        $data['totalAmount'] = ($salePrice * $quantity) + $taxPrice;
+        $product->sale_price = $this->FloatToReadableNumber($salePrice);
+        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + $taxPrice);
 
         return json_encode($data);
     }
@@ -381,7 +391,7 @@ class BillController extends Controller
     {
         if(\Auth::user()->can('create payment bill'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'date' => 'required',
                                    'amount' => 'required',
@@ -396,17 +406,19 @@ class BillController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
             $billPayment                 = new BillPayment();
             $billPayment->bill_id        = $bill_id;
-            $billPayment->date           = $request->date;
-            $billPayment->amount         = $request->amount;
-            $billPayment->account_id     = $request->account_id;
-            $billPayment->payment_method = $request->payment_method;
-            $billPayment->reference      = $request->reference;
-            $billPayment->description    = $request->description;
-            $billPayment->created_by     = \Auth::user()->creatorId();
+            $billPayment->date           = $request->input('date');
+            $billPayment->amount         = $amount;
+            $billPayment->account_id     = $request->input('account_id');
+            $billPayment->payment_method = $request->input('payment_method');
+            $billPayment->reference      = $request->input('reference');
+            $billPayment->description    = $request->input('description');
+            $billPayment->created_by     = Auth::user()->creatorId();
             $billPayment->save();
-            $this->addBalance($request->date, -($request->amount), $request->account_id);
+            $this->addBalance($request->input('date'), -($amount), $request->input('account_id'));
 
             $bill  = Bill::where('id', $bill_id)->first();
             $due   = $bill->getDue();
@@ -443,9 +455,9 @@ class BillController extends Controller
             $payment         = new BillPayment();
             $payment->name   = $vender['name'];
             $payment->method = $payment_method['name'];
-            $payment->date   = \Auth::user()->dateFormat($request->date);
-            $payment->amount = \Auth::user()->priceFormat($request->amount);
-            $payment->bill   = 'bill ' . \Auth::user()->billNumberFormat($billPayment->bill_id);
+            $payment->date   = Auth::user()->dateFormat($request->date);
+            $payment->amount = Auth::user()->priceFormat($amount);
+            $payment->bill   = 'bill ' . Auth::user()->billNumberFormat($billPayment->bill_id);
 
             try
             {
@@ -526,11 +538,11 @@ class BillController extends Controller
 
     public function venderBillShow($bill_id)
     {
-        if(\Auth::user()->can('show bill'))
+        if(Auth::user()->can('show bill'))
         {
             $bill = Bill::where('id', $bill_id)->first();
 
-            if($bill->created_by == \Auth::user()->creatorId())
+            if($bill->created_by == Auth::user()->creatorId())
             {
                 $vender = $bill->vender;
                 $iteams = $bill->items;
@@ -563,7 +575,7 @@ class BillController extends Controller
 
     public function venderBillSendMail(Request $request, $bill_id)
     {
-        $validator = \Validator::make(
+        $validator = Validator::make(
             $request->all(), [
                                'email' => 'required|email',
                            ]

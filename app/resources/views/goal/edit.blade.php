@@ -6,7 +6,7 @@
     </div>
     <div class="form-group col-md-6">
         {{ Form::label('amount', __('Amount')) }}
-        {{ Form::number('amount', null, array('class' => 'form-control','required'=>'required','step'=>'1000')) }}
+        {{ Form::text('amount', null, array('class' => 'form-control','required'=>'required','data-is-number')) }}
     </div>
     <div class="form-group  col-md-12">
         <div class="input-group">

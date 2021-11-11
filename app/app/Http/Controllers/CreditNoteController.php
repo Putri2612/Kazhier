@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
+use App\Traits\CanManageBalance;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CreditNoteController extends Controller
 {
+    use CanManageBalance, CanProcessNumber;
     public function __construct()
     {
         $this->middleware('auth');
@@ -47,9 +51,9 @@ class CreditNoteController extends Controller
     {
         if(\Auth::user()->can('create credit note'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                ]
             );
@@ -60,18 +64,23 @@ class CreditNoteController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
-            if($request->amount > $invoiceDue->getDue())
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+            if($amount > $invoiceDue->getDue())
             {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
+
             $invoice             = Invoice::where('id', $invoice_id)->first();
             $credit              = new CreditNote();
             $credit->invoice     = $invoice_id;
             $credit->customer    = $invoice->customer_id;
-            $credit->date        = $request->date;
-            $credit->amount      = $request->amount;
-            $credit->description = $request->description;
+            $credit->date        = $request->input('date');
+            $credit->amount      = $amount;
+            $credit->description = $request->input('description');
             $credit->save();
+            
+            // $this->AddBalance()
 
             return redirect()->back()->with('success', __('Credit Note successfully created.'));
         }
@@ -88,6 +97,7 @@ class CreditNoteController extends Controller
         {
 
             $creditNote = CreditNote::find($creditNote_id);
+            $creditNote->amount = $this->FloatToReadableNumber($creditNote->amount);
 
             return view('creditNote.edit', compact('creditNote'));
         }
@@ -104,9 +114,9 @@ class CreditNoteController extends Controller
         if(\Auth::user()->can('edit credit note'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                ]
             );
@@ -117,15 +127,17 @@ class CreditNoteController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
-            if($request->amount > $invoiceDue->getDue())
-            {
+
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+            if($amount > $invoiceDue->getDue()) {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
 
             $credit              = CreditNote::find($creditNote_id);
-            $credit->date        = $request->date;
-            $credit->amount      = $request->amount;
-            $credit->description = $request->description;
+            $credit->date        = $request->input('date');
+            $credit->amount      = $amount;
+            $credit->description = $request->input('description');
             $credit->save();
 
             return redirect()->back()->with('success', __('Credit Note successfully updated.'));
@@ -173,7 +185,7 @@ class CreditNoteController extends Controller
     {
         if(\Auth::user()->can('create credit note'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'invoice' => 'required|numeric',
                                    'amount' => 'required|numeric',
@@ -189,7 +201,9 @@ class CreditNoteController extends Controller
             $invoice_id = $request->invoice;
             $invoiceDue = Invoice::where('id', $invoice_id)->first();
 
-            if($request->amount > $invoiceDue->getDue())
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+            if($amount > $invoiceDue->getDue())
             {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
@@ -197,9 +211,9 @@ class CreditNoteController extends Controller
             $credit              = new CreditNote();
             $credit->invoice     = $invoice_id;
             $credit->customer    = $invoice->customer_id;
-            $credit->date        = $request->date;
-            $credit->amount      = $request->amount;
-            $credit->description = $request->description;
+            $credit->date        = $request->input('date');
+            $credit->amount      = $amount;
+            $credit->description = $request->input('description');
             $credit->save();
 
             return redirect()->back()->with('success', __('Credit Note successfully created.'));
@@ -213,7 +227,7 @@ class CreditNoteController extends Controller
     public function getinvoice(Request $request)
     {
         $invoice = Invoice::where('id', $request->invoice_id)->first();
-        echo json_encode($invoice->getDue());
+        echo json_encode($this->FloatToReadableNumber($invoice->getDue()));
     }
 
 }

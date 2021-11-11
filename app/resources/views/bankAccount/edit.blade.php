@@ -41,7 +41,7 @@
                     <i class="fas fa-dollar-sign"></i>
                 </div>
             </div>
-            {{ Form::text('opening_balance', null, array('class' => 'form-control','required'=>'required', 'is-currency' => 'true')) }}
+            {{ Form::text('opening_balance', null, array('class' => 'form-control','required'=>'required', 'data-is-number')) }}
         </div>
     </div>
     <div class="form-group  col-md-6">

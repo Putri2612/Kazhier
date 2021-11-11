@@ -39,6 +39,33 @@ const UpdateInvoiceAndBillItemData  = target => {
     UpdateSubTotal();
 }
 
+const OnlyAllowNumber   = () => {
+    const events = ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"];
+    events.forEach(event => {
+        document.addEventListener(event, event => {
+            let target = event.target;
+            if(target.nodeName == 'INPUT' && target.hasAttribute('data-is-number')){
+                let filtered = /^[0-9\.]*\,?[0-9]*$/.test(target.value);
+                if(filtered) {
+                    target.oldValue             = target.value;
+                    target.oldSelectionStart    = target.selectionStart;
+                    target.oldSelectionEnd      = target.selectionEnd;
+                } else if(target.hasOwnProperty('oldValue')) {
+                    target.value    = target.oldValue;
+                    target.setSelectionRange(target.oldSelectionStart, target.oldSelectionEnd);
+                } else {
+                    target.value = "";
+                }
+                if(target.value != "" && !(/^[0-9\.]*\,$/).test(target.value)) target.value = AddNumberSeparator(target.value);
+            }
+        });
+    });
+}
+
+OnlyAllowNumber();
+
+const AddNumberSeparator    = number => parseFloat(number.replace(/\./g, '').replace(/,/g, '.')).toLocaleString('id', {maximumFractionDigits: 6});
+
 $(function () {
     $(".custom-scroll").niceScroll();
     $(".custom-scroll-horizontal").niceScroll();

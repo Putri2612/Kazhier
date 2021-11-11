@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Plan;
 use App\Models\Utility;
+use App\Traits\CanProcessNumber;
+use App\Traits\CanUploadFile;
 use File;
 use Illuminate\Http\Request;
 
 class PlanController extends Controller
 {
+    use CanProcessNumber, CanUploadFile;
     public function index()
     {
         if(\Auth::user()->can('manage plan'))
@@ -52,34 +55,21 @@ class PlanController extends Controller
 
                 $validation                  = [];
                 $validation['name']          = 'required|unique:plans';
-                $validation['price']         = 'required|numeric|min:0';
+                $validation['price']         = 'required';
                 $validation['duration']      = 'required';
-                $validation['max_users']     = 'required|numeric';
-                // $validation['max_customers'] = 'required|numeric';
-                // $validation['max_venders']   = 'required|numeric';
-                $validation['max_bank_accounts']   = 'required|numeric';
+                $validation['max_users']     = 'required';
+                $validation['max_bank_accounts']   = 'required';
                 if($request->image)
                 {
                     $validation['image'] = 'required|max:2048';
                 }
                 $request->validate($validation);
                 $post = $request->all();
+                $post['price'] = $this->ReadableNumberToFloat($post['price']);
 
                 if($request->hasFile('image'))
                 {
-                    $filenameWithExt = $request->file('image')->getClientOriginalName();
-                    $filename        = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                    $extension       = $request->file('image')->getClientOriginalExtension();
-                    $fileNameToStore = 'plan_' . time() . '.' . $extension;
-
-                    $dir = storage_path('app/public/plan/');
-                    if(!file_exists($dir))
-                    {
-
-                        mkdir($dir, 0777, true);
-                    }
-                    $path          = $request->file('image')->storeAs('public/plan/', $fileNameToStore);
-                    $post['image'] = $fileNameToStore;
+                    $post['image'] = $this->UploadFile($request->file('image'), 'plan');
                 }
 
                 if(Plan::create($post))
@@ -132,47 +122,23 @@ class PlanController extends Controller
                 {
                     $validation                  = [];
                     $validation['name']          = 'required|unique:plans,name,' . $plan_id;
-                    $validation['price']         = 'required|numeric|min:0';
+                    $validation['price']         = 'required';
                     $validation['duration']      = 'required';
-                    $validation['max_users']     = 'required|numeric';
-                    // $validation['max_customers'] = 'required|numeric';
-                    // $validation['max_venders']   = 'required|numeric';
-                    $validation['max_bank_accounts']   = 'required|numeric';
+                    $validation['max_users']     = 'required';
+                    $validation['max_bank_accounts']   = 'required';
 
                     $request->validate($validation);
 
-                    $post = $request->all();
+                    $post           = $request->all();
+                    $post['price']  = $this->ReadableNumberToFloat($post['price']);
 
-                    if($request->hasFile('image'))
-                    {
-                        $filenameWithExt = $request->file('image')->getClientOriginalName();
-                        $filename        = pathinfo($filenameWithExt, PATHINFO_FILENAME);
-                        $extension       = $request->file('image')->getClientOriginalExtension();
-                        $fileNameToStore = 'plan_' . time() . '.' . $extension;
-
-                        $dir = storage_path('app/public/plan/');
-                        if(!file_exists($dir))
-                        {
-                            mkdir($dir, 0777, true);
-                        }
-                        $image_path = $dir . '/' . $plan->image;  // Value is not URL but directory file path
-                        if(File::exists($image_path))
-                        {
-
-                            chmod($image_path, 0755);
-                            File::delete($image_path);
-                        }
-                        $path = $request->file('image')->storeAs('public/plan/', $fileNameToStore);
-
-                        $post['image'] = $fileNameToStore;
+                    if($request->hasFile('image')) {
+                        $post['image'] = $this->ReplaceFile($plan->image, $request->file('image'), 'plan');
                     }
 
-                    if($plan->update($post))
-                    {
+                    if($plan->update($post)) {
                         return redirect()->back()->with('success', __('Plan successfully updated.'));
-                    }
-                    else
-                    {
+                    } else {
                         return redirect()->back()->with('error', __('Something is wrong.'));
                     }
                 }
@@ -238,6 +204,6 @@ class PlanController extends Controller
                 'duration' => $plan->duration
             );
         }
-        echo json_encode($planArray);
+        return json_encode($planArray);
     }
 }

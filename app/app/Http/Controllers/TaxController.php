@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tax;
+use App\Traits\CanProcessNumber;
 use Auth;
 use Illuminate\Http\Request;
 
 class TaxController extends Controller
 {
-
+    use CanProcessNumber;
 
     public function index()
     {
@@ -55,8 +56,8 @@ class TaxController extends Controller
             }
 
             $tax             = new Tax();
-            $tax->name       = $request->name;
-            $tax->rate       = $request->rate;
+            $tax->name       = $request->input('name');
+            $tax->rate       = $this->ReadableNumberToFloat($request->input('rate'));
             $tax->created_by = \Auth::user()->creatorId();
             $tax->save();
 
@@ -113,8 +114,8 @@ class TaxController extends Controller
                     return redirect()->back()->with('error', $messages->first());
                 }
 
-                $tax->name = $request->name;
-                $tax->rate = $request->rate;
+                $tax->name  = $request->input('name');
+                $tax->rate  = $this->ReadableNumberToFloat($request->input('rate'));
                 $tax->save();
 
                 return redirect()->route('taxes.index')->with('success', __('Tax rate successfully updated.'));

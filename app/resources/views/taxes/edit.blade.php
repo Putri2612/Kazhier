@@ -1,4 +1,4 @@
-{{ Form::model($tax, array('route' => array('taxes.update', $tax->id), 'method' => 'PUT')) }}
+{{ Form::model($tax, array('route' => array('taxes.update', $tax->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{ Form::label('name', __('Tax Rate Name')) }}
@@ -11,7 +11,7 @@
     </div>
     <div class="form-group col-md-6">
         {{ Form::label('rate', __('Tax Rate %')) }}
-        {{ Form::number('rate', null, array('class' => 'form-control','required'=>'required','step'=>'0.01')) }}
+        {{ Form::text('rate', null, array('class' => 'form-control','required'=>'required','data-is-number')) }}
         @error('rate')
         <span class="invalid-rate" role="alert">
         <strong class="text-danger">{{ $message }}</strong>

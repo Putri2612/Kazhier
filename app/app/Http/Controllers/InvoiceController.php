@@ -117,8 +117,8 @@ class InvoiceController extends Controller
         $salePrice           = $product->sale_price;
         $quantity            = 1;
         $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
-        $product->sale_price = number_format($salePrice, 2, ',', '.');
-        $data['totalAmount'] = number_format(($salePrice * $quantity) + $taxPrice, 2, ',', '.');
+        $product->sale_price = $this->FloatToReadableNumber($salePrice);
+        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + $taxPrice);
 
         return json_encode($data);
     }
@@ -469,17 +469,19 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
             $invoicePayment                 = new InvoicePayment();
             $invoicePayment->invoice_id     = $invoice_id;
-            $invoicePayment->date           = $request->date;
-            $invoicePayment->amount         = $request->amount;
-            $invoicePayment->account_id     = $request->account_id;
-            $invoicePayment->payment_method = $request->payment_method;
-            $invoicePayment->reference      = $request->reference;
-            $invoicePayment->description    = $request->description;
+            $invoicePayment->date           = $request->input('date');
+            $invoicePayment->amount         = $amount;
+            $invoicePayment->account_id     = $request->input('account_id');
+            $invoicePayment->payment_method = $request->input('payment_method');
+            $invoicePayment->reference      = $request->input('reference');
+            $invoicePayment->description    = $request->input('description');
             $invoicePayment->created_by     = Auth::user()->creatorId();
             $invoicePayment->save();
-            $this->addBalance($request->date, $request->amount, $request->account_id);
+            $this->addBalance($request->input('date'), $amount, $request->input('account_id'));
 
             $invoice = Invoice::where('id', $invoice_id)->first();
             $due     = $invoice->getDue();
@@ -513,8 +515,8 @@ class InvoiceController extends Controller
 
             $payment            = new InvoicePayment();
             $payment->name      = $customer['name'];
-            $payment->date      = Auth::user()->dateFormat($request->date);
-            $payment->amount    = Auth::user()->priceFormat($request->amount);
+            $payment->date      = Auth::user()->dateFormat($request->input('date'));
+            $payment->amount    = Auth::user()->priceFormat($amount);
             $payment->invoice   = 'invoice ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
             $payment->dueAmount = Auth::user()->priceFormat($invoice->getDue());
 

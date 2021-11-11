@@ -6,6 +6,7 @@
     <script src="{{asset('assets/js/jquery.repeater.min.js')}}"></script>
     <script>
         var selector = "body";
+        
         if ($(selector + " .repeater").length) {
             var $dragAndDrop = $("body .repeater tbody").sortable({
                 handle: '.sort-handler'
@@ -31,13 +32,7 @@
                         $(this).slideUp(deleteElement);
                         $(this).remove();
 
-                        var inputs = $(".amount");
-                        var subTotal = 0;
-                        for (var i = 0; i < inputs.length; i++) {
-                            subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-                        }
-                        $('.subTotal').html(subTotal.toFixed(2));
-                        $('.totalAmount').html(subTotal.toFixed(2));
+                        UpdateSubTotal();
                     }
                 },
                 ready: function (setIndexes) {
@@ -54,27 +49,30 @@
         }
 
         $(document).on('change', '#vender', function () {
-            $('#vender_detail').removeClass('d-none');
-            $('#vender_detail').addClass('d-block');
-            $('#vender-box').removeClass('d-block');
-            $('#vender-box').addClass('d-none');
             var id = $(this).val();
-            var url = $(this).data('url');
-            $.ajax({
-                url: url,
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': jQuery('#token').val()
-                },
-                data: {
-                    'id': id
-                },
-                cache: false,
-                success: function (data) {
-                    $('#vender_detail').html(data);
-                },
+            if(!id.includes('new')){
+                $('#vender_detail').removeClass('d-none');
+                $('#vender_detail').addClass('d-block');
+                $('#vender-box').removeClass('d-block');
+                $('#vender-box').addClass('d-none');
+                
+                var url = $(this).data('url');
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': jQuery('#token').val()
+                    },
+                    data: {
+                        'id': id
+                    },
+                    cache: false,
+                    success: function (data) {
+                        $('#vender_detail').html(data);
+                    },
 
-            });
+                });
+            }
         });
 
         $(document).on('click', '#remove', function () {
@@ -83,8 +81,6 @@
             $('#vender_detail').removeClass('d-block');
             $('#vender_detail').addClass('d-none');
         })
-
-
 
         $(document).on('change', '.item', function () {
             var iteams_id = $(this).val();
@@ -113,97 +109,42 @@
                     var inputs = $(".amount");
                     var subTotal = 0;
                     for (var i = 0; i < inputs.length; i++) {
-                        subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
+                        subTotal = parseFloat(subTotal) + parseFloat(ReadableToProcessable($(inputs[i]).html()));
                     }
-                    $('.subTotal').html(subTotal.toFixed(2));
-                    $('.totalAmount').html(subTotal.toFixed(2));
+                    subTotal = ProcessableToReadable(subTotal);
+                    $('.subTotal').html(subTotal);
+                    $('.totalAmount').html(subTotal);
 
                 },
             });
         });
 
-        $(document).on('keyup', '.quantity', function () {
-            var el = $(this).parent().parent().parent().parent();
-            var quantity = $(this).val();
-            var price = $(el.find('.price')).val();
-            var tax = $(el.find('.tax')).val();
-            var discount = $(el.find('.discount')).val();
-            var totalPrice = (quantity * price);
-            var taxPrice = (tax / 100) * (totalPrice);
-            var amount = (totalPrice + taxPrice) - discount;
-            $(el.find('.amount')).html(amount);
+        document.addEventListener('keyup', (event) => {
+            let target      = event.target,
+                doChange    = false;
+            
+            const acceptableInput = [
+                'quantity',
+                'price',
+                'tax',
+                'discount',
+            ], BreakForeach = {};
 
-            var inputs = $(".amount");
-            var subTotal = 0;
-            for (var i = 0; i < inputs.length; i++) {
-                subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
+            try {
+                acceptableInput.forEach(className => {
+                    if(target.classList.contains(className)) {
+                        doChange = true;
+                        throw BreakForeach;
+                    }
+                });
+            } catch (error) {
+                if(error !== BreakForeach) throw error;
             }
-            $('.subTotal').html(subTotal.toFixed(2));
-            $('.totalAmount').html(subTotal.toFixed(2));
 
-        })
-
-        $(document).on('keyup', '.price', function () {
-            var el = $(this).parent().parent().parent().parent();
-            var price = $(this).val();
-            var quantity = $(el.find('.quantity')).val();
-            var tax = $(el.find('.tax')).val();
-            var discount = $(el.find('.discount')).val();
-            var totalPrice = (quantity * price);
-            var taxPrice = (tax / 100) * (totalPrice);
-            var amount = (totalPrice + taxPrice) - discount;
-            $(el.find('.amount')).html(amount);
-
-            var inputs = $(".amount");
-            var subTotal = 0;
-            for (var i = 0; i < inputs.length; i++) {
-                subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
+            if(doChange) {
+                UpdateInvoiceAndBillItemData(target);
             }
-            $('.subTotal').html(subTotal.toFixed(2));
-            $('.totalAmount').html(subTotal.toFixed(2));
-
-        })
-
-        $(document).on('keyup', '.tax', function () {
-            var el = $(this).parent().parent().parent().parent();
-            var tax = $(this).val();
-            var price = $(el.find('.price')).val();
-            var quantity = $(el.find('.quantity')).val();
-            var discount = $(el.find('.discount')).val();
-
-            var totalPrice = (quantity * price);
-            var taxPrice = (tax / 100) * (totalPrice);
-            var amount = (totalPrice + taxPrice) - discount;
-            $(el.find('.amount')).html(amount);
-
-            var inputs = $(".amount");
-            var subTotal = 0;
-            for (var i = 0; i < inputs.length; i++) {
-                subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-            }
-            $('.subTotal').html(subTotal.toFixed(2));
-            $('.totalAmount').html(subTotal.toFixed(2));
-        })
-
-        $(document).on('keyup', '.discount', function () {
-            var el = $(this).parent().parent().parent().parent();
-            var discount = $(this).val();
-            var price = $(el.find('.price')).val();
-            var tax = $(el.find('.tax')).val();
-            var quantity = $(el.find('.quantity')).val();
-            var totalPrice = (quantity * price);
-            var taxPrice = (tax / 100) * (totalPrice);
-            var amount = (totalPrice + taxPrice) - discount;
-            $(el.find('.amount')).html(amount);
-
-            var inputs = $(".amount");
-            var subTotal = 0;
-            for (var i = 0; i < inputs.length; i++) {
-                subTotal = parseFloat(subTotal) + parseFloat($(inputs[i]).html());
-            }
-            $('.subTotal').html(subTotal.toFixed(2));
-            $('.totalAmount').html(subTotal.toFixed(2));
-        })
+        });
 
     </script>
 @endpush
@@ -218,7 +159,7 @@
             </div>
         </div>
         <div class="section-body">
-            {{ Form::open(array('url' => 'bill')) }}
+            {{ Form::open(array('url' => 'bill', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="row">
                 <div class="col-12">
@@ -340,14 +281,14 @@
                                 </tr>
                                 </thead>
                                 <tbody class="ui-sortable">
-                                <tr data-repeater-item>
-                                    <td width="25%">
+                                <tr data-repeater-item data-is-item="true">
+                                    <td width="17%">
                                         {{ Form::select('item', $product_services,'', array('class' => 'form-control font-style  customer-sel font-style item','data-url'=>route('bill.product'),'required'=>'required')) }}
                                     </td>
                                     <td>
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
-                                                {{ Form::text('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'required'=>'required')) }}
+                                                {{ Form::text('quantity','', array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'),'data-is-number')) }}
                                                 <div class="input-group-append">
                                                     <div class="input-group-text unit">
 
@@ -356,22 +297,22 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td width="20%">
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
-                                                {{ Form::text('price','', array('class' => 'form-control price','required'=>'required','placeholder'=>__('Price'),'required'=>'required')) }}
-                                                <div class="input-group-append">
+                                                <div class="input-group-prepend">
                                                     <div class="input-group-text">
                                                         {{\Auth::user()->currencySymbol()}}
                                                     </div>
                                                 </div>
+                                                {{ Form::text('price','', array('class' => 'form-control price','required'=>'required','placeholder'=>__('Price'),'data-is-number')) }}
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
-                                                {{ Form::text('tax','', array('class' => 'form-control tax','required'=>'required','placeholder'=>__('Tax'),'required'=>'required')) }}
+                                                {{ Form::text('tax','', array('class' => 'form-control tax','required'=>'required','placeholder'=>__('Tax'),'data-is-number')) }}
                                                 <div class="input-group-append">
                                                     <div class="input-group-text">
                                                         <i class="fas fa-percentage"></i>
@@ -383,12 +324,12 @@
                                     <td>
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
-                                                {{ Form::text('discount','', array('class' => 'form-control discount','required'=>'required','placeholder'=>__('Discount'))) }}
-                                                <div class="input-group-append">
+                                                <div class="input-group-prepend">
                                                     <div class="input-group-text">
                                                         {{\Auth::user()->currencySymbol()}}
                                                     </div>
                                                 </div>
+                                                {{ Form::text('discount','', array('class' => 'form-control discount','placeholder' => __('Discount'), 'data-is-number')) }}
                                             </div>
                                         </div>
                                     </td>
