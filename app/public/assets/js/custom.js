@@ -58,6 +58,8 @@ const OnlyAllowNumber   = () => {
                 }
                 if(target.value != "" && !(/^[0-9\.]*\,$/).test(target.value)) target.value = AddNumberSeparator(target.value);
             }
+
+            if(target.nodeName == 'INPUT' || target.nodeName == 'SELECT' || target.nodeName == 'TEXTAREA') { WatchChange(target, true); }
         });
     });
 }
@@ -65,6 +67,106 @@ const OnlyAllowNumber   = () => {
 OnlyAllowNumber();
 
 const AddNumberSeparator    = number => parseFloat(number.replace(/\./g, '').replace(/,/g, '.')).toLocaleString('id', {maximumFractionDigits: 6});
+
+const validateCurrencyInput = (form) => {        
+    const inputs = form.querySelectorAll('input[data-is-number]');
+    let error = false;
+    inputs.forEach(input => {
+        let pattern = /^[0-9\.]*,?[0-9]*$/;   
+        if(!pattern.test(input.value)  && input.value !== null) error = true;
+    });
+    if(error){
+        toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
+        return false;
+    }
+    return true;
+}
+
+const checkEmptyInputs = form => {
+    const inputs    = form.querySelectorAll('input, select, textarea');
+    let emptyInputs = [];
+    inputs.forEach(input => { 
+        if((!input.value || input.value == "") && input.hasAttribute('data-is-required') && input.getAttribute('type') != 'hidden') {
+            emptyInputs.push(input.name);
+        }
+    });
+    return {result: Boolean(emptyInputs.length), items: emptyInputs};
+}
+
+const InitModal     = (content) => {
+    let dialog = document.createElement('div');
+    dialog.className = 'modal fade';
+    dialog.setAttribute('tabindex', '-1');
+    dialog.innerHTML = `<div class="modal-dialog modal-dialog-centered">${content}</div>`;
+    return dialog;
+};
+
+const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}) => {
+    fetch(`${url}?${data}`, {method: 'get'})
+    .then(response => {
+        if( response.ok ) return response.text();
+        else throw new Error( `${response.status}: ${response.statusText}` );
+    }) .then (data => {
+        let dialog = InitModal(data);
+        document.body.append(dialog);
+        dialog.querySelector('.dialog-yes').addEventListener('click', () => {
+            callbacks.yes();
+            $(dialog).modal('hide');
+            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+            
+        });
+        dialog.querySelector('.dialog-no').addEventListener('click', () => {
+            callbacks.no();
+            $(dialog).modal('hide');
+            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+        });
+        $(dialog).modal('show');
+    }) .catch ( error => {
+        toastrs('Error', error, 'error');
+        console.error(error);
+    });
+}
+
+const ValidateForm = (event,form) => {
+    event.preventDefault();
+    let isEmpty = checkEmptyInputs(form);
+    
+    if(isEmpty.result){
+        let parameters = [];
+        isEmpty.items.forEach(item => {
+            parameters.push(`item[]=${item}`);
+        });
+        parameters = parameters.join('&');
+
+        parameters = `${parameters}&title=Empty Inputs`;
+        let url         = window.location.href,
+            pos         = url.indexOf('/app/'),
+            destination = url.substring(0, pos + 5) + 'dialog-empty-input';
+        
+        CreateModal(destination, parameters, {
+            yes: () => form.submit(), 
+            no: () => false
+        });
+    }
+    return false;
+}
+
+const WatchChange = (input, testOtherInput = false) => {
+    if((!input.value || input.value == '') && (input.hasAttribute('data-is-required') || input.hasAttribute('required'))){
+        input.classList.add('is-invalid');
+    } else {
+        input.classList.remove('is-invalid');
+    }
+    if(testOtherInput){
+        let form = input.parentNode;
+        while(form.nodeName != 'FORM'){
+            form = form.parentNode;
+        }
+
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(item => WatchChange(item));
+    }
+}
 
 $(function () {
     $(".custom-scroll").niceScroll();
