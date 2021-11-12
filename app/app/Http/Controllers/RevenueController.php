@@ -179,7 +179,7 @@ class RevenueController extends Controller
         if(\Auth::user()->can('edit revenue'))
         {
             $customers  = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customers->prepend(__('Select customer'), '');
+            $customers->prepend(__('Select customer'), null);
             $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type','=',1)->get()->pluck('name', 'id');
             $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
