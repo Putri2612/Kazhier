@@ -1,4 +1,4 @@
-{{Form::model($vender,array('route' => array('vender.update', $vender->id), 'method' => 'PUT')) }}
+{{Form::model($vender,array('route' => array('vender.update', $vender->id), 'method' => 'PUT', 'onsubmit' => 'ValidateForm(event,this)')) }}
 <h4 class="sub-title">{{__('Basic Info')}}</h4>
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-6">
@@ -52,19 +52,6 @@
     </div>
     <div class="col-lg-4 col-md-4 col-sm-6">
         <div class="form-group">
-            {{Form::label('billing_country',__('Country'),array('class'=>'')) }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">
-                        <i class="far fa-flag"></i>
-                    </div>
-                </div>
-                {{Form::text('billing_country',null,array('class'=>'form-control','required'=>'required'))}}
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6">
-        <div class="form-group">
             {{Form::label('billing_state',__('State'),array('class'=>'')) }}
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -72,7 +59,7 @@
                         <i class="fas fa-chess-pawn"></i>
                     </div>
                 </div>
-                {{Form::text('billing_state',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('billing_state',null,array('class'=>'form-control','data-is-required'))}}
             </div>
         </div>
     </div>
@@ -85,7 +72,7 @@
                         <i class="fas fa-city"></i>
                     </div>
                 </div>
-                {{Form::text('billing_city',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('billing_city',null,array('class'=>'form-control','data-is-required'))}}
             </div>
         </div>
     </div>
@@ -149,19 +136,6 @@
     </div>
     <div class="col-lg-4 col-md-4 col-sm-6">
         <div class="form-group">
-            {{Form::label('shipping_country',__('Country'),array('class'=>'')) }}
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">
-                        <i class="far fa-flag"></i>
-                    </div>
-                </div>
-                {{Form::text('shipping_country',null,array('class'=>'form-control','required'=>'required'))}}
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-4 col-md-4 col-sm-6">
-        <div class="form-group">
             {{Form::label('shipping_state',__('State'),array('class'=>'')) }}
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -169,7 +143,7 @@
                         <i class="fas fa-chess-pawn"></i>
                     </div>
                 </div>
-                {{Form::text('shipping_state',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('shipping_state',null,array('class'=>'form-control','data-is-required'))}}
             </div>
         </div>
     </div>
@@ -182,7 +156,7 @@
                         <i class="fas fa-city"></i>
                     </div>
                 </div>
-                {{Form::text('shipping_city',null,array('class'=>'form-control','required'=>'required'))}}
+                {{Form::text('shipping_city',null,array('class'=>'form-control','data-is-required'))}}
             </div>
         </div>
     </div>

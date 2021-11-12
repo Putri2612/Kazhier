@@ -7,9 +7,9 @@ use App\Mail\UserCreate;
 use App\Models\Plan;
 use App\Models\Transaction;
 use App\Models\Vender;
-use Auth;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Role;
@@ -60,22 +60,12 @@ class VenderController extends Controller
         {
             $rules = [
                 'name' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'email' => 'required|email|unique:venders',
-                'password' => 'required',
+                'contact' => 'required',
                 'billing_name' => 'required',
-                'billing_country' => 'required',
-                'billing_state' => 'required',
-                'billing_city' => 'required',
-                'billing_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'billing_zip' => 'required',
+                'billing_phone' => 'required',
                 'billing_address' => 'required',
                 'shipping_name' => 'required',
-                'shipping_country' => 'required',
-                'shipping_state' => 'required',
-                'shipping_city' => 'required',
-                'shipping_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'shipping_zip' => 'required',
+                'shipping_phone' => 'required',
                 'shipping_address' => 'required',
             ];
 
@@ -88,28 +78,13 @@ class VenderController extends Controller
                 return redirect()->route('vender.index')->with('error', $messages->first());
             }
 
-            $vender                   = new Vender();
-            $vender->vender_id        = $this->venderNumber();
-            $vender->name             = $request->name;
-            $vender->contact          = $request->contact;
-            $vender->email            = $request->email;
-            $vender->password         = Hash::make($request->password);
-            $vender->created_by       = \Auth::user()->creatorId();
-            $vender->billing_name     = $request->billing_name;
-            $vender->billing_country  = $request->billing_country;
-            $vender->billing_state    = $request->billing_state;
-            $vender->billing_city     = $request->billing_city;
-            $vender->billing_phone    = $request->billing_phone;
-            $vender->billing_zip      = $request->billing_zip;
-            $vender->billing_address  = $request->billing_address;
-            $vender->shipping_name    = $request->shipping_name;
-            $vender->shipping_country = $request->shipping_country;
-            $vender->shipping_state   = $request->shipping_state;
-            $vender->shipping_city    = $request->shipping_city;
-            $vender->shipping_phone   = $request->shipping_phone;
-            $vender->shipping_zip     = $request->shipping_zip;
-            $vender->shipping_address = $request->shipping_address;
-            $vender->save();
+            $venderData                 = $request->all();
+            $venderData['vender_id']    = $this->venderNumber();
+            $venderData['created_by']   = Auth::user()->creatorId();
+
+
+            $vender = Vender::create($venderData);
+            $vender->refresh();
             CustomField::saveData($vender, $request->customField);
             
             $role_r = Role::where('name', '=', 'vender')->firstOrFail();
@@ -168,22 +143,14 @@ class VenderController extends Controller
         {
 
             $rules = [
-                'name' => 'required',
-                'contact' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'billing_name' => 'required',
-                'billing_country' => 'required',
-                'billing_state' => 'required',
-                'billing_city' => 'required',
-                'billing_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'billing_zip' => 'required',
-                'billing_address' => 'required',
-                'shipping_name' => 'required',
-                'shipping_country' => 'required',
-                'shipping_state' => 'required',
-                'shipping_city' => 'required',
-                'shipping_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'shipping_zip' => 'required',
-                'shipping_address' => 'required',
+                'name'              => 'required',
+                'contact'           => 'required',
+                'billing_name'      => 'required',
+                'billing_phone'     => 'required',
+                'billing_address'   => 'required',
+                'shipping_name'     => 'required',
+                'shipping_phone'    => 'required',
+                'shipping_address'  => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -194,25 +161,9 @@ class VenderController extends Controller
 
                 return redirect()->route('vender.index')->with('error', $messages->first());
             }
+            $venderData = $request->all();
+            $vender->update($venderData);
 
-            $vender->name             = $request->name;
-            $vender->contact          = $request->contact;
-            $vender->created_by       = \Auth::user()->creatorId();
-            $vender->billing_name     = $request->billing_name;
-            $vender->billing_country  = $request->billing_country;
-            $vender->billing_state    = $request->billing_state;
-            $vender->billing_city     = $request->billing_city;
-            $vender->billing_phone    = $request->billing_phone;
-            $vender->billing_zip      = $request->billing_zip;
-            $vender->billing_address  = $request->billing_address;
-            $vender->shipping_name    = $request->shipping_name;
-            $vender->shipping_country = $request->shipping_country;
-            $vender->shipping_state   = $request->shipping_state;
-            $vender->shipping_city    = $request->shipping_city;
-            $vender->shipping_phone   = $request->shipping_phone;
-            $vender->shipping_zip     = $request->shipping_zip;
-            $vender->shipping_address = $request->shipping_address;
-            $vender->save();
             CustomField::saveData($vender, $request->customField);
 
             return redirect()->route('vender.index')->with('success', __('Vender successfully updated.'));

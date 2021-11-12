@@ -23,6 +23,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebitNoteController;
+use App\Http\Controllers\DialogController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GoalController;
@@ -62,6 +63,8 @@ Route::post('register', [RegisterController::class, 'register'])->name('register
 Route::get('/login/{lang?}', [LoginController::class, 'showLoginForm'])->name('login');
 
 Route::get('/plan/listAsync', [PlanController::class, 'getPlanAsync']);
+
+Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
 
 
 Route::prefix('customer')->as('customer.')->group(

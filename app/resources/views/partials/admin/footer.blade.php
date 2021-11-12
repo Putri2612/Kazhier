@@ -74,19 +74,7 @@
 </script>
 
 <script>
-    const validateCurrencyInput = (form) => {        
-        const inputs = form.querySelectorAll('input[data-is-number]');
-        let error = false;
-        inputs.forEach(input => {
-            let pattern = /^[0-9\.]*,?[0-9]*$/;   
-            if(!pattern.test(input.value)  && input.value !== null) error = true;
-        });
-        if(error){
-            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
-            return false;
-        }
-        return true;
-    }
+    
 </script>
 
 <script>

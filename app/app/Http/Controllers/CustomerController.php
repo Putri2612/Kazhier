@@ -63,15 +63,9 @@ class CustomerController extends Controller
                 'contact' => 'required',
                 'email' => 'email',
                 'billing_name' => 'required',
-                'billing_country' => 'required',
-                'billing_state' => 'required',
-                'billing_city' => 'required',
                 'billing_phone' => 'required',
                 'billing_address' => 'required',
                 'shipping_name' => 'required',
-                'shipping_country' => 'required',
-                'shipping_state' => 'required',
-                'shipping_city' => 'required',
                 'shipping_phone' => 'required',
                 'shipping_address' => 'required',
             ];
@@ -85,28 +79,15 @@ class CustomerController extends Controller
                 return redirect()->route('customer.index')->with('error', $messages->first());
             }
 
-            $customer                   = new Customer();
-            $customer->customer_id      = $this->customerNumber();
-            $customer->name             = $request->input('name');
-            $customer->contact          = $request->input('contact');
-            $customer->email            = $request->input('email');
-            $customer->password         = Hash::make($request->input('password'));
-            $customer->created_by       = Auth::user()->creatorId();
-            $customer->billing_name     = $request->input('billing_name');
-            $customer->billing_country  = $request->input('billing_country');
-            $customer->billing_state    = $request->input('billing_state');
-            $customer->billing_city     = $request->input('billing_city');
-            $customer->billing_phone    = $request->input('billing_phone');
-            $customer->billing_zip      = $request->input('billing_zip');
-            $customer->billing_address  = $request->input('billing_address');
-            $customer->shipping_name    = $request->input('shipping_name');
-            $customer->shipping_country = $request->input('shipping_country');
-            $customer->shipping_state   = $request->input('shipping_state');
-            $customer->shipping_city    = $request->input('shipping_city');
-            $customer->shipping_phone   = $request->input('shipping_phone');
-            $customer->shipping_zip     = $request->input('shipping_zip');
-            $customer->shipping_address = $request->input('shipping_address');
-            $customer->save();
+            $customerData = $request->all();
+            $customerData['created_by']         = Auth::user()->creatorId();
+            $customerData['customer_id']        = $this->customerNumber();
+            $customerData['biling_country']     = 'Indonesia';
+            $customerData['shipping_country']   = 'Indonesia';
+
+            $customer   = Customer::create($customerData);
+            $customer->refresh();
+
             CustomField::saveData($customer, $request->input('customField'));
 
             $role_r = Role::where('name', '=', 'customer')->firstOrFail();
@@ -168,15 +149,9 @@ class CustomerController extends Controller
                 'name' => 'required',
                 'contact' => 'required',
                 'billing_name' => 'required',
-                'billing_country' => 'required',
-                'billing_state' => 'required',
-                'billing_city' => 'required',
                 'billing_phone' => 'required',
                 'billing_address' => 'required',
                 'shipping_name' => 'required',
-                'shipping_country' => 'required',
-                'shipping_state' => 'required',
-                'shipping_city' => 'required',
                 'shipping_phone' => 'required',
                 'shipping_address' => 'required',
             ];
@@ -190,24 +165,8 @@ class CustomerController extends Controller
                 return redirect()->route('customer.index')->with('error', $messages->first());
             }
 
-            $customer->name             = $request->input('name');
-            $customer->contact          = $request->input('contact');
-            $customer->created_by       = Auth::user()->creatorId();
-            $customer->billing_name     = $request->input('billing_name');
-            $customer->billing_country  = $request->input('billing_country');
-            $customer->billing_state    = $request->input('billing_state');
-            $customer->billing_city     = $request->input('billing_city');
-            $customer->billing_phone    = $request->input('billing_phone');
-            $customer->billing_zip      = $request->input('billing_zip');
-            $customer->billing_address  = $request->input('billing_address');
-            $customer->shipping_name    = $request->input('shipping_name');
-            $customer->shipping_country = $request->input('shipping_country');
-            $customer->shipping_state   = $request->input('shipping_state');
-            $customer->shipping_city    = $request->input('shipping_city');
-            $customer->shipping_phone   = $request->input('shipping_phone');
-            $customer->shipping_zip     = $request->input('shipping_zip');
-            $customer->shipping_address = $request->input('shipping_address');
-            $customer->save();
+            $customerData = $request->all();
+            $customer->update($customerData);
 
             CustomField::saveData($customer, $request->input('customField'));
 
