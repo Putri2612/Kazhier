@@ -187,6 +187,8 @@ class PaymentController extends Controller
             $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
+            $payment->amount = $this->FloatToReadableNumber($payment->amount);
+
             return view('payment.edit', compact('venders', 'categories', 'payments', 'accounts', 'payment'));
         }
         else
@@ -236,7 +238,6 @@ class PaymentController extends Controller
             $payment->vender_id      = ($request->input('vender_id') != '' ? $request->input('vender_id') : null);
             $payment->category_id    = $request->input('category_id');
             $payment->payment_method = $request->input('payment_method');
-            $payment->reference      = $request->input('reference');
             $payment->description    = $request->input('description');
             $payment->save();
 

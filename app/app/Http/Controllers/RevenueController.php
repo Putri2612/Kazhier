@@ -184,6 +184,8 @@ class RevenueController extends Controller
             $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
+            $revenue->amount = $this->FloatToReadableNumber($revenue->amount);
+
             return view('revenue.edit', compact('customers', 'categories', 'payments', 'accounts', 'revenue'));
         }
         else
@@ -231,7 +233,6 @@ class RevenueController extends Controller
             $revenue->customer_id    = ($request->input('customer_id') != '' ? $request->input('customer_id') : null);;
             $revenue->category_id    = $request->input('category_id');
             $revenue->payment_method = $request->input('payment_method');
-            
             $revenue->description    = $request->input('description');
             $revenue->save();
 
