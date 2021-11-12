@@ -124,7 +124,7 @@ class PaymentController extends Controller
             $payment->date           = $request->input('date');
             $payment->amount         = $amount;
             $payment->account_id     = $request->input('account_id');
-            $payment->vender_id      = $request->input('vender_id');
+            $payment->vender_id      = ($request->input('vender_id') != '' ? $request->input('vender_id') : null);
             $payment->category_id    = $request->input('category_id');
             $payment->payment_method = $request->input('payment_method');
             $payment->description    = $request->input('description');
@@ -148,21 +148,21 @@ class PaymentController extends Controller
             Transaction::addTransaction($payment);
 
             $vender          = Vender::where('id', $request->input('vender_id'))->first();
-            $payment_method  = PaymentMethod::where('id', $request->input('payment_method'))->first();
-            $payment         = new BillPayment();
-            $payment->name   = $vender['name'];
-            $payment->method = $payment_method['name'];
-            $payment->date   = \Auth::user()->dateFormat($request->input('date'));
-            $payment->amount = \Auth::user()->priceFormat($amount);
-            $payment->bill   = '';
 
-            try
-            {
-                Mail::to($vender['email'])->send(new BillPaymentCreate($payment));
-            }
-            catch(\Exception $e)
-            {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+            if(!empty($vender)){
+                $payment_method  = PaymentMethod::where('id', $request->input('payment_method'))->first();
+                $payment         = new BillPayment();
+                $payment->name   = $vender['name'];
+                $payment->method = $payment_method['name'];
+                $payment->date   = \Auth::user()->dateFormat($request->input('date'));
+                $payment->amount = \Auth::user()->priceFormat($amount);
+                $payment->bill   = '';
+
+                try {
+                    Mail::to($vender['email'])->send(new BillPaymentCreate($payment));
+                } catch(\Exception $e) {
+                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+                }
             }
 
             return redirect()->route('payment.index')->with('success', __('Payment successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
@@ -233,7 +233,7 @@ class PaymentController extends Controller
             $payment->date           = $request->input('date');
             $payment->amount         = $amount;
             $payment->account_id     = $request->input('account_id');
-            $payment->vender_id      = $request->input('vender_id');
+            $payment->vender_id      = ($request->input('vender_id') != '' ? $request->input('vender_id') : null);
             $payment->category_id    = $request->input('category_id');
             $payment->payment_method = $request->input('payment_method');
             $payment->reference      = $request->input('reference');

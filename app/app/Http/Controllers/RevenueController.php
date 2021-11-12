@@ -118,14 +118,13 @@ class RevenueController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
             $revenue                 = new Revenue();
             $revenue->date           = $request->input('date');
             $revenue->amount         = $amount;
             $revenue->account_id     = $request->input('account_id');
-            $revenue->customer_id    = $request->input('customer_id');
+            $revenue->customer_id    = ($request->input('customer_id') != '' ? $request->input('customer_id') : null);
             $revenue->category_id    = $request->input('category_id');
             $revenue->payment_method = $request->input('payment_method');
             $revenue->description    = $request->input('description');
@@ -148,20 +147,20 @@ class RevenueController extends Controller
             Transaction::addTransaction($revenue);
 
             $customer = Customer::where('id',  $request->input('customer_id'))->first();
-            $payment          = new InvoicePayment();
-            $payment->name    = $customer['name'];
-            $payment->date    = \Auth::user()->dateFormat($request->input('date'));
-            $payment->amount  = \Auth::user()->priceFormat($amount);
-            $payment->invoice = '';
+            if(!empty($customer)){
+                $payment          = new InvoicePayment();
+                $payment->name    = $customer['name'];
+                $payment->date    = \Auth::user()->dateFormat($request->input('date'));
+                $payment->amount  = \Auth::user()->priceFormat($amount);
+                $payment->invoice = '';
 
-            try
-            {
-                Mail::to($customer['email'])->send(new InvoicePaymentCreate($payment));
+                try {
+                    Mail::to($customer['email'])->send(new InvoicePaymentCreate($payment));
+                } catch(\Exception $e) {
+                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+                }
             }
-            catch(\Exception $e)
-            {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-            }
+
 
             return redirect()->route('revenue.index')->with('success', __('Revenue successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
         }
@@ -229,7 +228,7 @@ class RevenueController extends Controller
             $revenue->date           = $request->input('date');
             $revenue->amount         = $amount;
             $revenue->account_id     = $request->input('account_id');
-            $revenue->customer_id    = $request->input('customer_id');
+            $revenue->customer_id    = ($request->input('customer_id') != '' ? $request->input('customer_id') : null);;
             $revenue->category_id    = $request->input('category_id');
             $revenue->payment_method = $request->input('payment_method');
             
