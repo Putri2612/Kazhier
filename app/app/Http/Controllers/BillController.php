@@ -74,11 +74,11 @@ class BillController extends Controller
         {
             $customFields = CustomField::where('module', '=', 'bill')->get();
             $category     = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
 
             $bill_number = \Auth::user()->billNumberFormat($this->billNumber());
             $venders     = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $venders->prepend('Select Vender', '');
+            $venders->prepend(__('Select Vender'), '');
 
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
@@ -188,7 +188,7 @@ class BillController extends Controller
         if(\Auth::user()->can('edit bill'))
         {
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
 
             $bill_number      = \Auth::user()->billNumberFormat($this->billNumber());
             $venders          = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');

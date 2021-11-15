@@ -7,8 +7,9 @@ use Illuminate\Http\Request;
 class DialogController extends Controller
 {
     public function EmptyInput(Request $request) {
-        $names = str_replace('_', ' ', array_unique($request->input('item')));
-        $title = $request->input('title');
+        $NoID   = str_replace('_id', '', array_unique($request->input('item')));
+        $names  = str_replace('_', ' ', $NoID);
+        $title  = $request->input('title');
         return view('dialog.empty-inputs', compact('names', 'title'));
     }
 }

@@ -84,9 +84,9 @@ class InvoiceController extends Controller
             $customFields       = CustomField::where('module', '=', 'invoice')->get();
             $invoice_number     = Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers          = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customers->prepend('Select Customer', '');
+            $customers->prepend(__('Select Customer'), '');
             $category           = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
             $product_services   = ProductService::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             $category           = $category->union(['new.product-category' => __('Create new category')]);
@@ -190,7 +190,7 @@ class InvoiceController extends Controller
             $invoice_number = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
             $customers      = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $category       = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
             $product_services = ProductService::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             $invoice->customField = CustomField::getData($invoice, 'invoice');

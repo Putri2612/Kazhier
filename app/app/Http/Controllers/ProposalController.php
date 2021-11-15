@@ -77,9 +77,9 @@ class ProposalController extends Controller
             $customFields    = CustomField::where('module', '=', 'proposal')->get();
             $proposal_number = \Auth::user()->proposalNumberFormat($this->proposalNumber());
             $customers       = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customers->prepend('Select Customer', '');
+            $customers->prepend(__('Select Customer'), '');
             $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             return view('proposal.create', compact('customers', 'proposal_number', 'product_services', 'category', 'customFields'));
@@ -171,7 +171,7 @@ class ProposalController extends Controller
             $proposal_number = \Auth::user()->proposalNumberFormat($proposal->proposal_id);
             $customers       = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $category        = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
-            $category->prepend('Select Category', '');
+            $category->prepend(__('Select Category'), '');
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
 
             $proposal->customField = CustomField::getData($proposal, 'proposal');
