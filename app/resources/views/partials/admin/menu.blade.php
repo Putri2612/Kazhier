@@ -197,7 +197,7 @@
                         <i class="fa fa-bullseye"></i> <span>{{__('Goal')}}</span></a>
                 </li>
             @endif
-            @if(Gate::check('manage assets')  || Gate::check('manage liabilities') || Gate::check('manage equities') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
+            @if(Gate::check('manage assets')  || Gate::check('manage liabilities') || Gate::check('manage equities'))
                 <li class="dropdown {{ (Request::segment(1) == 'account-assets' ||  Request::segment(1) == 'account-liabilities' || Request::segment(1) == 'account-equities' || Request::segment(1) == 'journal' || Request::segment(1) == 'ledger' || Request::segment(1) == 'balance-sheet') ? 'active' : ''}} ">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-balance-scale"></i> <span>{{__('Double Entry')}}</span></a>
                     <ul class="dropdown-menu">
@@ -216,21 +216,6 @@
                                 <a class="nav-link" href="{{ route('account-equities.index') }}">{{__('Equities')}}</a>
                             </li>    
                         @endif
-                        @can('view journal')
-                        <li class="{{ (Request::route()->getName() == 'journal.index' ) ? ' active' : '' }}">
-                            <a class="nav-link" href="{{route('journal.index')}}">{{  __('Journal') }}</a>
-                        </li>
-                        @endcan
-                        @can('view ledger')
-                        <li class="{{ (Request::route()->getName() == 'ledger.index' ) ? ' active' : '' }}">
-                            <a class="nav-link" href="{{route('ledger.index')}}">{{  __('Ledger') }}</a>
-                        </li>
-                        @endcan
-                        @can('view balance sheet')
-                        <li class="{{ (Request::route()->getName() == 'balance-sheet.index' ) ? ' active' : '' }}">
-                            <a class="nav-link" href="{{route('balance-sheet.index')}}">{{  __('Balance Sheet') }}</a>
-                        </li>
-                        @endcan
                     </ul>
                 </li>
             @endif
@@ -251,7 +236,7 @@
                 </li>
             @endif
 
-            @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report'))
+            @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
                 <li class="dropdown {{ (Request::segment(1) == 'report' || Request::segment(1) == 'transaction')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-chart-area"></i> <span>{{__('Report')}}</span></a>
                     <ul class="dropdown-menu">
@@ -299,6 +284,21 @@
                             <li class="{{ (Request::route()->getName() == 'report.bill.summary' ) ? ' active' : '' }}">
                                 <a class="nav-link" href="{{route('report.bill.summary')}}">{{  __('Bill Summary') }}</a>
                             </li>
+                        @endcan
+                        @can('view journal')
+                        <li class="{{ (Request::route()->getName() == 'journal.index' ) ? ' active' : '' }}">
+                            <a class="nav-link" href="{{route('journal.index')}}">{{  __('Journal') }}</a>
+                        </li>
+                        @endcan
+                        @can('view ledger')
+                        <li class="{{ (Request::route()->getName() == 'ledger.index' ) ? ' active' : '' }}">
+                            <a class="nav-link" href="{{route('ledger.index')}}">{{  __('Ledger') }}</a>
+                        </li>
+                        @endcan
+                        @can('view balance sheet')
+                        <li class="{{ (Request::route()->getName() == 'balance-sheet.index' ) ? ' active' : '' }}">
+                            <a class="nav-link" href="{{route('balance-sheet.index')}}">{{  __('Balance Sheet') }}</a>
+                        </li>
                         @endcan
                     </ul>
                 </li>
