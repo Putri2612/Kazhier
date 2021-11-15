@@ -1,4 +1,4 @@
-{{ Form::open(array('route' => array('invoice.credit.note',$invoice_id),'method'=>'post', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::open(array('route' => array('invoice.credit.note',$invoice_id),'method'=>'post', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('date', __('Date')) }}

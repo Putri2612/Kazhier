@@ -1,4 +1,4 @@
-{{Form::model($plan, array('route' => array('plans.update', $plan->id), 'method' => 'PUT', 'enctype' => "multipart/form-data", 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{Form::model($plan, array('route' => array('plans.update', $plan->id), 'method' => 'PUT', 'enctype' => "multipart/form-data", 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{Form::label('name',__('Name'))}}

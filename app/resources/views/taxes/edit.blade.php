@@ -1,4 +1,4 @@
-{{ Form::model($tax, array('route' => array('taxes.update', $tax->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::model($tax, array('route' => array('taxes.update', $tax->id), 'method' => 'PUT', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{ Form::label('name', __('Tax Rate Name')) }}

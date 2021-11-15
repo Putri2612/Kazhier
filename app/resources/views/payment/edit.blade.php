@@ -1,4 +1,4 @@
-{{ Form::model($payment, array('route' => array('payment.update', $payment->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::model($payment, array('route' => array('payment.update', $payment->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
 
 @php
     $ref = asset(Storage::url('reference/'));
@@ -39,7 +39,7 @@
     <div class="form-group  col-md-6">
         <div class="input-group">
             {{ Form::label('vender_id', __('Vendor')) }}
-            {{ Form::select('vender_id', $venders,null, array('class' => 'form-control customer-sel font-style selectric ')) }}
+            {{ Form::select('vender_id', $venders,null, array('class' => 'form-control customer-sel font-style selectric', 'data-is-required')) }}
         </div>
     </div>
     <div class="form-group  col-md-12">
@@ -61,7 +61,7 @@
     <div class="form-group  col-md-6">
         {{ Form::label('reference', __('Reference')) }}
         <div class="input-group">
-            <div class="fileinput fileinput-new" data-provides="fileinput">
+            <div class="fileinput fileinput-exists" data-provides="fileinput">
                 <div>
                     <span class="btn btn-file btn-secondary">
                         <span class="fileinput-new"><i class="fas fa-paperclip"></i></span>

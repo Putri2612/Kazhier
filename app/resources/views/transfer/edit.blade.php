@@ -1,4 +1,4 @@
-{{ Form::model($transfer, array('route' => array('transfer.update', $transfer->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::model($transfer, array('route' => array('transfer.update', $transfer->id), 'method' => 'PUT', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
 @php
     $ref = asset(Storage::url('reference/'));
 @endphp

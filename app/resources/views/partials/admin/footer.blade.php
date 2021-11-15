@@ -30,8 +30,8 @@
 <script src="{{ asset('assets/modules/nicescroll/jquery.nicescroll.min.js')}} "></script>
 
 <script src="{{ asset('assets/js/jscolor.js') }} "></script>
-<script src="{{ asset('assets/js/scripts.js') }} "></script>
-<script src="{{ asset('assets/js/custom.js') }} "></script>
+<script src="{{ asset('assets/js/scripts.min.js').'?'.time() }}"></script>
+<script src="{{ asset('assets/js/custom.min.js').'?'.time() }}"></script>
 <script src="{{asset('assets/js/jquery-ui.min.js')}}"></script>
 
 <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>

@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'goal', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::open(array('url' => 'goal', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{ Form::label('name', __('Name')) }}

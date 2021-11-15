@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'productservice', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::open(array('url' => 'productservice', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">

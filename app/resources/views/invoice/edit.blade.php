@@ -175,7 +175,7 @@
             </div>
         </div>
         <div class="section-body">
-            {{ Form::model($invoice, array('route' => array('invoice.update', $invoice->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+            {{ Form::model($invoice, array('route' => array('invoice.update', $invoice->id), 'method' => 'PUT', 'onsubmit' => 'return ValidateForm(event)')) }}
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="row">
                 <div class="col-12">

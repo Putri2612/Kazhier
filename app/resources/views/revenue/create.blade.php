@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'revenue', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::open(array('url' => 'revenue', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('date', __('Date')) }}
@@ -31,7 +31,7 @@
     <div class="form-group  col-md-6">
         <div class="input-group">
             {{ Form::label('customer_id', __('Customer')) }}
-            {{ Form::select('customer_id', $customers,null, array('class' => 'form-control customer-sel font-style selectric ')) }}
+            {{ Form::select('customer_id', $customers,null, array('class' => 'form-control customer-sel font-style selectric', 'data-is-required')) }}
         </div>
     </div>
     <div class="form-group  col-md-12">

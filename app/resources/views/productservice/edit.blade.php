@@ -1,4 +1,4 @@
-{{ Form::model($productService, array('route' => array('productservice.update', $productService->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::model($productService, array('route' => array('productservice.update', $productService->id), 'method' => 'PUT', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="col-md-6">
         <div class="form-group">

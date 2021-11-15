@@ -1,4 +1,4 @@
-{{Form::model($vender,array('route' => array('vender.update', $vender->id), 'method' => 'PUT', 'onsubmit' => 'ValidateForm(event,this)')) }}
+{{Form::model($vender,array('route' => array('vender.update', $vender->id), 'method' => 'PUT', 'onsubmit' => 'return ValidateForm(event)')) }}
 <h4 class="sub-title">{{__('Basic Info')}}</h4>
 <div class="row">
     <div class="col-lg-6 col-md-6 col-sm-6">

@@ -1,4 +1,4 @@
-{{ Form::model($bankAccount, array('route' => array('bank-account.update', $bankAccount->id), 'method' => 'PUT', 'onsubmit' => 'return validateCurrencyInput(this)')) }}
+{{ Form::model($bankAccount, array('route' => array('bank-account.update', $bankAccount->id), 'method' => 'PUT', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('holder_name', __('Bank Holder Name')) }}
