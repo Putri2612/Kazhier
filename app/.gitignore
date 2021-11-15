@@ -15,4 +15,4 @@ yarn-error.log
 /.vscode
 *.ps1
 resources/debug/ajaxDebug.html
-.zip
+*.zip
