@@ -554,7 +554,7 @@
                                     <li class="media">
                                         <div class="media-body">
                                             <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
+                                            <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
                                         </div>
                                     </li>
                                 </ul>
@@ -581,7 +581,7 @@
                                     <li class="media">
                                         <div class="media-body">
                                             <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
+                                            <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
                                         </div>
                                     </li>
                                 </ul>
