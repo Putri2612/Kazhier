@@ -504,18 +504,9 @@ Route::group(
 }
 );
 
-Route::get(
-    '/invoices/preview/{template}/{color}', [
-                                              'as' => 'invoice.preview',
-                                              'uses' => [InvoiceController::class, 'previewInvoice'],
-                                          ]
-);
-Route::post(
-    '/invoices/template/setting', [
-                                    'as' => 'template.setting',
-                                    'uses' => [InvoiceController::class, 'saveTemplateSettings'],
-                                ]
-);
+Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
+                                              
+Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
 
 Route::group(
     [
@@ -562,18 +553,8 @@ Route::group(
 );
 
 
-Route::get(
-    '/bill/preview/{template}/{color}', [
-                                          'as' => 'bill.preview',
-                                          'uses' => [BillController::class, 'previewBill'],
-                                      ]
-);
-Route::post(
-    '/bill/template/setting', [
-                                'as' => 'bill.template.setting',
-                                'uses' => [BillController::class, 'saveBillTemplateSettings'],
-                            ]
-);
+Route::get('/bill/preview/{template}/{color}', [BillController::class, 'previewBill'])->name('bill.preview');
+Route::post('/bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
 
 Route::resource('taxes', TaxController::class)->middleware(
     [
@@ -743,18 +724,8 @@ Route::group(
 }
 );
 
-Route::get(
-    '/proposal/preview/{template}/{color}', [
-                                              'as' => 'proposal.preview',
-                                              'uses' => [ProposalController::class, 'previewProposal'],
-                                          ]
-);
-Route::post(
-    '/proposal/template/setting', [
-                                    'as' => 'proposal.template.setting',
-                                    'uses' => [ProposalController::class, 'saveProposalTemplateSettings'],
-                                ]
-);
+Route::get('/proposal/preview/{template}/{color}', [ProposalController::class, 'previewProposal'])->name('proposal.preview');
+Route::post('/proposal/template/setting', [ProposalController::class, 'saveProposalTemplateSettings'])->name('proposal.template.setting');
 
 Route::resource('goal', GoalController::class)->middleware(
     [
