@@ -60,6 +60,9 @@
 .form-control:focus {
     box-shadow: none !important;
     outline: none; }
+.selectric.is-invalid{
+    border-color: #DC3645;
+}
 
 a {
     color: #0087f8;

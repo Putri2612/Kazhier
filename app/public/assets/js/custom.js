@@ -68,21 +68,23 @@ OnlyAllowNumber();
 
 const AddNumberSeparator    = number => parseFloat(number.replace(/\./g, '').replace(/,/g, '.')).toLocaleString('id', {maximumFractionDigits: 6});
 
-const validateCurrencyInput = (form) => {        
+const ValidateCurrencyInput = (form) => {        
     const inputs = form.querySelectorAll('input[data-is-number]');
     let error = false;
-    inputs.forEach(input => {
-        let pattern = /^[0-9\.]*,?[0-9]*$/;   
-        if(!pattern.test(input.value)  && input.value !== null) error = true;
-    });
-    if(error){
-        toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
-        return false;
+    if(inputs){
+        inputs.forEach(input => {
+            let pattern = /^[0-9\.]*,?[0-9]*$/;   
+            if(!pattern.test(input.value)  && input.value !== null) error = true;
+        });
+        if(error){
+            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
+            return false;
+        }
     }
     return true;
 }
 
-const checkEmptyInputs = form => {
+const CheckEmptyInputs = form => {
     const inputs    = form.querySelectorAll('input, select, textarea');
     let emptyInputs = [];
     inputs.forEach(input => { 
@@ -127,9 +129,11 @@ const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}
     });
 }
 
-const ValidateForm = (event,form) => {
+const ValidateForm = (event) => {
     event.preventDefault();
-    let isEmpty = checkEmptyInputs(form);
+    const form = event.target;
+    if(!ValidateCurrencyInput(form)) return false;
+    let isEmpty = CheckEmptyInputs(form);
     
     if(isEmpty.result){
         let parameters = [];
@@ -147,15 +151,29 @@ const ValidateForm = (event,form) => {
             yes: () => form.submit(), 
             no: () => false
         });
+    } else {
+        return form.submit();
     }
-    return false;
 }
 
 const WatchChange = (input, testOtherInput = false) => {
-    if((!input.value || input.value == '') && (input.hasAttribute('data-is-required') || input.hasAttribute('required'))){
-        input.classList.add('is-invalid');
+    if(
+        (!input.value || input.value == '' || (input.nodeName == 'SELECT' && input.value == '0')) 
+        && 
+        (input.hasAttribute('data-is-required') || input.hasAttribute('required'))
+    ){
+        if(input.nodeName == 'SELECT' && input.classList.contains('selectric')) {
+            input.parentNode.parentNode.querySelector('div.selectric').classList.add('is-invalid');
+        } else {
+            input.classList.add('is-invalid');
+        }
+        
     } else {
-        input.classList.remove('is-invalid');
+        if(input.nodeName == 'SELECT' && input.classList.contains('selectric')) {
+            input.parentNode.parentNode.querySelector('div.selectric').classList.remove('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
     }
     if(testOtherInput){
         let form = input.parentNode;
