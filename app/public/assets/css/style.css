@@ -63,6 +63,9 @@
 .selectric.is-invalid{
     border-color: #DC3645;
 }
+.column-small{
+    max-width: 9.5rem;
+}
 
 a {
     color: #0087f8;

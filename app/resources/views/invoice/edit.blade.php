@@ -289,9 +289,9 @@
                                 <thead>
                                 <tr>
                                     <th>{{__('Items')}}</th>
-                                    <th>{{__('Quantity')}}</th>
+                                    <th class="column-small">{{__('Quantity')}}</th>
                                     <th>{{__('Price')}} </th>
-                                    <th>{{__('Tax')}}</th>
+                                    <th class="column-small">{{__('Tax')}}</th>
                                     <th>{{__('Discount')}}</th>
                                     <th class="text-right">{{__('Amount')}} </th>
                                     <th></th>
@@ -300,10 +300,10 @@
                                 <tbody class="ui-sortable">
                                 <tr data-repeater-item data-is-item="true">
                                     {{ Form::hidden('id',null, array('class' => 'form-control id')) }}
-                                    <td width="25%">
+                                    <td width="17.5%">
                                         {{ Form::select('item', $product_services,null, array('class' => 'form-control font-style item','data-url'=>route('invoice.product'))) }}
                                     </td>
-                                    <td>
+                                    <td class="column-small">
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
                                                 {{ Form::text('quantity',null, array('class' => 'form-control quantity','required'=>'required','placeholder'=>__('Qty'), 'data-is-number')) }}
@@ -327,7 +327,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="column-small">
                                         <div class="form-group">
                                             <div class="input-group colorpickerinput">
                                                 {{ Form::text('tax',null, array('class' => 'form-control tax','required'=>'required','placeholder'=>__('Tax'), 'data-is-number')) }}
