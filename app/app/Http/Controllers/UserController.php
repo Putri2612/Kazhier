@@ -545,11 +545,6 @@ class UserController extends Controller
 
             foreach ($users as $usr){
                 DB::delete('DELETE FROM balance WHERE created_by = ?', array($usr->id));
-                $bankAccounts = BankAccount::where('created_by', '=', $usr->id)->get();
-                foreach($bankAccounts as $account){
-                    $account->current_balance = 0;
-                    $account->save();
-                }
 
                 $revenues = Revenue::where('created_by', '=', $usr->id)->get();
                 foreach($revenues as $revenue){

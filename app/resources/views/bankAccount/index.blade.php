@@ -54,7 +54,7 @@
                                                             <td>{{  $account->holder_name}}</td>
                                                             <td>{{  $account->bank_name}}</td>
                                                             <td>{{  $account->account_number}}</td>
-                                                            <td>{{  Auth::user()->priceFormat($account->current_balance)}}</td>
+                                                            <td>{{  Auth::user()->priceFormat($account->CurrentBalance())}}</td>
                                                             <td>{{  $account->contact_number}}</td>
                                                             <td>{{  $account->bank_address}}</td>
 

@@ -70,9 +70,9 @@
                                                                                             @else
                                                                                             <td></td>
                                                                                             <td>{{$asset->bank_name . ' ' . $asset->holder_name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->current_balance)}}</td>
+                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->CurrentBalance())}}</td>
                                                                                             @php
-                                                                                                $assetAmount += $asset->current_balance;
+                                                                                                $assetAmount += $asset->CurrentBalance();
                                                                                             @endphp
                                                                                             @endif
                                                                                         </tr>

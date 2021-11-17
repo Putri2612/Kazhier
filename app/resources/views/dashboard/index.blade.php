@@ -509,7 +509,7 @@
                                     <tr class="font-style">
                                         <td>{{$bankAccount->bank_name}}</td>
                                         <td>{{$bankAccount->holder_name}}</td>
-                                        <td>{{\Auth::user()->priceFormat($bankAccount->current_balance)}}</td>
+                                        <td>{{\Auth::user()->priceFormat($bankAccount->CurrentBalance())}}</td>
                                     </tr>
                                 @empty
                                     <tr>

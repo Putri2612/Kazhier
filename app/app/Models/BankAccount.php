@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\CanManageBalance;
 use Illuminate\Database\Eloquent\Model;
 
 class BankAccount extends Model
 {
+    use CanManageBalance;
+
     protected $fillable = [
         'holder_name',
         'bank_name',
@@ -17,6 +20,8 @@ class BankAccount extends Model
         'created_by',
     ];
 
-
+    public function CurrentBalance() {
+        return $this->GetCurrentBalance($this);
+    }
 }
 
