@@ -481,7 +481,7 @@ class InvoiceController extends Controller
             $invoicePayment->description    = $request->input('description');
             $invoicePayment->created_by     = Auth::user()->creatorId();
             $invoicePayment->save();
-            $this->addBalance($request->input('date'), $amount, $request->input('account_id'));
+            $this->AddBalance($request->input('account_id'), $amount, $request->input('date'));
 
             $invoice = Invoice::where('id', $invoice_id)->first();
             $due     = $invoice->getDue();
@@ -540,7 +540,7 @@ class InvoiceController extends Controller
         if(Auth::user()->can('delete payment invoice'))
         {
             $invoicePayment = InvoicePayment::where('id', '=', $payment_id)->first();
-            $this->addBalance($invoicePayment->date, -($invoicePayment->amount), $invoicePayment->account_id);
+            $this->AddBalance($invoicePayment->account_id, -($invoicePayment->amount), $invoicePayment->date);
             $invoicePayment->delete();
             
             $invoice = Invoice::where('id', $invoice_id)->first();

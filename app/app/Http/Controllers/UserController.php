@@ -33,6 +33,7 @@ use App\Traits\CanManageBalance;
 use Auth;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Session;
 use Spatie\Permission\Models\Role;
@@ -543,7 +544,7 @@ class UserController extends Controller
             $users     = User::where('type', '=', 'company')->get();
 
             foreach ($users as $usr){
-                \DB::delete('DELETE FROM balance WHERE created_by = ?', array($usr->id));
+                DB::delete('DELETE FROM balance WHERE created_by = ?', array($usr->id));
                 $bankAccounts = BankAccount::where('created_by', '=', $usr->id)->get();
                 foreach($bankAccounts as $account){
                     $account->current_balance = 0;
@@ -552,28 +553,27 @@ class UserController extends Controller
 
                 $revenues = Revenue::where('created_by', '=', $usr->id)->get();
                 foreach($revenues as $revenue){
-                    $this->addBalance($revenue->date, $revenue->amount, $revenue->account_id);
+                    $this->AddBalance($revenue->account_id, $revenue->amount, $revenue->date);
                 }
 
                 $payments = Payment::where('created_by', '=', $usr->id)->get();
                 foreach($payments as $payment){
-                    $this->addBalance($payment->date, -$payment->amount, $payment->account_id);
+                    $this->AddBalance($payment->account_id, -$payment->amount, $payment->date);
                 }
 
                 $invoicePayments = InvoicePayment::where('created_by', '=', $usr->id)->get();
                 foreach($invoicePayments as $invoicePayment){
-                    $this->addBalance($invoicePayment->date, $invoicePayment->amount, $invoicePayment->account_id);
+                    $this->AddBalance($invoicePayment->account_id, $invoicePayment->amount, $invoicePayment->date);
                 }
 
                 $billPayments = BillPayment::where('created_by', '=', $usr->id)->get();
                 foreach($billPayments as $billPayment){
-                    $this->addBalance($billPayment->date, -$billPayment->amount, $billPayment->account_id);
+                    $this->AddBalance($billPayment->account_id, -$billPayment->amount, $billPayment->date);
                 }
 
                 $transfers = Transfer::where('created_by', '=', $usr->id)->get();
                 foreach($transfers as $transfer){
-                    $this->addBalance($transfer->date, -$transfer->amount, $transfer->from_account);
-                    $this->addBalance($transfer->date, $transfer->amount, $transfer->to_account);
+                    $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date);
                 }
             }
             return redirect()->back()->with('success', __('Data synchronized.'));

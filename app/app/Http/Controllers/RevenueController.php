@@ -135,7 +135,7 @@ class RevenueController extends Controller
             }
             $revenue->save();
 
-            $this->addBalance($request->input('date'), $amount, $request->input('account_id'));
+            $this->AddBalance($request->input('account_id'), $amount, $request->input('date'));
 
             $category            = ProductServiceCategory::where('id', $request->input('category_id'))->first();
             $revenue->payment_id = $revenue->id;
@@ -225,7 +225,7 @@ class RevenueController extends Controller
 
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
             $difference = $revenue->amount - $amount;
-            $this->addBalance($request->input('date'), $difference, $request->input('account_id'));
+            $this->AddBalance($request->input('account_id'), $difference, $request->input('date'));
             
             $revenue->date           = $request->input('date');
             $revenue->amount         = $amount;
@@ -260,7 +260,7 @@ class RevenueController extends Controller
                     $this->DeleteFile($revenue->reference, 'reference');
                 }
 
-                $this->addBalance($revenue->date, -($revenue->amount), $revenue->account_id);
+                $this->AddBalance($revenue->account_id, -($revenue->amount), $revenue->date);
                 $revenue->delete();
                 $type = 'Payment';
                 $user = 'Customer';

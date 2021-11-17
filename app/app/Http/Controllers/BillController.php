@@ -418,7 +418,7 @@ class BillController extends Controller
             $billPayment->description    = $request->input('description');
             $billPayment->created_by     = Auth::user()->creatorId();
             $billPayment->save();
-            $this->addBalance($request->input('date'), -($amount), $request->input('account_id'));
+            $this->AddBalance($request->input('account_id'), -($amount), $request->input('date'));
 
             $bill  = Bill::where('id', $bill_id)->first();
             $due   = $bill->getDue();
@@ -479,7 +479,7 @@ class BillController extends Controller
         if(\Auth::user()->can('delete payment bill'))
         {
             $billPayment = BillPayment::where('id', '=', $payment_id)->first();
-            $this->addBalance($billPayment->date, $billPayment->amount, $billPayment->account_id);
+            $this->AddBalance($billPayment->account_id, $billPayment->amount, $billPayment->date);
             $billPayment->delete();
             
             $bill = Bill::where('id', $bill_id)->first();
