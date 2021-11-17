@@ -74,12 +74,12 @@ a {
     -webkit-transition: all .5s;
     -o-transition: all .5s; }
 
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .ion,
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fas,
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .far,
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fal,
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fab,
-a:not(.btn-social-icon):not(.btn-social):not(.page-link) .fa {
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .ion,
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fas,
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .far,
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fal,
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fab,
+a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fa {
     margin-left: 4px; }
 
 .bg-primary {

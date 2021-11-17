@@ -227,7 +227,7 @@
         @endif
         <div class="row">
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <div class="card card-statistic-1">
+                <a href="{{ route('customer.index') }}" class="card card-statistic-1">
                     <div class="card-icon bg-success">
                         <i class="far fa-user"></i>
                     </div>
@@ -239,10 +239,10 @@
                             {{\Auth::user()->countCustomers()}}
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <div class="card card-statistic-1">
+                <a href="{{ route('vender.index') }}" class="card card-statistic-1">
                     <div class="card-icon bg-warning">
                         <i class="far fa-user"></i>
                     </div>
@@ -254,10 +254,10 @@
                             {{\Auth::user()->countVenders()}}
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <div class="card card-statistic-1">
+                <a href="{{ route('invoice.index') }}" class="card card-statistic-1">
                     <div class="card-icon bg-primary">
                         <i class="far fa-money-bill-alt"></i>
                     </div>
@@ -269,10 +269,10 @@
                             {{\Auth::user()->countInvoices()}}
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="col-lg-3 col-md-6 col-sm-6 col-12">
-                <div class="card card-statistic-1">
+                <a href="{{ route('bill.index') }}" class="card card-statistic-1">
                     <div class="card-icon bg-danger">
                         <i class="fas fa-money-check"></i>
                     </div>
@@ -284,7 +284,7 @@
                             {{\Auth::user()->countBills()}}
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         <div class="row">
@@ -492,7 +492,13 @@
         </div>
         <div class="row">
             <div class="col-lg-6 col-md-12 col-12 col-sm-12">
-                <h4 class="font-weight-normal">{{__('Account Balance')}}</h4>
+                <div class="row">
+                    <h4 class="col-md-6 font-weight-normal">{{__('Account Balance')}}</h4>
+                    <div class="col-md-6 text-md-right">
+                        <a href="{{route('bank-account.index')}}">{{__('Manage Account')}}</a>
+                    </div>
+                </div>
+                
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -530,7 +536,13 @@
 
         <div class="row">
             <div class="col-12">
-                <h4 class="font-weight-normal">{{__('Invoices')}}</h4>
+                <div class="row">
+                    <h4 class="col-md-6 font-weight-normal">{{__('Invoices')}}</h4>
+                    <div class="col-md-6 text-md-right">
+                        <a href="{{route('invoice.index')}}">{{__('View All')}}</a>
+                    </div>
+                </div>
+                
                 <div class="card">
                     <div class="row">
                         <div class="col-6">
@@ -608,7 +620,11 @@
                                 <tbody>
                                 @forelse($recentInvoice as $invoice)
                                     <tr class="font-style">
-                                        <td>{{\Auth::user()->invoiceNumberFormat($invoice->invoice_id)}}</td>
+                                        <td>
+                                            <a class="btn btn-outline-primary" href="{{ route('invoice.show',$invoice->id) }}">
+                                                {{\Auth::user()->invoiceNumberFormat($invoice->invoice_id)}}
+                                            </a>
+                                        </td>
                                         <td>{{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
                                         <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
                                         <td>{{ Auth::user()->dateFormat($invoice->due_date) }}</td>
@@ -645,7 +661,13 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h4 class="font-weight-normal">{{__('Bills')}}</h4>
+                <div class="row">
+                    <h4 class="col-md-6 font-weight-normal">{{__('Bills')}}</h4>
+                    <div class="col-md-6 text-md-right">
+                        <a href="{{route('bill.index')}}">{{__('View All')}}</a>
+                    </div>
+                </div>
+                
                 <div class="card">
                     <div class="row">
                         <div class="col-6">
@@ -723,7 +745,11 @@
                                 <tbody>
                                 @forelse($recentBill as $bill)
                                     <tr class="font-style">
-                                        <td>{{\Auth::user()->billNumberFormat($bill->bill_id)}}</td>
+                                        <td>
+                                            <a class="btn btn-outline-primary" href="{{ route('bill.show',$bill->id) }}">
+                                                {{\Auth::user()->billNumberFormat($bill->bill_id)}}
+                                            </a>
+                                        </td>
                                         <td>{{!empty($bill->vender)? $bill->vender->name:'' }} </td>
                                         <td>{{ Auth::user()->dateFormat($bill->bill_date) }}</td>
                                         <td>{{ Auth::user()->dateFormat($bill->due_date) }}</td>
@@ -760,7 +786,13 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h4 class="font-weight-normal">{{__('Goal')}}</h4>
+                <div class="row">
+                    <h4 class="col-md-6 font-weight-normal">{{__('Goal')}}</h4>
+                    <div class="col-md-6 text-md-right">
+                        <a href="{{route('goal.index')}}">{{__('View All')}}</a>
+                    </div>
+                </div>
+                
                 <div class="card">
                     <div class="card-body">
                         @forelse($goals as $goal)
