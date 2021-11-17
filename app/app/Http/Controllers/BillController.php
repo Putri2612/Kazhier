@@ -117,7 +117,7 @@ class BillController extends Controller
             $bill->status           = 0;
             $bill->due_date         = $request->input('due_date');
             $bill->category_id      = $request->input('category_id');
-            $bill->order_number     = $request->has('order_number') ? $request->input('order_number') : 0;
+            $bill->order_number     = $request->input('order_number');
             $bill->discount_apply   = $request->has('discount_apply') ? 1 : 0;
             $bill->created_by       = \Auth::user()->creatorId();
             $bill->save();

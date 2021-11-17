@@ -226,7 +226,7 @@
                                                             <i class="fas fa-basketball-ball"></i>
                                                         </div>
                                                     </div>
-                                                    {{ Form::number('order_number', '', array('class' => 'form-control')) }}
+                                                    {{ Form::text('order_number', '', array('class' => 'form-control')) }}
                                                 </div>
                                             </div>
                                         </div>
