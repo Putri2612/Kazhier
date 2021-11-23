@@ -86,10 +86,10 @@
                                                 <i class="fas fa-user-plus"></i>
                                                 <p>{{$plan->max_bank_accounts}} {{__('Bank Accounts')}}</p>
                                             </li>
-                                            <!--<li>-->
+                                            {{-- <!--<li>-->
                                             <!--    <i class="fas fa-user-plus"></i>-->
                                             <!--    <p>{{$plan->max_venders}} {{__('Venders')}}</p>-->
-                                            <!--</li>-->
+                                            <!--</li>--> --}}
                                             
                                         </ul>
                                     </div>

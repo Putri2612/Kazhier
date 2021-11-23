@@ -41,5 +41,7 @@
 <script src="{{ asset('assets/modules/jquery-selectric/jquery.selectric.min.js') }} "></script>
 <script src="{{ asset('assets/js/scripts.js')}} "></script>
 <script src="{{ asset('assets/js/custom.js')}} "></script>
+
+@stack('page-script')
 </body>
 </html>
