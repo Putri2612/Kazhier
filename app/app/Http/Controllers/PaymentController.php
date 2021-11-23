@@ -83,9 +83,19 @@ class PaymentController extends Controller
         {
             $venders    = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $venders->prepend(__('Select vender'), null);
+            $venders    = $venders->union(['new.vender' => __('Create new vender')]);
+
             $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
+            $categories->prepend(__('Select category'), null);
+            $categories = $categories->union(['new.product-category' => __('Create new category')]);
+
             $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $payments->prepend(__('Select payment method'), null);
+            $payments   = $payments->union(['new.payment-method' => __('Create new payment method')]);
+
             $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts->prepend(__('Select bank account'), null);
+            $accounts   = $accounts->union(['new.bank-account' => __('Create new bank account')]);
 
             return view('payment.create', compact('venders', 'categories', 'payments', 'accounts'));
         }
@@ -183,9 +193,19 @@ class PaymentController extends Controller
         {
             $venders    = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $venders->prepend(__('Select vender'), null);
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get()->where('type', '=', 2)->pluck('name', 'id');
+            $venders    = $venders->union(['new.vender' => __('Create new vender')]);
+
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
+            $categories->prepend(__('Select category'), null);
+            $categories = $categories->union(['new.product-category' => __('Create new category')]);
+
             $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $payments->prepend(__('Select payment method'), null);
+            $payments   = $payments->union(['new.payment-method' => __('Create new payment method')]);
+
             $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts->prepend(__('Select bank account'), null);
+            $accounts   = $accounts->union(['new.bank-account' => __('Create new bank account')]);
 
             $payment->amount = $this->FloatToReadableNumber($payment->amount);
 

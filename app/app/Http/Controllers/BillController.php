@@ -72,15 +72,18 @@ class BillController extends Controller
 
         if(\Auth::user()->can('create bill'))
         {
-            $customFields = CustomField::where('module', '=', 'bill')->get();
-            $category     = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
+            $customFields   = CustomField::where('module', '=', 'bill')->get();
+            $category       = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
+            $category       = $category->union(['new.product-category' => __('Create new category')]);
 
-            $bill_number = \Auth::user()->billNumberFormat($this->billNumber());
-            $venders     = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $bill_number    = \Auth::user()->billNumberFormat($this->billNumber());
+            $venders        = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $venders->prepend(__('Select Vender'), '');
+            $venders        = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
 
             return view('bill.create', compact('venders', 'bill_number', 'product_services', 'category', 'customFields'));
         }
@@ -187,15 +190,20 @@ class BillController extends Controller
     {
         if(\Auth::user()->can('edit bill'))
         {
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
+            $category   = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
+            $category   = $category->union(['new.product-category' => __('Create new category')]);
 
-            $bill_number      = \Auth::user()->billNumberFormat($this->billNumber());
-            $venders          = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $bill_number    = \Auth::user()->billNumberFormat($this->billNumber());
+            $venders        = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $venders->prepend(__('Select Vender'), '');
+            $venders        = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $bill->customField = CustomField::getData($bill, 'bill');
-            $customFields      = CustomField::where('module', '=', 'bill')->get();
+            $product_services   = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
+
+            $bill->customField  = CustomField::getData($bill, 'bill');
+            $customFields       = CustomField::where('module', '=', 'bill')->get();
 
             return view('bill.edit', compact('venders', 'product_services', 'bill', 'bill_number', 'category', 'customFields'));
         }
