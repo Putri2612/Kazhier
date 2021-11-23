@@ -75,6 +75,11 @@
                         <a class="nav-link" href="{{ route('users.index') }}"> <i class="fas fa-columns"></i> <span>{{__('User') }}</span></a>
                     </li>
                 @endcan
+                @can('manage defaults')
+                    <li class="dropdown {{ (Request::route()->getName() == 'defaults.index' || Request::route()->getName() == 'defaults.create' || Request::route()->getName() == 'defaults.edit') ? ' active' : '' }}">
+                        <a class="nav-link" href="{{ route('defaults.index') }}"> <i class="fas fa-stream"></i> <span>{{__('Default Value') }}</span></a>
+                    </li>
+                @endcan
             @else
                 @php 
                     $user = \Auth::user();
