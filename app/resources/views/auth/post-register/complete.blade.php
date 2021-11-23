@@ -32,10 +32,10 @@
                     </div>
                     <div class="card card-primary">
                         <div class="card-body text-center">
-                            <div class="display-4">Thank You</div>
+                            <div class="display-4">{{__('Thank You')}}</div>
                             <p>
                                 {{ __('Thank you for completing the setup') }} <br/>
-                                {{ __('We will redirect you to dashboard in') }}
+                                {{ __('We will redirect you to dashboard in') }} ...
                             </p>
                             <div class="display-1 counter">5</div>
                         </div>
