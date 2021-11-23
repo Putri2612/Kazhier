@@ -13,6 +13,7 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\PostRegisterController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\BankAccountController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DebitNoteController;
+use App\Http\Controllers\DefaultValueController;
 use App\Http\Controllers\DialogController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\ExpenseController;
@@ -446,6 +448,30 @@ Route::group(
 }
 );
 
+Route::resource('defaults', DefaultValueController::class)->middleware(
+    [
+        'auth',
+        'xss'
+    ]
+);
+
+Route::group(
+    [
+        'middleware' => [
+            'auth',
+            'xss'
+        ]
+    ], function () {
+        Route::get('post-register', [PostRegisterController::class, 'index'])->name('post-register.index');
+        Route::match(['get', 'post'], 'post-register/revenue', [PostRegisterController::class, 'revenue'])->name('post-register.revenue');
+        Route::match(['get', 'post'], 'post-register/expense', [PostRegisterController::class, 'expense'])->name('post-register.expense');
+        Route::match(['get', 'post'], 'post-register/product-category', [PostRegisterController::class, 'product_category'])->name('post-register.product-category');
+        Route::match(['get', 'post'], 'post-register/unit', [PostRegisterController::class, 'unit'])->name('post-register.unit');
+        Route::match(['get', 'post'], 'post-register/tax', [PostRegisterController::class, 'tax'])->name('post-register.tax');
+        Route::match(['get', 'post'], 'post-register/payment-method', [PostRegisterController::class, 'paymentMethod'])->name('post-register.method');
+        Route::get('post-register/complete', [PostRegisterController::class, 'complete'])->name('post-register.complete');
+    }
+);
 
 Route::resource('taxes', TaxController::class)->middleware(
     [
