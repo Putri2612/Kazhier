@@ -20,6 +20,7 @@ use App\Models\ProposalProduct;
 use App\Models\Task;
 use App\Models\Transaction;
 use App\Models\Utility;
+use App\Traits\CanProcessNumber;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -29,6 +30,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProposalController extends Controller
 {
+    use CanProcessNumber;
     public function __construct()
     {
 
@@ -76,11 +78,17 @@ class ProposalController extends Controller
         {
             $customFields    = CustomField::where('module', '=', 'proposal')->get();
             $proposal_number = \Auth::user()->proposalNumberFormat($this->proposalNumber());
-            $customers       = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+
+            $customers  = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend(__('Select Customer'), '');
-            $category = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
+            $customers  = $customers->union(['new.customer' => __('Create new customer')]);
+
+            $category   = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
+            $category   = $category->union(['new.category' => __('Create new category')]);
+
             $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
 
             return view('proposal.create', compact('customers', 'proposal_number', 'product_services', 'category', 'customFields'));
         }
@@ -144,15 +152,20 @@ class ProposalController extends Controller
             CustomField::saveData($proposal, $request->customField);
             $products = $request->items;
 
-            for($i = 0; $i < count($products); $i++)
+            foreach($products as $product)
             {
+                $quantity   = $this->ReadableNumberToFloat($product['quantity']);
+                $tax        = $this->ReadableNumberToFloat($product['tax']);
+                $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
+                $price      = $this->ReadableNumberToFloat($product['price']);
+
                 $proposalProduct              = new ProposalProduct();
                 $proposalProduct->proposal_id = $proposal->id;
-                $proposalProduct->product_id  = $products[$i]['item'];
-                $proposalProduct->quantity    = $products[$i]['quantity'];
-                $proposalProduct->tax         = $products[$i]['tax'];
-                $proposalProduct->discount    = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                $proposalProduct->price       = $products[$i]['price'];
+                $proposalProduct->product_id  = $product['item'];
+                $proposalProduct->quantity    = $quantity;
+                $proposalProduct->tax         = $tax;
+                $proposalProduct->discount    = $discount;
+                $proposalProduct->price       = $price;
                 $proposalProduct->save();
             }
 
@@ -169,13 +182,18 @@ class ProposalController extends Controller
         if(\Auth::user()->can('edit proposal'))
         {
             $proposal_number = \Auth::user()->proposalNumberFormat($proposal->proposal_id);
-            $customers       = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $category        = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
-            $category->prepend(__('Select Category'), '');
-            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customFields    = CustomField::where('module', '=', 'proposal')->get();
 
-            $proposal->customField = CustomField::getData($proposal, 'proposal');
-            $customFields          = CustomField::where('module', '=', 'proposal')->get();
+            $customers  = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $customers->prepend(__('Select Customer'), '');
+            $customers  = $customers->union(['new.customer' => __('Create new customer')]);
+
+            $category   = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
+            $category->prepend(__('Select Category'), '');
+            $category   = $category->union(['new.category' => __('Create new category')]);
+
+            $product_services = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
 
             return view('proposal.edit', compact('customers', 'product_services', 'proposal', 'proposal_number', 'category', 'customFields'));
         }
@@ -213,19 +231,25 @@ class ProposalController extends Controller
                 CustomField::saveData($proposal, $request->customField);
                 $products = $request->items;
 
-                for($i = 0; $i < count($products); $i++)
+                foreach($products as $product)
                 {
-                    $proposalProduct = ProposalProduct::find($products[$i]['id']);
-                    if($proposalProduct == null)
-                    {
+                    $quantity   = $this->ReadableNumberToFloat($product['quantity']);
+                    $tax        = $this->ReadableNumberToFloat($product['tax']);
+                    $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
+                    $price      = $this->ReadableNumberToFloat($product['price']);
+
+                    $proposalProduct = ProposalProduct::find($product['id']);
+
+                    if($proposalProduct == null) {
                         $proposalProduct              = new ProposalProduct();
                         $proposalProduct->proposal_id = $proposal->id;
                     }
-                    $proposalProduct->product_id = $products[$i]['item'];
-                    $proposalProduct->quantity   = $products[$i]['quantity'];
-                    $proposalProduct->tax        = $products[$i]['tax'];
-                    $proposalProduct->discount   = isset($products[$i]['discount']) ? $products[$i]['discount'] : 0;
-                    $proposalProduct->price      = $products[$i]['price'];
+
+                    $proposalProduct->product_id  = $product['item'];
+                    $proposalProduct->quantity    = $quantity;
+                    $proposalProduct->tax         = $tax;
+                    $proposalProduct->discount    = $discount;
+                    $proposalProduct->price       = $price;
                     $proposalProduct->save();
                 }
 
