@@ -27,6 +27,8 @@ class User extends Authenticatable
         'plan',
         'plan_expire_date',
         'created_by',
+        'referral_token',
+        'referred_by',
     ];
 
     protected $hidden = [

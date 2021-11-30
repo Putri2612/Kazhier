@@ -9,6 +9,8 @@ use App\Models\ProductServiceCategory;
 use App\Models\Tax;
 use App\Models\ProductServiceUnit;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
@@ -87,16 +89,29 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        if(Cookie::has('REFERRAL_CODE')){
+            $code = Cookie::get('REFERRAL_CODE');
+            $user = User::where('referral_token', '=', $code)->first();
+            Cookie::queue(Cookie::forget('REFERRAL_CODE'));
+            if($user){
+                $ref_id = $user->id;
+            } else {
+                $ref_id = null;
+            }
+        } else {
+            $ref_id = null;
+        }
 
         $user   = User::create(
             [
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => Hash::make($data['password']),
-                'type' => 'company',
-                'lang' => 'id',
-                'created_by'=>1,
-                'plan' => 1,
+                'name'          => $data['name'],
+                'email'         => $data['email'],
+                'password'      => Hash::make($data['password']),
+                'type'          => 'company',
+                'lang'          => 'id',
+                'created_by'    => 1,
+                'plan'          => 1,
+                'referred_by'   => $ref_id
             ]
         );
         $role_r = Role::findByName('company');
@@ -104,9 +119,18 @@ class RegisterController extends Controller
         return $user->assignRole($role_r);
     }
 
-    public function showRegistrationForm($lang = 'id')
+    public function showRegistrationForm($lang = 'id', Request $request)
     {
         \App::setLocale($lang);
+
+        if($request->has('ref')){
+            if($request->cookies->has('REFERRAL_CODE')){
+                Cookie::queue(Cookie::forget('REFERRAL_CODE'));
+            }
+            Cookie::queue(Cookie::forever('REFERRAL_CODE', $request->input('ref')));
+        }
+
+        
 
         return view('auth.register', compact('lang'));
     }

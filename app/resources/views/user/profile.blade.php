@@ -10,6 +10,10 @@
 @endpush
 @push('script-page')
     <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
+    <script>
+        // $('#copy-button').tooltip();
+        CopyFromInput('[name="referral_token"]','#copy-button');
+    </script>
 @endpush
 @section('content')
     <section class="section">
@@ -58,6 +62,9 @@
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#referral_code" role="tab" aria-controls="" aria-selected="false">{{__('Referral Code')}}</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content" id="myTabContent2">
@@ -156,6 +163,26 @@
                                                     </div>
                                                 </div>
                                                 {{Form::close()}}
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="referral_code" role="tabpanel" aria-labelledby="profile-tab3">
+                                            <div class="company-setting-wrap">
+                                                <div class="row justify-content-center">
+                                                    <div class="col-12">
+                                                        <div class="display-2 text-center">{{ strtoupper($referral_token) }}</div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6">
+                                                        <div class="input-group">
+                                                            @php
+                                                                $url = route('register')."?ref={$referral_token}";
+                                                            @endphp
+                                                            {{ Form::text('referral_token', $url, array('class' => 'form-control', 'readonly', 'disabled')) }}
+                                                            <button class="btn btn-primary" type="button" id="copy-button" title="Copy to Clipboard">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

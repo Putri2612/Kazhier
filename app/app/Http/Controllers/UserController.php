@@ -30,9 +30,9 @@ use App\Models\Transfer;
 use App\Models\Transaction;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
-use Auth;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Session;
@@ -400,8 +400,24 @@ class UserController extends Controller
         $userDetail              = \Auth::user();
         $userDetail->customField = CustomField::getData($userDetail, 'user');
         $customFields            = CustomField::where('module', '=', 'user')->get();
+        $referral_token          = Auth::user()->referral_token ? Auth::user()->referral_token : $this->create_token();
 
-        return view('user.profile', compact('userDetail', 'customFields'));
+        return view('user.profile', compact('userDetail', 'customFields', 'referral_token'));
+    }
+
+    private function create_token() {
+        while(true){
+            $token = substr(md5(Auth::user()->email.time()), -6);
+            if(!User::where('referral_token', '=', $token)->count()){
+                break;
+            }
+        }
+
+        $user = User::where('id', '=', Auth::user()->id)->first();
+        $user->referral_token = $token;
+        $user->save();
+
+        return $token;
     }
 
     public function editprofile(Request $request)
