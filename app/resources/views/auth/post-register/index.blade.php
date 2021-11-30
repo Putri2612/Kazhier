@@ -12,7 +12,7 @@
                     </div>
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3>{{ __('Welcome To Kakabiz!') }}</h3>
+                            <h3>{{ __('Welcome To Kazhier!') }}</h3>
                         </div>
                         <div class="card-body">
                             <p>
