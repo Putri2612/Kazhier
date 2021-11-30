@@ -176,14 +176,37 @@ const WatchChange = (input, testOtherInput = false) => {
         }
     }
     if(testOtherInput){
-        let form = input.parentNode;
+        let form    = input.parentNode,
+            isInput = true;
         while(form.nodeName != 'FORM'){
+            if(form.nodeName == 'BODY'){
+                isInput = false;
+                break;
+            }
             form = form.parentNode;
         }
 
-        const inputs = form.querySelectorAll('input, select, textarea');
-        inputs.forEach(item => WatchChange(item));
+        if(isInput){
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(item => WatchChange(item));
+        }
     }
+}
+
+const CopyFromInput = (InputSelector, ButtonSelector) => {
+    const input = document.querySelector(InputSelector),
+        btn     = document.querySelector(ButtonSelector);
+
+    $(btn).tooltip();
+
+    btn.addEventListener('click', event => {
+        input.select();
+        input.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(input.value);
+
+        toastrs('Copied', 'code copied', 'success');
+    });
 }
 
 $(function () {
