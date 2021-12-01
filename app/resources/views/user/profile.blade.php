@@ -63,9 +63,11 @@
                                         <li class="nav-item">
                                             <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#referral_code" role="tab" aria-controls="" aria-selected="false">{{__('Referral Code')}}</a>
-                                        </li>
+                                        @if ($referral_token != null)
+                                            <li class="nav-item">
+                                                <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#referral_code" role="tab" aria-controls="" aria-selected="false">{{__('Referral Code')}}</a>
+                                            </li>
+                                        @endif
                                     </ul>
                                     <div class="tab-content" id="myTabContent2">
                                         <div class="tab-pane fade show active" id="personal_info" role="tabpanel" aria-labelledby="home-tab3">
@@ -165,26 +167,38 @@
                                                 {{Form::close()}}
                                             </div>
                                         </div>
-                                        <div class="tab-pane fade" id="referral_code" role="tabpanel" aria-labelledby="profile-tab3">
-                                            <div class="company-setting-wrap">
-                                                <div class="row justify-content-center">
-                                                    <div class="col-12">
-                                                        <div class="display-2 text-center">{{ strtoupper($referral_token) }}</div>
-                                                    </div>
-                                                    <div class="col-12 col-md-6">
-                                                        <div class="input-group">
-                                                            @php
-                                                                $url = route('register')."?ref={$referral_token}";
-                                                            @endphp
-                                                            {{ Form::text('referral_token', $url, array('class' => 'form-control', 'readonly', 'disabled')) }}
-                                                            <button class="btn btn-primary" type="button" id="copy-button" title="Copy to Clipboard">
-                                                                <i class="fas fa-copy"></i>
-                                                            </button>
+                                        @if($referral_token != null)
+                                            <div class="tab-pane fade" id="referral_code" role="tabpanel" aria-labelledby="profile-tab3">
+                                                <div class="company-setting-wrap">
+                                                    <div class="row justify-content-center">
+                                                        <div class="col-12 pb-5">
+                                                            <div class="row">
+                                                                <div class="col-6">
+                                                                    <div class="lead">{{ __('Referral Points') }}: <span class="text-primary">{{ $referral_point }}</span></div>
+                                                                </div>
+                                                                <div class="col-6 text-right">
+                                                                    <div class="btn btn-primary">{{ __('Redeem') }}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-12">
+                                                            <div class="display-2 text-center">{{ strtoupper($referral_token) }}</div>
+                                                        </div>
+                                                        <div class="col-12 col-md-6">
+                                                            <div class="input-group">
+                                                                @php
+                                                                    $url = route('register')."?ref={$referral_token}";
+                                                                @endphp
+                                                                {{ Form::text('referral_token', $url, array('class' => 'form-control', 'readonly', 'disabled')) }}
+                                                                <button class="btn btn-primary" type="button" id="copy-button" title="Copy to Clipboard">
+                                                                    <i class="fas fa-copy"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

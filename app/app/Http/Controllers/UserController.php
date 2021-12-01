@@ -25,6 +25,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Proposal;
 use App\Models\ProposalProduct;
+use App\Models\ReferralPoint;
 use App\Models\Tax;
 use App\Models\Transfer;
 use App\Models\Transaction;
@@ -400,9 +401,22 @@ class UserController extends Controller
         $userDetail              = \Auth::user();
         $userDetail->customField = CustomField::getData($userDetail, 'user');
         $customFields            = CustomField::where('module', '=', 'user')->get();
-        $referral_token          = Auth::user()->referral_token ? Auth::user()->referral_token : $this->create_token();
+        if(Auth::user()->type == 'company'){
+            $referral_token          = Auth::user()->referral_token ? Auth::user()->referral_token : $this->create_token();
+            $referral_point          = ReferralPoint::where('created_by', '=', Auth::user()->id)->first();
+            if(!$referral_point) {
+                $referral_point         = new ReferralPoint();
+                $referral_point->point  = 0;
+                $referral_point->created_by = Auth::user()->id;
+                $referral_point->save();
+            }
+            $referral_point = $referral_point->point;
+        } else {
+            $referral_token = null;
+            $referral_point = null;
+        }
 
-        return view('user.profile', compact('userDetail', 'customFields', 'referral_token'));
+        return view('user.profile', compact('userDetail', 'customFields', 'referral_token', 'referral_point'));
     }
 
     private function create_token() {
