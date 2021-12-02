@@ -362,20 +362,25 @@
                             <h4 class="col-md-6 text-md-right font-weight-400">{{__('Current year').' - '.$currentYear}}</h4>
                         </div>
                         <div class="card">
-                            <div class="col-12">
-                                @forelse($incomeCategory as $key=>$category)
-                                    <div class="text-right mt-10">
-                                        <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
-                                        <span>{{\Auth::user()->priceFormat($incomeCatAmount[$key])}}</span>
-                                    </div>
-                                @empty
-                                    <div class="text-center">
-                                        <h6>{{__('there is no income by category')}}</h6>
-                                    </div>
-                                @endforelse
-                            </div>
                             <div class="card-body">
-                                <canvas id="chart-doughnut-income" height="182"></canvas>
+                                <div class="row flex-md-row-reverse align-items-md-center">
+                                    <div class="col-12 col-md-4">
+                                        @forelse($incomeCategory as $key=>$category)
+                                            <div class="text-right mt-10">
+                                                <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
+                                                <span>{{\Auth::user()->priceFormat($incomeCatAmount[$key])}}</span>
+                                            </div>
+                                        @empty
+                                            <div class="text-center">
+                                                <h6>{{__('there is no income by category')}}</h6>
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <canvas id="chart-doughnut-income" height="182"></canvas>
+                                    </div>
+                                    <div class="col-md-4"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -384,21 +389,26 @@
                             <h4 class="col-md-6 font-weight-normal">{{__('Expense By Category')}}</h4>
                             <h4 class="col-md-6 text-md-right font-weight-400">{{__('Current year').' - '.$currentYear}}</h4>
                         </div>
-                        <div class="card">
-                            <div class="col-12">
-                                @forelse($expenseCategory as $key=>$category)
-                                    <div class="text-right mt-10">
-                                        <span class="graph-label" style="background-color: {{$expenseCategoryColor[$key]}}">{{$category}}</span>
-                                        <span>{{\Auth::user()->priceFormat($expenseCatAmount[$key])}}</span>
-                                    </div>
-                                @empty
-                                    <div class="text-center">
-                                        <h6>{{__('there is no expense by category')}}</h6>
-                                    </div>
-                                @endforelse
-                            </div>
+                        <div class="card">                            
                             <div class="card-body">
-                                <canvas id="chart-doughnut-expense" height="182"></canvas>
+                                <div class="row flex-md-row-reverse align-items-md-center">
+                                    <div class="col-12 col-md-4">
+                                        @forelse($expenseCategory as $key=>$category)
+                                            <div class="text-right mt-10">
+                                                <span class="graph-label" style="background-color: {{$expenseCategoryColor[$key]}}">{{$category}}</span>
+                                                <span>{{\Auth::user()->priceFormat($expenseCatAmount[$key])}}</span>
+                                            </div>
+                                        @empty
+                                            <div class="text-center">
+                                                <h6>{{__('there is no expense by category')}}</h6>
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <canvas id="chart-doughnut-expense" height="182"></canvas>
+                                    </div>
+                                    <div class="col-md-4"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
