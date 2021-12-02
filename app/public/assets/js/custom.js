@@ -208,6 +208,24 @@ const CopyFromInput = (InputSelector, ButtonSelector) => {
         toastrs('Copied', 'code copied', 'success');
     });
 }
+   
+const openNext  = (prevSelector, nextSelector) => {
+    const prev  = document.querySelector(prevSelector),
+        next    = document.querySelector(nextSelector);
+    
+    $(prev).fadeOut(500);
+    $(next).delay(500).fadeIn(500);
+}
+
+const CanNavigate = () => {
+    document.addEventListener('click', event => {
+        const target = event.target;
+        if(target.hasAttribute('can-navigate') && (!target.disabled && !target.classList.contains('disabled'))){
+            openNext(target.getAttribute('data-navigate-from'), target.getAttribute('data-navigate-to'));
+        }
+    });
+}
+
 
 $(function () {
     $(".custom-scroll").niceScroll();

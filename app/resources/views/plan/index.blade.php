@@ -47,13 +47,13 @@
                                             @can('edit plan')
                                                 <a title="Edit Plan" href="#" class="view-btn" data-url="{{ route('plans.edit',$plan->id) }}" data-ajax-popup="true" data-title="{{__('Edit Plan')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}"><i class="far fa-edit"></i></a>
                                             @endcan
-                                             @can('delete plan')
+                                            @can('delete plan')
                                             <a href="#" class="view-btn " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$plan->id}}').submit();">
                                                 <i class="fas fa-trash"></i>
                                             </a>
                                             {!! Form::open(['method' => 'DELETE', 'route' => ['plans.destroy', $plan->id],'id'=>'delete-form-'.$plan->id]) !!}
                                             {!! Form::close() !!}
-                                             @endcan    
+                                            @endcan    
                                             @can('buy plan')
                                                 @if($plan->id != \Auth::user()->plan)
                                                     @if($plan->price > 0)

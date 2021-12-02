@@ -43,6 +43,7 @@ use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\ProductServiceController;
 use App\Http\Controllers\ProductServiceUnitController;
 use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\RoleController;
@@ -278,6 +279,14 @@ Route::prefix('vender')->as('vender.')->group(
 );
 
 
+Route::prefix('redeem-referral')->as('referral.')->group(
+    function(){
+        Route::get('/', [ReferralController::class, 'redeem'])->name('redeem')->middleware(['auth', 'xss']);
+        Route::get('plan/{code}', [ReferralController::class, 'RedeemPlan'])->name('redeem.plan')->middleware(['auth', 'xss']);
+        Route::post('plan/{code}/checkout', [ReferralController::class, 'CheckoutPlan'])->name('checkout.plan')->middleware(['auth', 'xss']);
+    }
+);
+
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(
     [
         'auth',
@@ -309,19 +318,12 @@ Route::get('profile', [UserController::class, 'profile'])->name('profile')->midd
         'xss',
     ]
 );
-Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
+Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account')->middleware(['auth', 'xss',]);
 
-Route::resource('users', UserController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
+Route::resource('users', UserController::class)->middleware(['auth', 'xss',]);
+
+
+
 Route::put('change-password', [UserController::class, 'updatePassword'])->name('update.password');
 
 

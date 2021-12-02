@@ -40,7 +40,7 @@
                                                             <td>{{$order->order_id}}</td>
                                                             <td>{{$order->user_name}}</td>
                                                             <td>{{$order->plan_name}}</td>
-                                                            <td>Rp{{number_format($order->price)}}</td>
+                                                            <td>{{number_format($order->price)}} {{ $order->price_currency }}</td>
                                                             <td>
                                                                 @if($order->payment_status == 'succeeded')
                                                                     <i class="mdi mdi-circle text-success"></i> {{ucfirst($order->payment_status)}}
@@ -55,6 +55,8 @@
                                                                     <p>{{__('Manually plan upgraded by super admin')}}</p>
                                                                 @elseif($order->receipt =='free coupon')
                                                                     <p>{{__('Used 100 % discount coupon code.')}}</p>
+                                                                @elseif($order->receipt == 'point exchange')
+                                                                    <p>{{ __('Referral Point Redeemed') }}</p>
                                                                 @else
                                                                     <a href="{{$order->receipt}}" title="Invoice" target="_blank" class=""><i class="fas fa-file-invoice"></i> </a>
 

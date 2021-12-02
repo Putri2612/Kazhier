@@ -11,8 +11,8 @@
 @push('script-page')
     <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
     <script>
-        // $('#copy-button').tooltip();
         CopyFromInput('[name="referral_token"]','#copy-button');
+        CanNavigate();
     </script>
 @endpush
 @section('content')
@@ -177,7 +177,9 @@
                                                                     <div class="lead">{{ __('Referral Points') }}: <span class="text-primary">{{ $referral_point }}</span></div>
                                                                 </div>
                                                                 <div class="col-6 text-right">
-                                                                    <div class="btn btn-primary">{{ __('Redeem') }}</div>
+                                                                    <a href="#" data-url="{{ route('referral.redeem') }}" data-ajax-popup="true" data-title="{{__('Redeem Referral Points')}}" class="btn btn-primary">
+                                                                        {{ __('Redeem') }}
+                                                                    </a>
                                                                 </div>
                                                             </div>
                                                         </div>
