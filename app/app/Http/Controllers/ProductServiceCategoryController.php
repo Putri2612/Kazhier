@@ -11,7 +11,11 @@ class ProductServiceCategoryController extends Controller
     {
         if(\Auth::user()->can('manage constant category'))
         {
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $categories = [
+                'product'   => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get(),
+                'income'    => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get(),
+                'expense'   => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get(),
+            ];
 
             return view('productServiceCategory.index', compact('categories'));
         }

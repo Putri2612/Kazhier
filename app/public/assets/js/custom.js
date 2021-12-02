@@ -254,6 +254,12 @@ $(document).ready(function () {
             locale: date_picker_locale,
         });
     }
+
+    if($('table.dataTable').length){
+        $("table.dataTable").dataTable({
+            "ordering" : false,
+        });
+    }
     
     if($('#dataTable').length){
         $("#dataTable").dataTable({
