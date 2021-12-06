@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DefaultValue;
 use App\Models\Tax;
 use App\Traits\CanProcessNumber;
 use Auth;
@@ -30,7 +31,13 @@ class TaxController extends Controller
     {
         if(\Auth::user()->can('create constant tax'))
         {
-            return view('taxes.create');
+            $taxes = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name');
+            $defaultTax = DefaultValue::where('type', '=', 'Tax')->whereNotIn('name', $taxes)->get();
+            $tax = [];
+            foreach($defaultTax as $default) {
+                array_push($tax, ['value' => $default->name, 'attributes' => ['rate' => $default->value]]);
+            }
+            return view('taxes.create', compact('tax'));
         }
         else
         {

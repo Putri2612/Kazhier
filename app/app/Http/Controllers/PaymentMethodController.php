@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DefaultValue;
 use App\Models\PaymentMethod;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,10 @@ class PaymentMethodController extends Controller
     {
         if(\Auth::user()->can('create constant payment method'))
         {
-            return view('paymentMethod.create');
+            $methods    = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name');
+            $defaults   = DefaultValue::where('type', '=', 'payment method')->whereNotIn('name', $methods)->get()->pluck('name');
+
+            return view('paymentMethod.create', compact('defaults'));
         }
         else
         {

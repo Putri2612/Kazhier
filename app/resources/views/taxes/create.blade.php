@@ -23,4 +23,7 @@
         {{Form::submit(__('Create'),array('class'=>'btn btn-primary'))}}
     </div>
 </div>
+<script>
+    new Suggestion.CreateList('input[name="name"]', @json($tax));
+</script>
 {{ Form::close() }}

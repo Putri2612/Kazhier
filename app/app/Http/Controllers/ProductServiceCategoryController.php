@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DefaultValue;
 use App\Models\ProductServiceCategory;
 use Illuminate\Http\Request;
 
@@ -30,16 +31,40 @@ class ProductServiceCategoryController extends Controller
     {
         if(\Auth::user()->can('create constant category'))
         {
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name');
+            $defaultCat = DefaultValue::where('type', '=', 'product service')->whereNotIn('name', $categories)->get();
+
+            foreach($defaultCat as $def) {
+                $products[] = ['value' => $def->name, 'attributes' => ['color' => $def->color]];
+            }
+
             foreach(ProductServiceCategory::$categoryType as $type){
                 $types[] = __($type);
             }
 
-            return view('productServiceCategory.create', compact('types'));
+            return view('productServiceCategory.create', compact('types', 'products'));
         }
         else
         {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
+    }
+
+    public function createSuggestions(Request $request) {
+        $request->validate(['type' => 'required']);
+
+        $types      = ['product service', 'revenue', 'payment'];
+        $typeID     = $request->input('type');
+        $type       = $types[$typeID];
+        $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', $typeID)->get()->pluck('name');
+        $defaultCat = DefaultValue::where('type', '=', $type)->whereNotIn('name', $categories)->get();
+        
+        $defaults = [];
+        foreach($defaultCat as $def) {
+            $defaults[] = ['value' => $def->name, 'attributes' => ['color' => $def->color]];
+        }
+
+        return response()->json(['error' => false, 'message' => '', 'data' => $defaults]);
     }
 
     public function store(Request $request)

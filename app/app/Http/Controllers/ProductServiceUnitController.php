@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DefaultValue;
 use App\Models\ProductServiceUnit;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,9 @@ class ProductServiceUnitController extends Controller
     {
         if(\Auth::user()->can('create constant unit'))
         {
-            return view('productServiceUnit.create');
+            $units = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name');
+            $unit = DefaultValue::where('type', '=', 'unit')->whereNotIn('name', $units)->get()->pluck('name');
+            return view('productServiceUnit.create', compact('unit'));
         }
         else
         {

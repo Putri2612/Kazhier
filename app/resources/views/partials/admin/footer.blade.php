@@ -16,6 +16,7 @@
 <script src="{{ asset('assets/modules/chart/Chart.min.js') }} "></script>
 <script src="{{ asset('assets/modules/chart/Chart.extension.js') }} "></script>
 
+<script src="{{ asset('assets/js/InputSuggestion.js') }}"></script>
 
 {{-- <script src="{{ asset('assets/modules/datatables/datatables.js') }}" type="text/javascript"></script> --}}
 <script src="{{ asset('assets/modules/datatables/datatables.min.js') }}" type="text/javascript"></script>
@@ -32,7 +33,7 @@
 <script src="{{ asset('assets/js/jscolor.js') }} "></script>
 <script src="{{ asset('assets/js/scripts.min.js').'?'.time() }}"></script>
 <script src="{{ asset('assets/js/custom.min.js').'?'.time() }}"></script>
-<script src="{{asset('assets/js/jquery-ui.min.js')}}"></script>
+<script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
 
 <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
 
