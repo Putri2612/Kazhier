@@ -226,6 +226,23 @@ const CanNavigate = () => {
     });
 }
 
+window.onerror = (msg, url, lineNo, columnNo, error) => {
+    let data = `Message: ${msg} \n ${url} (${lineNo}:${columnNo}) \n ${error ? error.stack : ''}`;
+    let formData = new FormData();
+    formData.append('error', data);
+    fetch(`${window.location.protocol}//${window.location.hostname}/app/error/frontend`, {
+        method: 'post',
+        headers: {
+            'X-Requested-With'  : 'XMLHttpRequest',
+            'X-CSRF-TOKEN'      : document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin',
+        body: formData
+    }).then( response => {
+        if( response.ok ) return;
+        else console.error('Error cannot be uploaded');
+    });
+}
 
 $(function () {
     $(".custom-scroll").niceScroll();

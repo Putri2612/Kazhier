@@ -28,6 +28,7 @@ use App\Http\Controllers\DefaultValueController;
 use App\Http\Controllers\DialogController;
 use App\Http\Controllers\EquityController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\FrontEndErrorController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JournalController;
@@ -374,6 +375,8 @@ Route::group(
 }
 );
 
+Route::post('error/frontend', [FrontEndErrorController::class, 'storeError']);
+
 
 Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
 Route::resource('productservice', ProductServiceController::class)->middleware(
@@ -482,6 +485,12 @@ Route::resource('taxes', TaxController::class)->middleware(
     ]
 );
 
+Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion')->middleware(
+    [
+        'auth',
+        'xss',
+    ]
+);
 Route::resource('product-category', ProductServiceCategoryController::class)->middleware(
     [
         'auth',
