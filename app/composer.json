@@ -12,6 +12,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
         "laravelcollective/html": "^6.0",
+        "midtrans/midtrans-php": "^2.5",
         "rachidlaasri/laravel-installer": "^4.0",
         "spatie/laravel-permission": "^3.2",
         "stripe/stripe-php": "^7.13"
@@ -19,7 +20,6 @@
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
         "filp/whoops": "^2.0",
-        "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^4.1",
         "phpunit/phpunit": "^9.0"
