@@ -15,6 +15,20 @@ trait CanUploadFile{
         return $newName.'.'.$extension;
     }
 
+    public function CreateFile($location, $filename, $extension, $data, $method = null, $public = true){
+        if($public){
+            $path = "public/{$location}/{$filename}.{$extension}";
+        } else {
+            $path = "{$location}/{$filename}.{$extension}";
+        }
+
+        if(Storage::exists($path) && $method == 'append'){
+            Storage::append($path, $data);
+        } else {
+            Storage::put($path, $data);
+        }
+    }
+
     public function DeleteFile($fileName, $location){
         if(Storage::exists("public/{$location}/{$fileName}")){
             Storage::delete("public/{$location}/{$fileName}");
