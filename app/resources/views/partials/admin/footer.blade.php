@@ -18,8 +18,7 @@
 
 <script src="{{ asset('assets/js/InputSuggestion.js') }}"></script>
 
-{{-- <script src="{{ asset('assets/modules/datatables/datatables.js') }}" type="text/javascript"></script> --}}
-<script src="{{ asset('assets/modules/datatables/datatables.min.js') }}" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 
 <script src="{{ asset('assets/modules/bootstrap-toastr/toastr.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('assets/modules/bootstrap-toastr/ui-toastr.min.js') }}" type="text/javascript"></script>

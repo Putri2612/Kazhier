@@ -21,7 +21,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush font-style" id="dataTable">
+                                                <table class="table table-flush font-style dataTable">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th>{{__('Order Id')}}</th>

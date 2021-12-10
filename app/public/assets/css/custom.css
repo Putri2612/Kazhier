@@ -203,6 +203,16 @@ div.dataTables_wrapper div.dataTables_filter input {
     width: auto;
 }
 
+.dataTable-sorter {
+    padding-left: 4px;
+    font-weight: bold;
+}
+
+.dataTable-sorter::before, .dataTable-sorter::after {
+    right: unset;
+    left: -8px;
+}
+
 .lead-wrap .lead-grp {
     /*border: 1px solid #f5f5f5;*/
     padding: 15px;
@@ -483,6 +493,7 @@ span.task-status {
 ul li .project-highlight i {
     font-size: 42px;
     background: linear-gradient(to left top, #6676e9, rgba(103, 119, 239, 0.3));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -511,10 +522,6 @@ ul li .project-highlight .info p {
 
 .project-intro .card-header h4 {
     line-height: initial;
-}
-
-.custom-table-view {
-
 }
 
 .custom-table-view .table-row {
@@ -654,10 +661,6 @@ i.far.fa-trash-alt {
 
 .note.note-info {
     background-color: #3abaf4;
-}
-
-.note.note-danger .btn-wrap .btn {
-
 }
 
 .note-danger h2, .note-warning h2, .note-success h2, .note-info h2,

@@ -69,7 +69,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12" id="cust_table">
-                                <table class="table table-flush" id="dataTable">
+                                <table class="table table-flush dataTable">
                                     <thead class="thead-light">
                                     <tr>
                                         <th>#</th>

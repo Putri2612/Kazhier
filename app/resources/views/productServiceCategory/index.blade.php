@@ -55,8 +55,8 @@
                                                         <table class="table table-flush dataTable">
                                                             <thead class="thead-light">
                                                             <tr>
-                                                                <th> {{__('Type')}}</th>
-                                                                <th class="text-right"> {{__('Action')}}</th>
+                                                                <th>{{__('Type')}}</th>
+                                                                <th class="text-right">{{__('Action')}}</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>

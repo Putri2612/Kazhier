@@ -244,6 +244,18 @@ window.onerror = (msg, url, lineNo, columnNo, error) => {
     });
 }
 
+const DataTable = (element) => {
+    const lastIndex = element.querySelectorAll('thead th').length - 1,
+        lastColumnOption = {select: lastIndex, sortable: false}
+    
+        console.log(lastColumnOption);
+    return new simpleDatatables.DataTable(element, {
+        columns: [
+            lastColumnOption
+        ]
+    });
+}
+
 $(function () {
     $(".custom-scroll").niceScroll();
     $(".custom-scroll-horizontal").niceScroll();
@@ -272,16 +284,15 @@ $(document).ready(function () {
         });
     }
 
-    if($('table.dataTable').length){
-        $("table.dataTable").dataTable({
-            "ordering" : false,
+    let dataTables = document.querySelectorAll('table.dataTable');
+    if(dataTables.length) {
+        dataTables.forEach(table => {
+            DataTable(table);
         });
     }
-    
-    if($('#dataTable').length){
-        $("#dataTable").dataTable({
-            "ordering" : false,
-        });
+    dataTables = document.querySelector('#dataTable');
+    if(dataTables) {
+        DataTable(dataTables);
     }
 });
 

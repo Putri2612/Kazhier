@@ -32,10 +32,9 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush" id="dataTable">
+                                                <table class="table table-flush dataTable">
                                                     <thead class="thead-light">
                                                     <tr>
-
                                                         <th> {{__('Tax Name')}}</th>
                                                         <th> {{__('Rate %')}}</th>
                                                         <th class="text-right"> {{__('Action')}}</th>
@@ -43,21 +42,21 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    @foreach ($taxes as $taxe)
+                                                    @foreach ($taxes as $tax)
                                                         <tr class="font-style">
-                                                            <td>{{ $taxe->name }}</td>
-                                                            <td>{{ $taxe->rate }}</td>
+                                                            <td>{{ $tax->name }}</td>
+                                                            <td>{{ $tax->rate }}</td>
                                                             <td class="action text-right">
                                                                 @can('edit constant tax')
-                                                                    <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('taxes.edit',$taxe->id) }}" data-ajax-popup="true" data-title="{{__('Edit Tax Rate')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('taxes.edit',$tax->id) }}" data-ajax-popup="true" data-title="{{__('Edit Tax Rate')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete constant tax')
-                                                                    <a href="#" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$taxe->id}}').submit();">
+                                                                    <a href="#" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$tax->id}}').submit();">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['taxes.destroy', $taxe->id],'id'=>'delete-form-'.$taxe->id]) !!}
+                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['taxes.destroy', $tax->id],'id'=>'delete-form-'.$tax->id]) !!}
                                                                     {!! Form::close() !!}
                                                                 @endcan
                                                             </td>

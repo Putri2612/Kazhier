@@ -30,7 +30,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush" id="dataTable">
+                                                <table class="table table-flush dataTable">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Custom Field')}}</th>
