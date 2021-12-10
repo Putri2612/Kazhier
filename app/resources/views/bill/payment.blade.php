@@ -1,5 +1,5 @@
 
-{{ Form::open(array('route' => array('bill.payment', $bill->id),'method'=>'post',  'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => array('bill.payment.create', $bill->id),'method'=>'post',  'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('date', __('Date')) }}

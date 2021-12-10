@@ -189,7 +189,7 @@
                                                         <div class="col-12 col-md-6">
                                                             <div class="input-group">
                                                                 @php
-                                                                    $url = route('register')."?ref={$referral_token}";
+                                                                    $url = route('register.show')."?ref={$referral_token}";
                                                                 @endphp
                                                                 {{ Form::text('referral_token', $url, array('class' => 'form-control', 'readonly', 'disabled')) }}
                                                                 <button class="btn btn-primary" type="button" id="copy-button" title="Copy to Clipboard">

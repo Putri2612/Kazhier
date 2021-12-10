@@ -14,7 +14,7 @@
                     <div class="changeLanguage float-right mr-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
-                                <option @if($lang == $language) selected @endif value="{{ route('login',$language) }}">{{Str::upper($language)}}</option>
+                                <option @if($lang == $language) selected @endif value="{{ route('user.login',$language) }}">{{Str::upper($language)}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div class="mt-5 text-muted text-center">
-                        {{__('Dont have an account?')}} <a href="{{ route('register') }}">{{ __('Register') }}</a>
+                        {{__('Dont have an account?')}} <a href="{{ route('register.show') }}">{{ __('Register') }}</a>
                     </div>
                     <div class="simple-footer">
                         {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright AccountGo') }} {{ date('Y') }}

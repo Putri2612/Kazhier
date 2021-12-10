@@ -1,4 +1,4 @@
-{{ Form::open(array('route' => array('invoice.custom.credit.note'),'method'=>'post', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => array('invoice.custom.credit.note.store'),'method'=>'post', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="col-md-12">
         <div class="input-group">

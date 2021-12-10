@@ -1,4 +1,4 @@
-{{ Form::open(array('route' => array('bill.debit.note',$bill_id),'method'=>'post', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => array('bill.debit.note.store',$bill_id),'method'=>'post', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('date', __('Date')) }}

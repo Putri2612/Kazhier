@@ -30,7 +30,7 @@
                     <div class="card card-primary">
                         <div class="card-header"><h4>{{__('Vendor Login')}}</h4></div>
                         <div class="col-12 text-right">
-                            <a href="{{route('login')}}" class="btn btn-secondary">{{__('User Login')}}</a>
+                            <a href="{{route('user.login')}}" class="btn btn-secondary">{{__('User Login')}}</a>
                         </div>
                         <div class="card-body">
                             {{Form::open(array('route'=>'vender.login','method'=>'post','id'=>'loginForm','class'=> 'login-form' ))}}

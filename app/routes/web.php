@@ -58,406 +58,82 @@ use App\Http\Controllers\VenderController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/password/reset/{lang?}', [LoginController::class, 'showLinkRequestForm'])->name('change.langPass');
-
-Auth::routes();
-
-Route::get('/register/{lang?}', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [RegisterController::class, 'register'])->name('register');
-Route::get('/login/{lang?}', [LoginController::class, 'showLoginForm'])->name('login');
-
-Route::get('/plan/listAsync', [PlanController::class, 'getPlanAsync']);
-
-Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
-
-
 Route::prefix('customer')->as('customer.')->group(
     function (){
-        Route::get('login/{lang}', [LoginController::class, 'showCustomerLoginLang'])->name('login.lang')->middleware(['xss']);
-        Route::get('login', [LoginController::class, 'showCustomerLoginForm'])->name('login')->middleware(['xss']);
-        Route::post('login', [LoginController::class, 'customerLogin'])->name('login')->middleware(['xss']);
-        Route::get('dashboard', [CustomerController::class, 'dashboard'])->name('dashboard')->middleware(
+        Route::group(
             [
-                'auth:customer',
-                'xss',
-            ]
+                'middleware' => ['xss']
+            ], function () {
+                Route::get('login/{lang?}', [LoginController::class, 'showCustomerLoginLang'])->name('login.lang');
+                Route::post('login', [LoginController::class, 'customerLogin'])->name('login');
+            }
         );
 
-        Route::get('invoice', [InvoiceController::class, 'customerInvoice'])->name('invoice')->middleware(
+        Route::group(
             [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::get('proposal', [ProposalController::class, 'customerProposal'])->name('proposal')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-
-        Route::get('proposal/{id}/show', [ProposalController::class, 'customerProposalShow'])->name('proposal.show')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-
-        Route::get('invoice/{id}/send', [InvoiceController::class, 'customerInvoiceSend'])->name('invoice.send')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::post('invoice/{id}/send/mail', [InvoiceController::class, 'customerInvoiceSendMail'])->name('invoice.send.mail')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-
-        Route::get('invoice/{id}/show', [InvoiceController::class, 'customerInvoiceShow'])->name('invoice.show')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::get('payment', [CustomerController::class, 'payment'])->name('payment')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::get('transaction', [CustomerController::class, 'transaction'])->name('transaction')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::post('logout', [CustomerController::class, 'customerLogout'])->name('logout')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::get('profile', [CustomerController::class, 'profile'])->name('profile')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-
-        Route::put('update-profile', [CustomerController::class, 'editprofile'])->name('update.profile')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::put('billing-info', [CustomerController::class, 'editBilling'])->name('update.billing.info')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::put('shipping-info', [CustomerController::class, 'editShipping'])->name('update.shipping.info')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::put('change.password', [CustomerController::class, 'updatePassword'])->name('update.password')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
-        );
-        Route::get('change-language/{lang}', [CustomerController::class, 'changeLanquage'])->name('change.language')->middleware(
-            [
-                'auth:customer',
-                'xss',
-            ]
+                'middleware' => ['auth:customer', 'xss']
+            ], function() {
+                Route::get('dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
+                Route::get('invoice', [InvoiceController::class, 'customerInvoice'])->name('invoice');
+                Route::get('proposal', [ProposalController::class, 'customerProposal'])->name('proposal');
+                Route::get('proposal/{id}/show', [ProposalController::class, 'customerProposalShow'])->name('proposal.show');
+                Route::get('invoice/{id}/send', [InvoiceController::class, 'customerInvoiceSend'])->name('invoice.send');
+                Route::post('invoice/{id}/send/mail', [InvoiceController::class, 'customerInvoiceSendMail'])->name('invoice.send.mail');
+                Route::get('invoice/{id}/show', [InvoiceController::class, 'customerInvoiceShow'])->name('invoice.show');
+                Route::get('payment', [CustomerController::class, 'payment'])->name('payment');
+                Route::get('transaction', [CustomerController::class, 'transaction'])->name('transaction');
+                Route::post('logout', [CustomerController::class, 'customerLogout'])->name('logout');
+                Route::get('profile', [CustomerController::class, 'profile'])->name('profile');
+                Route::put('update-profile', [CustomerController::class, 'editprofile'])->name('update.profile');
+                Route::put('billing-info', [CustomerController::class, 'editBilling'])->name('update.billing.info');
+                Route::put('shipping-info', [CustomerController::class, 'editShipping'])->name('update.shipping.info');
+                Route::put('change.password', [CustomerController::class, 'updatePassword'])->name('update.password');
+                Route::get('change-language/{lang}', [CustomerController::class, 'changeLanquage'])->name('change.language');
+            }
         );
     }
 );
 
 Route::prefix('vender')->as('vender.')->group(
     function (){
-        Route::get('login/{lang}', [LoginController::class, 'showVenderLoginLang'])->name('login.lang')->middleware(['xss']);
-        Route::get('login', [LoginController::class, 'showVenderLoginForm'])->name('login')->middleware(['xss']);
-        Route::post('login', [LoginController::class, 'VenderLogin'])->name('login')->middleware(['xss']);
-        Route::get('dashboard', [VenderController::class, 'dashboard'])->name('dashboard')->middleware(
+        Route::group(
             [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::get('bill', [BillController::class, 'VenderBill'])->name('bill')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::get('bill/{id}/show', [BillController::class, 'venderBillShow'])->name('bill.show')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
+                'middleware' => [
+                    'xss'
+                ]
+            ], function () {
+                Route::get('login/{lang?}', [LoginController::class, 'showVenderLoginLang'])->name('login.lang');
+                Route::post('login', [LoginController::class, 'VenderLogin'])->name('login');
+            }
         );
 
+        Route::group(
+            [
+                'middleware' => [ 'auth:vender', 'xss' ]
+            ], function () {
+                Route::get('dashboard', [VenderController::class, 'dashboard'])->name('dashboard');
 
-        Route::get('bill/{id}/send', [BillController::class, 'venderBillSend'])->name('bill.send')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
+                Route::get('bill', [BillController::class, 'VenderBill'])->name('bill');
+                Route::prefix('bill')->as('bill.')->group(
+                    function() {
+                        Route::get('{id}/show', [BillController::class, 'venderBillShow'])->name('show');
+                        Route::get('{id}/send', [BillController::class, 'venderBillSend'])->name('send');
+                        Route::post('{id}/send/mail', [BillController::class, 'venderBillSendMail'])->name('send.mail');
+                    }
+                );
+                
+                Route::get('payment', [VenderController::class, 'payment'])->name('payment');
+                Route::get('transaction', [VenderController::class, 'transaction'])->name('transaction');
+                Route::post('logout', [VenderController::class, 'venderLogout'])->name('logout');
+                Route::get('profile', [VenderController::class, 'profile'])->name('profile');
+                Route::put('update-profile', [VenderController::class, 'editprofile'])->name('update.profile');
+                Route::put('billing-info', [VenderController::class, 'editBilling'])->name('update.billing.info');
+                Route::put('shipping-info', [VenderController::class, 'editShipping'])->name('update.shipping.info');
+                Route::put('change.password', [VenderController::class, 'updatePassword'])->name('update.password');
+                Route::get('change-language/{lang}', [VenderController::class, 'changeLanquage'])->name('change.language');
+            }
         );
-        Route::post('bill/{id}/send/mail', [BillController::class, 'venderBillSendMail'])->name('bill.send.mail')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-
-
-        Route::get('payment', [VenderController::class, 'payment'])->name('payment')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::get('transaction', [VenderController::class, 'transaction'])->name('transaction')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::post('logout', [VenderController::class, 'venderLogout'])->name('logout')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-
-        Route::get('profile', [VenderController::class, 'profile'])->name('profile')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-
-        Route::put('update-profile', [VenderController::class, 'editprofile'])->name('update.profile')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::put('billing-info', [VenderController::class, 'editBilling'])->name('update.billing.info')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::put('shipping-info', [VenderController::class, 'editShipping'])->name('update.shipping.info')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::put('change.password', [VenderController::class, 'updatePassword'])->name('update.password')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-        Route::get('change-language/{lang}', [VenderController::class, 'changeLanquage'])->name('change.language')->middleware(
-            [
-                'auth:vender',
-                'xss',
-            ]
-        );
-
     }
-);
-
-
-Route::prefix('redeem-referral')->as('referral.')->group(
-    function(){
-        Route::get('/', [ReferralController::class, 'redeem'])->name('redeem')->middleware(['auth', 'xss']);
-        Route::get('plan/{code}', [ReferralController::class, 'RedeemPlan'])->name('redeem.plan')->middleware(['auth', 'xss']);
-        Route::post('plan/{code}/checkout', [ReferralController::class, 'CheckoutPlan'])->name('checkout.plan')->middleware(['auth', 'xss']);
-    }
-);
-
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::get('user/{id}/plan/{pid}', [UserController::class, 'activePlan'])->name('plan.active')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::get('profile', [UserController::class, 'profile'])->name('profile')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account')->middleware(['auth', 'xss',]);
-
-Route::resource('users', UserController::class)->middleware(['auth', 'xss',]);
-
-
-
-Route::put('change-password', [UserController::class, 'updatePassword'])->name('update.password');
-
-
-Route::resource('roles', RoleController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('permissions', PermissionController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-    Route::get('change-language/{lang}', [LanguageController::class, 'changeLanquage'])->name('change.language');
-    Route::get('manage-language/{lang}', [LanguageController::class, 'manageLanguage'])->name('manage.language');
-    Route::post('store-language-data/{lang}', [LanguageController::class, 'storeLanguageData'])->name('store.language.data');
-    Route::get('create-language', [LanguageController::class, 'createLanguage'])->name('create.language');
-    Route::post('store-language', [LanguageController::class, 'storeLanguage'])->name('store.language');
-}
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::resource('systems', SystemController::class);
-    Route::post('email-settings', [SystemController::class, 'saveEmailSettings'])->name('email.settings');
-    Route::post('company-settings', [SystemController::class, 'saveCompanySettings'])->name('company.settings');
-    Route::post('stripe-settings', [SystemController::class, 'saveStripeSettings'])->name('stripe.settings');
-    Route::post('midtrans-settings', [SystemController::class, 'saveMidtransSettings'])->name('midtrans.settings');
-    Route::post('system-settings', [SystemController::class, 'saveSystemSettings'])->name('system.settings');
-    Route::get('company-setting', [SystemController::class, 'companyIndex'])->name('company.setting');
-    Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
-}
-);
-
-Route::post('error/frontend', [FrontEndErrorController::class, 'storeError']);
-
-
-Route::get('productservice/index', [ProductServiceController::class, 'index'])->name('productservice.index');
-Route::resource('productservice', ProductServiceController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('customer/{id}/show', [CustomerController::class, 'show'])->name('customer.show');
-    Route::resource('customer', CustomerController::class);
-
-}
-);
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('vender/{id}/show', [VenderController::class, 'show'])->name('vender.show');
-    Route::resource('vender', VenderController::class);
-
-}
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::resource('bank-account', BankAccountController::class);
-
-}
-);
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('transfer/index', [TransferController::class, 'index'])->name('transfer.index');
-    Route::resource('transfer', TransferController::class);
-
-}
-);
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('transaction/index', [TransactionController::class, 'index'])->name('transaction.index');
-    Route::resource('transaction', TransactionController::class);
-
-}
-);
-
-Route::resource('defaults', DefaultValueController::class)->middleware(
-    [
-        'auth',
-        'xss'
-    ]
 );
 
 Route::group(
@@ -467,196 +143,240 @@ Route::group(
             'xss'
         ]
     ], function () {
-        Route::get('post-register', [PostRegisterController::class, 'index'])->name('post-register.index');
-        Route::match(['get', 'post'], 'post-register/revenue', [PostRegisterController::class, 'revenue'])->name('post-register.revenue');
-        Route::match(['get', 'post'], 'post-register/expense', [PostRegisterController::class, 'expense'])->name('post-register.expense');
-        Route::match(['get', 'post'], 'post-register/product-category', [PostRegisterController::class, 'product_category'])->name('post-register.product-category');
-        Route::match(['get', 'post'], 'post-register/unit', [PostRegisterController::class, 'unit'])->name('post-register.unit');
-        Route::match(['get', 'post'], 'post-register/tax', [PostRegisterController::class, 'tax'])->name('post-register.tax');
-        Route::match(['get', 'post'], 'post-register/payment-method', [PostRegisterController::class, 'paymentMethod'])->name('post-register.method');
-        Route::get('post-register/complete', [PostRegisterController::class, 'complete'])->name('post-register.complete');
+
+
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade');
+
+        Route::get('user/{id}/plan/{pid}', [UserController::class, 'activePlan'])->name('plan.active');
+
+        Route::get('profile', [UserController::class, 'profile'])->name('profile');
+        Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account');
+        Route::resource('users', UserController::class);
+
+        Route::prefix('redeem-referral')->as('referral.')->group(
+            function(){
+                Route::get('/', [ReferralController::class, 'redeem'])->name('redeem');
+                Route::get('plan/{code}', [ReferralController::class, 'RedeemPlan'])->name('redeem.plan');
+                Route::post('plan/{code}/checkout', [ReferralController::class, 'CheckoutPlan'])->name('checkout.plan');
+            }
+        );
+
+        Route::resource('roles', RoleController::class);
+        Route::resource('permissions', PermissionController::class);
+
+        Route::get('change-language/{lang}', [LanguageController::class, 'changeLanquage'])->name('change.language');
+        Route::get('manage-language/{lang}', [LanguageController::class, 'manageLanguage'])->name('manage.language');
+        Route::post('store-language-data/{lang}', [LanguageController::class, 'storeLanguageData'])->name('store.language.data');
+        Route::get('create-language', [LanguageController::class, 'createLanguage'])->name('create.language');
+        Route::post('store-language', [LanguageController::class, 'storeLanguage'])->name('store.language');
+
+        Route::resource('systems', SystemController::class);
+        Route::post('email-settings', [SystemController::class, 'saveEmailSettings'])->name('email.settings');
+        Route::post('company-settings', [SystemController::class, 'saveCompanySettings'])->name('company.settings');
+        Route::post('stripe-settings', [SystemController::class, 'saveStripeSettings'])->name('stripe.settings');
+        Route::post('midtrans-settings', [SystemController::class, 'saveMidtransSettings'])->name('midtrans.settings');
+        Route::post('system-settings', [SystemController::class, 'saveSystemSettings'])->name('system.settings');
+        Route::get('company-setting', [SystemController::class, 'companyIndex'])->name('company.setting');
+        Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
+
+        Route::resource('productservice', ProductServiceController::class);
+
+        Route::resource('customer', CustomerController::class);
+
+        Route::resource('vender', VenderController::class);
+
+        Route::resource('bank-account', BankAccountController::class);
+
+        Route::resource('transfer', TransferController::class);
+
+        Route::resource('transaction', TransactionController::class);
+
+        Route::resource('defaults', DefaultValueController::class);
+
+        Route::prefix('post-register')->as('post-register.')->group(
+            function () {
+                Route::get('', [PostRegisterController::class, 'index'])->name('index');
+                Route::match(['get', 'post'], 'revenue', [PostRegisterController::class, 'revenue'])->name('revenue');
+                Route::match(['get', 'post'], 'expense', [PostRegisterController::class, 'expense'])->name('expense');
+                Route::match(['get', 'post'], 'product-category', [PostRegisterController::class, 'product_category'])->name('product-category');
+                Route::match(['get', 'post'], 'unit', [PostRegisterController::class, 'unit'])->name('unit');
+                Route::match(['get', 'post'], 'tax', [PostRegisterController::class, 'tax'])->name('tax');
+                Route::match(['get', 'post'], 'payment-method', [PostRegisterController::class, 'paymentMethod'])->name('method');
+                Route::get('complete', [PostRegisterController::class, 'complete'])->name('complete');
+            }
+        );
+
+        // Tax, category, unit, method
+        Route::resource('taxes', TaxController::class);
+        Route::resource('product-category', ProductServiceCategoryController::class);
+        Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion');
+
+        Route::resource('product-unit', ProductServiceUnitController::class);
+        Route::resource('payment-method', PaymentMethodController::class);
+
+        // Income
+
+        Route::prefix('invoice')->as('invoice.')->group(
+            function () {
+                Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
+                Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
+                Route::get('{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('payment.reminder');
+                Route::post('product/destroy', [InvoiceController::class, 'productDestroy'])->name('product.destroy');
+                Route::post('product', [InvoiceController::class, 'product'])->name('product');
+                Route::post('customer', [InvoiceController::class, 'customer'])->name('customer');
+                Route::get('{id}/sent', [InvoiceController::class, 'sent'])->name('sent');
+                Route::get('{id}/payment', [InvoiceController::class, 'payment'])->name('payment');
+                Route::post('{id}/payment', [InvoiceController::class, 'createPayment'])->name('payment.create');
+                Route::post('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
+
+                Route::get('{id}/credit-note', [CreditNoteController::class, 'create'])->name('credit.note');
+                Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
+                Route::get('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('edit.credit.note');
+                Route::put('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('update.credit.note');
+                Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('delete.credit.note');
+            }
+        );
+
+        Route::resource('invoice', InvoiceController::class);
+
+        Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
+        Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
+        Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
+        Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
+
+        Route::resource('revenue', RevenueController::class);
+
+        // Expense
+
+        Route::prefix('bill')->as('bill.')->group(
+            function() {
+                Route::get('{id}/duplicate', [BillController::class, 'duplicate'])->name('duplicate');
+                Route::get('{id}/shipping/print', [BillController::class, 'shippingDisplay'])->name('shipping.print');
+                Route::post('product/destroy', [BillController::class, 'productDestroy'])->name('product.destroy');
+                Route::post('product', [BillController::class, 'product'])->name('product');
+                Route::post('vender', [BillController::class, 'vender'])->name('vender');
+                Route::get('{id}/sent', [BillController::class, 'sent'])->name('sent');
+                Route::get('{id}/payment', [BillController::class, 'payment'])->name('payment');
+                Route::post('{id}/payment', [BillController::class, 'createPayment'])->name('payment.create');
+                Route::post('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
+
+                Route::get('{id}/debit-note', [DebitNoteController::class, 'create'])->name('debit.note');
+                Route::post('{id}/debit-note', [DebitNoteController::class, 'store'])->name('debit.note.store');
+                Route::get('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'edit'])->name('edit.debit.note');
+                Route::put('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'update'])->name('update.debit.note');
+                Route::delete('{id}/debit-note/delete/{cn_id}', [DebitNoteController::class, 'destroy'])->name('delete.debit.note');
+            }
+        );
+
+        Route::resource('bill', BillController::class);
+
+        Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
+        Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
+        Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note.store');
+        Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
+
+        Route::resource('payment', PaymentController::class);
+
+        Route::resource('expenses', ExpenseController::class);
+
+        // Plan & order
+
+        Route::resource('plans', PlanController::class);
+
+        Route::get('/orders', [MidtransPaymentController::class, 'index'])->name('order.index');
+        Route::get('/purchase/{code}', [MidtransPaymentController::class, 'showOrder'])->name('purchase');
+        Route::post('/midtrans', [MidtransPaymentController::class, 'payPlan'])->name('order.pay');
+
+        Route::resource('coupons', CouponController::class);
+
+        // Report
+
+        Route::prefix('report')->as('report.')->group(
+            function() {
+                Route::get('income-summary', [ReportController::class, 'incomeSummary'])->name('income.summary');
+                Route::get('expense-summary', [ReportController::class, 'expenseSummary'])->name('expense.summary');
+                Route::get('income-vs-expense-summary', [ReportController::class, 'incomeVsExpenseSummary'])->name('income.vs.expense.summary');
+                Route::get('tax-summary', [ReportController::class, 'taxSummary'])->name('tax.summary');
+                Route::get('profit-loss-summary', [ReportController::class, 'profitLossSummary'])->name('profit.loss.summary');
+
+                Route::get('invoice-summary', [ReportController::class, 'invoiceSummary'])->name('invoice.summary');
+                Route::get('bill-summary', [ReportController::class, 'billSummary'])->name('bill.summary');
+
+                Route::get('invoice-report', [ReportController::class, 'invoiceReport'])->name('invoice');
+                Route::get('account-statement-report', [ReportController::class, 'accountStatement'])->name('account.statement');
+            }
+        );
+        Route::get('journal', [JournalController::class, 'index'])->name('journal.index');
+        Route::get('ledger', [LedgerController::class, 'index'])->name('ledger.index');
+        Route::get('balance-sheet/index', [BalanceSheetController::class, 'index'])->name('balance-sheet.index');
+
+        // Proposal
+
+        Route::prefix('proposal')->as('proposal.')->group(
+            function() {
+                Route::get('{id}/status/change', [ProposalController::class, 'statusChange'])->name('status.change');
+                Route::get('{id}/convert', [ProposalController::class, 'convert'])->name('convert');
+                Route::get('{id}/duplicate', [ProposalController::class, 'duplicate'])->name('duplicate');
+                Route::post('product/destroy', [ProposalController::class, 'productDestroy'])->name('product.destroy');
+                Route::post('customer', [ProposalController::class, 'customer'])->name('customer');
+                Route::post('product', [ProposalController::class, 'product'])->name('product');
+                Route::get('{id}/sent', [ProposalController::class, 'sent'])->name('sent');
+            }
+        );
+
+        Route::resource('proposal', ProposalController::class);
+
+        Route::resource('goal', GoalController::class);
+
+        Route::resource('account-assets', AssetController::class);
+        Route::resource('account-equities', EquityController::class);
+        Route::resource('account-liabilities', LiabilityController::class);
+        Route::resource('custom-field', CustomFieldController::class);
+        Route::get('syncAllData', [UserController::class, 'syncData'])->name('syncData');
+        
     }
 );
 
-Route::resource('taxes', TaxController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('product-category', ProductServiceCategoryController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::resource('product-unit', ProductServiceUnitController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('payment-method', PaymentMethodController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf')->middleware(
-    [
-        'xss',
-    ]
-);
 Route::group(
     [
         'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-
-    Route::get('invoice/{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('invoice.duplicate');
-    Route::get('invoice/{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('invoice.shipping.print');
-    Route::get('invoice/{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('invoice.payment.reminder');
-    Route::get('invoice/index', [InvoiceController::class, 'index'])->name('invoice.index');
-    Route::post('invoice/product/destroy', [InvoiceController::class, 'productDestroy'])->name('invoice.product.destroy');
-    Route::post('invoice/product', [InvoiceController::class, 'product'])->name('invoice.product');
-    Route::post('invoice/customer', [InvoiceController::class, 'customer'])->name('invoice.customer');
-    Route::get('invoice/{id}/sent', [InvoiceController::class, 'sent'])->name('invoice.sent');
-    Route::get('invoice/{id}/payment', [InvoiceController::class, 'payment'])->name('invoice.payment');
-    Route::post('invoice/{id}/payment', [InvoiceController::class, 'createPayment'])->name('invoice.payment');
-    Route::post('invoice/{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('invoice.payment.destroy');
-    Route::resource('invoice', InvoiceController::class);
-
-}
+            'xss'
+        ]
+    ], function () {
+        Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf');
+        Route::get('bill/pdf/{id}', [BillController::class, 'bill'])->name('bill.pdf');
+        Route::get('proposal/pdf/{id}', [ProposalController::class, 'proposal'])->name('proposal.pdf');
+    }
 );
 
-Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');
-                                              
+Route::get('app', function () { return redirect()->route('user.login');} );
+
+Auth::routes();
+
+Route::get('/register/{lang?}', [RegisterController::class, 'showRegistrationForm'])->name('register.show');
+Route::post('register', [RegisterController::class, 'register'])->name('user.register');
+Route::get('/login/{lang?}', [LoginController::class, 'showLoginForm'])->name('user.login');
+
+Route::get('/plan/listAsync', [PlanController::class, 'getPlanAsync']);
+
+Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
+
+Route::get('/password/reset/{lang?}', [LoginController::class, 'showLinkRequestForm'])->name('change.langPass');
+Route::put('change-password', [UserController::class, 'updatePassword'])->name('update.password');
+
+Route::post('error/frontend', [FrontEndErrorController::class, 'storeError']);
+
+Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');                        
 Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-
-    Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
-    Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
-    Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note');
-    Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
-    Route::get('invoice/{id}/credit-note', [CreditNoteController::class, 'create'])->name('invoice.credit.note');
-    Route::post('invoice/{id}/credit-note', [CreditNoteController::class, 'store'])->name('invoice.credit.note');
-    Route::get('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('invoice.edit.credit.note');
-    Route::put('invoice/{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('invoice.edit.credit.note');
-    Route::delete('invoice/{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('invoice.delete.credit.note');
-
-}
-);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-
-    Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
-    Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
-    Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note');
-    Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
-    Route::get('bill/{id}/debit-note', [DebitNoteController::class, 'create'])->name('bill.debit.note');
-    Route::post('bill/{id}/debit-note', [DebitNoteController::class, 'store'])->name('bill.debit.note');
-    Route::get('bill/{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'edit'])->name('bill.edit.debit.note');
-    Route::put('bill/{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'update'])->name('bill.edit.debit.note');
-    Route::delete('bill/{id}/debit-note/delete/{cn_id}', [DebitNoteController::class, 'destroy'])->name('bill.delete.debit.note');
-
-}
-);
-
 
 Route::get('/bill/preview/{template}/{color}', [BillController::class, 'previewBill'])->name('bill.preview');
 Route::post('/bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
 
-Route::resource('taxes', TaxController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
+Route::post('/midtrans/callback', [MidtransPaymentController::class, 'handlePaymentNotification']);
 
-Route::get('revenue/index', [RevenueController::class, 'index'])->name('revenue.index')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::resource('revenue', RevenueController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('bill/pdf/{id}', [BillController::class, 'bill'])->name('bill.pdf')->middleware(
-    [
-        'xss',
-    ]
-);
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('bill/{id}/duplicate', [BillController::class, 'duplicate'])->name('bill.duplicate');
-    Route::get('bill/{id}/shipping/print', [BillController::class, 'shippingDisplay'])->name('bill.shipping.print');
-    Route::get('bill/index', [BillController::class, 'index'])->name('bill.index');
-    Route::post('bill/product/destroy', [BillController::class, 'productDestroy'])->name('bill.product.destroy');
-    Route::post('bill/product', [BillController::class, 'product'])->name('bill.product');
-    Route::post('bill/vender', [BillController::class, 'vender'])->name('bill.vender');
-    Route::get('bill/{id}/sent', [BillController::class, 'sent'])->name('bill.sent');
-    Route::get('bill/{id}/payment', [BillController::class, 'payment'])->name('bill.payment');
-    Route::post('bill/{id}/payment', [BillController::class, 'createPayment'])->name('bill.payment');
-    Route::post('bill/{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('bill.payment.destroy');
-
-    Route::resource('bill', BillController::class);
-
-}
-);
-
-
-Route::get('payment/index', [PaymentController::class, 'index'])->name('payment.index')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('payment', PaymentController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
+Route::get('/proposal/preview/{template}/{color}', [ProposalController::class, 'previewProposal'])->name('proposal.preview');
+Route::post('/proposal/template/setting', [ProposalController::class, 'saveProposalTemplateSettings'])->name('proposal.template.setting');
 // Route::group(
 //     [
 //         'middleware' => [
@@ -669,177 +389,3 @@ Route::resource('payment', PaymentController::class)->middleware(
 
 // }
 // );
-
-Route::resource('plans', PlanController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-
-Route::resource('expenses', ExpenseController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('/orders', [MidtransPaymentController::class, 'index'])->name('order.index');
-    Route::get('/purchase/{code}', [MidtransPaymentController::class, 'showOrder'])->name('purchase');
-    Route::post('/midtrans', [MidtransPaymentController::class, 'payPlan'])->name('order.pay');
-    
-
-    Route::get('/stripe/{code}', [StripePaymentController::class, 'stripe'])->name('stripe');
-    Route::post('/stripe', [StripePaymentController::class, 'stripePost'])->name('stripe.post');
-
-}
-);
-
-Route::post('/midtrans/callback', [MidtransPaymentController::class, 'handlePaymentNotification']);
-
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('report/income-summary', [ReportController::class, 'incomeSummary'])->name('report.income.summary');
-    Route::get('report/expense-summary', [ReportController::class, 'expenseSummary'])->name('report.expense.summary');
-    Route::get('report/income-vs-expense-summary', [ReportController::class, 'incomeVsExpenseSummary'])->name('report.income.vs.expense.summary');
-    Route::get('report/tax-summary', [ReportController::class, 'taxSummary'])->name('report.tax.summary');
-    Route::get('report/profit-loss-summary', [ReportController::class, 'profitLossSummary'])->name('report.profit.loss.summary');
-
-    Route::get('report/invoice-summary', [ReportController::class, 'invoiceSummary'])->name('report.invoice.summary');
-    Route::get('report/bill-summary', [ReportController::class, 'billSummary'])->name('report.bill.summary');
-
-    Route::get('report/invoice-report', [ReportController::class, 'invoiceReport'])->name('report.invoice');
-    Route::get('report/account-statement-report', [ReportController::class, 'accountStatement'])->name('report.account.statement');
-}
-);
-
-Route::resource('coupons', CouponController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('proposal/pdf/{id}', [ProposalController::class, 'proposal'])->name('proposal.pdf')->middleware(
-    [
-        'xss',
-    ]
-);
-Route::group(
-    [
-        'middleware' => [
-            'auth',
-            'xss',
-        ],
-    ], function (){
-
-    Route::get('proposal/{id}/status/change', [ProposalController::class, 'statusChange'])->name('proposal.status.change');
-    Route::get('proposal/{id}/convert', [ProposalController::class, 'convert'])->name('proposal.convert');
-    Route::get('proposal/{id}/duplicate', [ProposalController::class, 'duplicate'])->name('proposal.duplicate');
-    Route::post('proposal/product/destroy', [ProposalController::class, 'productDestroy'])->name('proposal.product.destroy');
-    Route::post('proposal/customer', [ProposalController::class, 'customer'])->name('proposal.customer');
-    Route::post('proposal/product', [ProposalController::class, 'product'])->name('proposal.product');
-    Route::get('proposal/{id}/sent', [ProposalController::class, 'sent'])->name('proposal.sent');
-    Route::resource('proposal', ProposalController::class);
-
-}
-);
-
-Route::get('/proposal/preview/{template}/{color}', [ProposalController::class, 'previewProposal'])->name('proposal.preview');
-Route::post('/proposal/template/setting', [ProposalController::class, 'saveProposalTemplateSettings'])->name('proposal.template.setting');
-
-Route::resource('goal', GoalController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('account-assets', AssetController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('account-equities', EquityController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('account-liabilities', LiabilityController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('custom-field', CustomFieldController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('syncAllData', [UserController::class, 'syncData'])->name('syncData')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('journal/index', [JournalController::class, 'index'])->name('journal.index')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::resource('journal', JournalController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('ledger/index', [LedgerController::class, 'index'])->name('ledger.index')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-
-Route::resource('ledger', LedgerController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-
-Route::get('balance-sheet/index', [BalanceSheetController::class, 'index'])->name('balance-sheet.index')->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
-Route::resource('balance-sheet', BalanceSheetController::class)->middleware(
-    [
-        'auth',
-        'xss',
-    ]
-);
