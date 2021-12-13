@@ -256,6 +256,119 @@ const DataTable = (element) => {
     });
 }
 
+let userActivities = {
+    interval : 0,
+    user     : null,
+    focus    : 1,
+}
+
+const loginUser = user => {
+    if(!sessionStorage.getItem('user')) {
+        sessionStorage.setItem('user', user);
+        userActivities.user = user;
+    }
+}
+
+const logoutUser = () => {
+    if(sessionStorage.getItem('user')) {
+        sessionStorage.clear();
+        clearInterval(userActivities.interval);
+        userActivities.user = null;
+    }
+}
+
+const userActivity = () => {
+    userActivities.interval = setInterval(checkActivity, 60000);
+}
+
+const checkActivity = () => {
+    console.log('check');
+    if(document.hasFocus()){
+        console.log('di laman');
+        if(!sessionStorage.getItem('last-active') || !userActivities.focus) {
+            getActivity();
+        } else {
+            console.log(sessionStorage, 'a');
+            const now   = moment(new Date()),
+                db      = moment(new Date(sessionStorage.getItem('db-active'))),
+                stored  = moment(new Date(sessionStorage.getItem('last-active'))),
+                time    = parseFloat(sessionStorage.getItem('active-time'));
+
+            if(now.diff(stored, 'minute') < 5){    
+                sessionStorage.setItem('active-time', time + now.diff(stored, 'second') / 60);
+                sessionStorage.setItem('last-active', now.format("YYYY-MM-DD HH:mm:ss"));
+                
+                if(now.diff(db, 'minute') >= 1){
+                    sendActivity();
+                }
+            } else {
+                getActivity();
+            }
+        }
+        userActivities.focus = 1;
+    } else {
+        console.log('tidak di laman')
+        userActivities.focus = 0;
+    }
+}
+
+const getActivity = () => {
+    const user = sessionStorage.getItem('user');
+    fetch(`${window.location.protocol}//${window.location.host}/app/users/${user}/activity`, {method: 'get'})
+    .then(response => {
+        if(response.ok) {
+            return response.json();
+        } else {
+            console.error(response.status, response.statusText);
+        }
+    }).then(data => {
+        const today = moment(new Date()),
+            before  = moment(new Date(data.last_active));
+
+        if(data.last_active && today.diff(before, 'minute') < 5) {
+            sessionStorage.setItem('last-active', data.last_active);
+            sessionStorage.setItem('db-active', data.last_active);
+        } else {
+            const string    = today.format("YYYY-MM-DD HH:mm:ss");
+            sessionStorage.setItem('last-active', string);
+        }
+        
+        sessionStorage.setItem('active-time', data.active_time);
+    }).catch( error => console.error(error));
+}
+
+const sendActivity = () => {
+    const data = new FormData();
+    data.append('last_active', sessionStorage.getItem('last-active'));
+    data.append('active_time', Math.round(sessionStorage.getItem('active-time')));
+    data.append('_method', 'put');
+    const user = sessionStorage.getItem('user');
+    fetch(
+        `${window.location.protocol}//${window.location.host}/app/users/${user}/activity`, 
+        {
+            method: 'post',
+            headers: {
+                'X-Requested-With'  : 'XMLHttpRequest',
+                'X-CSRF-TOKEN'      : document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            credentials: 'same-origin',
+            body: data
+        }
+    ).then(response => {
+        if(response.ok) {
+            return response.json();
+        } else {
+            console.error(response.status, response.statusText)
+        }
+    }).then(data => {
+        if(data.error) {
+            console.error(data.message);
+        } else {
+            sessionStorage.setItem('db-active', sessionStorage.getItem('last-active'));
+        }
+    }).catch(error => console.error(error));
+}
+
 $(function () {
     $(".custom-scroll").niceScroll();
     $(".custom-scroll-horizontal").niceScroll();

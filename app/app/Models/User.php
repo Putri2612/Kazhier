@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -65,6 +66,15 @@ class User extends Authenticatable
         else
         {
             return $this->created_by;
+        }
+    }
+
+    public function cryptId() {
+        if($this->type == 'company' || $this->type == 'super admin') {
+            $id = $this->creatorId();
+            return Crypt::encrypt($id);
+        } else {
+            return null;
         }
     }
 

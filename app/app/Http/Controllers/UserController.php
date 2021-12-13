@@ -26,14 +26,17 @@ use App\Models\ProductServiceUnit;
 use App\Models\Proposal;
 use App\Models\ProposalProduct;
 use App\Models\ReferralPoint;
+use App\Models\ReferralPointHistory;
 use App\Models\Tax;
 use App\Models\Transfer;
 use App\Models\Transaction;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
+use Carbon\Carbon;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Session;
@@ -604,6 +607,47 @@ class UserController extends Controller
             return redirect()->back()->with('success', __('Data synchronized.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function activity($userID, Request $request) {
+        $userID = Crypt::decrypt($userID);
+        if($request->has('last_active')) {
+            $last_active    = Carbon::createFromFormat('Y-m-d H:i:s', $request->input('last_active'));
+            $active_time    = floor($request->input('active_time'));
+            $updateItem     = ['active_time' => $active_time, 'last_active' => $last_active];
+
+            $user = DB::table('users')->find($userID);
+
+            if($active_time > 15 && $user->referred_by != null && !$user->referral_redeemed){
+                $point = ReferralPoint::where('created_by', '=', $user->referred_by)->first();
+
+                if($point) { $point->Add(25); }
+                else {
+                    $point              = new ReferralPoint();
+                    $point->point       = 25;
+                    $point->created_by  = $user->referred_by;
+                    $point->save();
+                }
+
+                $history = new ReferralPointHistory();
+                $history->description   = "A user used your referral code";
+                $history->amount        = 25;
+                $history->ref_id        = $point->id;
+                $history->created_by    = $user->referred_by;
+                $history->save();
+                $updateItem['referral_redeemed'] = 1;
+            }
+
+            $update = DB::table('users')->where('id', '=', $userID)->update($updateItem);
+
+            if($update) {
+                return response()->json(['error' => false]);
+            } else {
+                return response()->json(['error' => true, 'message' => 'cannot update user activity']);
+            }
+        } else {            
+            return response()->json(DB::table('users')->find($userID, ['last_active', 'active_time']));
         }
     }
 

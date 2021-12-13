@@ -34,6 +34,13 @@
 <script src="{{ asset('assets/js/custom.min.js').'?'.time() }}"></script>
 <script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
 
+<script>
+    loginUser('{!! Auth::user()->cryptId() !!}');
+    checkActivity();
+    userActivity();
+    document.querySelector('#frm-logout').addEventListener('submit', logoutUser);
+</script>
+
 <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
 
 <script>

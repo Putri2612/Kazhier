@@ -153,6 +153,7 @@ Route::group(
         Route::get('profile', [UserController::class, 'profile'])->name('profile');
         Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account');
         Route::resource('users', UserController::class);
+        Route::match(['get', 'put'], 'users/{userID}/activity', [UserController::class, 'activity'])->name('user.activity');
 
         Route::prefix('redeem-referral')->as('referral.')->group(
             function(){
