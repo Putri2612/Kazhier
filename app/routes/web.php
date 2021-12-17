@@ -159,7 +159,11 @@ Route::group(
             function(){
                 Route::get('/', [ReferralController::class, 'redeem'])->name('redeem');
                 Route::get('plan/{code}', [ReferralController::class, 'RedeemPlan'])->name('redeem.plan');
-                Route::post('plan/{code}/checkout', [ReferralController::class, 'CheckoutPlan'])->name('checkout.plan');
+                Route::post('plan/checkout', [ReferralController::class, 'CheckoutPlan'])->name('checkout.plan');
+                Route::get('withdraw', [ReferralController::class, 'WithdrawRequest'])->name('withdraw');
+                Route::post('withdraw/request', [ReferralController::class, 'RequestWithdraw'])->name('withdraw.request');
+                Route::put('withdraw/{id}/process', [ReferralController::class, 'ProcessWithdrawRequest'])->name('withdraw.process');
+                Route::delete('withdraw/{id}/cancel', [ReferralController::class, 'CancelWithdrawRequest'])->name('withdraw.cancel');
             }
         );
 
@@ -229,7 +233,7 @@ Route::group(
                 Route::get('{id}/sent', [InvoiceController::class, 'sent'])->name('sent');
                 Route::get('{id}/payment', [InvoiceController::class, 'payment'])->name('payment');
                 Route::post('{id}/payment', [InvoiceController::class, 'createPayment'])->name('payment.create');
-                Route::post('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
+                Route::delete('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
 
                 Route::get('{id}/credit-note', [CreditNoteController::class, 'create'])->name('credit.note');
                 Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
@@ -260,7 +264,7 @@ Route::group(
                 Route::get('{id}/sent', [BillController::class, 'sent'])->name('sent');
                 Route::get('{id}/payment', [BillController::class, 'payment'])->name('payment');
                 Route::post('{id}/payment', [BillController::class, 'createPayment'])->name('payment.create');
-                Route::post('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
+                Route::delete('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
 
                 Route::get('{id}/debit-note', [DebitNoteController::class, 'create'])->name('debit.note');
                 Route::post('{id}/debit-note', [DebitNoteController::class, 'store'])->name('debit.note.store');
@@ -336,6 +340,9 @@ Route::group(
         Route::resource('custom-field', CustomFieldController::class);
         Route::get('syncAllData', [UserController::class, 'syncData'])->name('syncData');
         
+        Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
+        Route::get('/dialog-status-update', [DialogController::class, 'StatusUpdate']);
+        Route::get('/dialog-confirm-delete', [DialogController::class, 'ConfirmDelete']);
     }
 );
 
@@ -360,8 +367,6 @@ Route::post('register', [RegisterController::class, 'register'])->name('user.reg
 Route::get('/login/{lang?}', [LoginController::class, 'showLoginForm'])->name('user.login');
 
 Route::get('/plan/listAsync', [PlanController::class, 'getPlanAsync']);
-
-Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
 
 Route::get('/password/reset/{lang?}', [LoginController::class, 'showLinkRequestForm'])->name('change.langPass');
 Route::put('change-password', [UserController::class, 'updatePassword'])->name('update.password');
