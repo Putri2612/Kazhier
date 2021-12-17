@@ -21,7 +21,7 @@
                                 <div class="card-header-action">
                                     <div class="dropdown">
                                         <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                        <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                                        <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                             {{ Form::open(array('route' => array('vender.payment'),'method' => 'GET')) }}
 
                                             <div class="form-group">
@@ -32,7 +32,7 @@
                                                 {{ Form::label('category', __('Category')) }}
                                                 {{ Form::select('category',  [''=>'All']+$category,isset($_GET['category'])?$_GET['category']:'', array('class' => 'form-control font-style selectric')) }}
                                             </div>
-                                            <div class="text-right">
+                                            <div class="text-end">
                                                 <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                                 <a href="{{route('vender.payment')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                             </div>

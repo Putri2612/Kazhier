@@ -286,7 +286,7 @@
                                     <th>{{__('Price')}} </th>
                                     <th class="column-small">{{__('Tax')}}</th>
                                     <th>{{__('Discount')}}</th>
-                                    <th class="text-right">{{__('Amount')}} </th>
+                                    <th class="text-end">{{__('Amount')}} </th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -343,7 +343,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-right amount">
+                                    <td class="text-end amount">
                                         0.00
                                     </td>
                                     @can('delete bill product')
@@ -360,7 +360,7 @@
                                     <td>&nbsp;</td>
                                     <td></td>
                                     <td><strong>{{__('Sub Total')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                    <td class="text-right subTotal">0.00</td>
+                                    <td class="text-end subTotal">0.00</td>
                                     <td></td>
                                 </tr>
                                 <tr>
@@ -369,7 +369,7 @@
                                     <td>&nbsp;</td>
                                     <td>&nbsp;</td>
                                     <td><strong>{{__('Total Amount')}} ({{\Auth::user()->currencySymbol()}})</strong></td>
-                                    <td class="text-right totalAmount">0.00</td>
+                                    <td class="text-end totalAmount">0.00</td>
                                     <td></td>
                                 </tr>
                                 </tfoot>
@@ -378,7 +378,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12 text-right">
+            <div class="col-md-12 text-end">
                 <a href="{{route('bill.index')}}" class="btn btn-secondary">{{__('Cancel')}}</a>
                 {{Form::submit(__('Update'),array('class'=>'btn btn-primary'))}}
             </div>

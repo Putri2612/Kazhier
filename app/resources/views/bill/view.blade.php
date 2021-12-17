@@ -50,7 +50,7 @@
                                 <span class="text-job text-primary"><h6>{{__('Create Bill')}}</h6>
                                 </span>
                                         @can('edit invoice')
-                                            <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Edit')}}
                                             </a>
                                         @endcan
@@ -70,7 +70,7 @@
                                             <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($bill->send_date)}}  </a></p>
                                         @else
                                             @can('send bill')
-                                                <a href="{{ route('bill.sent',$bill->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                                <a href="{{ route('bill.sent',$bill->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                     {{__('Mark Sent')}}
                                                 </a>
                                             @endcan
@@ -89,7 +89,7 @@
                                     </div>
                                     @if($bill->status!=0)
                                         @can('create payment bill')
-                                            <a href="#!" data-url="{{ route('bill.payment',$bill->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="#!" data-url="{{ route('bill.payment',$bill->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Add Payment')}}
                                             </a>
                                         @endcan
@@ -109,16 +109,16 @@
                         @if($bill->status!=0)
                             <div class="row mb-10">
                                 <div class="col-lg-12">
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         @if(!empty($billPayment))
-                                            <a href="#" data-url="{{ route('bill.debit.note',$bill->id) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Debit Note')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="#" data-url="{{ route('bill.debit.note',$bill->id) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Debit Note')}}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Add Debit Note')}}
                                             </a>
                                         @endif
-                                        <a href="{{ route('bill.sent',$bill->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                        <a href="{{ route('bill.sent',$bill->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Resend Bill')}}
                                         </a>
-                                        <a href="{{ route('bill.pdf', Crypt::encrypt($bill->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                        <a href="{{ route('bill.pdf', Crypt::encrypt($bill->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Print')}}
                                         </a>
                                         <div class="form-group ">
@@ -134,11 +134,11 @@
                     @else
                         <div class="row mb-10">
                             <div class="col-lg-12">
-                                <div class="text-right">
-                                    <a href="#" data-url="{{route('vender.bill.send',$bill->id)}}" data-ajax-popup="true" data-title="{{__('Send Bill')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                <div class="text-end">
+                                    <a href="#" data-url="{{route('vender.bill.send',$bill->id)}}" data-ajax-popup="true" data-title="{{__('Send Bill')}}" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Send Mail')}}
                                     </a>
-                                    <a href="{{ route('bill.pdf', Crypt::encrypt($bill->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                    <a href="{{ route('bill.pdf', Crypt::encrypt($bill->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Print')}}
                                     </a>
                                 </div>
@@ -163,7 +163,7 @@
                                         {{!empty($vendor->billing_city)?$vendor->billing_city:'' .', '}} {{!empty($vendor->billing_state)?$vendor->billing_state:'',', '}} {{!empty($vendor->billing_country)?$vendor->billing_country:''}}
                                     </address>
                                 </div>
-                                <div class="col-md-6 text-md-right">
+                                <div class="col-md-6 text-md-end">
                                     <address>
                                         <strong>{{__('Shipped To')}}:</strong><br>
                                         {{!empty($vendor->shipping_name)?$vendor->shipping_name:''}}<br>
@@ -197,7 +197,7 @@
                                         {{\Auth::user()->dateFormat($bill->bill_date)}}<br><br>
                                     </address>
                                 </div>
-                                <div class="col-md-4 text-md-right">
+                                <div class="col-md-4 text-md-end">
                                     <address>
                                         <strong>{{__('Due Date')}} :</strong><br>
                                         {{\Auth::user()->dateFormat($bill->due_date)}}<br><br>
@@ -221,7 +221,7 @@
                                         @if($bill->discount_apply==1)
                                             <th class="text-center">{{__('Discount')}}</th>
                                         @endif
-                                        <th class="text-right">{{__('Price')}}</th>
+                                        <th class="text-end">{{__('Price')}}</th>
                                     </tr>
 
                                     @foreach($iteams as $key =>$iteam)
@@ -233,7 +233,7 @@
                                             @if($bill->discount_apply==1)
                                                 <td class="text-center">{{\Auth::user()->priceFormat($iteam->discount)}}</td>
                                             @endif
-                                            <td class="text-right">{{\Auth::user()->priceFormat($iteam->price)}}</td>
+                                            <td class="text-end">{{\Auth::user()->priceFormat($iteam->price)}}</td>
                                         </tr>
                                     @endforeach
                                 </table>
@@ -259,7 +259,7 @@
                                         <div class="invoice-detail-value">{{\Auth::user()->priceFormat($bill->getSubTotal())}}</div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 text-right">
+                                <div class="col-lg-3 text-end">
                                     <div class="invoice-detail-item">
                                         <div class="invoice-detail-name">{{__('Total')}}</div>
                                         <div class="invoice-detail-value invoice-detail-value-lg">{{\Auth::user()->priceFormat($bill->getTotal())}}</div>
@@ -270,7 +270,7 @@
                                 <div class="col-lg-8">
 
                                 </div>
-                                <div class="col-lg-4 text-right">
+                                <div class="col-lg-4 text-end">
                                     <div class="invoice-detail-item">
                                         <div class="invoice-detail-name">{{__('Paid')}}</div>
                                         <div class="invoice-detail-value">{{\Auth::user()->priceFormat($bill->getTotal()-$bill->getDue()-($bill->billTotalDebitNote()))}}</div>
@@ -301,7 +301,7 @@
                                         <th class="text-center">{{__('Reference')}}</th>
                                         <th class="text-center">{{__('Description')}}</th>
                                         @can('delete payment bill')
-                                            <th class="text-right">{{__('Action')}}</th>
+                                            <th class="text-end">{{__('Action')}}</th>
                                         @endcan
                                     </tr>
                                     @foreach($bill->payments as $key =>$payment)
@@ -312,13 +312,11 @@
                                             <td class="text-center">{{!empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
                                             <td class="text-center">{{$payment->reference}}</td>
                                             <td class="text-center">{{$payment->description}}</td>
-                                            <td class="text-right">
+                                            <td class="text-end">
                                                 @can('delete bill product')
-                                                    <a href="#!" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$payment->id}}').submit();">
+                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('bill.payment.destroy',[$bill->id,$payment->id]) }}">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
-                                                    {!! Form::open(['method' => 'post', 'route' => ['bill.payment.destroy',$bill->id,$payment->id],'id'=>'delete-form-'.$payment->id]) !!}
-                                                    {!! Form::close() !!}
                                                 @endcan
                                             </td>
                                         </tr>
@@ -337,7 +335,7 @@
                                         <th class="text-center">{{__('Amount')}}</th>
                                         <th class="text-center">{{__('Description')}}</th>
                                         @if(Gate::check('edit debit note') || Gate::check('delete debit note'))
-                                            <th class="text-right">{{__('Action')}}</th>
+                                            <th class="text-end">{{__('Action')}}</th>
                                         @endif
                                     </tr>
                                     @foreach($bill->debitNote as $key =>$debitNote)
@@ -345,18 +343,16 @@
                                             <td>{{\Auth::user()->dateFormat($debitNote->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($debitNote->amount)}}</td>
                                             <td class="text-center">{{$debitNote->description}}</td>
-                                            <td class="text-right">
+                                            <td class="text-end">
                                                 @can('edit debit note')
-                                                    <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Debit Note')}}" href="#" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                    <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill, $debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Debit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
                                                 @endcan
                                                 @can('delete debit note')
-                                                    <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$debitNote->id}}').submit();">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                    {!! Form::open(['method' => 'DELETE', 'route' => array('bill.delete.debit.note', $debitNote->bill,$debitNote->id),'id'=>'delete-form-'.$debitNote->id]) !!}
-                                                    {!! Form::close() !!}
+                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('bill.delete.debit.note', [$debitNote->bill, $debitNote->id]) }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
                                                 @endcan
                                             </td>
                                         </tr>

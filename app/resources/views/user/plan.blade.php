@@ -3,7 +3,7 @@
         <ul class="list-unstyled user-details list-unstyled-border list-unstyled-noborder">
             @foreach($plans as $plan)
                 <li class="media">
-                    <img alt="" class="mr-3 rounded-circle" width="50" src="{{asset(Storage::url('plan')).'/'.$plan->image}}">
+                    <img alt="" class="me-3 rounded-circle" width="50" src="{{asset(Storage::url('plan')).'/'.$plan->image}}">
                     <div class="media-body">
                         <div class="media-title font-style">{{$plan->name}}</div>
                         <div class="text-job text-muted"> {{isset(\Auth::user()->planPrice()['stripe_currencys_symbol'])?\Auth::user()->planPrice()['stripe_currency_symbol'].$plan->price:''}} {{' / '. $plan->duration}}</div>

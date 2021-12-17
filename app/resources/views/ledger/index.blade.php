@@ -40,7 +40,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3">
-                        <h4 class="col-md-6 font-weight-normal">{{__('Ledger Report')}}</h4>
+                        <h4 class="col-md-6 fw-normal">{{__('Ledger Report')}}</h4>
                         <div class="col-md-6 row">
                             <div class="form-group col-sm-12">
                                 {{ Form::select('account', $accountList, (isset($_GET['account']) ? $_GET['account'] : ''), array('id' => 'change-account', 'class' => 'form-control font-style selectric'))}}
@@ -124,7 +124,7 @@
                                                     <tfoot>
                                                         @if($count != 0)
                                                             <tr>
-                                                                <th class="text-right" colspan="3">{{__('Total')}}</th>
+                                                                <th class="text-end" colspan="3">{{__('Total')}}</th>
                                                                 <th>{{Auth::user()->priceFormat($debitTotal)}} </th>
                                                                 <th>{{Auth::user()->priceFormat($creditTotal)}}</th>
                                                                 <th>{{Auth::user()->priceFormat($balance)}}</th>

@@ -15,20 +15,20 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3 crd">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Product & Service')}}</h4>
-                        <div class="col-6 row text-right">
+                        <h4 class="col-6 fw-normal">{{__('Manage Product & Service')}}</h4>
+                        <div class="col-6 row text-end">
                             <div class="col-lg-8"></div>
                             <div class="dropdown col-lg-2">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round">
                                     <i class="fas fa-filter"></i>{{__('Filter')}}
                                 </a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
                                     {{ Form::open(array('route' => array('productservice.index'),'method' => 'GET')) }}
                                     <div class="form-group">
                                         {{ Form::label('category', __('Category')) }}
                                         {{ Form::select('category', $category,null, array('class' => 'form-control font-style selectric','required'=>'required')) }}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         <a href="{{route('productservice.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                     </div>
@@ -64,7 +64,7 @@
                                                         <th> {{__('Unit')}}</th>
                                                         <th>{{__('Type')}}</th>
                                                         <th>{{__('Description')}}</th>
-                                                        <th class="text-right">{{__('Action')}}</th>
+                                                        <th class="text-end">{{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
 
@@ -82,18 +82,16 @@
                                                             <td>{{ $productService->description }}</td>
 
                                                             @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit product & service')
-                                                                        <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete product & service')
-                                                                        <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$productService->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('productservice.destroy', $productService->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['productservice.destroy', $productService->id],'id'=>'delete-form-'.$productService->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
                                                             @endif

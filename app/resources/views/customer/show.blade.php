@@ -3,18 +3,16 @@
         <div class="col">
             <h4>{{__('Customer Details')}}</h4>
         </div>
-        <div class="col text-right ">
+        <div class="col text-end ">
             @can('edit customer')
-                <a href="#!" class="btn btn-primary btn-action mr-1" data-size="2xl" data-url="{{ route('customer.edit',$customer['id']) }}" data-ajax-popup="true" data-title="{{__('Edit Customer')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                <a href="#!" class="btn btn-primary btn-action me-1" data-size="2xl" data-url="{{ route('customer.edit',$customer['id']) }}" data-ajax-popup="true" data-title="{{__('Edit Customer')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                     <i class="fas fa-pencil-alt"></i>
                 </a>
             @endcan
             @can('delete customer')
-                <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{ $customer['id']}}').submit();">
+                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('customer.destroy', $customer['id']) }}">
                     <i class="fas fa-trash"></i>
                 </a>
-                {!! Form::open(['method' => 'DELETE', 'route' => ['customer.destroy', $customer['id']],'id'=>'delete-form-'.$customer['id']]) !!}
-                {!! Form::close() !!}
             @endcan
 
         </div>

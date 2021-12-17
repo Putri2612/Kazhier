@@ -123,7 +123,7 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                <div class="col-lg-12 text-right">
+                                                <div class="col-lg-12 text-end">
                                                     <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                     {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                                 </div>
@@ -213,7 +213,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-lg-12 text-right">
+                                                    <div class="col-lg-12 text-end">
                                                         <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                         {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                                     </div>
@@ -304,7 +304,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-lg-12 text-right">
+                                                    <div class="col-lg-12 text-end">
                                                         <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                         {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                                     </div>
@@ -345,7 +345,7 @@
                                                         </span>
                                                         @enderror
                                                     </div>
-                                                    <div class="col-lg-12 text-right">
+                                                    <div class="col-lg-12 text-end">
                                                         <a href="{{ route('customer.dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                         {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                                     </div>

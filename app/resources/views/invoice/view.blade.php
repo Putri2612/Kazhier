@@ -49,7 +49,7 @@
                                         <span class="text-job text-primary"><h6>{{__('Create Invoice')}}</h6>
                                         </span>
                                         @can('edit invoice')
-                                            <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Edit')}}
                                             </a>
                                         @endcan
@@ -68,7 +68,7 @@
                                             <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($invoice->send_date)}}  </a></p>
                                         @else
                                             @can('send invoice')
-                                                <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                                <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                     {{__('Mark Sent')}}
                                                 </a>
                                             @endcan
@@ -87,7 +87,7 @@
                                     </div>
                                     @if($invoice->status!=0)
                                         @can('create payment invoice')
-                                            <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Add Payment')}}
                                             </a>
                                         @endcan
@@ -107,21 +107,21 @@
                         @if($invoice->status!=0)
                             <div class="row mb-10">
                                 <div class="col-lg-12">
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         @if(!empty($invoicePayment))
-                                            <a href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Add Credit Note')}}
                                             </a>
                                         @endif
                                         @if($invoice->status!=4)
-                                            <a href="{{ route('invoice.payment.reminder',$invoice->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="{{ route('invoice.payment.reminder',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Payment Reminder')}}
                                             </a>
                                         @endif
-                                        <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                        <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Resend Invoice')}}
                                         </a>
-                                        <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                        <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Print')}}
                                         </a>
                                     </div>
@@ -137,11 +137,11 @@
                     @else
                         <div class="row mb-10">
                             <div class="col-lg-12">
-                                <div class="text-right">
-                                    <a href="#" data-url="{{route('customer.invoice.send',$invoice->id)}}" data-ajax-popup="true" data-title="{{__('Send Invoice')}}" class="btn btn-primary btn-action mr-1 float-right">
+                                <div class="text-end">
+                                    <a href="#" data-url="{{route('customer.invoice.send',$invoice->id)}}" data-ajax-popup="true" data-title="{{__('Send Invoice')}}" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Send Mail')}}
                                     </a>
-                                    <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                    <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Print')}}
                                     </a>
 
@@ -168,7 +168,7 @@
                                         {{!empty($customer->billing_city)?$customer->billing_city:'' .', '}} {{!empty($customer->billing_state)?$customer->billing_state:'',', '}} {{!empty($customer->billing_country)?$customer->billing_country:''}}
                                     </address>
                                 </div>
-                                <div class="col-md-6 text-md-right">
+                                <div class="col-md-6 text-md-end">
                                     <address>
                                         <strong>{{__('Shipped To')}}:</strong><br>
                                         {{!empty($customer->shipping_name)?$customer->shipping_name:''}}<br>
@@ -202,7 +202,7 @@
                                         {{\Auth::user()->dateFormat($invoice->issue_date)}}<br><br>
                                     </address>
                                 </div>
-                                <div class="col-md-4 text-md-right">
+                                <div class="col-md-4 text-md-end">
                                     <address>
                                         <strong>{{__('Due Date')}} :</strong><br>
                                         {{\Auth::user()->dateFormat($invoice->due_date)}}<br><br>
@@ -226,7 +226,7 @@
                                         @if($invoice->discount_apply==1)
                                             <th class="text-center">{{__('Discount')}}</th>
                                         @endif
-                                        <th class="text-right">{{__('Price')}}</th>
+                                        <th class="text-end">{{__('Price')}}</th>
                                     </tr>
                                     @foreach($iteams as $key =>$iteam)
                                         <tr>
@@ -237,7 +237,7 @@
                                             @if($invoice->discount_apply==1)
                                                 <td class="text-center">{{\Auth::user()->priceFormat($iteam->discount)}}</td>
                                             @endif
-                                            <td class="text-right">{{\Auth::user()->priceFormat($iteam->price)}}</td>
+                                            <td class="text-end">{{\Auth::user()->priceFormat($iteam->price)}}</td>
                                         </tr>
                                     @endforeach
                                 </table>
@@ -263,7 +263,7 @@
                                         <div class="invoice-detail-value">{{\Auth::user()->priceFormat($invoice->getSubTotal())}}</div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 text-right">
+                                <div class="col-lg-3 text-end">
                                     <div class="invoice-detail-item">
                                         <div class="invoice-detail-name">{{__('Total')}}</div>
                                         <div class="invoice-detail-value invoice-detail-value-lg">{{\Auth::user()->priceFormat($invoice->getTotal())}}</div>
@@ -274,7 +274,7 @@
                                 <div class="col-lg-8">
 
                                 </div>
-                                <div class="col-lg-4 text-right">
+                                <div class="col-lg-4 text-end">
                                     <div class="invoice-detail-item">
                                         <div class="invoice-detail-name">{{__('Paid')}}</div>
                                         <div class="invoice-detail-value">{{\Auth::user()->priceFormat(($invoice->getTotal()-$invoice->getDue())-($invoice->invoiceTotalCreditNote()))}}</div>
@@ -306,7 +306,7 @@
                                         <th class="text-center">{{__('Reference')}}</th>
                                         <th class="text-center">{{__('Description')}}</th>
                                         @can('delete payment invoice')
-                                            <th class="text-right">{{__('Action')}}</th>
+                                            <th class="text-end">{{__('Action')}}</th>
                                         @endcan
                                     </tr>
                                     @foreach($invoice->payments as $key =>$payment)
@@ -317,13 +317,11 @@
                                             <td class="text-center">{{!empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
                                             <td class="text-center">{{$payment->reference}}</td>
                                             <td class="text-center">{{$payment->description}}</td>
-                                            <td class="text-right">
+                                            <td class="text-end">
                                                 @can('delete invoice product')
-                                                    <a href="#!" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$payment->id}}').submit();">
+                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('invoice.payment.destroy',[$invoice->id, $payment->id]) }}">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
-                                                    {!! Form::open(['method' => 'post', 'route' => ['invoice.payment.destroy',$invoice->id,$payment->id],'id'=>'delete-form-'.$payment->id]) !!}
-                                                    {!! Form::close() !!}
                                                 @endcan
                                             </td>
                                         </tr>
@@ -342,7 +340,7 @@
                                         <th class="text-center">{{__('Amount')}}</th>
                                         <th class="text-center">{{__('Description')}}</th>
                                         @if(Gate::check('edit credit note') || Gate::check('delete credit note'))
-                                            <th class="text-right">{{__('Action')}}</th>
+                                            <th class="text-end">{{__('Action')}}</th>
                                         @endif
                                     </tr>
                                     @foreach($invoice->creditNote as $key =>$creditNote)
@@ -350,18 +348,16 @@
                                             <td>{{\Auth::user()->dateFormat($creditNote->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($creditNote->amount)}}</td>
                                             <td class="text-center">{{$creditNote->description}}</td>
-                                            <td class="text-right">
+                                            <td class="text-end">
                                                 @can('edit credit note')
-                                                    <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                    <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
                                                 @endcan
                                                 @can('delete credit note')
-                                                    <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$creditNote->id}}').submit();">
+                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('invoice.delete.credit.note',[$creditNote->invoice, $creditNote->id]) }}">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
-                                                    {!! Form::open(['method' => 'DELETE', 'route' => array('invoice.delete.credit.note', $creditNote->invoice,$creditNote->id),'id'=>'delete-form-'.$creditNote->id]) !!}
-                                                    {!! Form::close() !!}
                                                 @endcan
                                             </td>
                                         </tr>

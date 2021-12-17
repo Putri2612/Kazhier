@@ -17,7 +17,7 @@
                     <div class="row crd mb-3">
                         <h4 class="col-6">{{__('Manage Product & Service Unit')}}</h4>
                         @can('create constant unit')
-                            <div class="col-6 text-right">
+                            <div class="col-6 text-end">
                                 <a href="#" data-url="{{ route('product-unit.create') }}" data-ajax-popup="true" data-title="{{__('Create New Unit')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -36,25 +36,23 @@
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Unit')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
                                                     @foreach ($units as $unit)
                                                         <tr class="font-style">
                                                             <td>{{ $unit->name }}</td>
-                                                            <td class="action text-right">
+                                                            <td class="action text-end">
                                                                 @can('edit constant category')
-                                                                    <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('product-unit.edit',$unit->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Unit')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('product-unit.edit',$unit->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Unit')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete constant category')
-                                                                    <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$unit->id}}').submit();">
+                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('product-unit.destroy', $unit->id]) }}">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['product-unit.destroy', $unit->id],'id'=>'delete-form-'.$unit->id]) !!}
-                                                                    {!! Form::close() !!}
                                                                 @endcan
                                                             </td>
                                                         </tr>

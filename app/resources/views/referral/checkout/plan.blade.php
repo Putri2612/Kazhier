@@ -6,6 +6,41 @@
 @section('page-title')
     {{__('Order Summary')}}
 @endsection
+
+@push('script-page')
+    <script>
+        const original = {{ $plan->price }},
+            balance = {{ $point }};
+        
+        const updatePrice = (duration) => {
+            let price = original * duration;
+            return price;
+        }
+
+        document.querySelectorAll('[name="durations"]').forEach(element => {
+            element.addEventListener('change', event => {
+                const duration  = parseInt(event.currentTarget.value),
+                    endPrice    = updatePrice(duration),
+                    formatter   = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                    }),
+                    priceDisp   = document.querySelector('.price'),
+                    form        = document.querySelector('[type="submit"]');
+
+                priceDisp.innerHTML = formatter.format(endPrice);
+                if(balance < endPrice) {
+                    form.disabled = true;
+                    priceDisp.classList.add('text-danger');
+                } else {
+                    form.disabled = false;
+                    priceDisp.classList.remove('text-danger');
+                }
+            });
+        });
+    </script>
+@endpush
+
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -34,9 +69,9 @@
                                             <img class="plan-img" src="{{$dir.'/'.$plan->image}}">
                                         @endif
                                     </div>
-                                    <h3>
-                                        {{ $plan->price / 1000 . ' ' . __('Points')}}
-                                    </h3>
+                                    <h2 class="price">
+                                        {{ Auth::user()->planPriceFormat($plan->price) }}
+                                    </h2>
                                     <div class="text-center">
 
                                     </div>
@@ -54,8 +89,30 @@
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        {{ Form::open(array('route' => array('referral.checkout.plan', [$orderID]),'method'=>'post')) }}
+                                        {{ Form::open(array('route' => array('referral.checkout.plan'),'method'=>'post')) }}
                                         <div class="row">
+                                            @php
+                                                if($plan->duration == 'month'){
+                                                    $durations = [
+                                                        __('1 Month')   => 1,
+                                                        __('6 Months')  => 6,
+                                                        __('1 Year')    => 12
+                                                    ];
+                                                } else {
+                                                    $durations = [
+                                                        __('1 Year')    => 1,
+                                                        __('2 Years')   => 2,
+                                                        __('3 Years')   => 3,
+                                                    ];
+                                                }
+                                            @endphp
+
+                                            <div class="col-md-6 btn-group">
+                                                @foreach ($durations as $label => $value)
+                                                    <input type="radio" class="btn-check" name="durations" value="{{$value}}" id="dur{{$value}}" {{ $value == 1 ? 'checked' : ''}}/>
+                                                    <label for="dur{{$value}}" class="btn btn-outline-primary">{{$label}}</label>
+                                                @endforeach
+                                            </div>
                                             <ul class="col-12">
                                                 <li style='list-style-type: none'>
                                                     <i class="fas fa-user-tie"></i>
@@ -68,7 +125,7 @@
                                             </ul>
                                             <input type="hidden" name="plan" value="{{\Illuminate\Support\Facades\Crypt::encrypt($plan->id)}}">
                                             
-                                            <div class="col-md-12 text-right">
+                                            <div class="col-md-12 text-end">
                                                 {{Form::submit(__('Pay Now'),array('class'=>'btn btn-primary'))}}
                                             </div>
                                         </div>

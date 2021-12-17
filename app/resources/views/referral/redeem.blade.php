@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-12">
         <div class="mb-5">
-            {{__('Referral Points')}}: <span class="text-primary">{{ $point }}</span>
+            {{__('Balance')}}: <span class="text-primary">{{ Auth::user()->priceFormat($point) }}</span>
         </div>
     </div>
 </div>
@@ -22,12 +22,12 @@
     <div class="col-6">
         <div class="d-flex flex-column justify-content-between h-100">
             <div>
-                <p class="lead">{{ __('Cash Out') }}</p>
-                <div class="mt-2">{{ __('Transfer points you\'ve earned to your bank account') }}</div>
-                <div class="font-weight-bold">{{ __('(Only available for :PlanName plan)', ['PlanName' => $expensive]) }}</div>
+                <p class="lead">{{ __('Withdraw') }}</p>
+                <div class="mt-2">{{ __('Withdraw your referrals to your bank account') }}</div>
+                <div class="fw-bold">{{ __('(Minimum balance: :amount)', ['amount' => Auth::user()->planPriceFormat(config('referral.minWithdrawal'))])}}</div>
             </div>
             <div>
-                <div class="btn btn-primary btn-cash-out{{ !empty($plans)? ' disabled' : '' }}" can-navigate data-navigate-from="#options" data-navigate-to="#upgrade">
+                <div class="btn btn-primary btn-cash-out" can-navigate data-navigate-from="#options" data-navigate-to="#withdraw">
                     {{ __('Cash Out') }}
                 </div>
             </div>
@@ -40,17 +40,20 @@
             <div class="plan-item">
                 <h4 class="font-style"> {{$plan->name}}</h4>
                 <div class="img-wrap">
+                    @php
+                        $dir= asset(Storage::url('plan'));
+                    @endphp
                     @if(!empty($plan->image))
                         <img class="plan-img" src="{{$dir.'/'.$plan->image}}">
                     @endif
                 </div>
                 @php
-                    $price          = $plan->price / 1000;
+                    $price          = $plan->price;
                     $pointEnough    = $point >= $price;
                 @endphp
-                <h3 {!! !$pointEnough ? 'class="text-danger"' : '' !!}>
-                    {{ $price.' '.__('Points') }}
-                </h3>
+                <h2 {!! !$pointEnough ? 'class="text-danger"' : '' !!}>
+                    {{ Auth::user()->planPriceFormat($price) }}
+                </h2>
                 <p class="font-style">{{$plan->duration}}</p>
                 <div class="text-center mb-5">
                     @can('buy plan')
@@ -78,4 +81,32 @@
             </div>
         </div>
     @endforeach
+</div>
+<div class="row" style="display: none" id="withdraw">
+    <div class="col-md-12">
+        @php
+            $now    = now();
+            $date   = $now->day;
+            $processingDate = config('referral.withdrawalDate');
+            if($date > $processingDate) {
+                $now->addMonth();
+            }
+            $now->day = $processingDate;
+        @endphp
+        <p class="lead">{{ __('Withdraw') }}</p>
+        <div class="col-12 mb-3">{!! __('Our staff will process your request on <strong>:date</strong>', ['date' => Auth::user()->dateFormat($now)]) !!}</div>
+        {{ Form::open(['route' => 'referral.withdraw.request', 'method' => 'POST', 'class' => 'row']) }}
+        <div class="form-group col-md-6">
+            {{ Form::label('amount', __('Amount')) }}
+            {{ Form::text('amount', null, ['class' => 'form-control', 'data-is-number', 'required']) }}
+        </div>
+        <div class="form-group col-md-6">
+            {{ Form::label('account', __('Account Number')) }}
+            {{ Form::text('account', null, ['class' => 'form-control', 'required']) }}
+        </div>
+        <div class="col-md-12 text-end">
+            {{ Form::submit(__('Withdraw'), ['class' => 'btn btn-primary']) }}
+        </div>
+        {{ Form::close() }}
+    </div>
 </div>

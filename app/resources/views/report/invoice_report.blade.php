@@ -61,7 +61,7 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-right mb-10">
+            <div class="row text-end mb-10">
                 <div class="col-12">
                     <div class="card-header-action">
                         <div class="dropdown ">
@@ -72,7 +72,7 @@
                             <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">
                                 <i class="fas fa-download"></i>{{__('Download')}}
                             </a>
-                            <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                            <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                 {{ Form::open(array('route' => array('report.invoice.summary'),'method' => 'GET')) }}
                                 <div class="form-group">
                                     {{ Form::label('customer', __('Customer')) }}
@@ -86,7 +86,7 @@
                                     {{ Form::label('status', __('Status')) }}
                                     {{ Form::select('status', [''=>'All']+$status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
                                 </div>
-                                <div class="text-right">
+                                <div class="text-end">
                                     <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                     <a href="{{route('report.invoice.summary')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                 </div>

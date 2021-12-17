@@ -290,7 +290,7 @@
         <div class="row">
             <div class="col-lg-3 col-md-12 col-12 col-sm-12">
                 <div>
-                    <h4 class="font-weight-normal">{{__('Income Vs Expense')}}</h4>
+                    <h4 class="fw-normal">{{__('Income Vs Expense')}}</h4>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -329,8 +329,8 @@
             @endphp
             <div class="col-lg-9 col-md-12 col-12 col-sm-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Cashflow')}}</h4>
-                    <h5 class="col-md-6 font-weight-400 text-md-right">{{__($current_m).' '.$currentYear}}</h5>
+                    <h4 class="col-md-6 fw-normal">{{__('Cashflow')}}</h4>
+                    <h5 class="col-md-6 fw-400 text-md-end">{{__($current_m).' '.$currentYear}}</h5>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -342,8 +342,8 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Income & Expense')}}</h4>
-                    <h4 class="col-md-6 font-weight-400 text-md-right">{{__('Current year').' - '.$currentYear}}</h4>
+                    <h4 class="col-md-6 fw-normal">{{__('Income & Expense')}}</h4>
+                    <h4 class="col-md-6 fw-400 text-md-end">{{__('Current year').' - '.$currentYear}}</h4>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -358,15 +358,15 @@
                 <div class="row">
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-6 font-weight-normal">{{__('Income By Category')}}</h4>
-                            <h4 class="col-md-6 text-md-right font-weight-400">{{__('Current year').' - '.$currentYear}}</h4>
+                            <h4 class="col-md-6 fw-normal">{{__('Income By Category')}}</h4>
+                            <h4 class="col-md-6 text-md-end fw-400">{{__('Current year').' - '.$currentYear}}</h4>
                         </div>
                         <div class="card">
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
                                     <div class="col-12 col-md-4">
                                         @forelse($incomeCategory as $key=>$category)
-                                            <div class="text-right mt-10">
+                                            <div class="text-end mt-10">
                                                 <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
                                                 <span>{{\Auth::user()->priceFormat($incomeCatAmount[$key])}}</span>
                                             </div>
@@ -386,15 +386,15 @@
                     </div>
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-6 font-weight-normal">{{__('Expense By Category')}}</h4>
-                            <h4 class="col-md-6 text-md-right font-weight-400">{{__('Current year').' - '.$currentYear}}</h4>
+                            <h4 class="col-md-6 fw-normal">{{__('Expense By Category')}}</h4>
+                            <h4 class="col-md-6 text-md-end fw-400">{{__('Current year').' - '.$currentYear}}</h4>
                         </div>
                         <div class="card">                            
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
                                     <div class="col-12 col-md-4">
                                         @forelse($expenseCategory as $key=>$category)
-                                            <div class="text-right mt-10">
+                                            <div class="text-end mt-10">
                                                 <span class="graph-label" style="background-color: {{$expenseCategoryColor[$key]}}">{{$category}}</span>
                                                 <span>{{\Auth::user()->priceFormat($expenseCatAmount[$key])}}</span>
                                             </div>
@@ -418,8 +418,8 @@
         <div class="row">
             <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Latest Income')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Latest Income')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('revenue.index')}}">{{__('View All')}}</a>
                     </div>
                 </div>
@@ -461,8 +461,8 @@
             </div>
             <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Latest Expense')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Latest Expense')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('payment.index')}}">{{__('View All')}}</a>
                     </div>
                 </div>
@@ -503,8 +503,8 @@
         <div class="row">
             <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Account Balance')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Account Balance')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('bank-account.index')}}">{{__('Manage Account')}}</a>
                     </div>
                 </div>
@@ -547,8 +547,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Invoices')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Invoices')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('invoice.index')}}">{{__('View All')}}</a>
                     </div>
                 </div>
@@ -672,8 +672,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Bills')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Bills')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('bill.index')}}">{{__('View All')}}</a>
                     </div>
                 </div>
@@ -797,8 +797,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
-                    <h4 class="col-md-6 font-weight-normal">{{__('Goal')}}</h4>
-                    <div class="col-md-6 text-md-right">
+                    <h4 class="col-md-6 fw-normal">{{__('Goal')}}</h4>
+                    <div class="col-md-6 text-md-end">
                         <a href="{{route('goal.index')}}">{{__('View All')}}</a>
                     </div>
                 </div>

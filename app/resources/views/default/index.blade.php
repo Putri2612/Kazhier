@@ -16,8 +16,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{ __('Manage Default Values') }}</h4>
-                        <div class="col-6 text-right row">
+                        <h4 class="col-6 fw-normal">{{ __('Manage Default Values') }}</h4>
+                        <div class="col-6 text-end row">
                             <div class="col-lg-10"></div>
                             @can('create defaults')
                                 <div class="col-lg-2">
@@ -43,7 +43,7 @@
                                                             <th> {{ __('Name') }} </th>
                                                             <th> {{ __('Color') }} </th>
                                                             <th> {{ __('Value') }} </th>
-                                                            <th class="text-right"> {{ __('Action') }} </th>
+                                                            <th class="text-end"> {{ __('Action') }} </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -53,18 +53,16 @@
                                                                 <td>{{ $default->name }}</td>
                                                                 <td {!! $default->color != null ? 'style="background-color:#'.$default->color.'"' : '' !!}>{{ ( $default->color == null ? '-' : '') }}</td>
                                                                 <td>{{ ($default->value != null ? $default->value : '-') }}</td>
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit defaults')
-                                                                        <a href="#" data-url="{{ route('defaults.edit', $default->id) }}" class="btn btn-primary btn-action mr-1" data-ajax-popup="true" data-title="{{ __('Edit Default Value') }}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#" data-url="{{ route('defaults.edit', $default->id) }}" class="btn btn-primary btn-action me-1" data-ajax-popup="true" data-title="{{ __('Edit Default Value') }}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('destroy defaults')
-                                                                        <a href="#"class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$default->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('defaults.destroy', $default->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['defaults.destroy', $default->id],'id'=>'delete-form-'.$default->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
                                                             </tr>

@@ -508,7 +508,7 @@
                                         <h3 data-v-7d9d14b5="">{{\App\Models\Utility::billNumberFormat($settings,$bill->bill_id)}}</h3>
                                         <p data-v-7d9d14b5="">{{\App\Models\Utility::dateFormat($settings,$bill->issue_date)}}</p>
                                     </div>
-                                    <div data-v-7d9d14b5="" class="col-2 text-right"><img data-v-7d9d14b5="" class="d-logo" src="{{$img}}" style="max-width: 250px;"></div>
+                                    <div data-v-7d9d14b5="" class="col-2 text-end"><img data-v-7d9d14b5="" class="d-logo" src="{{$img}}" style="max-width: 250px;"></div>
                                 </div>
                                 <div data-v-7d9d14b5="" class="break-50"></div>
                                 <div data-v-7d9d14b5="" class="row">
@@ -526,7 +526,7 @@
                                             <tbody data-v-7d9d14b5="">
                                             <tr data-v-7d9d14b5="">
                                                 <td data-v-7d9d14b5="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-7d9d14b5="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
+                                                <td data-v-7d9d14b5="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -568,7 +568,7 @@
                                                 <div class="d-table-th w-3"></div>
                                             @endif
                                             <div class="d-table-th w-3">{{__('Price')}}</div>
-                                            <div class="d-table-th w-4 text-right">{{__('Totals')}}
+                                            <div class="d-table-th w-4 text-end">{{__('Totals')}}
                                             </div>
                                         </div>
                                         <div data-v-7d9d14b5="" class="d-table-body">
@@ -596,7 +596,7 @@
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                         </div>
-                                                        <div class="d-table-td w-4 text-right"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
+                                                        <div class="d-table-td w-4 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
                                                     </div>
                                                 @endforeach
                                             @else
@@ -611,7 +611,7 @@
                                                     <div class="d-table-td w-5">
                                                         <pre data-v-f2a183a6="">-</pre>
                                                     </div>
-                                                    <div class="d-table-td w-4 text-right"><span>-</span></div>
+                                                    <div class="d-table-td w-4 text-end"><span>-</span></div>
                                                 </div>
                                             @endif
                                         </div>

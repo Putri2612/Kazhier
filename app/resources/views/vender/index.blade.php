@@ -55,8 +55,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="row crd mb-3">
-                    <h4 class="col-6 font-weight-normal">{{__('Manage Vendor')}}</h4>
-                    <div class="col-6 text-right">
+                    <h4 class="col-6 fw-normal">{{__('Manage Vendor')}}</h4>
+                    <div class="col-6 text-end">
                         @can('create vender')
                             <a href="#" data-size="2xl" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}" class="btn btn-icon icon-left btn-primary btn-round commonModal">
                                 <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>

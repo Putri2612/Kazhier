@@ -31,7 +31,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    <h4 class="font-weight-normal mb-3">{{__('Balance Sheet Report')}}</h4>
+                    <h4 class="fw-normal mb-3">{{__('Balance Sheet Report')}}</h4>
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
@@ -63,14 +63,14 @@
                                                                                             @if(is_a($asset, 'App\Models\Asset'))
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
                                                                                             @else
                                                                                             <td></td>
                                                                                             <td>{{$asset->bank_name . ' ' . $asset->holder_name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->CurrentBalance())}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->CurrentBalance())}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->CurrentBalance();
                                                                                             @endphp
@@ -86,7 +86,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -101,7 +101,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -116,7 +116,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -131,7 +131,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -146,7 +146,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -161,7 +161,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$asset->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($asset->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($asset->amount)}}</td>
                                                                                             @php
                                                                                                 $assetAmount += $asset->amount;
                                                                                             @endphp
@@ -172,7 +172,7 @@
                                                                             <tfoot>
                                                                                 <tr>
                                                                                     <th colspan="2">{{__('Total Asset')}}</th>
-                                                                                    <th class="text-right">{{\Auth::user()->priceFormat($assetAmount)}}</th>
+                                                                                    <th class="text-end">{{\Auth::user()->priceFormat($assetAmount)}}</th>
                                                                                 </tr>
                                                                             </tfoot>
                                                                         </table>
@@ -195,7 +195,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$liability->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($liability->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($liability->amount)}}</td>
                                                                                             @php
                                                                                                 $liabilityAmount += $liability->amount;
                                                                                             @endphp
@@ -210,7 +210,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$liability->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($liability->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($liability->amount)}}</td>
                                                                                             @php
                                                                                                 $liabilityAmount += $liability->amount;
                                                                                             @endphp
@@ -225,7 +225,7 @@
                                                                                         <tr>
                                                                                             <td></td>
                                                                                             <td>{{$liability->name}}</td>
-                                                                                            <td class="text-right">{{\Auth::user()->priceFormat($liability->amount)}}</td>
+                                                                                            <td class="text-end">{{\Auth::user()->priceFormat($liability->amount)}}</td>
                                                                                             @php
                                                                                                 $liabilityAmount += $liability->amount;
                                                                                             @endphp
@@ -236,7 +236,7 @@
                                                                             <tfoot>
                                                                                 <tr>
                                                                                     <th colspan="2">{{__('Total Liabilities')}}</th>
-                                                                                    <th class="text-right">{{\Auth::user()->priceFormat($liabilityAmount)}}</th>
+                                                                                    <th class="text-end">{{\Auth::user()->priceFormat($liabilityAmount)}}</th>
                                                                                 </tr>
                                                                             </tfoot>
                                                                         </table>
@@ -257,7 +257,7 @@
                                                                                 <tr>
                                                                                     <td></td>
                                                                                     <td>{{$equity->name}}</td>
-                                                                                    <td class="text-right">{{\Auth::user()->priceFormat($equity->amount)}}</td>
+                                                                                    <td class="text-end">{{\Auth::user()->priceFormat($equity->amount)}}</td>
                                                                                     @php
                                                                                         $equityAmount += $equity->amount;
                                                                                     @endphp
@@ -266,7 +266,7 @@
                                                                             <tr>
                                                                                 <td></td>
                                                                                 <td>{{__('Stock')}}</td>
-                                                                                <td class="text-right">
+                                                                                <td class="text-end">
                                                                                     @php
                                                                                         $stockAmount = (!empty($assetAmount) ? $assetAmount : 0) - (!empty($liabilityAmount) ? $liabilityAmount : 0) - (!empty($equityAmount) ? $equityAmount : 0);
                                                                                     @endphp
@@ -279,7 +279,7 @@
                                                                         <tfoot>
                                                                             <tr>
                                                                                 <th colspan="2">{{__('Total Equities')}}</th>
-                                                                                <th class="text-right">{{\Auth::user()->priceFormat($equityAmount)}}</th>
+                                                                                <th class="text-end">{{\Auth::user()->priceFormat($equityAmount)}}</th>
                                                                             </tr>
                                                                         </tfoot>
                                                                     </table>

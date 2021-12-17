@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 pt-4">
-                    <div class="changeLanguage float-right mr-1 position-relative">
+                    <div class="changeLanguage float-right me-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
                                 <option @if($lang == $language) selected @endif value="{{ route('customer.login.lang',$language) }}">{{Str::upper($language)}}</option>
@@ -29,7 +29,7 @@
 
                     <div class="card card-primary">
                         <div class="card-header"><h4>{{__('Customer Login')}}</h4></div>
-                        <div class="col-12 text-right">
+                        <div class="col-12 text-end">
                             <a href="{{route('user.login')}}" class="btn btn-secondary">{{__('User Login')}}</a>
                         </div>
                         <div class="card-body">

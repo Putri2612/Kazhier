@@ -80,6 +80,19 @@
                         <a class="nav-link" href="{{ route('defaults.index') }}"> <i class="fas fa-stream"></i> <span>{{__('Default Value') }}</span></a>
                     </li>
                 @endcan
+                <li class="dropdown {{ Request::segment(1) == 'referral' ? 'active' : '' }}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
+                        <i class="fas fa-retweet"></i><span>{{ __('Referral') }}</span>
+                    </a>
+                    <ul class="dropdown-menu {{ Request::segment(1) == 'referral' ? 'display:block' : '' }}">
+                        <li class="{{ Request::route()->getName() == 'referral.withdraw' }}">
+                            <a href="{{ route('referral.withdraw') }}" class="nav-link">{{ __('Withdraw Request') }}</a>
+                        </li>
+                        <li class="{{ Request::route()->getName() == 'referral.history' }}">
+                            <a href="#" class="nav-link">{{ __('Transaction History') }}</a>
+                        </li>
+                    </ul>
+                </li>
             @else
                 @php 
                     $user = \Auth::user();

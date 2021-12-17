@@ -15,12 +15,12 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Revenue')}}</h4>
-                        <div class="col-6 text-right row">
+                        <h4 class="col-6 fw-normal">{{__('Manage Revenue')}}</h4>
+                        <div class="col-6 text-end row">
                             <div class="col-lg-8"></div>
                             <div class="dropdown col-lg-2">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     {{ Form::open(array('route' => array('revenue.index'),'method' => 'GET')) }}
                                     <div class="form-group">
                                         {{ Form::label('date', __('Date')) }}
@@ -43,7 +43,7 @@
                                         {{ Form::select('payment',$payment,isset($_GET['payment'])?$_GET['payment']:'', array('class' => 'form-control font-style selectric')) }}
                                     </div>
 
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         <a href="{{route('revenue.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                     </div>
@@ -80,7 +80,7 @@
                                                         <th> {{__('Reference')}}</th>
                                                         <th> {{__('Description')}}</th>
                                                         @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -102,25 +102,21 @@
                                                             <td>{{  $revenue->description}}</td>
 
                                                             @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit revenue')
-                                                                        <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('revenue.edit',$revenue->id) }}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('revenue.edit',$revenue->id) }}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete revenue')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$revenue->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('revenue.destroy', $revenue->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['revenue.destroy', $revenue->id],'id'=>'delete-form-'.$revenue->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
-
                                                             @endif
                                                         </tr>
                                                     @endforeach
-
                                                     </tbody>
                                                 </table>
                                             </div>

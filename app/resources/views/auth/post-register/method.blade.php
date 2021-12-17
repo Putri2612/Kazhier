@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="login-brand">
-                        <img class="img-fluid logo-img" src="{{asset('storage/logo/logo.png')}} " alt="">
+                        <img class="img-fluid logo-img" style="width:140px" src="{{asset('storage/logo/logo.png')}} " alt="">
                     </div>
                     <div class="card card-primary">
                         <div class="card-header">
@@ -30,7 +30,7 @@
                             </p>
                             {{ Form::open(array('route' => 'post-register.method', 'method' => 'post')) }}
                             {{ Form::text('items', '', array('class' => 'items'))}}
-                            <div class="text-right">
+                            <div class="text-end">
                                 {{ Form::submit( __('Next'), array('class'=>'btn btn-primary btn-lg') ) }}
                             </div>
                             {{ Form::close()}}

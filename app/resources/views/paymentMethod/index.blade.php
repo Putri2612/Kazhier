@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Payment Method')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Payment Method')}}</h4>
                         @can('create constant payment method')
                             <a href="#" data-url="{{ route('payment-method.create') }}" data-ajax-popup="true" data-title="{{__('Create New Payment Method')}}" class="btn btn-sm btn-primary btn-round">
                                 <i class="fa fa-plus"></i> {{__('Create')}}
@@ -35,7 +35,7 @@
                                                     <tr>
                                                         <th>{{__('Title')}}</th>
                                                         @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -45,18 +45,16 @@
                                                         <tr class="font-style">
                                                             <td>{{ $paymentMethod->name }}</td>
                                                             @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit constant payment method')
-                                                                        <a href="#!" data-url="{{ route('payment-method.edit',$paymentMethod->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment Method')}}" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" data-url="{{ route('payment-method.edit',$paymentMethod->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment Method')}}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete constant payment method')
-                                                                        <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$paymentMethod->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('payment-method.destroy', $paymentMethod->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['payment-method.destroy', $paymentMethod->id],'id'=>'delete-form-'.$paymentMethod->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
                                                             @endif

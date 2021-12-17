@@ -15,9 +15,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 mb-3 crd">
-                        <h4 class="font-weight-normal">{{__('Manage Categories')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Categories')}}</h4>
                         @can('create constant category')
-                            <div class="col-auto text-right">
+                            <div class="col-auto text-end">
                                 <a href="#" data-url="{{ route('product-category.create') }}" data-ajax-popup="true" data-title="{{__('Create New Category')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -56,25 +56,23 @@
                                                             <thead class="thead-light">
                                                             <tr>
                                                                 <th>{{__('Type')}}</th>
-                                                                <th class="text-right">{{__('Action')}}</th>
+                                                                <th class="text-end">{{__('Action')}}</th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
                                                             @foreach ($item as $category)
                                                                 <tr>
                                                                     <td class="font-style">{{ $category->name }}</td>
-                                                                    <td class="action text-right">
+                                                                    <td class="action text-end">
                                                                         @can('edit constant category')
-                                                                            <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('product-category.edit',$category->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Category')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                            <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('product-category.edit',$category->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Category')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                 <i class="fas fa-pencil-alt"></i>
                                                                             </a>
                                                                         @endcan
                                                                         @can('delete constant category')
-                                                                            <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$category->id}}').submit();">
+                                                                            <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('product-category.destroy', $category->id) }}">
                                                                                 <i class="fas fa-trash"></i>
                                                                             </a>
-                                                                            {!! Form::open(['method' => 'DELETE', 'route' => ['product-category.destroy', $category->id],'id'=>'delete-form-'.$category->id]) !!}
-                                                                            {!! Form::close() !!}
                                                                         @endcan
                                                                     </td>
                                                                 </tr>

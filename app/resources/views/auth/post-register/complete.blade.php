@@ -28,7 +28,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="login-brand">
-                        <img class="img-fluid logo-img" src="{{asset('storage/logo/logo.png')}} " alt="">
+                        <img class="img-fluid logo-img" style="width:140px" src="{{asset('storage/logo/logo.png')}} " alt="">
                     </div>
                     <div class="card card-primary">
                         <div class="card-body text-center">

@@ -518,15 +518,15 @@
                                             <tbody data-v-1ad6e3b9="">
                                             <tr data-v-1ad6e3b9="">
                                                 <td data-v-1ad6e3b9="" class="fwb">{{__('Number')}}:</td>
-                                                <td data-v-1ad6e3b9="" class="text-right">{{\App\Models\Utility::invoiceNumberFormat($settings,$invoice->invoice_id)}}</td>
+                                                <td data-v-1ad6e3b9="" class="text-end">{{\App\Models\Utility::invoiceNumberFormat($settings,$invoice->invoice_id)}}</td>
                                             </tr>
                                             <tr data-v-1ad6e3b9="">
                                                 <td data-v-1ad6e3b9="" class="fwb">{{__('Issue Date')}}:</td>
-                                                <td data-v-1ad6e3b9="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$invoice->issue_date)}}</td>
+                                                <td data-v-1ad6e3b9="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$invoice->issue_date)}}</td>
                                             </tr>
                                             <tr data-v-1ad6e3b9="">
                                                 <td data-v-1ad6e3b9="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-1ad6e3b9="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$invoice->due_date)}}</td>
+                                                <td data-v-1ad6e3b9="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$invoice->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -568,7 +568,7 @@
                                                     <div class="d-table-th w-3"></div>
                                                 @endif
                                                 <div class="d-table-th w-3">{{__('Price')}}</div>
-                                                <div class="d-table-th w-4 text-right">{{__('Totals')}} </div>
+                                                <div class="d-table-th w-4 text-end">{{__('Totals')}} </div>
                                             </div>
                                             <div data-v-1ad6e3b9="" class="d-table-body">
                                                 @if(isset($invoice->items) && count($invoice->items) > 0)
@@ -595,7 +595,7 @@
                                                             <div class="d-table-td w-3">
                                                                 <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                             </div>
-                                                            <div class="d-table-td w-4 text-right"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
+                                                            <div class="d-table-td w-4 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
                                                         </div>
                                                     @endforeach
                                                 @else
@@ -610,7 +610,7 @@
                                                         <div class="d-table-td w-5">
                                                             <pre data-v-f2a183a6="">-</pre>
                                                         </div>
-                                                        <div class="d-table-td w-4 text-right"><span>-</span></div>
+                                                        <div class="d-table-td w-4 text-end"><span>-</span></div>
                                                     </div>
                                                 @endif
                                             </div>

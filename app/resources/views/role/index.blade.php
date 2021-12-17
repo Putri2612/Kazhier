@@ -15,9 +15,9 @@
         <div class="row">
             <div class="col-12">
                 <div class="row crd mb-3">
-                    <h4 class="col-6 font-weight-normal">{{__('Role')}}</h4>
+                    <h4 class="col-6 fw-normal">{{__('Role')}}</h4>
                     @can('create role')
-                    <div class="col-6 text-right">
+                    <div class="col-6 text-end">
                         <a href="#" data-url="{{ route('roles.create') }}" data-size="xl" data-ajax-popup="true" data-title="{{__('Create New User')}}" class="btn btn-icon icon-left btn-primary btn-round">
                             <i class="fa fa-plus"></i> {{__('Create')}}
                         </a>
@@ -53,15 +53,14 @@
                                                         <td class="action">
 
                                                             @can('edit role')
-                                                                <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('roles.edit',$role->id) }}" data-size="xl" data-ajax-popup="true" data-toggle="tooltip" data-original-title="{{__('Edit')}}" data-title="{{__('Update Role')}}">
+                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('roles.edit',$role->id) }}" data-size="xl" data-ajax-popup="true" data-toggle="tooltip" data-original-title="{{__('Edit')}}" data-title="{{__('Update Role')}}">
                                                                     <i class="fas fa-pencil-alt"></i>
                                                                 </a>
                                                             @endcan
                                                             @can('delete role')
-                                                                <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$role->id}}').submit();"><i class="fas fa-trash"></i></a>
-
-                                                                {!! Form::open(['method' => 'DELETE', 'route' => ['roles.destroy', $role->id],'id'=>'delete-form-'.$role->id]) !!}
-                                                                {!! Form::close() !!}
+                                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('roles.destroy', $role->id) }}">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </a>
                                                             @endcan
                                                         </td>
                                                     </tr>

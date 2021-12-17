@@ -39,9 +39,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Credit Note')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Credit Note')}}</h4>
                         @can('create credit note')
-                        <div class="col-6 text-right">
+                        <div class="col-6 text-end">
                             <a href="#" data-url="{{ route('invoice.custom.credit.note') }}" data-ajax-popup="true" data-title="{{__('Create New Credit Note')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                 <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                 <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -64,7 +64,7 @@
                                                         <th> {{__('Date')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -81,18 +81,16 @@
                                                                     <td>{{ Auth::user()->dateFormat($creditNote->date) }}</td>
                                                                     <td>{{ Auth::user()->priceFormat($creditNote->amount) }}</td>
                                                                     <td>{{$creditNote->description}}</td>
-                                                                    <td class="text-right">
+                                                                    <td class="text-end">
                                                                         @can('edit credit note')
-                                                                            <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                            <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                 <i class="fas fa-pencil-alt"></i>
                                                                             </a>
                                                                         @endcan
                                                                         @can('edit credit note')
-                                                                            <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$creditNote->id}}').submit();">
+                                                                            <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('invoice.delete.credit.note', [$creditNote->invoice, $creditNote->id]) }}">
                                                                                 <i class="fas fa-trash"></i>
                                                                             </a>
-                                                                            {!! Form::open(['method' => 'DELETE', 'route' => array('invoice.delete.credit.note', $creditNote->invoice,$creditNote->id),'id'=>'delete-form-'.$creditNote->id]) !!}
-                                                                            {!! Form::close() !!}
                                                                         @endcan
                                                                     </td>
                                                                 </tr>

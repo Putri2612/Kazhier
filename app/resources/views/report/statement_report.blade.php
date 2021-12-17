@@ -30,10 +30,10 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-right mb-10">
+            <div class="row text-end mb-10">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 mb-3">
-                        <h4 class="font-weight-normal">{{__('Statement Summary')}}</h4>
+                        <h4 class="fw-normal">{{__('Statement Summary')}}</h4>
                         <div class="card-header-action">
                             <div class="dropdown ">
     
@@ -41,7 +41,7 @@
                                     <i class="fas fa-filter"></i>{{__('Filter')}}
                                 </a>
     
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown ">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown ">
                                     {{ Form::open(array('route' => array('report.account.statement'),'method' => 'GET')) }}
                                     <div class="form-group">
                                         {{ Form::label('account', __('Account')) }}
@@ -59,7 +59,7 @@
                                         {{ Form::label('type', __('Type')) }}
                                         {{ Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control font-style selectric')) }}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         <a href="{{route('report.account.statement')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                     </div>

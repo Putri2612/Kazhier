@@ -129,7 +129,7 @@
     </div>
 
 </div>
-<div class="col-md-12 text-right">
+<div class="col-md-12 text-end">
     <a href="#" class="btn btn-info"  id="billing_data">{{__('Shipping Same As Billing')}}</a>
 </div>
 <h4 class="sub-title">{{__('Shipping Address')}}</h4>
@@ -212,7 +212,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-12 text-right">
+<div class="col-md-12 text-end">
     <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
     {{Form::submit(__('Create'),array('class'=>'btn btn-primary'))}}
 </div>

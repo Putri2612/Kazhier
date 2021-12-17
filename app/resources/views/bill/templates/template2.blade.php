@@ -507,7 +507,7 @@
                                     <div data-v-37eeda86="" class="col-2">
                                         <img src="{{$img}}" style="max-width: 250px"/>
                                     </div>
-                                    <div data-v-37eeda86="" class="col-2 text-right">
+                                    <div data-v-37eeda86="" class="col-2 text-end">
                                         <p data-v-37eeda86="">@if($settings['company_name']){{$settings['company_name']}}@endif</p>
                                         <p data-v-37eeda86="">
                                             @if($settings['company_address']){{$settings['company_address']}}@endif
@@ -525,16 +525,16 @@
                                         <tbody data-v-37eeda86="">
                                         <tr data-v-37eeda86="">
                                             <td data-v-37eeda86="" class="tu">{{__('Number')}}:</td>
-                                            <td data-v-37eeda86="" class="text-right">{{\App\Models\Utility::billNumberFormat($settings,$bill->bill_id)}}</td>
+                                            <td data-v-37eeda86="" class="text-end">{{\App\Models\Utility::billNumberFormat($settings,$bill->bill_id)}}</td>
                                         </tr>
                                         <tr data-v-37eeda86="">
                                             <td data-v-37eeda86="" class="tu">{{__('Issue Date')}}:</td>
                                             <td data-v-37eeda86=""
-                                                class="text-right">{{\App\Models\Utility::dateFormat($settings,$bill->issue_date)}}</td>
+                                                class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->issue_date)}}</td>
                                         </tr>
                                         <tr data-v-37eeda86="">
                                             <td data-v-37eeda86="" class="tu">{{__('Due Date')}}:</td>
-                                            <td data-v-37eeda86="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
+                                            <td data-v-37eeda86="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -579,7 +579,7 @@
                                                 <div class="d-table-th w-3"></div>
                                             @endif
                                             <div class="d-table-th w-3">{{__('Price')}}</div>
-                                            <div class="d-table-th w-4 text-right">{{__('Totals')}} </div>
+                                            <div class="d-table-th w-4 text-end">{{__('Totals')}} </div>
                                         </div>
                                         <div data-v-37eeda86="" class="d-table-body">
                                             @if(isset($bill->items) && count($bill->items) > 0)
@@ -606,7 +606,7 @@
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                         </div>
-                                                        <div class="d-table-td w-4 text-right"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
+                                                        <div class="d-table-td w-4 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
                                                     </div>
                                                 @endforeach
                                             @else
@@ -621,7 +621,7 @@
                                                     <div class="d-table-td w-5">
                                                         <pre data-v-f2a183a6="">-</pre>
                                                     </div>
-                                                    <div class="d-table-td w-4 text-right"><span>-</span></div>
+                                                    <div class="d-table-td w-4 text-end"><span>-</span></div>
                                                 </div>
                                             @endif
                                         </div>

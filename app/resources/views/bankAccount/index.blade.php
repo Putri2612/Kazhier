@@ -15,8 +15,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Account')}}</h4>
-                        <div class="col-6 text-right">
+                        <h4 class="col-6 fw-normal">{{__('Manage Account')}}</h4>
+                        <div class="col-6 text-end">
                             @can('create bank account')
                                 <a href="#" data-url="{{ route('bank-account.create') }}" data-ajax-popup="true" data-title="{{__('Create New Account')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
@@ -43,7 +43,7 @@
                                                         <th> {{__('Contact Number')}}</th>
                                                         <th> {{__('Bank Branch')}}</th>
                                                         @if(Gate::check('edit bank account') || Gate::check('delete bank account'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -59,18 +59,16 @@
                                                             <td>{{  $account->bank_address}}</td>
 
                                                             @if(Gate::check('edit bank account') || Gate::check('delete bank account'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit bank account')
-                                                                        <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('bank-account.edit',$account->id) }}" data-ajax-popup="true" data-title="{{__('Edit Bank Detail')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('bank-account.edit',$account->id) }}" data-ajax-popup="true" data-title="{{__('Edit Bank Detail')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete bank account')
-                                                                        <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$account->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('bank-account.destroy', $account->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['bank-account.destroy', $account->id],'id'=>'delete-form-'.$account->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
 

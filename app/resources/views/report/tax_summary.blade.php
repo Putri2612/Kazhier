@@ -30,7 +30,7 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-right mb-10">
+            <div class="row text-end mb-10">
                 <div class="col-12">
                     <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
                         <i class="fas fa-filter"></i>{{__('Filter')}}
@@ -40,13 +40,13 @@
                     </a>
                     <div class="card-header-action">
                         <div class="dropdown">
-                            <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown">
+                            <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
                                 {{ Form::open(array('route' => array('report.tax.summary'),'method' => 'GET')) }}
                                 <div class="form-group">
                                     {{ Form::label('year', __('Year')) }}
                                     {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
                                 </div>
-                                <div class="text-right">
+                                <div class="text-end">
                                     <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                     <a href="{{route('report.tax.summary')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                 </div>
@@ -60,7 +60,7 @@
             <div class="row">
                 <div class="col-12" id="chart-container">
                     <div class="d-flex justify-content-between w-100">
-                        <h4 class="font-weight-normal">{{__('Tax Summary')}}</h4> <h4 class="font-weight-400">{{$currentYear}}</h4>
+                        <h4 class="fw-normal">{{__('Tax Summary')}}</h4> <h4 class="fw-400">{{$currentYear}}</h4>
                     </div>
                     <div class="card">
                         <div class="card-body">

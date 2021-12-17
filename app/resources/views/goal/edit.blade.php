@@ -28,7 +28,7 @@
             <label class="custom-control-label" for="is_display">{{__('Is Dashoard Display')}}</label>
         </div>
     </div>
-    <div class="col-md-12 text-right">
+    <div class="col-md-12 text-end">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
         {{Form::submit(__('Update'),array('class'=>'btn btn-primary'))}}
     </div>

@@ -15,11 +15,11 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Transaction')}}</h4>
-                        <div class="col-6 text-right">
+                        <h4 class="col-6 fw-normal">{{__('Manage Transaction')}}</h4>
+                        <div class="col-6 text-end">
                             <div class="dropdown">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET')) }}
                                     <div class="form-group">
                                         {{ Form::label('date', __('Date')) }}
@@ -29,7 +29,7 @@
                                         {{ Form::label('account', __('Account')) }}
                                         {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         <a href="{{route('transaction.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                     </div>
@@ -54,7 +54,7 @@
                                                         <th> {{__('Type')}}</th>
                                                         <th> {{__('Category')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Amount')}}</th>
+                                                        <th class="text-end"> {{__('Amount')}}</th>
                                                     </tr>
                                                     </thead>
 
@@ -66,7 +66,7 @@
                                                             <td class="font-style">{{  $transaction->type}}</td>
                                                             <td class="font-style">{{  $transaction->category}}</td>
                                                             <td>{{  $transaction->description}}</td>
-                                                            <td class="text-right">{{\Auth::user()->priceFormat($transaction->amount)}}</td>
+                                                            <td class="text-end">{{\Auth::user()->priceFormat($transaction->amount)}}</td>
                                                         </tr>
                                                     @endforeach
                                                     </tbody>

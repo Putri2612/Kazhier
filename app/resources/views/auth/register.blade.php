@@ -10,7 +10,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 pt-4">
-                    <div class="changeLanguage float-right mr-1 position-relative">
+                    <div class="changeLanguage float-right me-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
                                 <option @if($lang == $language) selected @endif value="{{ route('register.show',$language) }}">{{Str::upper($language)}}</option>
@@ -24,7 +24,7 @@
             <div class="row">
                 <div class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-8 offset-xl-2">
                     <div class="login-brand">
-                        <img class="img-fluid logo-img" src="{{$logo.'/logo.png'}} " alt="">
+                        <img class="img-fluid logo-img" style="width:140px" src="{{$logo.'/logo.png'}} " alt="">
                     </div>
 
                     <div class="card card-primary">
@@ -74,6 +74,19 @@
                                     @enderror
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="form-group col-6">
+                                    {{Form::label('referral',__('Referral Code'))}}
+                                    {{Form::text('referral', $referral, array('class'=>'form-control'))}}
+                                    @error('referral')
+                                    <span class="invalid-referral text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox required">
                                     <input type="checkbox" required name="agree" class="custom-control-input" id="agree">

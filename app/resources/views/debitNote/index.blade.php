@@ -39,7 +39,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Debit Note')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Debit Note')}}</h4>
                         @can('create debit note')
                             <a href="#" data-url="{{ route('bill.custom.debit.note') }}" data-ajax-popup="true" data-title="{{__('Create New Debit Note')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                 <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
@@ -62,7 +62,7 @@
                                                         <th> {{__('Date')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -80,18 +80,16 @@
                                                                     <td>{{ Auth::user()->dateFormat($debitNote->date) }}</td>
                                                                     <td>{{ Auth::user()->priceFormat($debitNote->amount) }}</td>
                                                                     <td>{{$debitNote->description}}</td>
-                                                                    <td class="text-right">
+                                                                    <td class="text-end">
                                                                         @can('edit debit note')
-                                                                            <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                            <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                 <i class="fas fa-pencil-alt"></i>
                                                                             </a>
                                                                         @endcan
                                                                         @can('edit debit note')
-                                                                            <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$debitNote->id}}').submit();">
+                                                                            <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('bill.delete.debit.note', [$debitNote->bill, $debitNote->id]) }}">
                                                                                 <i class="fas fa-trash"></i>
                                                                             </a>
-                                                                            {!! Form::open(['method' => 'DELETE', 'route' => array('bill.delete.debit.note', $debitNote->bill,$debitNote->id),'id'=>'delete-form-'.$debitNote->id]) !!}
-                                                                            {!! Form::close() !!}
                                                                         @endcan
                                                                     </td>
                                                                 </tr>

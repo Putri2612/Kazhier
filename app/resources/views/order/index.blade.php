@@ -59,7 +59,6 @@
                                                                     <p>{{ __('Referral Point Redeemed') }}</p>
                                                                 @else
                                                                     <a href="{{$order->receipt}}" title="Invoice" target="_blank" class=""><i class="fas fa-file-invoice"></i> </a>
-
                                                                 @endif
                                                             </td>
                                                         </tr>

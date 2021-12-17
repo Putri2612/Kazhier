@@ -1,6 +1,6 @@
 <div class="container">
     <nav class="row navbar navbar-expand-lg navbar-light bg-white">
-        <div class="navbar-nav ml-auto mr-auto mr-sm-auto mr-lg-0 mr-md-auto">
+        <div class="navbar-nav ml-auto me-auto me-sm-auto me-lg-0 me-md-auto">
             <a href="{{route('dashboard')}}" class="navbar-brand">
         
             </a>

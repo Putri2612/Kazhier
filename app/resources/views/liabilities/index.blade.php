@@ -15,9 +15,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Liabilities')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Liabilities')}}</h4>
                         @can('create liabilities')
-                            <div class="col-6 text-right">
+                            <div class="col-6 text-end">
                                 <a href="#" data-url="{{ route('account-liabilities.create') }}" data-ajax-popup="true" data-title="{{__('Create New Liabilities')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -41,7 +41,7 @@
                                                         <th> {{__('Type')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -53,18 +53,16 @@
                                                             <td class="font-style">{{__("$liability->type") }}</td>
                                                             <td class="font-style">{{ \Auth::user()->priceFormat($liability->amount) }}</td>
                                                             <td class="font-style">{{ $liability->description }}</td>
-                                                            <td class="action text-right">
+                                                            <td class="action text-end">
                                                                 @can('edit liabilities')
-                                                                    <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('account-liabilities.edit',$liability->id) }}" data-ajax-popup="true" data-title="{{__('Edit Liabilities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-liabilities.edit',$liability->id) }}" data-ajax-popup="true" data-title="{{__('Edit Liabilities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete liabilities')
-                                                                    <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$liability->id}}').submit();">
+                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('account-liabilities.destroy', $liability->id) }}">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['account-liabilities.destroy', $liability->id],'id'=>'delete-form-'.$liability->id]) !!}
-                                                                    {!! Form::close() !!}
                                                                 @endcan
                                                             </td>
                                                         </tr>

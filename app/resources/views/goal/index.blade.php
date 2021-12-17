@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Goal')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Goal')}}</h4>
                         @can('create goal')
                             <div class="col-auto">
                                 <a href="#" data-url="{{ route('goal.create') }}" data-ajax-popup="true" data-title="{{__('Create New Goal')}}" class="btn btn-icon icon-left btn-primary btn-round">
@@ -41,30 +41,28 @@
                                                         <th> {{__('To')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Is Dashboard Display')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    @foreach ($golas as $gola)
+                                                    @foreach ($golas as $goal)
                                                         <tr>
-                                                            <td class="font-style">{{ $gola->name }}</td>
-                                                            <td class="font-style"> {{ __(\App\Models\Goal::$goalType[$gola->type]) }} </td>
-                                                            <td class="font-style">{{ $gola->from }}</td>
-                                                            <td class="font-style">{{ $gola->to }}</td>
-                                                            <td class="font-style">{{ \Auth::user()->priceFormat($gola->amount) }}</td>
-                                                            <td class="font-style">{{$gola->is_display==1 ? __('Yes') :__('No')}}</td>
-                                                            <td class="action text-right">
+                                                            <td class="font-style">{{ $goal->name }}</td>
+                                                            <td class="font-style"> {{ __(\App\Models\Goal::$goalType[$goal->type]) }} </td>
+                                                            <td class="font-style">{{ $goal->from }}</td>
+                                                            <td class="font-style">{{ $goal->to }}</td>
+                                                            <td class="font-style">{{ \Auth::user()->priceFormat($goal->amount) }}</td>
+                                                            <td class="font-style">{{ $goal->is_display==1 ? __('Yes') :__('No') }}</td>
+                                                            <td class="action text-end">
                                                                 @can('edit goal')
-                                                                    <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('goal.edit',$gola->id) }}" data-ajax-popup="true" data-title="{{__('Edit Goal')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('goal.edit',$goal->id) }}" data-ajax-popup="true" data-title="{{__('Edit Goal')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete goal')
-                                                                    <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$gola->id}}').submit();">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['goal.destroy', $gola->id],'id'=>'delete-form-'.$gola->id]) !!}
-                                                                    {!! Form::close() !!}
+                                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('goal.destroy', $goal->id) }}">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </a>
                                                                 @endcan
                                                             </td>
                                                         </tr>

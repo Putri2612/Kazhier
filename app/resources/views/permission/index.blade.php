@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Permissions')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Permissions')}}</h4>
                         <a href="#" data-url="{{ route('permissions.create') }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Create New Permission')}}" class="btn btn-icon icon-left btn-primary btn-round">
                             <i class="fa fa-plus"></i> {{__('Create')}}
                         </a>
@@ -32,7 +32,7 @@
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Permissions')}}</th>
-                                                        <th class="text-right" width="200px"> {{__('Action')}}</th>
+                                                        <th class="text-end" width="200px"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
 
@@ -43,16 +43,13 @@
 
                                                             <td class="action">
 
-                                                                <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('permissions.edit',$permission->id) }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Update permission')}}" class="btn btn-outline btn-sm blue-madison" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('permissions.edit',$permission->id) }}" data-size="lg" data-ajax-popup="true" data-title="{{__('Update permission')}}" class="btn btn-outline btn-sm blue-madison" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                     <i class="fas fa-pencil-alt"></i>
                                                                 </a>
 
-                                                                <a href="#" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$permission->id}}').submit();">
+                                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('permissions.destroy', $permission->id) }}">
                                                                     <i class="fas fa-trash"></i>
                                                                 </a>
-                                                                {!! Form::open(['method' => 'DELETE', 'route' => ['permissions.destroy', $permission->id],'id'=>'delete-form-'.$permission->id]) !!}
-                                                                {!! Form::close() !!}
-
                                                             </td>
 
                                                         </tr>

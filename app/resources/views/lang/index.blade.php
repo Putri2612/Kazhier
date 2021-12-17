@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between w-100 mb-3 crd">
-                    <h4 class="font-weight-normal">{{__('Language')}}</h4>
+                    <h4 class="fw-normal">{{__('Language')}}</h4>
                     <a href="#" data-size="2xl" data-url="{{ route('create.language') }}" data-ajax-popup="true" data-title="{{__('Create New Language')}}" class="btn btn-icon icon-left btn-primary btn-round">
                         <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                         <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -67,7 +67,7 @@
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
-                                                                <div class="col-lg-12 text-right">
+                                                                <div class="col-lg-12 text-end">
                                                                     <button class="btn btn-primary" type="submit">{{ __('Save Changes')}}</button>
                                                                 </div>
 
@@ -136,7 +136,7 @@
                                                                     @endforeach
                                                                 @endforeach
                                                             </div>
-                                                            <div class="col-lg-12 text-right">
+                                                            <div class="col-lg-12 text-end">
                                                                 <button class="btn btn-primary" type="submit">{{ __('Save Changes')}}</button>
                                                             </div>
                                                         </form>

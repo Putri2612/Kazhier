@@ -15,9 +15,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Assets')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Assets')}}</h4>
                         @can('create assets')
-                            <div class="col-6 text-right crd">
+                            <div class="col-6 text-end crd">
                                 <a href="#" data-url="{{ route('account-assets.create') }}" data-ajax-popup="true" data-title="{{__('Create New Assets')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -41,7 +41,7 @@
                                                         <th> {{__('Type')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -53,18 +53,16 @@
                                                             <td class="font-style">{{ __($asset->type) }}</td>
                                                             <td class="font-style">{{ \Auth::user()->priceFormat($asset->amount) }}</td>
                                                             <td class="font-style">{{ $asset->description }}</td>
-                                                            <td class="action text-right">
+                                                            <td class="action text-end">
                                                                 @can('edit assets')
-                                                                    <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('account-assets.edit',$asset->id) }}" data-ajax-popup="true" data-title="{{__('Edit Assets')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-assets.edit',$asset->id) }}" data-ajax-popup="true" data-title="{{__('Edit Assets')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete assets')
-                                                                    <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$asset->id}}').submit();">
+                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('account-assets.destroy', $asset->id) }}">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['account-assets.destroy', $asset->id],'id'=>'delete-form-'.$asset->id]) !!}
-                                                                    {!! Form::close() !!}
                                                                 @endcan
                                                             </td>
                                                         </tr>

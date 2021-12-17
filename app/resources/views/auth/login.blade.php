@@ -11,7 +11,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12 pt-4">
-                    <div class="changeLanguage float-right mr-1 position-relative">
+                    <div class="changeLanguage float-right me-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
                                 <option @if($lang == $language) selected @endif value="{{ route('user.login',$language) }}">{{Str::upper($language)}}</option>
@@ -25,14 +25,14 @@
             <div class="row">
                 <div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-6 offset-lg-3 col-xl-4 offset-xl-4">
                     <div class="login-brand">
-                        <img class="img-fluid logo-img" src="{{$logo.'/logo.png'}}" alt="image">
+                        <img class="img-fluid logo-img" style="width:140px" src="{{$logo.'/logo.png'}}" alt="image">
                     </div>
                     <div class="card card-primary">
                         <a href="." class="back-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header">
                             <h4>{{__('User Login')}}</h4>
                         </div>
-                        {{-- <div class="col-12 text-right">
+                        {{-- <div class="col-12 text-end">
                             <a href="{{route('customer.login')}}" class="btn btn-secondary">{{__('Customer Login')}}</a>
                             <a href="{{route('vender.login')}}" class="btn btn-secondary m-">{{__('Vendor Login')}}</a>
                         </div> --}}

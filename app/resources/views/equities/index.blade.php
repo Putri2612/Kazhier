@@ -15,9 +15,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Equities')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Equities')}}</h4>
                         @can('create equities')
-                            <div class="col-6 text-right">
+                            <div class="col-6 text-end">
                                 <a href="#" data-url="{{ route('account-equities.create') }}" data-ajax-popup="true" data-title="{{__('Create New Equities')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -38,7 +38,7 @@
                                                         <th> {{__('Name')}}</th>
                                                         <th> {{__('Amount')}}</th>
                                                         <th> {{__('Description')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -47,9 +47,9 @@
                                                             <td class="font-style">{{ $equity->name }}</td>
                                                             <td class="font-style">{{ \Auth::user()->priceFormat($equity->amount) }}</td>
                                                             <td class="font-style">{{ $equity->description }}</td>
-                                                            <td class="action text-right">
+                                                            <td class="action text-end">
                                                                 @can('edit equities')
-                                                                    <a href="#" class="btn btn-primary btn-action mr-1" data-url="{{ route('account-equities.edit',$equity->id) }}" data-ajax-popup="true" data-title="{{__('Edit Equities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-equities.edit',$equity->id) }}" data-ajax-popup="true" data-title="{{__('Edit Equities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan

@@ -48,7 +48,7 @@
                                         <span class="text-job text-primary"><h6>{{__('Create Proposal')}}</h6>
                                         </span>
                                         @can('edit proposal')
-                                            <a href="{{ route('proposal.edit',$proposal->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                            <a href="{{ route('proposal.edit',$proposal->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Edit')}}
                                             </a>
                                         @endcan
@@ -67,7 +67,7 @@
                                             <p><a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($proposal->send_date)}}  </a></p>
                                         @else
                                             @can('send proposal')
-                                                <a href="{{ route('proposal.sent',$proposal->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                                <a href="{{ route('proposal.sent',$proposal->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                     {{__('Mark Sent')}}
                                                 </a>
                                             @endcan
@@ -117,11 +117,11 @@
                         @if($proposal->status!=0)
                             <div class="row mb-10">
                                 <div class="col-lg-12">
-                                    <div class="text-right">
-                                        <a href="{{ route('proposal.sent',$proposal->id) }}" class="btn btn-primary btn-action mr-1 float-right">
+                                    <div class="text-end">
+                                        <a href="{{ route('proposal.sent',$proposal->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Resend Proposal')}}
                                         </a>
-                                        <a href="{{ route('proposal.pdf', Crypt::encrypt($proposal->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                        <a href="{{ route('proposal.pdf', Crypt::encrypt($proposal->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Print')}}
                                         </a>
                                     </div>
@@ -131,9 +131,9 @@
                     @else
                         <div class="row mb-10">
                             <div class="col-lg-12">
-                                <div class="text-right">
+                                <div class="text-end">
 
-                                    <a href="{{ route('proposal.pdf', Crypt::encrypt($proposal->id))}}" target="_blank" class="btn btn-primary btn-action mr-1 float-right">
+                                    <a href="{{ route('proposal.pdf', Crypt::encrypt($proposal->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Print')}}
                                     </a>
                                 </div>
@@ -158,7 +158,7 @@
                                         {{!empty($customer->billing_city)?$customer->billing_city:'' .', '}} {{!empty($customer->billing_state)?$customer->billing_state:'',', '}} {{!empty($customer->billing_country)?$customer->billing_country:''}}
                                     </address>
                                 </div>
-                                <div class="col-md-6 text-md-right">
+                                <div class="col-md-6 text-md-end">
                                     <address>
                                         <strong>{{__('Shipped To')}}:</strong><br>
                                         {{!empty($customer->shipping_name)?$customer->shipping_name:''}}<br>
@@ -186,7 +186,7 @@
                                         @endif
                                     </address>
                                 </div>
-                                <div class="col-md-8 text-md-right">
+                                <div class="col-md-8 text-md-end">
                                     <address>
                                         <strong>{{__('Issue Date')}} :</strong><br>
                                         {{\Auth::user()->dateFormat($proposal->issue_date)}}<br><br>
@@ -209,7 +209,7 @@
                                         @if($proposal->discount_apply==1)
                                             <th class="text-center">{{__('Discount')}}</th>
                                         @endif
-                                        <th class="text-right">{{__('Price')}}</th>
+                                        <th class="text-end">{{__('Price')}}</th>
                                     </tr>
                                     @foreach($iteams as $key =>$iteam)
                                         <tr>
@@ -220,7 +220,7 @@
                                             @if($proposal->discount_apply==1)
                                                 <td class="text-center">{{\Auth::user()->priceFormat($iteam->discount)}}</td>
                                             @endif
-                                            <td class="text-right">{{\Auth::user()->priceFormat($iteam->price)}}</td>
+                                            <td class="text-end">{{\Auth::user()->priceFormat($iteam->price)}}</td>
                                         </tr>
                                     @endforeach
                                 </table>
@@ -246,7 +246,7 @@
                                         <div class="proposal-detail-value">{{\Auth::user()->priceFormat($proposal->getSubTotal())}}</div>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 text-right">
+                                <div class="col-lg-3 text-end">
                                     <div class="proposal-detail-item">
                                         <div class="proposal-detail-name">{{__('Total')}}</div>
                                         <div class="proposal-detail-value proposal-detail-value-lg">{{\Auth::user()->priceFormat($proposal->getTotal())}}</div>

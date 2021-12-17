@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between w-100 crd mb-3">
-                    <h4 class="font-weight-normal">{{__('Manage Plan')}}</h4>
+                    <h4 class="fw-normal">{{__('Manage Plan')}}</h4>
                     @can('create plan')
                         <a href="#" data-url="{{ route('plans.create') }}" data-ajax-popup="true" data-title="{{__('Create New Plan')}}" class="btn btn-icon icon-left btn-primary btn-round">
                             <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
@@ -39,20 +39,33 @@
                                                 <img class="plan-img" src="{{$dir.'/'.$plan->image}}">
                                             @endif
                                         </div>
-                                        <h3>
-                                            {{isset(\Auth::user()->planPrice()['stripe_currency_symbol'])?\Auth::user()->planPrice()['stripe_currency_symbol'].$plan->price:''}}
-                                        </h3>
+                                        @if (Auth::user()->referral_redeemed || !Auth::user()->referred_by)
+                                            <h3>
+                                                {{Auth::user()->planPriceFormat($plan->price)}}
+                                            </h3>
+                                        @else
+                                            @php
+                                                $original = $plan->price;
+                                                $discount = $original/10;
+                                                if($discount > 50000){
+                                                    $discount = 50000;
+                                                }
+                                                $discounted = $original - $discount;
+                                            @endphp
+                                            <h6 class="text-muted"><del>{{Auth::user()->planPriceFormat($original)}}</del></h6>
+                                            <h3>
+                                                {{Auth::user()->planPriceFormat($discounted)}}
+                                            </h3>
+                                        @endif
                                         <p class="font-style">{{$plan->duration}}</p>
                                         <div class="text-center">
                                             @can('edit plan')
                                                 <a title="Edit Plan" href="#" class="view-btn" data-url="{{ route('plans.edit',$plan->id) }}" data-ajax-popup="true" data-title="{{__('Edit Plan')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}"><i class="far fa-edit"></i></a>
                                             @endcan
                                             @can('delete plan')
-                                            <a href="#" class="view-btn " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$plan->id}}').submit();">
+                                            <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('plans.destroy', $plan->id) }}">
                                                 <i class="fas fa-trash"></i>
                                             </a>
-                                            {!! Form::open(['method' => 'DELETE', 'route' => ['plans.destroy', $plan->id],'id'=>'delete-form-'.$plan->id]) !!}
-                                            {!! Form::close() !!}
                                             @endcan    
                                             @can('buy plan')
                                                 @if($plan->id != \Auth::user()->plan)
@@ -63,14 +76,14 @@
                                                     @endif
                                                 @endif
                                             @endcan
-                                            @if(\Auth::user()->type=='company' && \Auth::user()->plan == $plan->id)
+                                            @if(Auth::user()->type=='company' && Auth::user()->plan == $plan->id)
                                                 <div class="text-center">
                                                     <a class="view-success-btn">
                                                         {{__('Active')}}
                                                     </a>
                                                 </div>
                                                 <div class="col-md-12 text-left">
-                                                    <p>{{__('Expired : '.\Auth::user()->dateFormat(\Auth::user()->plan_expire_date))}}</p>
+                                                    <p>{{__('Expired : '.Auth::user()->dateFormat(Auth::user()->plan_expire_date))}}</p>
                                                 </div>
                                             @endif
                                         </div>
@@ -86,11 +99,6 @@
                                                 <i class="fas fa-user-plus"></i>
                                                 <p>{{$plan->max_bank_accounts}} {{__('Bank Accounts')}}</p>
                                             </li>
-                                            {{-- <!--<li>-->
-                                            <!--    <i class="fas fa-user-plus"></i>-->
-                                            <!--    <p>{{$plan->max_venders}} {{__('Venders')}}</p>-->
-                                            <!--</li>--> --}}
-                                            
                                         </ul>
                                     </div>
                                 </div>

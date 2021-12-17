@@ -23,7 +23,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <h4 class="font-weight-normal">{{__('Settings')}}</h4>
+                <h4 class="fw-normal">{{__('Settings')}}</h4>
                 <div class="card">
                     <div class="card-body">
                         <div class="setting-tab">
@@ -130,7 +130,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer text-right">
+                                        <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>
                                         {{Form::close()}}
@@ -213,7 +213,7 @@
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="card-footer text-right">
+                                        <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>
                                         {{Form::close()}}
@@ -252,7 +252,7 @@
                                             {{__('Set Midtrans Payment Notification URL to ')}}
                                             <a href="#">{{'https://'.$uri.$url.'midtrans/callback'}}</a>
                                         </p>
-                                        <div class="card-footer text-right">
+                                        <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>
                                         {{Form::close()}}

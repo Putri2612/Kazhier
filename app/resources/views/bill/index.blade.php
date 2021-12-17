@@ -15,12 +15,12 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3 crd">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Bill')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Bill')}}</h4>
                         <div class="col-6 row">
                             <div class="col-lg-8"></div>
-                            <div class="dropdown col-lg-2 text-right">
+                            <div class="dropdown col-lg-2 text-end">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     @if(!\Auth::guard('vender')->check())
                                         {{ Form::open(array('route' => array('bill.index'),'method' => 'GET')) }}
                                     @else
@@ -40,7 +40,7 @@
                                         {{ Form::label('status', __('Status')) }}
                                         {{ Form::select('status', [''=>'All'] + $status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         @if(!\Auth::guard('vender')->check())
                                             <a href="{{route('bill.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
@@ -53,7 +53,7 @@
                                 </div>
                             </div>
                             @can('create bill')
-                            <div class="col-lg-2 text-right">
+                            <div class="col-lg-2 text-end">
                                 <a href="{{ route('bill.create') }}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -81,7 +81,7 @@
                                                         <th> {{__('Due Date')}}</th>
                                                         <th>{{__('Status')}}</th>
                                                         @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -118,9 +118,9 @@
                                                                 @endif
                                                             </td>
                                                             @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('duplicate bill')
-                                                                        <a href="#" class="btn btn-success btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$bill->id}}').submit();">
+                                                                        <a href="#" class="btn btn-success btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$bill->id}}').submit();">
                                                                             <i class="fas fa-copy"></i>
                                                                             {!! Form::open(['method' => 'get', 'route' => ['bill.duplicate', $bill->id],'id'=>'duplicate-form-'.$bill->id]) !!}
                                                                             {!! Form::close() !!}
@@ -128,26 +128,24 @@
                                                                     @endcan
                                                                     @can('show bill')
                                                                         @if(\Auth::guard('vender')->check())
-                                                                            <a href="{{ route('vender.bill.show',$bill->id) }}" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('vender.bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @else
-                                                                            <a href="{{ route('bill.show',$bill->id) }}" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @endif
                                                                     @endcan
                                                                     @can('edit bill')
-                                                                        <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete bill')
-                                                                        <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$bill->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url='{{ route('bill.destroy', $bill->id) }}'>
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['bill.destroy', $bill->id],'id'=>'delete-form-'.$bill->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
                                                             @endif

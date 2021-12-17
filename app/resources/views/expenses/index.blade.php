@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Expense')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Expense')}}</h4>
                         @can('create invoice')
                             <div class="col-auto">
                                 <a href="#" data-url="{{ route('expenses.create') }}" data-ajax-popup="true" data-title="{{__('Create New Expense')}}" class="btn btn-sm btn-warning btn-round">
@@ -44,7 +44,7 @@
                                                         <th> {{__('User')}}</th>
                                                         <th> {{__('Attachment')}}</th>
                                                         @if(Gate::check('edit expense') || Gate::check('delete expense'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -66,7 +66,7 @@
                                                                 @endif
                                                             </td>
                                                             @if(Gate::check('edit expense') || Gate::check('delete expense'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit expense')
                                                                         <a href="#!" class="table-action" data-url="{{ route('expenses.edit',$expense->id) }}" data-ajax-popup="true" data-title="{{__('Edit Expense')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="far fa-edit"></i>

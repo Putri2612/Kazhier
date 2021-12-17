@@ -62,10 +62,10 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-right mb-10">
+            <div class="row text-end mb-10">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100">
-                        <h4 class="font-weight-normal">{{__('Income Summary')}}</h4><h4 class="font-weight-400">{{$currentYear}}</h4>
+                        <h4 class="fw-normal">{{__('Income Summary')}}</h4><h4 class="fw-400">{{$currentYear}}</h4>
                     </div>
                     <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary" id="filter-buttons">
                         <i class="fas fa-filter"></i>{{__('Filter')}}
@@ -75,7 +75,7 @@
                     </a>
                     <div class="card-header-action">
                         <div class="dropdown">
-                            <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown">
+                            <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
                                 {{ Form::open(array('route' => array('report.income.summary'),'method' => 'GET')) }}
                                 <div class="form-group">
                                     {{ Form::label('year', __('Year')) }}
@@ -93,7 +93,7 @@
                                     {{ Form::label('customer', __('Customer')) }}
                                     {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
                                 </div>
-                                <div class="text-right">
+                                <div class="text-end">
                                     <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                     <a href="{{route('report.income.summary')}}" class="btn btn-danger">{{__('Reset')}}</a>
                                 </div>

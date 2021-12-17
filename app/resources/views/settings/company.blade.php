@@ -153,7 +153,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer text-right">
+                                        <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>
                                         {{Form::close()}}
@@ -294,7 +294,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="card-footer text-right">
+                                        <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>
                                         {{Form::close()}}
@@ -407,7 +407,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="card-footer text-right">
+                                            <div class="card-footer text-end">
                                                 {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                             </div>
                                             {{Form::close()}}

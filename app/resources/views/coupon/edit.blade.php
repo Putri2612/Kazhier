@@ -17,7 +17,7 @@
         {{Form::label('code',__('Code'))}}
         {{Form::text('code',null,array('class'=>'form-control','required'=>'required'))}}
     </div>
-    <div class="form-group col-md-12 text-right">
+    <div class="form-group col-md-12 text-end">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
         {{Form::submit(__('Update'),array('class'=>'btn btn-primary'))}}
     </div>

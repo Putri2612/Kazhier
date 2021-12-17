@@ -6,22 +6,24 @@
 @endphp
 <div class="navbar-bg"></div>
 <nav class="navbar navbar-expand-lg main-navbar">
-    <form class="form-inline mr-auto search-element" method="post">
+    <form class="form-inline me-auto search-element" method="post">
         <div class="easy-autocomplete"><input type="hidden" name="_token" value="ifSnVqGphjkOu1aqYvyflvadZqTOLssR8oVLlL9q" id="eac-5343" style="" autocomplete="off">
             <div class="easy-autocomplete-container" id="eac-container-eac-5343">
                 <ul></ul>
             </div>
         </div>
-        <ul class="navbar-nav mr-3">
+        <ul class="navbar-nav me-3">
             <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
-            <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
         </ul>
     </form>
 
-    <ul class="navbar-nav navbar-right">
+    <ul class="navbar-nav navbar-end">
         @can('manage language')
-            <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg language-dd"><i class="fas fa-language"></i></a>
-                <div class="dropdown-menu dropdown-list dropdown-menu-right">
+            <li class="dropdown dropdown-list-toggle">
+                <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg language-dd">
+                    <i class="fas fa-language"></i>
+                </a>
+                <div class="dropdown-menu dropdown-list dropdown-menu-end">
                     <div class="dropdown-header">{{__('Choose Language')}}
                     </div>
                     @can('create language')
@@ -49,11 +51,12 @@
                 </div>
             </li>
         @endcan
-        <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                <img alt="image" src="{{(!empty($users->avatar)? $profile.'/'.$users->avatar : $profile.'/avatar.png').'?'.rand()}}" class="rounded-circle mr-1">
+        <li class="dropdown">
+            <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                <img alt="image" src="{{(!empty($users->avatar)? $profile.'/'.$users->avatar : $profile.'/avatar.png').'?'.rand()}}" class="rounded-circle me-1">
                 <div class="d-sm-none d-lg-inline-block">{{__('Hi')}}, {{\Auth::user()->name}}</div>
             </a>
-            <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-menu dropdown-menu-end">
                 <div class="dropdown-title">{{__('Welcome!')}}</div>
                 @if(\Auth::guard('customer')->check())
                     <a href="{{route('customer.profile')}}" class="dropdown-item has-icon">

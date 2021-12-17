@@ -19,12 +19,12 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Proposal')}}</h4>
-                        <div class="col-6 text-right row">
+                        <h4 class="col-6 fw-normal">{{__('Manage Proposal')}}</h4>
+                        <div class="col-6 text-end row">
                             <div class="col-lg-8"></div>
                             <div class="dropdown col-lg-2">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-right Filter-dropdown w-64">
+                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     @if(!\Auth::guard('customer')->check())
                                         {{ Form::open(array('route' => array('proposal.index'),'method' => 'GET')) }}
                                     @else
@@ -44,7 +44,7 @@
                                         {{ Form::label('status', __('Status')) }}
                                         {{ Form::select('status', [''=>'All']+$status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-end">
                                         <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
                                         @if(!\Auth::guard('customer')->check())
                                             <a href="{{route('proposal.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
@@ -83,7 +83,7 @@
                                                         <th> {{__('Issue Date')}}</th>
                                                         <th> {{__('Status')}}</th>
                                                         @if(Gate::check('edit proposal') || Gate::check('delete proposal') || Gate::check('show proposal'))
-                                                            <th class="text-right"> {{__('Action')}}</th>
+                                                            <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
                                                     </tr>
                                                     </thead>
@@ -119,16 +119,16 @@
                                                                 @endif
                                                             </td>
                                                             @if(Gate::check('edit proposal') || Gate::check('delete proposal') || Gate::check('show proposal'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('convert invoice')
-                                                                        <a href="#" class="btn btn-warning btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Convert to Invoice')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm convert to invoice. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('proposal-form-{{$proposal->id}}').submit();">
+                                                                        <a href="#" class="btn btn-warning btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Convert to Invoice')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm convert to invoice. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('proposal-form-{{$proposal->id}}').submit();">
                                                                             <i class="fas fa-exchange-alt"></i>
                                                                             {!! Form::open(['method' => 'get', 'route' => ['proposal.convert', $proposal->id],'id'=>'proposal-form-'.$proposal->id]) !!}
                                                                             {!! Form::close() !!}
                                                                         </a>
                                                                     @endcan
                                                                     @can('duplicate proposal')
-                                                                        <a href="#" class="btn btn-success btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm duplicate this invoice. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$proposal->id}}').submit();">
+                                                                        <a href="#" class="btn btn-success btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm duplicate this invoice. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$proposal->id}}').submit();">
                                                                             <i class="fas fa-copy"></i>
                                                                             {!! Form::open(['method' => 'get', 'route' => ['proposal.duplicate', $proposal->id],'id'=>'duplicate-form-'.$proposal->id]) !!}
                                                                             {!! Form::close() !!}
@@ -136,27 +136,25 @@
                                                                     @endcan
                                                                     @can('show proposal')
                                                                         @if(\Auth::guard('customer')->check())
-                                                                            <a href="{{ route('customer.proposal.show',$proposal->id) }}" class="btn btn-info btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('customer.proposal.show',$proposal->id) }}" class="btn btn-info btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @else
-                                                                            <a href="{{ route('proposal.show',$proposal->id) }}" class="btn btn-info btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('proposal.show',$proposal->id) }}" class="btn btn-info btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @endif
                                                                     @endcan
                                                                     @can('edit proposal')
-                                                                        <a href="{{ route('proposal.edit',$proposal->id) }}" class="btn btn-primary btn-action mr-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="{{ route('proposal.edit',$proposal->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
 
                                                                     @can('delete proposal')
-                                                                        <a href="#!" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$proposal->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('proposal.destroy', $proposal->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['proposal.destroy', $proposal->id],'id'=>'delete-form-'.$proposal->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
                                                             @endif

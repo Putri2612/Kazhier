@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="login-brand">
-                        <img class="img-fluid logo-img" src="{{asset('storage/logo/logo.png')}} " alt="">
+                        <img class="img-fluid logo-img" style="width:140px" src="{{asset('storage/logo/logo.png')}} " alt="">
                     </div>
                     <div class="card card-primary">
                         <div class="card-header">
@@ -21,7 +21,7 @@
                                 {{ __('Don\'t worry, it will only take less than 2 minutes.') }} <br/>
                                 {{ __('You can change the settings on "constant" menu afterward.') }}
                             </p>
-                            <div class="text-right">
+                            <div class="text-end">
                                 <a href="{{route('post-register.revenue')}}" class="btn btn-primary">{{ __('Let\'s get started!') }}</a>
                             </div>
                         </div>

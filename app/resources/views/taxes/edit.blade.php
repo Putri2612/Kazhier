@@ -18,7 +18,7 @@
     </span>
         @enderror
     </div>
-    <div class="col-md-12 text-right">
+    <div class="col-md-12 text-end">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
         {{Form::submit(__('Update'),array('class'=>'btn btn-primary'))}}
     </div>

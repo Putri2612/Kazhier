@@ -15,7 +15,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="font-weight-normal">{{__('Manage Custom Field')}}</h4>
+                        <h4 class="fw-normal">{{__('Manage Custom Field')}}</h4>
                         @can('create constant custom field')
                             <a href="#" data-url="{{ route('custom-field.create') }}" data-ajax-popup="true" data-title="{{__('Create New Custom Field')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                 <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
@@ -36,7 +36,7 @@
                                                         <th> {{__('Custom Field')}}</th>
                                                         <th> {{__('Type')}}</th>
                                                         <th> {{__('Module')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
@@ -47,18 +47,16 @@
                                                             <td>{{ $field->type}}</td>
                                                             <td>{{ $field->module}}</td>
                                                             @if(Gate::check('edit constant custom field') || Gate::check('delete constant custom field'))
-                                                                <td class="action text-right">
+                                                                <td class="action text-end">
                                                                     @can('edit constant custom field')
-                                                                        <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('custom-field.edit',$field->id) }}" data-ajax-popup="true" data-title="{{__('Edit Custom Field')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('custom-field.edit',$field->id) }}" data-ajax-popup="true" data-title="{{__('Edit Custom Field')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete constant custom field')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$field->id}}').submit();">
+                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('custom-field.destroy', $field->id) }}">
                                                                             <i class="fas fa-trash"></i>
                                                                         </a>
-                                                                        {!! Form::open(['method' => 'DELETE', 'route' => ['custom-field.destroy', $field->id],'id'=>'delete-form-'.$field->id]) !!}
-                                                                        {!! Form::close() !!}
                                                                     @endcan
                                                                 </td>
 

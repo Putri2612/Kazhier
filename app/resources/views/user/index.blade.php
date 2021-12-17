@@ -17,8 +17,8 @@
         <div class="row">
             <div class="col-12">
                 <div class="row crd mb-3">
-                    <h4 class="col-6 font-weight-normal">{{__('Manage User')}}</h4>
-                    <div class="col-6 text-right">
+                    <h4 class="col-6 fw-normal">{{__('Manage User')}}</h4>
+                    <div class="col-6 text-end">
                         @can('create user')
                         @if (\Auth::user()->type == 'super admin')
                             <a href="#" data-url="{{ route('users.create') }}" data-ajax-popup="true" data-title="{{__('Create New User')}}" class="btn btn-icon icon-left btn-primary btn-round">
@@ -55,7 +55,7 @@
                                             <div class="more-action">
                                                 @if($user->is_active==1)
                                                     <div class="dropdown">
-                                                        @if($user->is_active!=1) <i class="fas fa-lock mr-1"></i>@endif
+                                                        @if($user->is_active!=1) <i class="fas fa-lock me-1"></i>@endif
                                                         <a href="" class="btn dropdown-toggle" data-toggle="dropdown">
                                                             <svg width="18" height="4" viewBox="0 0 18 4" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                                 <path
@@ -101,7 +101,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-6 col-md-6">
-                                                        <div class="text-right mb-3">
+                                                        <div class="text-end mb-3">
                                                             <a href="#" class="btn btn-primary" data-url="{{ route('plan.upgrade',$user->id) }}" data-ajax-popup="true" data-title="{{__('Upgrade Plan')}}">{{__('Upgrade Plan')}}</a>
                                                         </div>
                                                     </div>

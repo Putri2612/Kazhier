@@ -15,9 +15,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 font-weight-normal">{{__('Manage Tax Rate')}}</h4>
+                        <h4 class="col-6 fw-normal">{{__('Manage Tax Rate')}}</h4>
                         @can('create constant tax')
-                            <div class="col-6 text-right">
+                            <div class="col-6 text-end">
                                 <a href="#" data-url="{{ route('taxes.create') }}" data-ajax-popup="true" data-title="{{__('Create Tax Rate')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -37,7 +37,7 @@
                                                     <tr>
                                                         <th> {{__('Tax Name')}}</th>
                                                         <th> {{__('Rate %')}}</th>
-                                                        <th class="text-right"> {{__('Action')}}</th>
+                                                        <th class="text-end"> {{__('Action')}}</th>
                                                     </tr>
                                                     </thead>
 
@@ -46,18 +46,16 @@
                                                         <tr class="font-style">
                                                             <td>{{ $tax->name }}</td>
                                                             <td>{{ $tax->rate }}</td>
-                                                            <td class="action text-right">
+                                                            <td class="action text-end">
                                                                 @can('edit constant tax')
-                                                                    <a href="#!" class="btn btn-primary btn-action mr-1" data-url="{{ route('taxes.edit',$tax->id) }}" data-ajax-popup="true" data-title="{{__('Edit Tax Rate')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('taxes.edit',$tax->id) }}" data-ajax-popup="true" data-title="{{__('Edit Tax Rate')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete constant tax')
-                                                                    <a href="#" class="btn btn-danger btn-action " data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$tax->id}}').submit();">
+                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('taxes.destroy', $tax->id) }}">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
-                                                                    {!! Form::open(['method' => 'DELETE', 'route' => ['taxes.destroy', $tax->id],'id'=>'delete-form-'.$tax->id]) !!}
-                                                                    {!! Form::close() !!}
                                                                 @endcan
                                                             </td>
                                                         </tr>

@@ -49,32 +49,32 @@
                     <div class="card-header">
 
                         <div class="col-3">
-                            <div class="text-small float-right font-weight-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalUnpaidInvoice']}}</div>
-                            <div class="font-weight-bold mb-1">{{__('Unpaid')}}</div>
+                            <div class="text-small float-right fw-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalUnpaidInvoice']}}</div>
+                            <div class="fw-bold mb-1">{{__('Unpaid')}}</div>
                             <div class="progress height3" data-height="3">
                                 <div class="progress-bar" role="progressbar" data-width="{{$invoiceChartData['progressData']['unpaidPr']}}%" aria-valuenow="{{$invoiceChartData['progressData']['unpaidPr']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$invoiceChartData['progressData']['unpaidPr']}}%; background-color: {{$invoiceChartData['progressData']['unpaidColor']}}"></div>
                             </div>
                             {{($invoiceChartData['progressData']['unpaidPr'].'%')}}
                         </div>
                         <div class="col-3">
-                            <div class="text-small float-right font-weight-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalPaidInvoice']}}</div>
-                            <div class="font-weight-bold mb-1">{{__('Paid')}}</div>
+                            <div class="text-small float-right fw-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalPaidInvoice']}}</div>
+                            <div class="fw-bold mb-1">{{__('Paid')}}</div>
                             <div class="progress height3" data-height="3">
                                 <div class="progress-bar" role="progressbar" data-width="{{$invoiceChartData['progressData']['paidPr']}}%" aria-valuenow="{{$invoiceChartData['progressData']['paidPr']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$invoiceChartData['progressData']['paidPr']}}%;background-color: {{$invoiceChartData['progressData']['paidColor']}}"></div>
                             </div>
                             {{($invoiceChartData['progressData']['paidPr'].'%')}}
                         </div>
                         <div class="col-3">
-                            <div class="text-small float-right font-weight-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalPartialInvoice']}}</div>
-                            <div class="font-weight-bold mb-1">{{__('Partial Paid')}}</div>
+                            <div class="text-small float-right fw-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalPartialInvoice']}}</div>
+                            <div class="fw-bold mb-1">{{__('Partial Paid')}}</div>
                             <div class="progress height3" data-height="3">
                                 <div class="progress-bar" role="progressbar" data-width="{{$invoiceChartData['progressData']['partialPr']}}%" aria-valuenow="{{$invoiceChartData['progressData']['partialPr']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$invoiceChartData['progressData']['partialPr']}}%;background-color: {{$invoiceChartData['progressData']['partialColor']}}"></div>
                             </div>
                             {{($invoiceChartData['progressData']['partialPr'].'%')}}
                         </div>
                         <div class="col-3">
-                            <div class="text-small float-right font-weight-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalDueInvoice']}}</div>
-                            <div class="font-weight-bold mb-1">{{__('Due')}}</div>
+                            <div class="text-small float-right fw-bold text-muted">{{$invoiceChartData['progressData']['totalInvoice'] .'/'.$invoiceChartData['progressData']['totalDueInvoice']}}</div>
+                            <div class="fw-bold mb-1">{{__('Due')}}</div>
                             <div class="progress height3" data-height="3">
                                 <div class="progress-bar" role="progressbar" data-width="{{$invoiceChartData['progressData']['duePr']}}%" aria-valuenow="{{$invoiceChartData['progressData']['duePr']}}" aria-valuemin="0" aria-valuemax="100" style="width: {{$invoiceChartData['progressData']['duePr']}}%;background-color: {{$invoiceChartData['progressData']['dueColor']}}"></div>
                             </div>

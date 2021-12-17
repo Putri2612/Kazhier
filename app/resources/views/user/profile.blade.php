@@ -58,14 +58,14 @@
                                 <div class="setting-tab">
                                     <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link active" id="home-tab3" data-toggle="tab" href="#personal_info" role="tab" aria-controls="" aria-selected="true">{{__('Personal Info')}}</a>
+                                            <a class="nav-link active" id="home-tab3" data-bs-toggle="tab" href="#personal_info" data-bs-target="#personal_info" role="tab" aria-controls="" aria-selected="true">{{__('Personal Info')}}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
+                                            <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" href="#change_password" data-bs-target="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
                                         </li>
                                         @if ($referral_token != null)
                                             <li class="nav-item">
-                                                <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#referral_code" role="tab" aria-controls="" aria-selected="false">{{__('Referral Code')}}</a>
+                                                <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" href="#referral_code" data-bs-target="#referral_code" role="tab" aria-controls="" aria-selected="false">{{__('Referral Code')}}</a>
                                             </li>
                                         @endif
                                     </ul>
@@ -117,7 +117,7 @@
                                                         </div>
                                                     </div>
                                                 @endif
-                                                <div class="col-lg-12 text-right">
+                                                <div class="col-lg-12 text-end">
                                                     <a href="{{ route('dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                     @can('edit account')
                                                         {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
@@ -159,7 +159,7 @@
                                                         </span>
                                                         @enderror
                                                     </div>
-                                                    <div class="col-lg-12 text-right">
+                                                    <div class="col-lg-12 text-end">
                                                         <a href="{{ route('dashboard') }}" class="btn btn-secondary">{{__('Cancel')}}</a>
                                                         {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                                     </div>
@@ -174,9 +174,9 @@
                                                         <div class="col-12 pb-5">
                                                             <div class="row">
                                                                 <div class="col-6">
-                                                                    <div class="lead">{{ __('Referral Points') }}: <span class="text-primary">{{ $referral_point }}</span></div>
+                                                                    <div class="lead">{{ __('Balance') }}: <span class="text-primary">{{ Auth::user()->priceFormat($referral_point) }}</span></div>
                                                                 </div>
-                                                                <div class="col-6 text-right">
+                                                                <div class="col-6 text-end">
                                                                     <a href="#" data-url="{{ route('referral.redeem') }}" data-ajax-popup="true" data-title="{{__('Redeem Referral Points')}}" class="btn btn-primary">
                                                                         {{ __('Redeem') }}
                                                                     </a>

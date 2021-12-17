@@ -506,7 +506,7 @@
                             <div data-v-4b3dcb8a="" class="d-inner" style="border-top: 15px solid {{$color}};">
                                 <div data-v-4b3dcb8a="" class="row">
                                     <div data-v-4b3dcb8a="" class="col-2"><h1 data-v-4b3dcb8a="" class="fancy-title mb5">{{__('PROPOSAL')}}</h1></div>
-                                    <div data-v-4b3dcb8a="" class="col-2 text-right">
+                                    <div data-v-4b3dcb8a="" class="col-2 text-end">
                                         <img data-v-4b3dcb8a="" src="{{$img}}" class="d-logo" style="max-width: 250px"></div>
                                 </div>
                                 <div data-v-4b3dcb8a="" class="break-50"></div>
@@ -554,15 +554,15 @@
                                             <tbody data-v-4b3dcb8a="">
                                             <tr data-v-363339a0="">
                                                 <td data-v-363339a0="" class="tu fwb" style="color: {{$color}};">{{__('Number')}}:</td>
-                                                <td data-v-363339a0="" class="text-right">{{\App\Models\Utility::proposalNumberFormat($settings,$proposal->proposal_id)}}</td>
+                                                <td data-v-363339a0="" class="text-end">{{\App\Models\Utility::proposalNumberFormat($settings,$proposal->proposal_id)}}</td>
                                             </tr>
                                             <tr data-v-363339a0="">
                                                 <td data-v-363339a0="" class="tu fwb" style="color: {{$color}};">{{__('Issue Date')}}:</td>
-                                                <td data-v-363339a0="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$proposal->issue_date)}}</td>
+                                                <td data-v-363339a0="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$proposal->issue_date)}}</td>
                                             </tr>
                                             <tr data-v-363339a0="">
                                                 <td data-v-363339a0="" class="tu fwb" style="color: {{$color}};">{{__('Due Date')}}:</td>
-                                                <td data-v-363339a0="" class="text-right">{{\App\Models\Utility::dateFormat($settings,$proposal->due_date)}}</td>
+                                                <td data-v-363339a0="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$proposal->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -581,7 +581,7 @@
                                                 <div class="d-table-th w-3"></div>
                                             @endif
                                             <div class="d-table-th w-3">{{__('Price')}}</div>
-                                            <div class="d-table-th w-4 text-right">{{__('Totals')}} </div>
+                                            <div class="d-table-th w-4 text-end">{{__('Totals')}} </div>
                                         </div>
                                         <div data-v-4b3dcb8a="" class="d-table-body">
                                             @if(isset($proposal->items) && count($proposal->items) > 0)
@@ -608,7 +608,7 @@
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                         </div>
-                                                        <div class="d-table-td w-4 text-right"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
+                                                        <div class="d-table-td w-4 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
                                                     </div>
                                                 @endforeach
                                             @else
@@ -623,7 +623,7 @@
                                                     <div class="d-table-td w-5">
                                                         <pre data-v-f2a183a6="">-</pre>
                                                     </div>
-                                                    <div class="d-table-td w-4 text-right"><span>-</span></div>
+                                                    <div class="d-table-td w-4 text-end"><span>-</span></div>
                                                 </div>
                                             @endif
                                         </div>

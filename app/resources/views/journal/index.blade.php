@@ -33,7 +33,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3">
-                        <h4 class="col-md-6 font-weight-normal">{{__('Journal Report')}}</h4>
+                        <h4 class="col-md-6 fw-normal">{{__('Journal Report')}}</h4>
                         <div class="col-md-6 row">
                             <div class="form-group col-md-6">
                                 {{ Form::select('month', $months, (isset($_GET['month']) ? $_GET['month'] : date('m')), array('id' => 'change-month', 'class' => 'form-control font-style selectric'))}}
@@ -115,7 +115,7 @@
                                                                         {{ '( '.__('transfer').' )'}}
                                                                         @endif
                                                                         </td>
-                                                                        <td class="text-right">{{Auth::user()->priceFormat($data->amount)}}</td>
+                                                                        <td class="text-end">{{Auth::user()->priceFormat($data->amount)}}</td>
                                                                         <td></td>
                                                                     </tr>
                                                                     <tr class="font-style">
@@ -146,7 +146,7 @@
                                                                         @endif
                                                                         </td>
                                                                         <td></td>
-                                                                        <td class="text-right">{{Auth::user()->priceFormat($data->amount)}} </td>
+                                                                        <td class="text-end">{{Auth::user()->priceFormat($data->amount)}} </td>
                                                                     </tr>
                                                                 @php
                                                                     $total = $total + $data->amount;
@@ -158,9 +158,9 @@
                                                     @if(!empty($journal_data))
                                                     <tfoot>
                                                         <tr>
-                                                            <th class="text-right" colspan="4">{{__('Total')}}</th>
-                                                            <th class="text-right">{{Auth::user()->priceFormat($total)}}</th>
-                                                            <th class="text-right">{{Auth::user()->priceFormat($total)}}</th>
+                                                            <th class="text-end" colspan="4">{{__('Total')}}</th>
+                                                            <th class="text-end">{{Auth::user()->priceFormat($total)}}</th>
+                                                            <th class="text-end">{{Auth::user()->priceFormat($total)}}</th>
                                                         </tr>
                                                     </tfoot>
                                                     @endif
