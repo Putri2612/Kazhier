@@ -7,6 +7,147 @@
 
 "use strict";
 
+// Data Tables
+
+const DataTable = (element) => {
+    const lastIndex = element.querySelectorAll('thead th').length - 1,
+        lastColumnOption = {select: lastIndex, sortable: false}
+    
+        console.log(lastColumnOption);
+    return new simpleDatatables.DataTable(element, {
+        columns: [
+            lastColumnOption
+        ]
+    });
+}
+
+// Modals
+
+const InitModal     = (content) => {
+    let dialog = document.createElement('div');
+    dialog.className = 'modal fade';
+    dialog.setAttribute('tabindex', '-1');
+    dialog.innerHTML = `<div class="modal-dialog modal-dialog-centered">${content}</div>`;
+    return dialog;
+};
+
+const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}) => {
+    fetch(`${url}?${data}`, {method: 'get'})
+    .then(response => {
+        if( response.ok ) return response.text();
+        else throw new Error( `${response.status}: ${response.statusText}` );
+    }) .then (data => {
+        let dialog = InitModal(data);
+        document.body.append(dialog);
+        dialog.querySelector('.dialog-yes').addEventListener('click', () => {
+            callbacks.yes();
+            $(dialog).modal('hide');
+            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+            
+        });
+        dialog.querySelector('.dialog-no').addEventListener('click', () => {
+            callbacks.no();
+            $(dialog).modal('hide');
+            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+        });
+        $(dialog).modal('show');
+    }) .catch ( error => {
+        toastrs('Error', error, 'error');
+        console.error(error);
+    });
+}
+
+const EmptyInputModal = (items) => {
+    let parameters = [];
+    items.forEach(item => {
+        parameters.push(`item[]=${item}`);
+    });
+    parameters = parameters.join('&');
+
+    parameters = `${parameters}&title=Empty Inputs`;
+    let url         = window.location.href,
+        pos         = url.indexOf('/app/'),
+        destination = url.substring(0, pos + 5) + 'dialog-empty-input';
+    
+    CreateModal(destination, parameters, {
+        yes: () => form.submit(), 
+        no: () => false
+    });
+}
+
+const ConfirmDeleteModal = (target) => {
+    let parameter = `url=${target}`,
+        url         = window.location.href,
+        pos         = url.indexOf('/app/'),
+        destination = url.substring(0, pos + 5) + 'dialog-confirm-delete';
+    
+    CreateModal(destination, parameter, {
+        yes : () => document.querySelector('#confirm-delete-modal').submit(),
+        no  : () => false
+    });
+}
+
+const ConfirmStatusModal = (target, status) => {
+    let parameter = `url=${target}&status=${status}`,
+        url         = window.location.href,
+        pos         = url.indexOf('/app/'),
+        destination = url.substring(0, pos + 5) + 'dialog-status-update';
+    
+    CreateModal(destination, parameter, {
+        yes : () => document.querySelector('#confirm-status-modal').submit(),
+        no  : () => false
+    });
+}
+
+
+// Modal Navigation
+
+const openNext  = (prevSelector, nextSelector) => {
+    const prev  = document.querySelector(prevSelector),
+        next    = document.querySelector(nextSelector);
+    
+    $(prev).fadeOut(500);
+    $(next).delay(500).fadeIn(500);
+}
+
+const CanNavigate = () => {
+    document.addEventListener('click', event => {
+        const target = event.target;
+        if(target.hasAttribute('can-navigate') && (!target.disabled && !target.classList.contains('disabled'))){
+            openNext(target.getAttribute('data-navigate-from'), target.getAttribute('data-navigate-to'));
+        }
+    });
+}
+
+
+// Forms
+
+const CheckEmptyInputs = form => {
+    const inputs    = form.querySelectorAll('input, select, textarea');
+    let emptyInputs = [];
+    inputs.forEach(input => { 
+        if((!input.value || input.value == "") && input.hasAttribute('data-is-required') && input.getAttribute('type') != 'hidden') {
+            emptyInputs.push(input.name);
+        }
+    });
+    return {result: Boolean(emptyInputs.length), items: emptyInputs};
+}
+
+const ValidateForm = (event) => {
+    event.preventDefault();
+    const form = event.target;
+    if(!ValidateCurrencyInput(form)) return false;
+    let isEmpty = CheckEmptyInputs(form);
+    
+    if(isEmpty.result){
+        EmptyInputModal(isEmpty.items);
+    } else {
+        return form.submit();
+    }
+}
+
+// Inputs
+
 const ReadableToProcessable = input => input.replace(/\./g, '').replace(/,/g, '.');
 const ProcessableToReadable = input => input.toFixed(2).toString().replace(/\./g, ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
@@ -84,78 +225,6 @@ const ValidateCurrencyInput = (form) => {
     return true;
 }
 
-const CheckEmptyInputs = form => {
-    const inputs    = form.querySelectorAll('input, select, textarea');
-    let emptyInputs = [];
-    inputs.forEach(input => { 
-        if((!input.value || input.value == "") && input.hasAttribute('data-is-required') && input.getAttribute('type') != 'hidden') {
-            emptyInputs.push(input.name);
-        }
-    });
-    return {result: Boolean(emptyInputs.length), items: emptyInputs};
-}
-
-const InitModal     = (content) => {
-    let dialog = document.createElement('div');
-    dialog.className = 'modal fade';
-    dialog.setAttribute('tabindex', '-1');
-    dialog.innerHTML = `<div class="modal-dialog modal-dialog-centered">${content}</div>`;
-    return dialog;
-};
-
-const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}) => {
-    fetch(`${url}?${data}`, {method: 'get'})
-    .then(response => {
-        if( response.ok ) return response.text();
-        else throw new Error( `${response.status}: ${response.statusText}` );
-    }) .then (data => {
-        let dialog = InitModal(data);
-        document.body.append(dialog);
-        dialog.querySelector('.dialog-yes').addEventListener('click', () => {
-            callbacks.yes();
-            $(dialog).modal('hide');
-            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
-            
-        });
-        dialog.querySelector('.dialog-no').addEventListener('click', () => {
-            callbacks.no();
-            $(dialog).modal('hide');
-            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
-        });
-        $(dialog).modal('show');
-    }) .catch ( error => {
-        toastrs('Error', error, 'error');
-        console.error(error);
-    });
-}
-
-const ValidateForm = (event) => {
-    event.preventDefault();
-    const form = event.target;
-    if(!ValidateCurrencyInput(form)) return false;
-    let isEmpty = CheckEmptyInputs(form);
-    
-    if(isEmpty.result){
-        let parameters = [];
-        isEmpty.items.forEach(item => {
-            parameters.push(`item[]=${item}`);
-        });
-        parameters = parameters.join('&');
-
-        parameters = `${parameters}&title=Empty Inputs`;
-        let url         = window.location.href,
-            pos         = url.indexOf('/app/'),
-            destination = url.substring(0, pos + 5) + 'dialog-empty-input';
-        
-        CreateModal(destination, parameters, {
-            yes: () => form.submit(), 
-            no: () => false
-        });
-    } else {
-        return form.submit();
-    }
-}
-
 const WatchChange = (input, testOtherInput = false) => {
     if(
         (!input.value || input.value == '' || (input.nodeName == 'SELECT' && input.value == '0')) 
@@ -197,8 +266,6 @@ const CopyFromInput = (InputSelector, ButtonSelector) => {
     const input = document.querySelector(InputSelector),
         btn     = document.querySelector(ButtonSelector);
 
-    $(btn).tooltip();
-
     btn.addEventListener('click', event => {
         input.select();
         input.setSelectionRange(0, 99999);
@@ -208,23 +275,9 @@ const CopyFromInput = (InputSelector, ButtonSelector) => {
         toastrs('Copied', 'code copied', 'success');
     });
 }
-   
-const openNext  = (prevSelector, nextSelector) => {
-    const prev  = document.querySelector(prevSelector),
-        next    = document.querySelector(nextSelector);
-    
-    $(prev).fadeOut(500);
-    $(next).delay(500).fadeIn(500);
-}
 
-const CanNavigate = () => {
-    document.addEventListener('click', event => {
-        const target = event.target;
-        if(target.hasAttribute('can-navigate') && (!target.disabled && !target.classList.contains('disabled'))){
-            openNext(target.getAttribute('data-navigate-from'), target.getAttribute('data-navigate-to'));
-        }
-    });
-}
+
+// Data logging
 
 window.onerror = (msg, url, lineNo, columnNo, error) => {
     let data = `Message: ${msg} \n ${url} (${lineNo}:${columnNo}) \n ${error ? error.stack : ''}`;
@@ -241,18 +294,6 @@ window.onerror = (msg, url, lineNo, columnNo, error) => {
     }).then( response => {
         if( response.ok ) return;
         else console.error('Error cannot be uploaded');
-    });
-}
-
-const DataTable = (element) => {
-    const lastIndex = element.querySelectorAll('thead th').length - 1,
-        lastColumnOption = {select: lastIndex, sortable: false}
-    
-        console.log(lastColumnOption);
-    return new simpleDatatables.DataTable(element, {
-        columns: [
-            lastColumnOption
-        ]
     });
 }
 
@@ -278,6 +319,7 @@ const logoutUser = () => {
 }
 
 const userActivity = () => {
+    checkActivity();
     userActivities.interval = setInterval(checkActivity, 60000);
 }
 
@@ -368,6 +410,24 @@ const sendActivity = () => {
         }
     }).catch(error => console.error(error));
 }
+
+
+// Document event listener
+document.addEventListener('click', event => {
+    const target = event.target;
+    if(target.hasAttribute('data-is-delete')) {
+        const url = target.getAttribute('data-delete-url');
+        ConfirmDeleteModal(url);
+    }
+    if(target.hasAttribute('data-status-update')) {
+        const url   = target.getAttribute('data-status-url'),
+            status  = target.getAttribute('data-status-update');
+            console.log(url, status);
+        ConfirmStatusModal(url, status);
+    }
+});
+
+// Template default programs below (a bit modified tho)
 
 $(function () {
     $(".custom-scroll").niceScroll();

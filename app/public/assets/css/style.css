@@ -82,6 +82,9 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fab,
 a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fa {
     margin-left: 4px; }
 
+a{ text-decoration: none; }
+a:not(.nav-link):hover{ text-decoration: underline; }
+
 .bg-primary {
     background-color: #0087f8 !important; }
 
@@ -133,7 +136,7 @@ a:not(.btn-social-icon):not(.btn-social):not(.page-link):not(.card) .fa {
 .text-dark, .text-dark-all *, .text-dark-all *:before, .text-dark-all *:after {
     color: #191d21 !important; }
 
-.font-weight-normal {
+.fw-normal {
     font-weight: 500 !important; }
 
 .lead {
@@ -919,6 +922,19 @@ select.form-control:not([size]):not([multiple]) {
     .card.card-hero .card-header {
         padding: 25px; } }
 /* 3.6 Table */
+.table {
+    border-bottom: unset;
+}
+.table>:not(:first-child){
+    border-top: unset;
+}
+.table>:not(caption)>*>*{
+    border-bottom: unset;
+}
+
+.table thead tr {
+    box-shadow: 0 29px 39px #dedede5f;
+}
 .table td, .table:not(.table-bordered) th {
     border-top: none; }
 .table:not(.table-sm):not(.table-md):not(.dataTable) td, .table:not(.table-sm):not(.table-md):not(.dataTable) th {
@@ -1038,6 +1054,7 @@ table tr:hover .table-links {
     padding-left: 15px !important;
     padding-right: 15px !important; }
 .nav-pills .nav-item .nav-link:hover {
+    text-decoration: none;
     background-color: #f6f7fe; }
 .nav-pills .nav-item .nav-link.active {
     box-shadow: 0 2px 6px #acb5f6;
@@ -1515,7 +1532,9 @@ h6 .badge {
     right: 5px;
     position: absolute;
     z-index: 890;
-    background-color: transparent; }
+    background-color: transparent; 
+    padding: 0.5rem 1rem;
+}
 .navbar.active {
     background-color: #0087f8;
     box-shadow: rgba(103, 119, 239, 0.2) rgba(0, 0, 0, 0.03); }
@@ -2018,7 +2037,7 @@ a.bb {
     color: #666;
     text-align: center; }
 
-.font-weight-600 {
+.fw-600 {
     font-weight: 600 !important; }
 
 .budget-price {
