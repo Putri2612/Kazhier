@@ -16,6 +16,7 @@ use App\Models\ProductServiceUnit;
 use App\Models\Projects;
 use App\Models\Revenue;
 use App\Models\Tax;
+use Illuminate\Support\Facades\Auth;
 
 class
 DashboardController extends Controller
@@ -37,7 +38,6 @@ DashboardController extends Controller
      */
     public function index()
     {
-
         if(\Auth::user()->type == 'super admin')
         {
             $user                       = \Auth::user();

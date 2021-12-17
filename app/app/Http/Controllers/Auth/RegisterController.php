@@ -10,6 +10,7 @@ use App\Models\Tax;
 use App\Models\ProductServiceUnit;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -89,10 +90,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        if(Cookie::has('REFERRAL_CODE')){
-            $code = Cookie::get('REFERRAL_CODE');
+        if($data['referral']){
+            $code = $data['referral'];
             $user = User::where('referral_token', '=', $code)->first();
-            Cookie::queue(Cookie::forget('REFERRAL_CODE'));
             if($user){
                 $ref_id = $user->id;
             } else {
@@ -121,17 +121,16 @@ class RegisterController extends Controller
 
     public function showRegistrationForm($lang = 'id', Request $request)
     {
-        \App::setLocale($lang);
+        App::setLocale($lang);
 
         if($request->has('ref')){
-            if($request->cookies->has('REFERRAL_CODE')){
-                Cookie::queue(Cookie::forget('REFERRAL_CODE'));
-            }
-            Cookie::queue(Cookie::forever('REFERRAL_CODE', $request->input('ref')));
+            $referral = $request->input('ref');
+        } else {
+            $referral = null;
         }
 
         
 
-        return view('auth.register', compact('lang'));
+        return view('auth.register', compact('lang', 'referral'));
     }
 }

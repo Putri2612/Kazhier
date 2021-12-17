@@ -617,28 +617,6 @@ class UserController extends Controller
             $active_time    = floor($request->input('active_time'));
             $updateItem     = ['active_time' => $active_time, 'last_active' => $last_active];
 
-            $user = DB::table('users')->find($userID);
-
-            if($active_time > 15 && $user->referred_by != null && !$user->referral_redeemed){
-                $point = ReferralPoint::where('created_by', '=', $user->referred_by)->first();
-
-                if($point) { $point->Add(25); }
-                else {
-                    $point              = new ReferralPoint();
-                    $point->point       = 25;
-                    $point->created_by  = $user->referred_by;
-                    $point->save();
-                }
-
-                $history = new ReferralPointHistory();
-                $history->description   = "A user used your referral code";
-                $history->amount        = 25;
-                $history->ref_id        = $point->id;
-                $history->created_by    = $user->referred_by;
-                $history->save();
-                $updateItem['referral_redeemed'] = 1;
-            }
-
             $update = DB::table('users')->where('id', '=', $userID)->update($updateItem);
 
             if($update) {

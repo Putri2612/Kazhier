@@ -6,12 +6,17 @@ use App\Models\Order;
 use App\Models\Plan;
 use App\Models\ReferralPoint;
 use App\Models\ReferralPointHistory;
+use App\Models\ReferralWithdrawRequest;
+use App\Models\User;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 
 class ReferralController extends Controller
 {
+    use CanProcessNumber;
+
     public function index() {
 
     }
@@ -20,10 +25,9 @@ class ReferralController extends Controller
         if(Auth::user()->type == 'company'){
             $point  = ReferralPoint::where('created_by', '=', Auth::user()->id)->first()->point;
             $price  = Plan::find(Auth::user()->plan)->price;
-            $plans  = Plan::where('price', '>', $price)->get();
-            $expensive  = Plan::get()->sortByDesc('price')->first()->name;
+            $plans  = Plan::get();
 
-            return view('referral.redeem', compact('point', 'plans', 'expensive'));
+            return view('referral.redeem', compact('point', 'plans'));
         } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
@@ -33,10 +37,9 @@ class ReferralController extends Controller
         if(Auth::user()->type == 'company'){
             $planID = Crypt::decrypt($code);
             $plan   = Plan::find($planID);
-            $orderID= Crypt::encrypt('KZ'.bin2hex(random_bytes(8)));
             $point  = ReferralPoint::where('created_by', '=', Auth::user()->id)->first()->point;    
             
-            return view('referral.checkout.plan', compact('plan', 'orderID', 'point'));
+            return view('referral.checkout.plan', compact('plan', 'point'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
@@ -44,30 +47,32 @@ class ReferralController extends Controller
 
     public function CheckoutPlan($code, Request $request){
         if(Auth::user()->type == 'company'){
-            $user       = Auth::user();
-            $orderID    = Crypt::decrypt($code);
+            $user       = User::find(Auth::user()->id);
+            $duration   = $request->input('durations');
+            $now        = now();
+            $date       = $now->format('Ymd');
+            $time       = $now->format('His');
+            $orderID    = "/INV/{$date}/RFR/{$time}{$user->id}";
             $plan       = Plan::find(Crypt::decrypt($request->input('plan')));
 
             if(!$plan) {
                 return redirect()->back()->with('error', __('Plan deleted'));
             }
-            
-            if(!(substr($orderID, 0, 2) == 'KZ')){
-                return redirect()->back()->with('error', __('Something went wrong.'));
-            }
 
             $orderID = strtoupper($orderID);
 
+            $price = $plan->price * $duration;
+
             $point = ReferralPoint::where('created_by', '=', $user->id)->first();
-            if($point->point < $plan->price/1000){
+            if($point->point < $price){
                 return redirect()->back()->with('error', __('Insufficient points'));
             }
 
-            $point->Deduct($plan->price / 1000);
+            $point->Deduct($price);
 
             $history = new ReferralPointHistory();
             $history->description   = 'Plan purchase';
-            $history->amount        = -100;
+            $history->amount        = -$price;
             $history->ref_id        = $point->id;
             $history->created_by    = $user->id;
             $history->save();
@@ -77,14 +82,15 @@ class ReferralController extends Controller
             $order->name            = $user->name;
             $order->plan_name       = $plan->name;
             $order->plan_id         = $plan->id;
-            $order->price           = $plan->price / 1000;
-            $order->price_currency  = "Point";
+            $order->price           = $price;
+            $order->price_currency  = 'Rp';
             $order->payment_status  = 'succeeded';
             $order->receipt         = 'point exchange';
+            $order->duration        = $duration;
             $order->user_id         = $user->id;
             $order->save();
 
-            $assignPlan            = $user->assignPlan($plan->id);
+            $assignPlan            = $user->assignPlan($plan->id, $duration);
             if($assignPlan['is_success']){
                 return redirect()->route('dashboard')->with('success', __('Plan successfully activated.'));
             } else {
@@ -92,6 +98,113 @@ class ReferralController extends Controller
             }
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function RequestWithdraw(Request $request) {
+        if(Auth::user()->type == 'company'){
+            $request->validate([
+                'amount'    => 'required',
+                'account'   => 'required',
+            ]);
+            
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+            $dest   = $request->input('account');
+            $user   = Auth::user();
+
+            $point = ReferralPoint::where('created_by', '=', $user->id)->first();
+
+            if($amount < config('referral.minWithdrawal') || $amount > $point->point) {
+                return redirect()->back()->with('error', __('Insufficient balance'));
+            }
+
+            $withRequest = new ReferralWithdrawRequest();
+            $withRequest->amount        = $amount;
+            $withRequest->destination   = $dest;
+            $withRequest->created_by    = $user->id;
+            $withRequest->status        = "pending";
+            $withRequest->save();
+
+            $point->Deduct($amount);
+
+            $history                = new ReferralPointHistory();
+            $history->description   = 'Withdrawal';
+            $history->ref_id        = $point->id;
+            $history->amount        = -$amount;
+            $history->created_by    = $user->id;
+            $history->save();
+
+            return redirect()->back()->with('success', __('Request submitted'));
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function CancelWithdrawRequest($id) {
+        if(Auth::user()->type === 'company'){
+            $user       = Auth::user();
+            $request    = ReferralWithdrawRequest::find($id);
+
+            if(!$request) {
+                return redirect()->back()->with('error', __('Request not found'));
+            }
+
+            if($request->created_by != $user->id) {
+                return redirect()->back()->with('error', __('Something went wrong'));
+            }
+
+            if($request->status != 'pending') {
+                return redirect()->back()->with('error', __('Your request is being processed'));
+            }
+
+            $point      = ReferralPoint::where('created_by', '=', $user->id)->first();
+
+            $request->delete();
+
+            $history                = new ReferralPointHistory();
+            $history->description   = 'Cancel withdrawal';
+            $history->ref_id        = $point->id;
+            $history->amount        = $request->amount;
+            $history->created_by    = $user->id;
+            $history->save();
+
+            $point->Add($request->amount);
+
+            return redirect()->back()->with('success', __('Request cancelled'));
+        } else {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function WithdrawRequest(Request $request) {
+        if(Auth::user()->type == 'super admin'){
+            if($request->has('status')) {
+                $status = $request->input('status');
+            } else {
+                $status = 'pending';
+            }
+            $statusOptions = array_map('ucfirst', ReferralWithdrawRequest::$status);
+            $statusOptions = array_combine($statusOptions, $statusOptions);
+
+            $req = ReferralWithdrawRequest::where('status', '=', $status)->get();
+
+            return view('referral.withdraw', compact('req', 'statusOptions'));
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function ProcessWithdrawRequest($id, Request $request) {
+        if(Auth::user()->type == 'super admin') {
+            if($request->has('status')) {
+                $status = $request->input('status');
+                $withRequest = ReferralWithdrawRequest::find($id);
+                $withRequest->status = $status;
+                $withRequest->save();   
+            }
+            return redirect()->back()->with('success', __('Successfully updated.'));
+        } else {
+            return redirect()->back();
         }
     }
 }

@@ -138,7 +138,7 @@ class User extends Authenticatable
         return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
-    public function assignPlan($planID)
+    public function assignPlan($planID, $duration = 1)
     {
         $plan = Plan::find($planID);
         if($plan)
@@ -146,130 +146,17 @@ class User extends Authenticatable
             $this->plan = $plan->id;
             if($plan->duration == 'month')
             {
-                $this->plan_expire_date = Carbon::now()->addMonths(1)->isoFormat('YYYY-MM-DD');
+                $this->plan_expire_date = Carbon::now()->addMonths($duration)->isoFormat('YYYY-MM-DD');
             }
             elseif($plan->duration == 'year')
             {
-                $this->plan_expire_date = Carbon::now()->addYears(1)->isoFormat('YYYY-MM-DD');
+                $this->plan_expire_date = Carbon::now()->addYears($duration)->isoFormat('YYYY-MM-DD');
             }
             $this->save();
 
-            $users     = User::where('created_by', '=', \Auth::user()->creatorId())->where('type', '!=', 'super admin')->where('type', '!=', 'company')->get();
-            $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $venders   = Vender::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-
-            if($plan->max_users == -1)
-            {
-                foreach($users as $user)
-                {
-                    $user->is_active = 1;
-                    $user->save();
-                }
-            }
-            else
-            {
-                $userCount = 0;
-                foreach($users as $user)
-                {
-                    $userCount++;
-                    if($userCount <= $plan->max_users)
-                    {
-                        $user->is_active = 1;
-                        $user->save();
-                    }
-                    else
-                    {
-                        $user->is_active = 0;
-                        $user->save();
-                    }
-                }
-            }
-
-            if($plan->max_customers == -1)
-            {
-                foreach($customers as $customer)
-                {
-                    $customer->is_active = 1;
-                    $customer->save();
-                }
-            }
-            else
-            {
-                $customerCount = 0;
-                foreach($customers as $customer)
-                {
-                    $customerCount++;
-                    if($customerCount <= $plan->max_customers)
-                    {
-                        $customer->is_active = 1;
-                        $customer->save();
-                    }
-                    else
-                    {
-                        $customer->is_active = 0;
-                        $customer->save();
-                    }
-                }
-            }
-
-
-            if($plan->max_venders == -1)
-            {
-                foreach($venders as $vender)
-                {
-                    $vender->is_active = 1;
-                    $vender->save();
-                }
-            }
-            else
-            {
-                $venderCount = 0;
-                foreach($venders as $vender)
-                {
-                    $venderCount++;
-                    if($venderCount <= $plan->max_venders)
-                    {
-                        $vender->is_active = 1;
-                        $vender->save();
-                    }
-                    else
-                    {
-                        $vender->is_active = 0;
-                        $vender->save();
-                    }
-                }
-            }
-
-            return ['is_success' => true];
-        }
-        else
-        {
-            return [
-                'is_success' => false,
-                'error' => 'Plan is deleted.',
-            ];
-        }
-    }
-    public function assignPlanFromOutside($userID, $planID)
-    {
-        $plan = Plan::find($planID);
-        if($plan)
-        {
-            $this->plan = $plan->id;
-            if($plan->duration == 'month')
-            {
-                $this->plan_expire_date = Carbon::now()->addMonths(1)->isoFormat('YYYY-MM-DD');
-            }
-            elseif($plan->duration == 'year')
-            {
-                $this->plan_expire_date = Carbon::now()->addYears(1)->isoFormat('YYYY-MM-DD');
-            }
-            $this->save();
-
-            $users     = User::where('created_by', '=', $userID)->where('type', '!=', 'super admin')->where('type', '!=', 'company')->get();
-            $customers = Customer::where('created_by', '=', $userID)->get();
-            $venders   = Vender::where('created_by', '=', $userID)->get();
+            $users     = User::where('created_by', '=', $this->creatorId())->where('type', '!=', 'super admin')->where('type', '!=', 'company')->get();
+            $customers = Customer::where('created_by', '=', $this->creatorId())->get();
+            $venders   = Vender::where('created_by', '=', $this->creatorId())->get();
 
 
             if($plan->max_users == -1)
@@ -528,6 +415,7 @@ class User extends Authenticatable
         return $total;
      
     }
+
     public function getincExpBarChartData()
     {
         $month[]       = __('January');
@@ -698,6 +586,13 @@ class User extends Authenticatable
 
         return DB::table('settings')->where('created_by', '=', $userId)->get()->pluck('value', 'name');
 
+    }
+
+    public function planPriceFormat($price){
+        $planPrice          = $this->planPrice();
+        $symbol             = isset($planPrice['stripe_currency_symbol']) ? $planPrice['stripe_currency_symbol'] : '';
+        $formatted_price    = number_format($price, 2, ',', '.');
+        return "{$symbol} {$formatted_price}";
     }
 
     public function currentPlan()

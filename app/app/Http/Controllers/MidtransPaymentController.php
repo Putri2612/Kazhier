@@ -6,9 +6,13 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\Coupon;
+use App\Models\ReferralPoint;
+use App\Models\ReferralPointHistory;
 use App\Models\UserCoupon;
+use App\Traits\CanUseMidtrans;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Midtrans\Config;
 use Midtrans\Transaction;
 use Midtrans\ApiRequestor;
@@ -20,9 +24,11 @@ use Midtrans\Sanitizer;
 
 class MidtransPaymentController extends Controller
 {
+    use CanUseMidtrans;
+
     public function index()
     {
-        $objUser = \Auth::user();
+        $objUser = Auth::user();
         if($objUser->type == 'super admin')
         {
             $orders = Order::select(
@@ -56,11 +62,19 @@ class MidtransPaymentController extends Controller
     }
 
     public function payPlan(Request $request){
-        $user    = \Auth::user();
-        $planID  = \Illuminate\Support\Facades\Crypt::decrypt($request->plan);
+        $duration = $request->input('durations');
+        $user    = User::find(Auth::user()->id);
+        $planID  = \Illuminate\Support\Facades\Crypt::decrypt($request->input('plan'));
         $plan    = Plan::find($planID);
+        
+        $price   = $plan->price * $duration;
 
-        $price   = $plan->price;
+        if($user->referred_by && !$user->referral_redeemed){
+            $discount = $price / 10;
+            $discount = $discount > 50000 ? 50000 : $discount;
+
+            $price -= $discount;
+        }   
 
         if(!empty($request->coupon)){
             $coupons = Coupon::where('code', strtoupper($request->coupon))->where('is_active', '1')->first();
@@ -77,69 +91,72 @@ class MidtransPaymentController extends Controller
             }
         }
 
+        $now        = now();
+        $date       = $now->format('Ymd');
+        $time       = $now->format('His');
+        $orderID    = "/INV/{$date}/PYM/{$time}{$user->id}";
+
+        $order = new Order();
+        $order->order_id       = $orderID;
+        $order->name           = $user->name;
+        $order->plan_name      = $plan->name;
+        $order->plan_id        = $plan->id;
+        $order->price          = $price;
+        $order->payment_status = 'pending';
+        $order->user_id        = $user->id;
+        $order->duration       = $duration;
+        $order->save();
+
+        if(!empty($request->coupon)){
+            $coupons = Coupon::where('code', strtoupper($request->coupon))->where('is_active', '1')->first();
+
+            $userCoupon         = new UserCoupon();
+            $userCoupon->user   = $user->id;
+            $userCoupon->coupon = $coupons->id;
+            $userCoupon->order  = $orderID;
+            $userCoupon->save();
+
+            $usedCoupon = $coupons->used_coupon();
+            if($coupons->limit <= $usedCoupon){
+                $coupons->is_active = 0;
+                $coupons->save();
+            } 
+        }
+
         if($price > 0.0){
-            Config::$serverKey   = env('MIDTRANS_SERVER');
-            Config::$isSanitized = true;
-            Config::$is3ds       = true;
+            $item_details = [
+                [
+                    'id'       => 'kz'.$planID,
+                    'price'    => $price,
+                    'quantity' => 1,
+                    'name'     => 'Kazhier '. $plan->name . ' plan',
+                ]
+            ];
 
-            $item_list = array(
-                'id'       => 'biz'.$planID,
-                'price'    => $price,
-                'quantity' => 1,
-                'name'     => 'kakabiz '. $plan->name . ' plan',
-            );
-            
-            $item_details = array($item_list);
+            $transaction_details = [
+                'order_id'      => $orderID,
+                'gross_amount'  => $price,
+            ];
 
-            $transaction_details = array(
-                'order_id'     => strtoupper(str_replace('.', '', uniqid('BIZ', true))) . '_' . $planID . '_' . $user->id . (!empty($request->coupon) ? '_' . strtoupper($request->coupon) : ''),
-                'gross_amount' => $price,
-            );
-
-            $customer_details = array(
+            $customer_details = [
                 'first_name'  => $user->name,
                 'last_name'   => '',
                 'email'       => $user->email,
-            );
+            ];
 
-            $transactions = array(
+            $transactions = [
                 'transaction_details' => $transaction_details,
                 'customer_details'    => $customer_details,
                 'item_details'        => $item_details
-            );
+            ];
 
-            $snapToken = Snap::getSnapToken($transactions);
+            $snapToken = $this->getSnapToken($transactions);
             return view('order.purchase', compact('snapToken'));
         } else {
-            $orderID = strtoupper(str_replace('.', '', uniqid('BIZ', true)));
-
-            $order = new Order();
-            $order->order_id       = $orderID;
-            $order->name           = $user->name;
-            $order->plan_name      = $plan->name;
-            $order->plan_id        = $plan->id;
-            $order->price          = $price;
-            $order->payment_status = 'succeeded';
-            $order->user_id        = $user->id;
+            $assignPlan             = $user->assignPlan($plan->id);
+            $order->payment_status  = 'success';
+            $order->receipt         = 'free coupon';
             $order->save();
-
-            if(!empty($request->coupon)){
-                $coupons = Coupon::where('code', strtoupper($request->coupon))->where('is_active', '1')->first();
-
-                $userCoupon         = new UserCoupon();
-                $userCoupon->user   = $user->id;
-                $userCoupon->coupon = $coupons->id;
-                $userCoupon->order  = $orderID;
-                $userCoupon->save();
-
-                $usedCoupon = $coupons->used_coupon();
-                if($coupons->limit <= $usedCoupon){
-                    $coupons->is_active = 0;
-                    $coupons->save();
-                } 
-            }
-
-            $assignPlan            = $user->assignPlan($plan->id);
             if($assignPlan['is_success']){
                 return redirect()->route('plans.index')->with('success', __('Plan successfully activated.'));
             } else {
@@ -149,67 +166,59 @@ class MidtransPaymentController extends Controller
     }
 
     public function handlePaymentNotification(Request $request){
-        Config::$serverKey   = env('MIDTRANS_SERVER');
-        Config::$isSanitized = true;
-        Config::$is3ds       = true;
+        $this->configureMidtrans();
 
         $notification = new Notification();
 
+        $transactionID = $notification->transaction_id;
         $transaction = $notification->transaction_status;
         $type        = $notification->payment_type;
         $fraud       = $notification->fraud_status;
         $order_id    = $notification->order_id;
         $price       = $notification->gross_amount;
+        
+        $order  = Order::where('order_id', '=', $order_id)->get()->first();
+        $user   = User::find($order->user_id);
 
-        // decode data
-        $order_id    = explode('_', $order_id);
-        $orderID     = $order_id[0];
-        $planID      = $order_id[1];
-        $plan        = Plan::find($planID);
-        $userID      = $order_id[2];
-        $user        = User::find($userID);
+        if ($transaction == 'capture') {
+            // For credit card transaction, we need to check whether transaction is challenge by FDS or not
+            if ($type == 'credit_card') {
+                if ($fraud == 'challenge') {
+                    $order->payment_status = 'pending';
+                } else {
+                    $order->payment_status = 'success';
+                    $assignPlan            = $user->assignPlan($order->plan_id);
+                }
+            }
+        } else if ($transaction == 'settlement') {
+            $order->payment_status  = 'success';
+            $order->receipt         = "https://app.midtrans.com/snap/v1/transactions/{$transactionID}/pdf";
+            $assignPlan             = $user->assignPlan($order->plan_id, $order->duration);
+            if($user->referred_by){
+                $referralPoint  = ReferralPoint::where('created_by', '=', $user->referred_by)->first();
+                if(!$referralPoint) {
+                    $referralPoint = new ReferralPoint();
+                    $referralPoint->created_by = $user->referred_by;
+                }
+                $referralPoint->Add(25000);
 
-        if(count($order_id) > 3){
-            $coupon  = $order_id[3];
+                $history = new ReferralPointHistory();
+                $history->description   = __(':name bought a plan', ['name' => $user->name]);
+                $history->amount        = 25000;
+                $history->ref_id        = $referralPoint->id;
+                $history->created_by    = $user->referred_by;
+                $history->save();
+            }
+        } else if ($transaction == 'deny') {
+            $order->payment_status = 'DENIED';
+        } else if ($transaction == 'expire') {
+            // TODO set payment status in merchant's database to 'expire'
+            $order->payment_status = 'EXPIRED';
+        } else if ($transaction == 'cancel') {
+            // TODO set payment status in merchant's database to 'Denied'
+            $order->payment_status = 'CANCELED';
         }
 
-        if ($transaction == 'pending') {
-            $order = new Order();
-            $order->order_id       = $orderID;
-            $order->name           = $user->name;
-            $order->plan_name      = $plan->name;
-            $order->plan_id        = $plan->id;
-            $order->price          = $price;
-            $order->payment_status = 'pending';
-            $order->user_id        = $user->id;
-            $order->save();
-        } else {
-            $order = Order::where('order_id', '=', $orderID)->get()->first();
-
-            if ($transaction == 'capture') {
-                // For credit card transaction, we need to check whether transaction is challenge by FDS or not
-                if ($type == 'credit_card') {
-                    if ($fraud == 'challenge') {
-                        $order->payment_status = 'pending';
-                    } else {
-                        $order->payment_status = 'success';
-                        $assignPlan            = $user->assignPlanFromOutside($user->id, $plan->id);
-                    }
-                }
-            } else if ($transaction == 'settlement') {
-                $order->payment_status = 'success';
-                $assignPlan            = $user->assignPlanFromOutside($user->id, $plan->id);
-            } else if ($transaction == 'deny') {
-                $order->payment_status = 'DENIED';
-            } else if ($transaction == 'expire') {
-                // TODO set payment status in merchant's database to 'expire'
-                $order->payment_status = 'EXPIRED';
-            } else if ($transaction == 'cancel') {
-                // TODO set payment status in merchant's database to 'Denied'
-                $order->payment_status = 'CANCELED';
-            }
-
-            $order->save();
-        }        
+        $order->save();
     }
 }
