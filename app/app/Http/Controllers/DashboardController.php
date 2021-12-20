@@ -51,8 +51,12 @@ DashboardController extends Controller
 
             return view('dashboard.super_admin', compact('user', 'chartData'));
         }
+        else if(Auth::user()->type == 'company' && !Auth::user()->initialized){
+            return redirect()->route('initial-setup.index');
+        }
         else
         {
+            
             $data['latestIncome']  = Revenue::where('created_by', '=', \Auth::user()->creatorId())->orderBy('date', 'desc')->limit(5)->get();
             $data['latestExpense'] = Payment::where('created_by', '=', \Auth::user()->creatorId())->orderBy('date', 'desc')->limit(5)->get();
 

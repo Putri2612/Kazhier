@@ -8,8 +8,11 @@
         console.log(Installable);
         let Items = new Installable.List({
             target  : '.items',
-            data    : {installed: [], installable: @json($taxes)}
+            data    : {installed: @json($bait), installable: @json($taxes)}
         });
+        @error('items')
+            toastrs('Error', '{{ __('Please add at least one item') }}', 'error');
+        @enderror
     </script>
 @endpush
 @section('content')
@@ -26,9 +29,15 @@
                         </div>
                         <div class="card-body">
                             <p>
-                                {{ __('Insert taxes') }}
+                                <span>
+                                    {{ __('Press the plus (+) button on the left panel to add a tax') }}
+                                    {!! __('or press the <strong>"create new"</strong> on the right panel to create your own tax.') !!}
+                                </span> <br/>
+                                <span class="text-danger">
+                                    {{ __('Press the minus(-) button on the right panel to remove a tax') }}
+                                </span>
                             </p>
-                            {{ Form::open(array('route' => 'post-register.tax', 'method' => 'post')) }}
+                            {{ Form::open(array('route' => 'initial-setup.tax', 'method' => 'post')) }}
                             {{ Form::text('items', '', array('class' => 'items'))}}
                             <div class="text-end">
                                 {{ Form::submit( __('Next'), array('class'=>'btn btn-primary btn-lg') ) }}

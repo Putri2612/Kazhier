@@ -8,8 +8,8 @@
 @section('content')
     <section class="section">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 pt-4">
+            <div class="row justify-content-end">
+                <div class="col-auto pt-4">
                     <div class="changeLanguage float-right me-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
@@ -28,7 +28,7 @@
                     </div>
 
                     <div class="card card-primary">
-                        <a href="." class="back-btn"><i class="fas fa-arrow-left"></i></a>
+                        <a href="{{ Request::getSchemeAndHttpHost() }}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header"><h4>{{ __('Free Sign Up') }}</h4></div>
 
                         <div class="card-body">

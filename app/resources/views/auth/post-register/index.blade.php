@@ -22,7 +22,8 @@
                                 {{ __('You can change the settings on "constant" menu afterward.') }}
                             </p>
                             <div class="text-end">
-                                <a href="{{route('post-register.revenue')}}" class="btn btn-primary">{{ __('Let\'s get started!') }}</a>
+                                <a href="{{route('initial-setup.skip')}}" class="me-5"> {{ __('Not now') }} </a>
+                                <a href="{{route('initial-setup.revenue')}}" class="btn btn-primary">{{ __('Let\'s get started!') }}</a>
                             </div>
                         </div>
                     </div>

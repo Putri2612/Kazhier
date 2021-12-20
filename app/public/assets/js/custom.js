@@ -414,12 +414,22 @@ const sendActivity = () => {
 
 // Document event listener
 document.addEventListener('click', event => {
-    const target = event.target;
+    let target = event.target;
     if(target.hasAttribute('data-is-delete')) {
+        const url = target.getAttribute('data-delete-url');
+        ConfirmDeleteModal(url);
+    } else if (target.parentNode.hasAttribute('data-is-delete')){
+        target = target.parentNode;
         const url = target.getAttribute('data-delete-url');
         ConfirmDeleteModal(url);
     }
     if(target.hasAttribute('data-status-update')) {
+        const url   = target.getAttribute('data-status-url'),
+            status  = target.getAttribute('data-status-update');
+            console.log(url, status);
+        ConfirmStatusModal(url, status);
+    } else if(target.parentNode.hasAttribute('data-status-update')){
+        target = target.parentNode;
         const url   = target.getAttribute('data-status-url'),
             status  = target.getAttribute('data-status-update');
             console.log(url, status);

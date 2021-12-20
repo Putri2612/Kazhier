@@ -5,11 +5,13 @@
 @push('page-script')
     <script src="{{ asset('assets/js/installable-list.js') }}"></script>
     <script>
-        console.log(Installable);
         let Items = new Installable.List({
             target  : '.items',
-            data    : {installed: [], installable: @json($products)}
+            data    : {installed: @json($bait), installable: @json($products)}
         });
+        @error('items')
+            toastrs('Error', '{{ __('Please add at least one item') }}', 'error');
+        @enderror
     </script>
 @endpush
 @section('content')
@@ -26,9 +28,15 @@
                         </div>
                         <div class="card-body">
                             <p>
-                                {{ __('Insert product and service categories') }}
+                                <span>
+                                    {{ __('Press the plus (+) button on the left panel to add a category') }}
+                                    {!! __('or press the <strong>"create new"</strong> on the right panel to create your own category.') !!}
+                                </span> <br/>
+                                <span class="text-danger">
+                                    {{ __('Press the minus(-) button on the right panel to remove a category') }}
+                                </span>
                             </p>
-                            {{ Form::open(array('route' => 'post-register.product-category', 'method' => 'post')) }}
+                            {{ Form::open(array('route' => 'initial-setup.product-category', 'method' => 'post')) }}
                             {{ Form::text('items', '', array('class' => 'items'))}}
                             <div class="text-end">
                                 {{ Form::submit( __('Next'), array('class'=>'btn btn-primary btn-lg') ) }}

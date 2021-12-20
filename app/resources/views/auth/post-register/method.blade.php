@@ -8,8 +8,11 @@
         console.log(Installable);
         let Items = new Installable.List({
             target  : '.items',
-            data    : {installed: [], installable: @json($methods)}
+            data    : {installed: @json($bait), installable: @json($methods)}
         });
+        @error('items')
+            toastrs('Error', '{{ __('Please add at least one item') }}', 'error');
+        @enderror
     </script>
 @endpush
 @section('content')
@@ -26,9 +29,15 @@
                         </div>
                         <div class="card-body">
                             <p>
-                                {{ __('Insert payment methods for your transactions') }}
+                                <span>
+                                    {{ __('Press the plus (+) button on the left panel to add a payment method') }}
+                                    {!! __('or press the <strong>"create new"</strong> on the right panel to create your own payment method.') !!}
+                                </span> <br/>
+                                <span class="text-danger">
+                                    {{ __('Press the minus(-) button on the right panel to remove a payment method') }}
+                                </span>
                             </p>
-                            {{ Form::open(array('route' => 'post-register.method', 'method' => 'post')) }}
+                            {{ Form::open(array('route' => 'initial-setup.method', 'method' => 'post')) }}
                             {{ Form::text('items', '', array('class' => 'items'))}}
                             <div class="text-end">
                                 {{ Form::submit( __('Next'), array('class'=>'btn btn-primary btn-lg') ) }}

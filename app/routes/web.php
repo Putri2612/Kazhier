@@ -15,6 +15,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PostRegisterController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BillController;
@@ -140,10 +141,10 @@ Route::group(
     [
         'middleware' => [
             'auth',
-            'xss'
+            'xss',
+            'verified'
         ]
     ], function () {
-
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade');
@@ -199,7 +200,7 @@ Route::group(
 
         Route::resource('defaults', DefaultValueController::class);
 
-        Route::prefix('post-register')->as('post-register.')->group(
+        Route::prefix('initial-setup')->as('initial-setup.')->group(
             function () {
                 Route::get('', [PostRegisterController::class, 'index'])->name('index');
                 Route::match(['get', 'post'], 'revenue', [PostRegisterController::class, 'revenue'])->name('revenue');
@@ -209,6 +210,7 @@ Route::group(
                 Route::match(['get', 'post'], 'tax', [PostRegisterController::class, 'tax'])->name('tax');
                 Route::match(['get', 'post'], 'payment-method', [PostRegisterController::class, 'paymentMethod'])->name('method');
                 Route::get('complete', [PostRegisterController::class, 'complete'])->name('complete');
+                Route::get('skip', [PostRegisterController::class, 'skip'])->name('skip');
             }
         );
 
@@ -360,7 +362,7 @@ Route::group(
 
 Route::get('app', function () { return redirect()->route('user.login');} );
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 Route::get('/register/{lang?}', [RegisterController::class, 'showRegistrationForm'])->name('register.show');
 Route::post('register', [RegisterController::class, 'register'])->name('user.register');

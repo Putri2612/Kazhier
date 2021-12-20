@@ -8,20 +8,24 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PostRegisterController extends Controller
 {
+
+    private $validationRule = [
+        'items' => 'required|not_in:[]',
+    ];
+
     public function index() {
         return view('auth.post-register.index');
     }
 
     public function revenue(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $revenues = json_decode($request->input('items'));
 
@@ -44,23 +48,29 @@ class PostRegisterController extends Controller
                 }
             }
 
-            return redirect()->route('post-register.expense');
+            return redirect()->route('initial-setup.expense');
         } else {
             $defaults = DefaultValue::Get('revenue');
             $revenues = [];
-            foreach($defaults as $default){
-                array_push($revenues, $default->name);
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($revenues, $defaults[$index]->name);
+                } else {
+                    array_push($bait, $defaults[$index]->name);
+                }
             }
 
-            return view('auth.post-register.revenue', compact('revenues'));
+            return view('auth.post-register.revenue', compact('revenues', 'bait'));
         }
     }
 
     public function expense(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $expenses = json_decode($request->input('items'));
 
@@ -83,23 +93,29 @@ class PostRegisterController extends Controller
                 }
             }
 
-            return redirect()->route('post-register.product-category');
+            return redirect()->route('initial-setup.product-category');
         } else {
-            $defaults = DefaultValue::Get('payment');
-            $expenses = [];
-            foreach($defaults as $default){
-                array_push($expenses, $default->name);
+            $defaults   = DefaultValue::Get('payment');
+            $expenses   = [];
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($expenses, $defaults[$index]->name);
+                } else {
+                    array_push($bait, $defaults[$index]->name);
+                }
             }
 
-            return view('auth.post-register.expense', compact('expenses'));
+            return view('auth.post-register.expense', compact('expenses', 'bait'));
         }
     }
 
     public function product_category(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $products = json_decode($request->input('items'));
 
@@ -122,23 +138,29 @@ class PostRegisterController extends Controller
                 }
             }
 
-            return redirect()->route('post-register.unit');
+            return redirect()->route('initial-setup.unit');
         } else {
-            $defaults = DefaultValue::Get('product service');
-            $products = [];
-            foreach($defaults as $default){
-                array_push($products, $default->name);
+            $defaults   = DefaultValue::Get('product service');
+            $products   = [];
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($products, $defaults[$index]->name);
+                } else {
+                    array_push($bait, $defaults[$index]->name);
+                }
             }
 
-            return view('auth.post-register.product', compact('products'));
+            return view('auth.post-register.product', compact('products', 'bait'));
         }
     }
 
     public function unit(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $units = json_decode($request->input('items'));
 
@@ -149,23 +171,29 @@ class PostRegisterController extends Controller
                 ]);
             }
 
-            return redirect()->route('post-register.method');
+            return redirect()->route('initial-setup.method');
         } else {
-            $defaults = DefaultValue::Get('unit');
-            $units = [];
-            foreach($defaults as $default){
-                array_push($units, $default->name);
+            $defaults   = DefaultValue::Get('unit');
+            $units      = [];
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($units, $defaults[$index]->name);
+                } else {
+                    array_push($bait, $defaults[$index]->name);
+                }
             }
 
-            return view('auth.post-register.unit', compact('units'));
+            return view('auth.post-register.unit', compact('units', 'bait'));
         }
     }
     
     public function paymentMethod(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $methods = json_decode($request->input('items'));
 
@@ -176,23 +204,29 @@ class PostRegisterController extends Controller
                 ]);
             }
 
-            return redirect()->route('post-register.tax');
+            return redirect()->route('initial-setup.tax');
         } else {
-            $defaults = DefaultValue::Get('payment method');
-            $methods = [];
-            foreach($defaults as $default){
-                array_push($methods, $default->name);
+            $defaults   = DefaultValue::Get('payment method');
+            $methods    = [];
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+            
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($methods, $defaults[$index]->name);
+                } else {
+                    array_push($bait, $defaults[$index]->name);
+                }
             }
 
-            return view('auth.post-register.method', compact('methods'));
+            return view('auth.post-register.method', compact('methods', 'bait'));
         }
     }
 
     public function tax(Request $request) {
         if(!empty($request->all())){
-            $request->validate([
-                'items' => 'required',
-            ]);
+            $request->validate($this->validationRule);
 
             $taxes = json_decode($request->input('items'));
 
@@ -204,19 +238,38 @@ class PostRegisterController extends Controller
                 ]);
             }
 
-            return redirect()->route('post-register.complete');
+            return redirect()->route('initial-setup.complete');
         } else {
-            $defaults = DefaultValue::Get('tax');
-            $taxes = [];
-            foreach($defaults as $default){
-                array_push($taxes, ['label' => $default->name, 'value' => $default->value]);
+            $defaults   = DefaultValue::Get('tax');
+            $taxes      = [];
+            $bait       = [];
+            $length     = $defaults->count();
+            $baitCount  = $length - ceil($length / 5);
+            for($index = 0; $index < $length; $index++){
+                if($index < $baitCount) {
+                    array_push($taxes, ['label' => $defaults[$index]->name, 'value' => $defaults[$index]->value]);
+                } else {
+                    array_push($bait, ['label' => $defaults[$index]->name, 'value' => $defaults[$index]->value]);
+                }
             }
 
-            return view('auth.post-register.tax', compact('taxes'));
+            return view('auth.post-register.tax', compact('taxes', 'bait'));
         }
     }
 
     public function complete() {
+        $user = User::find(Auth::user()->id);
+        $user->initialized = true;
+        $user->save();
+
         return view('auth.post-register.complete');
+    }
+
+    public function skip() {
+        $user = User::find(Auth::user()->id);
+        $user->initialized = true;
+        $user->save();
+
+        return redirect()->route('dashboard');
     }
 }
