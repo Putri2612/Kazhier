@@ -28,6 +28,7 @@ use App\Http\Controllers\DebitNoteController;
 use App\Http\Controllers\DefaultValueController;
 use App\Http\Controllers\DialogController;
 use App\Http\Controllers\EquityController;
+use App\Http\Controllers\EULAController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FrontEndErrorController;
 use App\Http\Controllers\GoalController;
@@ -357,6 +358,11 @@ Route::group(
         Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf');
         Route::get('bill/pdf/{id}', [BillController::class, 'bill'])->name('bill.pdf');
         Route::get('proposal/pdf/{id}', [ProposalController::class, 'proposal'])->name('proposal.pdf');
+        
+        Route::get('term-of-service/edit', [EULAController::class, 'edit'])->name('tos.edit');
+        Route::put('term-of-service/update', [EULAController::class, 'update'])->name('tos.update');
+        Route::get('term-of-service', [EULAController::class, 'show'])->name('tos.show');
+        Route::get('term-of-service/ajax', [EULAController::class, 'ajax'])->name('tos.ajax');
     }
 );
 
