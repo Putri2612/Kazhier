@@ -1,5 +1,22 @@
 @extends('layouts.auth')
 
+@section('title')
+    {{ __('Email Verification') }}
+@endsection
+
+@push('page-script')
+    <script>
+        const button = document.querySelector('form#resend button');
+        @if (session('resent'))
+        button.disabled = true;
+        setTimeout(() => {
+            console.log('a');
+            button.disabled = false;
+        }, 30000);
+        @endif
+    </script>
+@endpush
+
 @section('content')
 <section class="section">
     <div class="container text-end pt-4">
@@ -32,8 +49,8 @@
                         <div class="mb-4">
                             {{ __('Before proceeding, please check your email for a verification link.') }}
                         </div>
-                        {{ Form::open(array('route'=>'verification.resend','method'=>'post')) }}
-                        {{ __('If you did not receive the email') }}, <button class="btn btn-primary">{{ __('click here to request another') }}</button>.
+                        {{ Form::open(array('route'=>'verification.resend','method'=>'post', 'id' => 'resend')) }}
+                        {{ __('If you did not receive the email') }}, <button class="btn btn-primary" @if (session('resent'))disabled @endif>{{ __('click here to request another') }}</button>.
                         {{ Form::close() }}
                     </div>
                 </div>

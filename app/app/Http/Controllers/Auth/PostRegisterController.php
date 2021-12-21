@@ -50,7 +50,7 @@ class PostRegisterController extends Controller
 
             return redirect()->route('initial-setup.expense');
         } else {
-            $defaults = DefaultValue::Get('revenue');
+            $defaults = DefaultValue::Get('income');
             $revenues = [];
             $bait       = [];
             $length     = $defaults->count();
@@ -95,7 +95,7 @@ class PostRegisterController extends Controller
 
             return redirect()->route('initial-setup.product-category');
         } else {
-            $defaults   = DefaultValue::Get('payment');
+            $defaults   = DefaultValue::Get('expense');
             $expenses   = [];
             $bait       = [];
             $length     = $defaults->count();
@@ -258,17 +258,13 @@ class PostRegisterController extends Controller
     }
 
     public function complete() {
-        $user = User::find(Auth::user()->id);
-        $user->initialized = true;
-        $user->save();
+        Auth::user()->initialize();
 
         return view('auth.post-register.complete');
     }
 
     public function skip() {
-        $user = User::find(Auth::user()->id);
-        $user->initialized = true;
-        $user->save();
+        Auth::user()->initialize();
 
         return redirect()->route('dashboard');
     }

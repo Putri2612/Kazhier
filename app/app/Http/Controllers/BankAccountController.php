@@ -195,7 +195,7 @@ class BankAccountController extends Controller
                 }
                 else
                 {
-                    $bankAccount->delete();
+                    $bankAccount->forceDelete();
 
                     return redirect()->route('bank-account.index')->with('success', __('Account successfully deleted.'));
                 }

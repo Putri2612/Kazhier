@@ -57,7 +57,7 @@ const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}
     });
 }
 
-const EmptyInputModal = (items) => {
+const EmptyInputModal = (items, form) => {
     let parameters = [];
     items.forEach(item => {
         parameters.push(`item[]=${item}`);
@@ -140,7 +140,7 @@ const ValidateForm = (event) => {
     let isEmpty = CheckEmptyInputs(form);
     
     if(isEmpty.result){
-        EmptyInputModal(isEmpty.items);
+        EmptyInputModal(isEmpty.items, form);
     } else {
         return form.submit();
     }
@@ -186,7 +186,7 @@ const OnlyAllowNumber   = () => {
         document.addEventListener(event, event => {
             let target = event.target;
             if(target.nodeName == 'INPUT' && target.hasAttribute('data-is-number')){
-                let filtered = /^[0-9\.]*\,?[0-9]*$/.test(target.value);
+                let filtered = /^\-?[0-9\.]*\,?[0-9]*$/.test(target.value);
                 if(filtered) {
                     target.oldValue             = target.value;
                     target.oldSelectionStart    = target.selectionStart;
@@ -197,7 +197,7 @@ const OnlyAllowNumber   = () => {
                 } else {
                     target.value = "";
                 }
-                if(target.value != "" && !(/^[0-9\.]*\,$/).test(target.value)) target.value = AddNumberSeparator(target.value);
+                if(target.value != "" && target.value != "-" && !(/^[0-9\.]*\,$/).test(target.value)) target.value = AddNumberSeparator(target.value);
             }
 
             if(target.nodeName == 'INPUT' || target.nodeName == 'SELECT' || target.nodeName == 'TEXTAREA') { WatchChange(target, true); }
@@ -214,11 +214,11 @@ const ValidateCurrencyInput = (form) => {
     let error = false;
     if(inputs){
         inputs.forEach(input => {
-            let pattern = /^[0-9\.]*,?[0-9]*$/;   
+            let pattern = /^\-?[0-9\.]*,?[0-9]*$/;   
             if(!pattern.test(input.value)  && input.value !== null) error = true;
         });
         if(error){
-            toastrs('Error', '{{ __("Invalid number format.") }}', 'error');
+            toastrs('Error', '"Invalid number format."', 'error');
             return false;
         }
     }

@@ -29,13 +29,13 @@
                         <div class="setting-tab">
                             <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="contact-tab4" data-toggle="tab" href="#site-setting" role="tab" aria-controls="" aria-selected="false">{{__('Site Setting')}}</a>
+                                    <a class="nav-link active" id="contact-tab4" data-bs-toggle="tab" data-bs-target="#site-setting" href="#site-setting" role="tab" aria-controls="" aria-selected="false">{{__('Site Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#email-setting" role="tab" aria-controls="" aria-selected="false">{{__('Email Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#email-setting" href="#email-setting" role="tab" aria-controls="" aria-selected="false">{{__('Email Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#midtrans-setting" role="tab" aria-controls="" aria-selected="false">{{__('Midtrans Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#midtrans-setting" href="#midtrans-setting" role="tab" aria-controls="" aria-selected="false">{{__('Midtrans Setting')}}</a>
                                 </li>
                             </ul>
                             <div class="tab-content" id="myTabContent2">

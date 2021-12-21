@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Traits\CanManageBalance;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class BankAccount extends Model
 {
-    use CanManageBalance;
+    use CanManageBalance, SoftDeletes;
 
     protected $fillable = [
         'holder_name',
@@ -18,6 +19,7 @@ class BankAccount extends Model
         'contact_number',
         'bank_address',
         'created_by',
+        'deleted_at'
     ];
 
     public function CurrentBalance() {

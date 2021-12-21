@@ -52,22 +52,22 @@
                         <div class="setting-tab">
                             <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="contact-tab4" data-toggle="tab" href="#business-setting" role="tab" aria-controls="" aria-selected="false">{{__('Business Setting')}}</a>
+                                    <a class="nav-link active" id="contact-tab4" data-bs-toggle="tab" data-bs-target="#business-setting" href="#business-setting" role="tab" aria-controls="" aria-selected="false">{{__('Business Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="contact-tab4" data-toggle="tab" href="#system-setting" role="tab" aria-controls="" aria-selected="false">{{__('System Setting')}}</a>
+                                    <a class="nav-link" id="contact-tab4" data-bs-toggle="tab" data-bs-target="#system-setting" href="#system-setting" role="tab" aria-controls="" aria-selected="false">{{__('System Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#company-setting" role="tab" aria-controls="" aria-selected="false">{{__('Company Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#company-setting" href="#company-setting" role="tab" aria-controls="" aria-selected="false">{{__('Company Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab5" data-toggle="tab" href="#proposal-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Proposal Print Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target="#proposal-template-setting" href="#proposal-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Proposal Print Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab5" data-toggle="tab" href="#template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Invoice Print Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target="#template-setting" href="#template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Invoice Print Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab5" data-toggle="tab" href="#bill-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Bill Print Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target=""="#bill-template-setting" href="#bill-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Bill Print Setting')}}</a>
                                 </li>
                             </ul>
                             <div class="tab-content" id="myTabContent2">

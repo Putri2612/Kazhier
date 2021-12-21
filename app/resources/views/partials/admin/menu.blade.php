@@ -93,6 +93,9 @@
                         </li>
                     </ul>
                 </li>
+                <li class="dropdown {{ Request::segment(1) == 'tos' ? 'active' : '' }}">
+                    <a href="{{ route('tos.edit') }}" class="nav-link"><i class="fas fa-signature"></i><span>{{ __('ToS') }}</span></a>
+                </li>
             @else
                 @php 
                     $user = \Auth::user();

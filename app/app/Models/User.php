@@ -31,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'created_by',
         'referral_token',
         'referred_by',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -141,107 +142,61 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function assignPlan($planID, $duration = 1)
     {
+        $same = $this->plan == $planID;
         $plan = Plan::find($planID);
         if($plan)
         {
             $this->plan = $plan->id;
+            if($same && $plan->duration != 'unlimited'){
+                $startingDate = Carbon::createFromFormat('Y-m-d', $this->plan_expire_date);
+            } else {
+                $startingDate = Carbon::now();
+            }
             if($plan->duration == 'month')
             {
-                $this->plan_expire_date = Carbon::now()->addMonths($duration)->isoFormat('YYYY-MM-DD');
+                $this->plan_expire_date = $startingDate->addMonths($duration)->isoFormat('YYYY-MM-DD');
             }
-            elseif($plan->duration == 'year')
+            else if($plan->duration == 'year')
             {
-                $this->plan_expire_date = Carbon::now()->addYears($duration)->isoFormat('YYYY-MM-DD');
+                $this->plan_expire_date = $startingDate->addYears($duration)->isoFormat('YYYY-MM-DD');
+            } else if ($plan->duration == 'unlimited') {
+                $this->plan_expire_date = null;
             }
             $this->save();
 
-            $users     = User::where('created_by', '=', $this->creatorId())->where('type', '!=', 'super admin')->where('type', '!=', 'company')->get();
-            $customers = Customer::where('created_by', '=', $this->creatorId())->get();
-            $venders   = Vender::where('created_by', '=', $this->creatorId())->get();
+            $userQuery = User::where('created_by', '=', $this->creatorId())
+                            ->where('type', '!=', 'super admin')
+                            ->where('type', '!=', 'company');
 
+            $bankQuery = BankAccount::withTrashed()->where('created_by', '=', $this->creatorId());
+            
+            
+            $users      = (clone $userQuery)->count();
+            $accounts   = (clone $bankQuery)->count();
+            
 
             if($plan->max_users == -1)
             {
-                foreach($users as $user)
-                {
-                    $user->is_active = 1;
-                    $user->save();
-                }
+                $updateActivate = (clone $userQuery)->update(['is_active' => 1]);
             }
             else
             {
-                $userCount = 0;
-                foreach($users as $user)
-                {
-                    $userCount++;
-                    if($userCount <= $plan->max_users)
-                    {
-                        $user->is_active = 1;
-                        $user->save();
-                    }
-                    else
-                    {
-                        $user->is_active = 0;
-                        $user->save();
-                    }
-                }
+                $updateDelete = (clone $userQuery)->update(['is_active' => 0]);
+                $updateActivate = (clone $userQuery)->limit($plan->max_users)->update(['is_active' => 1]);
             }
-
-            if($plan->max_customers == -1)
+            $now = Carbon::now();
+            if($plan->max_bank_accounts == -1)
             {
-                foreach($customers as $customer)
-                {
-                    $customer->is_active = 1;
-                    $customer->save();
-                }
+                $updateActivate = (clone $bankQuery)->update(['deleted_at' => null]);
             }
             else
             {
-                $customerCount = 0;
-                foreach($customers as $customer)
-                {
-                    $customerCount++;
-                    if($customerCount <= $plan->max_customers)
-                    {
-                        $customer->is_active = 1;
-                        $customer->save();
-                    }
-                    else
-                    {
-                        $customer->is_active = 0;
-                        $customer->save();
-                    }
-                }
+                $updateDelete   = (clone $bankQuery)->update(['deleted_at' => $now]);
+                $updateActivate = (clone $bankQuery)->offset(0)->limit($plan->max_bank_accounts)->update(['deleted_at' => null]);
             }
 
 
-            if($plan->max_venders == -1)
-            {
-                foreach($venders as $vender)
-                {
-                    $vender->is_active = 1;
-                    $vender->save();
-                }
-            }
-            else
-            {
-                $venderCount = 0;
-                foreach($venders as $vender)
-                {
-                    $venderCount++;
-                    if($venderCount <= $plan->max_venders)
-                    {
-                        $vender->is_active = 1;
-                        $vender->save();
-                    }
-                    else
-                    {
-                        $vender->is_active = 0;
-                        $vender->save();
-                    }
-                }
-            }
-
+            
             return ['is_success' => true];
         }
         else
@@ -251,6 +206,12 @@ class User extends Authenticatable implements MustVerifyEmail
                 'error' => 'Plan is deleted.',
             ];
         }
+    }
+
+    public function initialize() {
+        $this->initialized = 1;
+        $planID = Plan::select('id')->where('price', '>', 0)->orderBy('price', 'asc')->first()->id;
+        $this->assignPlan($planID, 2);
     }
 
     public function customerNumberFormat($number)
