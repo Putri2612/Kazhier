@@ -23,6 +23,7 @@ use App\Models\Transaction;
 use App\Models\Utility;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -143,6 +144,8 @@ class InvoiceController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
+
+            dd(json_encode($request->all()));
             $status = Invoice::$statues;
 
             $invoice                 = new Invoice();
@@ -155,6 +158,7 @@ class InvoiceController extends Controller
             $invoice->ref_number     = $request->input('ref_number');
             $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
             $invoice->created_by     = Auth::user()->creatorId();
+            $invoice->served_by      = $user->id;
             $invoice->save();
             CustomField::saveData($invoice, $request->input('customField'));
             $products = $request->input('items');
@@ -173,6 +177,25 @@ class InvoiceController extends Controller
                 $invoiceProduct->discount   = $discount;
                 $invoiceProduct->price      = $price;
                 $invoiceProduct->save();
+            }
+
+            $invoice->send_date = date('Y-m-d');
+            $invoice->status    = 1;
+            $invoice->save();
+
+            $customer         = Customer::where('id', $invoice->customer_id)->first();
+            $invoice->name    = !empty($customer) ? $customer->name : '';
+            $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+
+            $invoiceId    = Crypt::encrypt($invoice->id);
+            $invoice->url = route('invoice.pdf', $invoiceId);
+
+            if($customer->email){
+                try {
+                    Mail::to($customer->email)->send(new InvoiceSend($invoice));
+                } catch(Exception $e) {
+                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+                }
             }
 
             return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
@@ -414,13 +437,15 @@ class InvoiceController extends Controller
             $invoiceId    = Crypt::encrypt($invoice->id);
             $invoice->url = route('invoice.pdf', $invoiceId);
 
-            try
-            {
-                Mail::to($customer->email)->send(new InvoiceSend($invoice));
-            }
-            catch(\Exception $e)
-            {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+            if($customer->email){
+                try
+                {
+                    Mail::to($customer->email)->send(new InvoiceSend($invoice));
+                }
+                catch(\Exception $e)
+                {
+                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+                }
             }
 
             return redirect()->back()->with('success', __('Invoice successfully sent.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
