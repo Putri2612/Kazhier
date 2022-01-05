@@ -16,20 +16,25 @@ class ProductService extends Model
         'unit_id',
         'type',
         'created_by',
+        'quantity'
     ];
 
     public function taxes()
     {
-        return $this->hasOne(Tax::class, 'id', 'tax_id')->first();
+        return $this->hasOne(Tax::class, 'id', 'tax_id');
     }
 
     public function unit()
     {
-        return $this->hasOne(ProductServiceUnit::class, 'id', 'unit_id')->first();
+        return $this->hasOne(ProductServiceUnit::class, 'id', 'unit_id');
     }
 
     public function category()
     {
         return $this->hasOne(ProductServiceCategory::class, 'id', 'category_id');
+    }
+
+    public function stock() {
+        return "{$this->quantity} {$this->unit->name}";
     }
 }

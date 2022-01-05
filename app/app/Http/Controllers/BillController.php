@@ -315,8 +315,8 @@ class BillController extends Controller
     public function product(Request $request)
     {
         $data['product']     = $product = ProductService::find($request->product_id);
-        $data['unit']        = (!empty($product->unit())) ? $product->unit()->name : '';
-        $data['taxRate']     = $taxRate = (!empty($product->taxes())) ? $product->taxes()->rate : 0;
+        $data['unit']        = $product->unit ? $product->unit->name : '';
+        $data['taxRate']     = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
         $salePrice           = $product->sale_price;
         $quantity            = 1;
         $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);

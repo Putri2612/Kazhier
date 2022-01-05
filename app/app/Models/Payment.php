@@ -16,6 +16,7 @@ class Payment extends Model
         'payment_method',
         'reference',
         'created_by',
+        'served_by',
     ];
 
     public function category()
@@ -36,6 +37,10 @@ class Payment extends Model
     public function bankAccount()
     {
         return $this->hasOne(BankAccount::class, 'id', 'account_id');
+    }
+
+    public function server(){
+        return $this->hasOne(User::class, 'id', 'served_by');
     }
 
 }

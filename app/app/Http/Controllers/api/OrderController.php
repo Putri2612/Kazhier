@@ -26,9 +26,14 @@ class OrderController extends Controller
         
         foreach ($invoices as $invoice) {
             $data[] = [
-                'order_id'      => $invoice->id,
-                'invoice_id'    => $invoice->invoice_id,
-                'order_time'    => 
+                'order_id'              => $invoice->id,
+                'invoice_id'            => $invoice->invoice_id,
+                'order_time'            => date_format($invoice->issue_date, 'H:i:s'),
+                'order_date'            => date_format($invoice->issue_date, 'Y-m-d'),
+                'order_price'           => $invoice->getTotal(),
+                'order_payment_method'  => $invoice->status > 2 ? $invoice->payments()->first()->bankAccount->bank_name . ' ' . $invoice->payments()->first()->bankAccount->holder_name : 'unpaid',
+                'customer_name'         => $invoice->customer->name,
+                'served_by'             => $invoice->served_by
             ];
         }
         

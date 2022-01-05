@@ -29,17 +29,17 @@
                         <div class="card-body">
                             <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link active" id="product-tab" data-toggle="tab" href="#product" role="tab" aria-controls="" aria-selected="true">
+                                    <a class="nav-link active" id="product-tab" data-bs-toggle="tab" data-bs-target="#product" role="tab" aria-controls="" aria-selected="true">
                                         {{__('Product & Service')}}
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="income-tab" data-toggle="tab" href="#income" role="tab" aria-controls="" aria-selected="false">
+                                    <a class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#income" role="tab" aria-controls="" aria-selected="false">
                                         {{__('Revenue')}}
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="expense-tab" data-toggle="tab" href="#expense" role="tab" aria-controls="" aria-selected="false">
+                                    <a class="nav-link" id="expense-tab" data-bs-toggle="tab" data-bs-target="#expense" role="tab" aria-controls="" aria-selected="false">
                                         {{__('Expense')}}
                                     </a>
                                 </li>

@@ -17,7 +17,7 @@ class Bill extends Model
         'created_by',
     ];
 
-    public static $statues = [
+    public static $statuses = [
         'Draft',
         'Sent',
         'Unpaid',
@@ -112,5 +112,9 @@ class Bill extends Model
     public function lastPayments()
     {
         return $this->hasOne(BillPayment::class, 'id', 'bill_id');
+    }
+
+    public function server(){
+        return $this->hasOne(User::class, 'id', 'served_by');
     }
 }

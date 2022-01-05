@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\Customer;
 use App\Http\Controllers\Controller;
+use App\Models\BankAccount;
 use App\Models\Plan;
 use App\Models\Projects;
 use App\Models\User;
-use App\Models\Vender;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -64,108 +65,19 @@ class LoginController extends Controller
 
         if($user->type == 'company')
         {
-            $free_plan = Plan::where('price', '=', '0.0')->first();
-            if($user->plan != $free_plan->id)
+            
+            if(date('Y-m-d') > $user->plan_expire_date)
             {
-                if(date('Y-m-d') > $user->plan_expire_date)
-                {
-                    $user->plan             = $free_plan->id;
-                    $user->plan_expire_date = null;
-                    $user->save();
+                $user->plan             = 0;
+                $user->plan_expire_date = null;
+                $user->save();
 
-                    $users     = User::where('created_by', '=', \Auth::user()->creatorId())->get();
-                    $customers = Customer::where('created_by', '=', \Auth::user()->creatorId())->get();
-                    $venders   = Vender::where('created_by', '=', \Auth::user()->creatorId())->get();
+                $users      = User::where('created_by', '=', Auth::user()->creatorId())->update(['is_active' => 0]);
+                $accounts   = BankAccount::where('created_by', '=', Auth::user()->creatorId())->update(['deleted_at' => now()]);
 
-                    if($free_plan->max_users == -1)
-                    {
-                        foreach($users as $user)
-                        {
-                            $user->is_active = 1;
-                            $user->save();
-                        }
-                    }
-                    else
-                    {
-                        $userCount = 0;
-                        foreach($users as $user)
-                        {
-                            $userCount++;
-                            if($userCount <= $free_plan->max_users)
-                            {
-                                $user->is_active = 1;
-                                $user->save();
-                            }
-                            else
-                            {
-                                $user->is_active = 0;
-                                $user->save();
-                            }
-                        }
-
-                    }
-
-
-                    if($free_plan->max_customers == -1)
-                    {
-                        foreach($customers as $customer)
-                        {
-                            $customer->is_active = 1;
-                            $customer->save();
-                        }
-                    }
-                    else
-                    {
-                        $customerCount = 0;
-                        foreach($customers as $customer)
-                        {
-                            $customerCount++;
-                            if($customerCount <= $free_plan->max_customers)
-                            {
-                                $customer->is_active = 1;
-                                $customer->save();
-                            }
-                            else
-                            {
-                                $customer->is_active = 0;
-                                $customer->save();
-                            }
-                        }
-                    }
-
-                    if($free_plan->max_venders == -1)
-                    {
-                        foreach($venders as $vender)
-                        {
-                            $vender->is_active = 1;
-                            $vender->save();
-                        }
-                    }
-                    else
-                    {
-                        $venderCount = 0;
-                        foreach($venders as $vender)
-                        {
-                            $venderCount++;
-                            if($venderCount <= $free_plan->max_venders)
-                            {
-                                $vender->is_active = 1;
-                                $vender->save();
-                            }
-                            else
-                            {
-                                $vender->is_active = 0;
-                                $vender->save();
-                            }
-                        }
-                    }
-
-                    return redirect()->route('dashboard')->with('error', 'Your plan expired limit is over, please upgrade your plan');
-                }
+                return redirect()->route('dashboard')->with('error', 'Your plan expired limit is over, please upgrade your plan');
             }
-
         }
-
     }
 
     public function showCustomerLoginForm($lang = 'id')
@@ -183,16 +95,16 @@ class LoginController extends Controller
                     ]
         );
 
-        if(\Auth::guard('customer')->attempt(
+        if(Auth::guard('customer')->attempt(
             [
                 'email' => $request->email,
                 'password' => $request->password,
             ], $request->get('remember')
         ))
         {
-            if(\Auth::guard('customer')->user()->is_active == 0)
+            if(Auth::guard('customer')->user()->is_active == 0)
             {
-                \Auth::guard('customer')->logout();
+                Auth::guard('customer')->logout();
             }
 
             return redirect()->route('customer.dashboard');
@@ -214,16 +126,16 @@ class LoginController extends Controller
                         'password' => 'required|min:6',
                     ]
         );
-        if(\Auth::guard('vender')->attempt(
+        if(Auth::guard('vender')->attempt(
             [
                 'email' => $request->email,
                 'password' => $request->password,
             ], $request->get('remember')
         ))
         {
-            if(\Auth::guard('vender')->user()->is_active == 0)
+            if(Auth::guard('vender')->user()->is_active == 0)
             {
-                \Auth::guard('vender')->logout();
+                Auth::guard('vender')->logout();
             }
 
             return redirect()->route('vender.dashboard');
@@ -234,25 +146,25 @@ class LoginController extends Controller
 
     public function showLoginForm($lang = 'id')
     {
-        \App::setLocale($lang);
+        App::setLocale($lang);
 
         return view('auth.login', compact('lang'));
     }
 
     public function showLinkRequestForm($lang = 'id')
     {
-        \App::setLocale($lang);
+        App::setLocale($lang);
         return view('auth.passwords.email', compact('lang'));
     }
 
     public function showCustomerLoginLang($lang = 'id')
     {
-        \App::setLocale($lang);
+        App::setLocale($lang);
         return view('auth.customer_login', compact('lang'));
     }
     public function showVenderLoginLang($lang = 'id')
     {
-        \App::setLocale($lang);
+        App::setLocale($lang);
         return view('auth.vender_login', compact('lang'));
     }
 

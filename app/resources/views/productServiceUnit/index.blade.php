@@ -50,7 +50,7 @@
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete constant category')
-                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('product-unit.destroy', $unit->id]) }}">
+                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('product-unit.destroy', [$unit->id]) }}">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
                                                                 @endcan
