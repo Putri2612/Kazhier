@@ -3,14 +3,17 @@ nav{
     width: 100%;
     display: flex;
     justify-content: flex-end;
+    position: relative;
 }
 
 .nav-btn{
     width: 31px;
     height: 20px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 3;
     cursor: pointer;
-    margin: 5% 0;
     
     [class^="btn-burg"]{
         width: 31px;
@@ -57,14 +60,14 @@ nav{
     margin: 0;
     z-index: 2;
     opacity: 0;
-    background-color: $light;
-    box-shadow: 0 1px 5px -5px $gray;
+    background-color: $white;
+    box-shadow: 0 5px 30px -10px $gray;
     border-radius: 15px 0 15px 15px;
-    transform: translateY(-200%);
-    transition: linear .2s;
+    transform: translateX(150%);
+    transition: .3s;
     &.open{
         opacity: 1;
-        transform: translateY(0);
+        transform: translate(0);
     }
 }
 
@@ -72,7 +75,6 @@ nav{
     text-align: center;
     display: block;
     padding: 1rem;
-    border-bottom: 1px solid darken(#f8f9fa, 10%);
     transition: linear 0.3s;
     &:hover{
         background: darken(#f8f9fa, 2%)
