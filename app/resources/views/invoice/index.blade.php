@@ -20,49 +20,17 @@
                 <div class="col-12">
                     <div class="row crd mb-3">
                         <h4 class="col-6 fw-normal">{{__('Manage Invoice')}}</h4>
-                        <div class="col-6 row text-end">
-                            <div class="col-lg-8"></div>
-                            {{-- <div class="dropdown col-lg-2">
-                                <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
-                                    @if(!\Auth::guard('customer')->check())
-                                        {{ Form::open(array('route' => array('invoice.index'),'method' => 'GET')) }}
-                                    @else
-                                        {{ Form::open(array('route' => array('customer.invoice'),'method' => 'GET')) }}
-                                    @endif
-                                    @if(!\Auth::guard('customer')->check())
-                                        <div class="form-group">
-                                            {{ Form::label('customer', __('Customer')) }}
-                                            {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
-                                        </div>
-                                    @endif
-                                    <div class="form-group">
-                                        {{ Form::label('issue_date', __('Date')) }}
-                                        {{ Form::text('issue_date', isset($_GET['issue_date'])?$_GET['issue_date']:null, array('class' => 'form-control datepicker-range')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('status', __('Status')) }}
-                                        {{ Form::select('status', [''=>'All']+$status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                        @if(!\Auth::guard('customer')->check())
-                                            <a href="{{route('invoice.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                        @else
-                                            <a href="{{route('customer.invoice')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                        @endif
-                                    </div>
-                                    {{ Form::close() }}
-                                </div>
-                            </div> --}}
-                            <div class="col-lg-2">
+                        <div class="col-6 row justify-content-end text-end">
+                            @if(Auth::user()->type == 'company')
+                            <div class="col-auto">
                                 <a href="{{ route('invoice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                     <span class="btn-inner--text"> {{__('Export')}}</span>
                                 </a>
                             </div>
+                            @endif
                             @can('create invoice')
-                            <div class="col-lg-2">
+                            <div class="col-auto">
                                 <a href="{{ route('invoice.create') }}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -74,6 +42,36 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
+                                @if(!Auth::guard('customer')->check())
+                                {{ Form::open(array('route' => array('invoice.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                @else
+                                {{ Form::open(array('route' => array('customer.invoice'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                @endif
+                                <div class="form-group col-12 col-md-6 col-lg-auto">
+                                    {{ Form::label('issue_date', __('Date')) }}
+                                    {{ Form::text('issue_date', isset($_GET['issue_date'])?$_GET['issue_date']:null, array('class' => 'form-control datepicker-range')) }}
+                                </div>
+                                @if(!\Auth::guard('customer')->check())
+                                    <div class="form-group col-12 col-md-6 col-lg-2">
+                                        {{ Form::label('customer', __('Customer')) }}
+                                        {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
+                                    </div>
+                                @endif
+                                <div class="form-group col-12 col-md-6 col-lg-2">
+                                    {{ Form::label('status', __('Status')) }}
+                                    {{ Form::select('status', [''=>'All']+$status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg-auto">
+                                    <div class="text-end">
+                                        <button type="submit" class="btn btn-primary btn-round"><i class="fas fa-search"></i></button>
+                                        @if(!\Auth::guard('customer')->check())
+                                            <a href="{{route('invoice.index')}}" class="btn btn-danger btn-round"><i class="fas fa-trash"></i></a>
+                                        @else
+                                            <a href="{{route('customer.invoice')}}" class="btn btn-danger btn-round"><i class="fas fa-trash"></i></a>
+                                        @endif
+                                    </div>
+                                </div>
+                                {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">
                                         <div class="row">

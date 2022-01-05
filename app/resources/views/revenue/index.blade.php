@@ -16,42 +16,18 @@
                 <div class="col-12">
                     <div class="row crd mb-3">
                         <h4 class="col-6 fw-normal">{{__('Manage Revenue')}}</h4>
-                        <div class="col-6 text-end row">
-                            <div class="col-lg-8"></div>
-                            <div class="dropdown col-lg-2">
-                                <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
-                                    {{ Form::open(array('route' => array('revenue.index'),'method' => 'GET')) }}
-                                    <div class="form-group">
-                                        {{ Form::label('date', __('Date')) }}
-                                        {{ Form::text('date', isset($_GET['date'])?$_GET['date']:null, array('class' => 'form-control datepicker-range')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('account', __('Account')) }}
-                                        {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('customer', __('Customer')) }}
-                                        {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('category', __('Category')) }}
-                                        {{ Form::select('category',$category,isset($_GET['category'])?$_GET['category']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('payment', __('Payment Method')) }}
-                                        {{ Form::select('payment',$payment,isset($_GET['payment'])?$_GET['payment']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                        <a href="{{route('revenue.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                    </div>
-                                    {{ Form::close() }}
-                                </div>
+                        <div class="col-6 text-end row justify-content-end">
+                            @if (Auth::user()->type == 'company')
+                            <div class="col-auto">
+                                <a href="{{ route('revenue.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
+                                    <span class="btn-inner--text"> {{__('Export')}}</span>
+                                </a>
                             </div>
+                            @endif
+                            
                             @can('create revenue')
-                            <div class="col-lg-2">
+                            <div class="col-auto">
                                 <a href="#" data-url="{{ route('revenue.create') }}" data-ajax-popup="true" data-title="{{__('Create New Revenue')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -63,6 +39,33 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
+                                {{ Form::open(array('route' => array('revenue.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                <div class="col-12 col-md-6 col-lg-auto form-group">
+                                    {{ Form::label('date', __('Date')) }}
+                                    {{ Form::text('date', isset($_GET['date'])?$_GET['date']:null, array('class' => 'form-control datepicker-range')) }}
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-2 form-group">
+                                    {{ Form::label('account', __('Account')) }}
+                                    {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-2 form-group">
+                                    {{ Form::label('customer', __('Customer')) }}
+                                    {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-2 form-group">
+                                    {{ Form::label('category', __('Category')) }}
+                                    {{ Form::select('category',$category,isset($_GET['category'])?$_GET['category']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-2 form-group">
+                                    {{ Form::label('payment', __('Payment Method')) }}
+                                    {{ Form::select('payment',$payment,isset($_GET['payment'])?$_GET['payment']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-round btn-primary"><i class="fas fa-search"></i></button>
+                                    <a href="{{route('revenue.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                </div>
+                                {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">
                                         <div class="row">

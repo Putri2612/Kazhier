@@ -231,6 +231,13 @@ div.dataTables_wrapper div.dataTables_filter input {
     border-bottom: unset;
 }
 
+.datepicker-range{
+    border-radius: 20px;
+    min-height: 42px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+}
+
 .lead-wrap .lead-grp {
     /*border: 1px solid #f5f5f5;*/
     padding: 15px;

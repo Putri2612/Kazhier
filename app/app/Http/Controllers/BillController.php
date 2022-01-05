@@ -39,7 +39,7 @@ class BillController extends Controller
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $vender->prepend('All', '');
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Bill::where('created_by', '=', \Auth::user()->creatorId());
             if(!empty($request->vender))
@@ -515,7 +515,7 @@ class BillController extends Controller
         if(\Auth::user()->can('manage vender bill'))
         {
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Bill::where('vender_id', '=', \Auth::user()->vender_id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
 

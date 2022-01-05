@@ -29,6 +29,7 @@ Route::as('api.')->group(
 
         Route::group(['middleware' => 'auth:api'], function() {
 
+            Route::get('order', [OrderController::class, 'index'])->name('order.index');
             Route::post('order/create', [OrderController::class, 'create'])->name('order.create');
 
             Route::get('product-service', [ProductServiceController::class, 'get'])->name('product-service.get');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RevenueExport;
 use App\Models\BankAccount;
 use App\Models\Customer;
 use App\Models\InvoicePayment;
@@ -13,15 +14,18 @@ use App\Models\Revenue;
 use App\Models\Transaction;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use App\Traits\CanUploadFile;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RevenueController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanUploadFile;
+    use CanManageBalance, CanProcessNumber, CanUploadFile, CanRedirect;
     
     public function index(Request $request)
     {
@@ -73,7 +77,7 @@ class RevenueController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -176,7 +180,7 @@ class RevenueController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -266,7 +270,7 @@ class RevenueController extends Controller
 
             return redirect()->route('revenue.index')->with('success', __('Revenue successfully updated.'));
         } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -288,10 +292,18 @@ class RevenueController extends Controller
 
                 return redirect()->route('revenue.index')->with('success', __('Revenue successfully deleted.'));
             } else {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         } else {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function export() {
+        if(Auth::user()->type == 'company'){
+            return Excel::download(new RevenueExport, 'revenues.xlsx');
+        } else {
+            return $this->RedirectDenied();
         }
     }
 }

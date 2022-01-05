@@ -990,7 +990,7 @@ class ReportController extends Controller
 
             $customer->prepend('All', '');
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Invoice::where('created_by', '=', \Auth::user()->creatorId());
 
@@ -1057,7 +1057,7 @@ class ReportController extends Controller
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'vender_id');
             $vender->prepend('All', '');
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Bill::where('created_by', '=', \Auth::user()->creatorId());
             if(!empty($request->vender))
