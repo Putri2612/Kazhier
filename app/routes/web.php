@@ -187,6 +187,7 @@ Route::group(
         Route::get('company-setting', [SystemController::class, 'companyIndex'])->name('company.setting');
         Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
 
+        Route::get('productservice/export', [ProductServiceController::class, 'export'])->name('productservice.export');
         Route::resource('productservice', ProductServiceController::class);
 
         Route::resource('customer', CustomerController::class);
@@ -227,22 +228,25 @@ Route::group(
 
         Route::prefix('invoice')->as('invoice.')->group(
             function () {
-                Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
-                Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
-                Route::get('{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('payment.reminder');
-                Route::post('product/destroy', [InvoiceController::class, 'productDestroy'])->name('product.destroy');
-                Route::post('product', [InvoiceController::class, 'product'])->name('product');
-                Route::post('customer', [InvoiceController::class, 'customer'])->name('customer');
-                Route::get('{id}/sent', [InvoiceController::class, 'sent'])->name('sent');
-                Route::get('{id}/payment', [InvoiceController::class, 'payment'])->name('payment');
-                Route::post('{id}/payment', [InvoiceController::class, 'createPayment'])->name('payment.create');
-                Route::delete('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
-
                 Route::get('{id}/credit-note', [CreditNoteController::class, 'create'])->name('credit.note');
                 Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
                 Route::get('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('edit.credit.note');
                 Route::put('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('update.credit.note');
                 Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('delete.credit.note');
+
+                Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
+                Route::get('{id}/payment', [InvoiceController::class, 'payment'])->name('payment');
+                Route::delete('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
+                Route::get('{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('payment.reminder');
+                Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
+                Route::get('{id}/sent', [InvoiceController::class, 'sent'])->name('sent');
+                Route::post('{id}/payment', [InvoiceController::class, 'createPayment'])->name('payment.create');
+
+                Route::post('customer', [InvoiceController::class, 'customer'])->name('customer');
+                Route::get('export', [InvoiceController::class, 'export'])->name('export');
+                Route::post('product/destroy', [InvoiceController::class, 'productDestroy'])->name('product.destroy');
+                Route::post('product', [InvoiceController::class, 'product'])->name('product');
+
             }
         );
 
@@ -253,27 +257,29 @@ Route::group(
         Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
         Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
 
+        Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
         Route::resource('revenue', RevenueController::class);
-
         // Expense
 
         Route::prefix('bill')->as('bill.')->group(
             function() {
-                Route::get('{id}/duplicate', [BillController::class, 'duplicate'])->name('duplicate');
-                Route::get('{id}/shipping/print', [BillController::class, 'shippingDisplay'])->name('shipping.print');
-                Route::post('product/destroy', [BillController::class, 'productDestroy'])->name('product.destroy');
-                Route::post('product', [BillController::class, 'product'])->name('product');
-                Route::post('vender', [BillController::class, 'vender'])->name('vender');
-                Route::get('{id}/sent', [BillController::class, 'sent'])->name('sent');
-                Route::get('{id}/payment', [BillController::class, 'payment'])->name('payment');
-                Route::post('{id}/payment', [BillController::class, 'createPayment'])->name('payment.create');
-                Route::delete('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
-
                 Route::get('{id}/debit-note', [DebitNoteController::class, 'create'])->name('debit.note');
                 Route::post('{id}/debit-note', [DebitNoteController::class, 'store'])->name('debit.note.store');
                 Route::get('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'edit'])->name('edit.debit.note');
                 Route::put('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'update'])->name('update.debit.note');
                 Route::delete('{id}/debit-note/delete/{cn_id}', [DebitNoteController::class, 'destroy'])->name('delete.debit.note');
+
+                Route::get('{id}/duplicate', [BillController::class, 'duplicate'])->name('duplicate');
+                Route::get('{id}/shipping/print', [BillController::class, 'shippingDisplay'])->name('shipping.print');
+                Route::get('{id}/sent', [BillController::class, 'sent'])->name('sent');
+                Route::get('{id}/payment', [BillController::class, 'payment'])->name('payment');
+                Route::post('{id}/payment', [BillController::class, 'createPayment'])->name('payment.create');
+                Route::delete('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
+
+                Route::get('export', [BillController::class, 'export'])->name('export');
+                Route::post('product/destroy', [BillController::class, 'productDestroy'])->name('product.destroy');
+                Route::post('product', [BillController::class, 'product'])->name('product');
+                Route::post('vender', [BillController::class, 'vender'])->name('vender');
             }
         );
 
@@ -284,6 +290,7 @@ Route::group(
         Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note.store');
         Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
 
+        Route::get('payment/export', [PaymentController::class, 'export'])->name('payment.export');
         Route::resource('payment', PaymentController::class);
 
         Route::resource('expenses', ExpenseController::class);

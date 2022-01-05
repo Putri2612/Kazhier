@@ -16,27 +16,17 @@
                 <div class="col-12">
                     <div class="row mb-3 crd">
                         <h4 class="col-6 fw-normal">{{__('Manage Product & Service')}}</h4>
-                        <div class="col-6 row text-end">
-                            <div class="col-lg-8"></div>
-                            <div class="dropdown col-lg-2">
-                                <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round">
-                                    <i class="fas fa-filter"></i>{{__('Filter')}}
+                        <div class="col-6 row text-end justify-content-end">
+                            @if (Auth::user()->type == 'company')
+                            <div class="col-auto">
+                                <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
+                                    <span class="btn-inner--text"> {{__('Export')}}</span>
                                 </a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
-                                    {{ Form::open(array('route' => array('productservice.index'),'method' => 'GET')) }}
-                                    <div class="form-group">
-                                        {{ Form::label('category', __('Category')) }}
-                                        {{ Form::select('category', $category,null, array('class' => 'form-control font-style selectric','required'=>'required')) }}
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                        <a href="{{route('productservice.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                    </div>
-                                    {{ Form::close() }}
-                                </div>
                             </div>
+                            @endif
                             @can('create product & service')
-                            <div class="col-lg-2">
+                            <div class="col-auto">
                                 <a href="#" data-url="{{ route('productservice.create') }}" data-ajax-popup="true" data-title="{{__('Create New Product')}}" class="btn btn-icon icon-left btn-primary btn-round">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
@@ -48,6 +38,16 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
+                                {{ Form::open(array('route' => array('productservice.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                <div class="form-group col-12 col-md-6 col-lg-2">
+                                    {{ Form::label('category', __('Category')) }}
+                                    {{ Form::select('category', $category,null, array('class' => 'form-control font-style selectric','required'=>'required')) }}
+                                </div>
+                                <div class="form-group text-end col-12 col-md-6 col-lg-auto">
+                                    <button type="submit" class="btn btn-round btn-primary"><i class="fas fa-search"></i></button>
+                                    <a href="{{route('productservice.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                </div>
+                                {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">
                                         <div class="row">
@@ -75,9 +75,9 @@
                                                             <td>{{ $productService->sku }}</td>
                                                             <td>{{ \Auth::user()->priceFormat($productService->sale_price) }}</td>
                                                             <td>{{  \Auth::user()->priceFormat($productService->purchase_price )}}</td>
-                                                            <td>{{ !empty($productService->taxes())?$productService->taxes()->name :'' }}</td>
-                                                            <td>{{ !empty($productService->category)?$productService->category->name:'' }}</td>
-                                                            <td>{{ !empty($productService->unit())?$productService->unit()->name:'' }}</td>
+                                                            <td>{{ $productService->taxes?$productService->taxes->name :'' }}</td>
+                                                            <td>{{ $productService->category?$productService->category->name:'' }}</td>
+                                                            <td>{{ $productService->unit?$productService->unit->name:'' }}</td>
                                                             <td>{{ $productService->type }}</td>
                                                             <td>{{ $productService->description }}</td>
 

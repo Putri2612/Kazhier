@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductServiceExport;
 use App\Models\CustomField;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductServiceController extends Controller
 {
-    use CanProcessNumber;
+    use CanProcessNumber, CanRedirect;
     public function index(Request $request)
     {
 
@@ -222,6 +226,14 @@ class ProductServiceController extends Controller
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
+        }
+    }
+
+    public function export() {
+        if(Auth::user()->type == 'company') {
+            return Excel::download(new ProductServiceExport, 'Product & Services.xlsx');
+        } else {
+            return $this->RedirectDenied();
         }
     }
 
