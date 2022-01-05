@@ -22,7 +22,7 @@
                         <h4 class="col-6 fw-normal">{{__('Manage Invoice')}}</h4>
                         <div class="col-6 row text-end">
                             <div class="col-lg-8"></div>
-                            <div class="dropdown col-lg-2">
+                            {{-- <div class="dropdown col-lg-2">
                                 <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
                                 <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     @if(!\Auth::guard('customer')->check())
@@ -54,6 +54,12 @@
                                     </div>
                                     {{ Form::close() }}
                                 </div>
+                            </div> --}}
+                            <div class="col-lg-2">
+                                <a href="{{ route('invoice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
+                                    <span class="btn-inner--text"> {{__('Export')}}</span>
+                                </a>
                             </div>
                             @can('create invoice')
                             <div class="col-lg-2">
@@ -110,15 +116,15 @@
                                                             <td>{{ Auth::user()->dateFormat($invoice->due_date) }}</td>
                                                             <td>
                                                                 @if($invoice->status == 0)
-                                                                    <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                                    <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                                                 @elseif($invoice->status == 1)
-                                                                    <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                                    <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                                                 @elseif($invoice->status == 2)
-                                                                    <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                                    <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                                                 @elseif($invoice->status == 3)
-                                                                    <span class="badge badge-info">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                                    <span class="badge badge-info">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                                                 @elseif($invoice->status == 4)
-                                                                    <span class="badge badge-success">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                                                    <span class="badge badge-success">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                                                 @endif
                                                             </td>
                                                             @if(Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))

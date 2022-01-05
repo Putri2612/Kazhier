@@ -184,15 +184,15 @@
                                     <address>
                                         <strong>{{__('Status')}}:</strong><br>
                                         @if($invoice->status == 0)
-                                            <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                            <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                         @elseif($invoice->status == 1)
-                                            <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                            <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                         @elseif($invoice->status == 2)
-                                            <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                            <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                         @elseif($invoice->status == 3)
-                                            <span class="badge badge-info">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                            <span class="badge badge-info">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                         @elseif($invoice->status == 4)
-                                            <span class="badge badge-success">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
+                                            <span class="badge badge-success">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
                                         @endif
                                     </address>
                                 </div>
@@ -228,16 +228,16 @@
                                         @endif
                                         <th class="text-end">{{__('Price')}}</th>
                                     </tr>
-                                    @foreach($iteams as $key =>$iteam)
+                                    @foreach($iteams as $key =>$item)
                                         <tr>
                                             <td>{{$key+1}}</td>
-                                            <td>{{!empty($iteam->product())?$iteam->product()->name:''}}</td>
-                                            <td class="text-center">{{$iteam->quantity}}</td>
-                                            <td class="text-center">{{$iteam->tax}}</td>
+                                            <td>{{!empty($item->product)?$item->product->name:''}}</td>
+                                            <td class="text-center">{{$item->quantity}}</td>
+                                            <td class="text-center">{{$item->tax}}</td>
                                             @if($invoice->discount_apply==1)
-                                                <td class="text-center">{{\Auth::user()->priceFormat($iteam->discount)}}</td>
+                                                <td class="text-center">{{\Auth::user()->priceFormat($item->discount)}}</td>
                                             @endif
-                                            <td class="text-end">{{\Auth::user()->priceFormat($iteam->price)}}</td>
+                                            <td class="text-end">{{\Auth::user()->priceFormat($item->price)}}</td>
                                         </tr>
                                     @endforeach
                                 </table>

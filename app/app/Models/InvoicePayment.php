@@ -14,6 +14,7 @@ class InvoicePayment extends Model
         'reference',
         'description',
         'created_by',
+        'served_by'
     ];
 
     public function invoice(){
@@ -28,5 +29,9 @@ class InvoicePayment extends Model
     public function bankAccount()
     {
         return $this->hasOne(BankAccount::class, 'id', 'account_id');
+    }
+    
+    public function server(){
+        return $this->hasOne(User::class, 'id', 'served_by');
     }
 }

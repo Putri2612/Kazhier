@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InvoiceExport;
 use App\Models\ActivityLog;
 use App\Models\BankAccount;
 use App\Models\Customer;
@@ -30,6 +31,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
@@ -49,7 +51,7 @@ class InvoiceController extends Controller
             $customer = Customer::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend('All', '');
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Invoice::where('created_by', '=', Auth::user()->creatorId());
 
@@ -145,8 +147,7 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            dd(json_encode($request->all()));
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $invoice                 = new Invoice();
             $invoice->invoice_id     = $this->invoiceNumber();
@@ -374,7 +375,7 @@ class InvoiceController extends Controller
         if(Auth::user()->can('manage customer invoice'))
         {
 
-            $status = Invoice::$statues;
+            $status = Invoice::$statuses;
 
             $query = Invoice::where('customer_id', '=', Auth::user()->id)->where('status', '!=', '0')->where('created_by', Auth::user()->creatorId());
 
@@ -834,5 +835,7 @@ class InvoiceController extends Controller
         return redirect()->back()->with('success', __('Invoice Setting updated successfully'));
     }
 
-
+    public function export() {
+        return Excel::download(new InvoiceExport, 'invoices.xlsx');
+    }
 }

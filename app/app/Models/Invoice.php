@@ -17,7 +17,7 @@ class Invoice extends Model
         'created_by',
     ];
 
-    public static $statues = [
+    public static $statuses = [
         'Draft',
         //0
         'Sent',
@@ -28,6 +28,11 @@ class Invoice extends Model
         //3
         'Paid',
         //4
+    ];
+
+    protected $casts = [
+        'issue_date'    => 'datetime',
+        'due_date'      => 'datetime',
     ];
 
 
@@ -128,6 +133,8 @@ class Invoice extends Model
     {
         return $this->hasOne(InvoicePayment::class, 'id', 'invoice_id');
     }
-
+    public function server(){
+        return $this->hasOne(User::class, 'id', 'served_by');
+    }
 
 }

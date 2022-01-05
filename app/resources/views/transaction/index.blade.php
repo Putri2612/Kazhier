@@ -62,7 +62,7 @@
                                                     @foreach ($transactions as $transaction)
                                                         <tr class="font-style">
                                                             <td>{{ \Auth::user()->dateFormat($transaction->date)}}</td>
-                                                            <td>{{!empty($transaction->bankAccount())?$transaction->bankAccount()->bank_name.' '.$transaction->bankAccount()->holder_name:''}}</td>
+                                                            <td>{{!empty($transaction->bankAccount)?$transaction->bankAccount->bank_name.' '.$transaction->bankAccount->holder_name:''}}</td>
                                                             <td class="font-style">{{  $transaction->type}}</td>
                                                             <td class="font-style">{{  $transaction->category}}</td>
                                                             <td>{{  $transaction->description}}</td>

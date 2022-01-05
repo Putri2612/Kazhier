@@ -106,15 +106,15 @@
                                                             <td>{{ Auth::user()->dateFormat($bill->due_date) }}</td>
                                                             <td>
                                                                 @if($bill->status == 0)
-                                                                    <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statues[$bill->status]) }}</span>
+                                                                    <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span>
                                                                 @elseif($bill->status == 1)
-                                                                    <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statues[$bill->status]) }}</span>
+                                                                    <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span>
                                                                 @elseif($bill->status == 2)
-                                                                    <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statues[$bill->status]) }}</span>
+                                                                    <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span>
                                                                 @elseif($bill->status == 3)
-                                                                    <span class="badge badge-info">{{ __(\App\Models\Invoice::$statues[$bill->status]) }}</span>
+                                                                    <span class="badge badge-info">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span>
                                                                 @elseif($bill->status == 4)
-                                                                    <span class="badge badge-success">{{ __(\App\Models\Invoice::$statues[$bill->status]) }}</span>
+                                                                    <span class="badge badge-success">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span>
                                                                 @endif
                                                             </td>
                                                             @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
