@@ -8,7 +8,9 @@ use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
 use App\Models\ProductServiceCategory;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
+use App\Traits\CanManageIDs;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,15 +19,16 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanManageIDs, ApiResponse;
 
     public function index() {
         $user       = Auth::user();
         $creatorID  = $user->creatorId();
         $invoices   = Invoice::where('created_by', '=', $creatorID)->get();
+        $data       = [];
         
         foreach ($invoices as $invoice) {
-            $data[] = [
+            array_push($data, [
                 'order_id'              => $invoice->id,
                 'invoice_id'            => $invoice->invoice_id,
                 'order_time'            => date_format($invoice->issue_date, 'H:i:s'),
@@ -33,30 +36,48 @@ class OrderController extends Controller
                 'order_price'           => $invoice->getTotal(),
                 'order_payment_method'  => $invoice->status > 2 ? $invoice->payments()->first()->bankAccount->bank_name . ' ' . $invoice->payments()->first()->bankAccount->holder_name : 'unpaid',
                 'customer_name'         => $invoice->customer->name,
+                'status'                => Invoice::$statuses[$invoice->status],
                 'served_by'             => $invoice->served_by
-            ];
+            ]);
         }
         
 
-        return response()->json($data);
+        return $this->FetchSuccessResponse($data);
     }
 
     public function create(Request $request) {
+        $validator  = Validator::make($request->all(), [
+            'order_date'            => 'required',
+            'order_time'            => 'required',
+            'order_category_id'     => 'required',
+            'customer_name'         => 'required',
+            'products'              => 'required',
+            'order_price'           => 'required',
+            'order_payment_method'  => 'required',
+            'payment_method'        => 'required',
+        ]);
+
+        if($validator->fails()){
+            return $this->FailedResponse('One or more parameter is missing');
+        }
+        
         $user       = Auth::user();
         $creatorID  = $user->creatorId();
         $products   = $request->input('products');
 
         $customer   = Customer::firstOrNew([
-            'name'      => $request->input('customer_name')
+            'name'      => $request->input('customer_name'),
+            'created_by'=> $creatorID,
         ], [
-            'contact'           => $request->has('customer_phone') ? $request->input('customer_phone') : 000000,
+            'email'             => $request->has('customer_email') ? $request->input('customer_email') : 'noemail@example.com',
+            'contact'           => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
             'billing_name'      => $request->input('customer_name'),
-            'billing_phone'     => $request->has('customer_phone') ? $request->input('customer_phone') : 000000,
-            'billing_address'   => $request->has('customer_address') ? $request->input('customer_address') : '-',
+            'billing_phone'     => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
+            'billing_address'   => $request->has('customer_address') ? $request->input('customer_address') : 'no address',
             'shipping_name'     => $request->input('customer_name'),
-            'shipping_phone'    => $request->has('customer_phone') ? $request->input('customer_phone') : 000000,
-            'shipping_address'  => $request->has('customer_address') ? $request->input('customer_address') : '-',
-            'customer_id'       => $this->customerNumber($creatorID),
+            'shipping_phone'    => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
+            'shipping_address'  => $request->has('customer_address') ? $request->input('customer_address') : 'no address',
+            'customer_id'       => $this->CustomerNumber(),
         ]);
         $customer->save();
 
@@ -64,9 +85,9 @@ class OrderController extends Controller
         $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
         
         $invoice                    = new Invoice();
-        $invoice->invoice_id        = $this->invoiceNumber($creatorID);
+        $invoice->invoice_id        = $this->InvoiceNumber();
         $invoice->customer_id       = $customer->id;
-        $invoice->status            = 4;
+        $invoice->status            = 2;
         $invoice->issue_date        = $datetime;
         $invoice->due_date          = $datetime;
         $invoice->category_id       = $request->input('order_category_id');
@@ -103,30 +124,19 @@ class OrderController extends Controller
         $invoicePayment->payment_method = $request->input('payment_method');
         $invoicePayment->reference      = '';
         $invoicePayment->description    = '';
+        $invoicePayment->served_by      = $user->id;
         $invoicePayment->created_by     = $creatorID;
         $invoicePayment->save();
         $this->AddBalance($request->input('order_payment_method'), $request->input('order_price'), $request->input('order_date'));
 
-        return response()->json(['message' => 'Successfully stored']);
-    }
-
-    private function invoiceNumber($id) {
-        $latest = Invoice::where('created_by', '=', $id)->latest()->first();
-        if(!$latest)
-        {
-            return 1;
+        if($invoice->getDue() == 0) {
+            $invoice->status = 4;
+        } else if ($invoice->getDue() == $invoice->getTotal()) {
+            $invoice->status = 2;
+        } else {
+            $invoice->status = 3;
         }
 
-        return $latest->invoice_id + 1;
-    }
-
-    private function customerNumber($id) {
-        $latest = Customer::where('created_by', '=', $id)->latest()->first();
-        if(!$latest)
-        {
-            return 1;
-        }
-
-        return $latest->customer_id + 1;
+        return $this->CreateSuccessResponse();
     }
 }
