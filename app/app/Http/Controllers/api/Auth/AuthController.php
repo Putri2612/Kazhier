@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     // public function register (Request $request) {
     //     $validator = $request->validate([
     //         'name'      => 'required|string',
@@ -35,16 +37,16 @@ class AuthController extends Controller
         ]);
 
         if($validation->fails()) {
-            return response()->json(['message' => 'Email or password missing']);
+            return $this->FailedResponse('Email or password missing');
         }
 
         if(Auth::attempt(['email' => $request->input('email'), 'password' => $request->input('password')])){
             $user   = Auth::user();
             $token  = $user->createToken('KazhierPAC')->accessToken;
 
-            return response()->json(['token' => $token]);
+            return  $this->FetchSuccessResponse(['token' => $token]);
         } else {
-            return response()->json(['message' => 'Incorrect email or password']);
+            return $this->FailedResponse('Incorrect email or password');
         }
     }
 }
