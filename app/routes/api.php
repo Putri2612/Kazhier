@@ -32,6 +32,8 @@ Route::as('api.')->group(
         Route::group(['middleware' => 'auth:api'], function() {
 
             Route::get('bank-account', [BankAccountController::class, 'get'])->name('bank-account.get');
+            Route::post('bank-account/create', [BankAccountController::class, 'create'])->name('bank-account.create');
+            Route::delete('bank-account/{account_id}/delete', [BankAccountController::class, 'destroy'])->name('bank-account.destroy');
             
             Route::post('category/create', [ProductServiceCategoryController::class, 'create'])->name('category.create');
             Route::get('category/{type}', [ProductServiceCategoryController::class, 'get'])->name('category.get');
@@ -43,6 +45,7 @@ Route::as('api.')->group(
 
             Route::get('order', [OrderController::class, 'index'])->name('order.index');
             Route::post('order/create', [OrderController::class, 'create'])->name('order.create');
+            Route::delete('order/{order_id}/delete', [OrderController::class, 'destroy'])->name('order.destroy');
 
             Route::get('product-service', [ProductServiceController::class, 'get'])->name('product-service.get');
             

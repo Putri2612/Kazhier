@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
+use App\Models\BankAccount;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
@@ -64,6 +65,7 @@ class OrderController extends Controller
         $user       = Auth::user();
         $creatorID  = $user->creatorId();
         $products   = $request->input('products');
+        $products   = gettype($products) == 'string' ? json_decode($products): $products;
 
         $customer   = Customer::firstOrNew([
             'name'      => $request->input('customer_name'),
@@ -79,7 +81,9 @@ class OrderController extends Controller
             'shipping_address'  => $request->has('customer_address') ? $request->input('customer_address') : 'no address',
             'customer_id'       => $this->CustomerNumber(),
         ]);
-        $customer->save();
+        if(!$customer->exists){
+            $customer->save();
+        }
 
         $datetime = $request->input('order_date') . ' ' . $request->input('order_time');
         $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
@@ -116,18 +120,25 @@ class OrderController extends Controller
             $invoiceProduct->save();
         }
 
+        $bankAccount    = BankAccount::where('id', '=', $request->input('order_payment_method'))->where('created_by', '=', $creatorID)->first();
+        if($bankAccount) {
+            $accountId  = $bankAccount->id;
+        } else {
+            $accountId  = BankAccount::select('id')->where('created_by', '=', $creatorID)->first()->id;
+        }
+
         $invoicePayment                 = new InvoicePayment();
         $invoicePayment->invoice_id     = $invoice->id;
         $invoicePayment->date           = $request->input('order_date');
         $invoicePayment->amount         = $request->input('order_price');
-        $invoicePayment->account_id     = $request->input('order_payment_method');
+        $invoicePayment->account_id     = $accountId;
         $invoicePayment->payment_method = $request->input('payment_method');
         $invoicePayment->reference      = '';
         $invoicePayment->description    = '';
         $invoicePayment->served_by      = $user->id;
         $invoicePayment->created_by     = $creatorID;
         $invoicePayment->save();
-        $this->AddBalance($request->input('order_payment_method'), $request->input('order_price'), $request->input('order_date'));
+        $this->AddBalance($accountId, $request->input('order_price'), $request->input('order_date'));
 
         if($invoice->getDue() == 0) {
             $invoice->status = 4;
@@ -136,7 +147,29 @@ class OrderController extends Controller
         } else {
             $invoice->status = 3;
         }
+        $invoice->save();
 
         return $this->CreateSuccessResponse();
+    }
+
+    public function destroy($order_id) {
+        $user       = Auth::user();
+        $creatorID  = $user->creatorId();
+        $order      = Invoice::where('created_by', '=', $creatorID)->where('id', '=', $order_id)->first();
+
+        if(!$order) {
+            return $this->NotFoundResponse();
+        }
+
+        foreach($order->payments as $payment) {
+            $this->AddBalance($payment->account_id, $payment->amount, $payment->date);
+            $payment->delete();
+        }
+
+        InvoiceProduct::where('invoice_id', '=', $order_id)->delete();
+
+        $order->delete();
+
+        return $this->SuccessWithoutDataResponse('Data successfully deleted');
     }
 }
