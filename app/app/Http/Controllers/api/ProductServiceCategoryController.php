@@ -54,9 +54,9 @@ class ProductServiceCategoryController extends Controller
             'type'      => $type,
             'color'     => $color,
         ]);
-        $category->save();
-
-        if($category->wasRecentlyCreated){
+        
+        if(!$category->exists){
+            $category->save();
             return $this->CreateSuccessResponse();
         } else {
             return $this->FailedDataExistResponse();

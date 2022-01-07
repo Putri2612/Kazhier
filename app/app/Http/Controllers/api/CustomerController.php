@@ -55,9 +55,9 @@ class CustomerController extends Controller
             'customer_id'       => $this->CustomerNumber()
         ]);
 
-        $customer->save();
-
-        if($customer->wasRecentlyCreated){
+        
+        if(!$customer->exists){
+            $customer->save();
             return $this->CreateSuccessResponse();
         } else {
             return $this->FailedDataExistResponse();

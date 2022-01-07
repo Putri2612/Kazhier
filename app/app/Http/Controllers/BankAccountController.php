@@ -187,7 +187,7 @@ class BankAccountController extends Controller
                 $invoicePayment = InvoicePayment::where('account_id', $bankAccount->id)->first();
                 $transaction    = Transaction::where('account', $bankAccount->id)->first();
                 $payment        = Payment::where('account_id', $bankAccount->id)->first();
-                $billPayment    = BillPayment::first();
+                $billPayment    = BillPayment::where('account_id', $bankAccount->id)->first();
 
                 if(!empty($revenue) && !empty($invoicePayment) && !empty($transaction) && !empty($payment) && !empty($billPayment))
                 {

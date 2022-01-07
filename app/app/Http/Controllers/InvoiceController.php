@@ -518,16 +518,14 @@ class InvoiceController extends Controller
                 $invoice->save();
             }
 
-            if($due <= 0)
-            {
+            if($due <= 0) {
                 $invoice->status = 4;
-                $invoice->save();
-            }
-            else
-            {
+            } else if ($due == $invoice->getTotal()) {
+                $invoice->status = 2;
+            } else {
                 $invoice->status = 3;
-                $invoice->save();
             }
+
             $invoicePayment->user_id    = $invoice->customer_id;
             $invoicePayment->user_type  = 'Customer';
             $invoicePayment->type       = 'Partial';
@@ -571,11 +569,14 @@ class InvoiceController extends Controller
             
             $invoice = Invoice::where('id', $invoice_id)->first();
             $due     = $invoice->getDue();
-            if($due > 0)
-            {
+            if($due <= 0) {
+                $invoice->status = 4;
+            } else if ($due == $invoice->getTotal()) {
+                $invoice->status = 2;
+            } else {
                 $invoice->status = 3;
-                $invoice->save();
             }
+            $invoice->save();
 
             $type = 'Partial';
             $user = 'Customer';

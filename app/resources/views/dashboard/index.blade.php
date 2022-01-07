@@ -766,15 +766,15 @@
                                         <td>{{\Auth::user()->priceFormat($bill->getTotal())}}</td>
                                         <td>
                                             @if($bill->status == 0)
-                                                <span class="badge badge-primary">{{ __(\App\Models\Bill::$statueses[$bill->status]) }}</span>
+                                                <span class="badge badge-primary">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
                                             @elseif($bill->status == 1)
-                                                <span class="badge badge-warning">{{ __(\App\Models\Bill::$statueses[$bill->status]) }}</span>
+                                                <span class="badge badge-warning">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
                                             @elseif($bill->status == 2)
-                                                <span class="badge badge-danger">{{ __(\App\Models\Bill::$statueses[$bill->status]) }}</span>
+                                                <span class="badge badge-danger">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
                                             @elseif($bill->status == 3)
-                                                <span class="badge badge-info">{{ __(\App\Models\Bill::$statueses[$bill->status]) }}</span>
+                                                <span class="badge badge-info">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
                                             @elseif($bill->status == 4)
-                                                <span class="badge badge-success">{{ __(\App\Models\Bill::$statueses[$bill->status]) }}</span>
+                                                <span class="badge badge-success">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
                                             @endif
                                         </td>
                                     </tr>
