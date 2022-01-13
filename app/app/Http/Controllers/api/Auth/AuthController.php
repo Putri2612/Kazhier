@@ -49,4 +49,11 @@ class AuthController extends Controller
             return $this->FailedResponse('Incorrect email or password');
         }
     }
+
+    public function logout() {
+        $user = Auth::user()->token();
+        $user->revoke();
+
+        return $this->SuccessWithoutDataResponse('logged out');
+    }
 }

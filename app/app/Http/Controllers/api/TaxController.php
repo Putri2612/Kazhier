@@ -4,25 +4,66 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tax;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class TaxController extends Controller
 {
-    //
-    public function all(){
+    use ApiResponse;
+
+    public function get($tax_id){
         $user   = Auth::user();
+        $query  = Tax::select(
+            'id AS tax_id',
+            'name AS tax_name',
+            'rate AS tax_rate'
+        )->where('created_by', '=', $user->creatorId());
+        if($tax_id == 'all') {
+            $tax    = $query->get();
+        } else {
+            $tax    = $query->where('id', '=', $tax_id)->first();
+        }
 
-        $tax    = Tax::where('created_by', '=', $user->creatorId())->get();
-
-        return response()->json($tax);
+        return $this->FetchSuccessResponse($tax);
     }
     
-    public function get($id) {
-        $user   = Auth::user();
+    public function create(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'tax_name'  => 'required',
+            'tax_rate'  => 'required'
+        ]);
 
-        $tax    = Tax::select('name', 'rate')->where('created_by', '=', $user->creatorId())->where('id', '=', $id)->first();
+        if($validator->fails()) {
+            return $this->FailedResponse('Tax name or rate is missing');
+        }
 
-        return response()->json($tax);
+        $user = Auth::user();
+
+        $tax    = Tax::firstOrNew([
+            'name'      => $request->input('tax_name'),
+            'created_by'=> $user->creatorId(),
+        ], [
+            'rate'      => $request->input('tax_rate')
+        ]);
+
+        if(!$tax->exists){
+            $tax->save();
+            return $this->CreateSuccessResponse();
+        } else {
+            return $this->FailedDataExistResponse();
+        }
+    }
+
+    public function destroy($tax_id) {
+        $tax = Tax::where('created_by', Auth::user()->creatorId())->where('id', $tax_id)->first();
+
+        if(empty($tax)){
+            return $this->NotFoundResponse();
+        }
+
+        $tax->delete();
+        return $this->DeleteSuccessResponse();
     }
 }

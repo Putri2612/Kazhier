@@ -39,4 +39,8 @@ trait ApiResponse {
     public function FetchSuccessResponse($data) {
         return response()->json($data);
     }
+
+    public function DeleteSuccessResponse() {
+        return $this->SuccessWithoutDataResponse('Data successfully deleted');
+    }
 }
