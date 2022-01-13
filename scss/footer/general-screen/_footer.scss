@@ -5,6 +5,25 @@ footer{
         width: 100%;
         margin-bottom: 50px;
     }
+    .social-media-footer{
+        border-bottom: 1px solid $dark;
+        .kakakonten{
+            padding: 0 5% 10px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .social-item {
+            color: $white;
+            font-size: 2rem;
+            margin-top: 10px;
+            margin-right: 32px;
+            &:last-child{
+                margin-right: 0;
+            }
+        }
+    }
     .bot-menu{
         padding-top: 40px;
         padding-left: 5%;
@@ -16,6 +35,17 @@ footer{
             li, a{
                 color: $white;
             }
+        }
+        .logo-container img {
+            filter:brightness(0) invert(1);
+        }
+        .footer-navigation {
+            a {
+                color: $gray;
+            }
+        }
+        .copyright{
+            font-weight: 300;
         }
     }
     .legal{

@@ -10,3 +10,16 @@
 .kakaanim-fast{
     transition: linear 0.2s;
 }
+
+.ellipsis-dot{
+    width: 0.75rem; 
+    height: 0.75rem; 
+    background: $white; 
+    border-radius: 50%; 
+    margin: 0.1rem;
+}
+
+.nav-spacer {
+    height:80px; 
+    width:100%;
+}
