@@ -71,7 +71,7 @@ class ReferralController extends Controller
             $point->Deduct($price);
 
             $history = new ReferralPointHistory();
-            $history->description   = 'Plan purchase';
+            $history->description   = __('Plan purchase');
             $history->amount        = -$price;
             $history->ref_id        = $point->id;
             $history->created_by    = $user->id;
@@ -106,10 +106,12 @@ class ReferralController extends Controller
             $request->validate([
                 'amount'    => 'required',
                 'account'   => 'required',
+                'bank_name' => 'required'
             ]);
             
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
             $dest   = $request->input('account');
+            $bnkName= $request->input('bank_name');
             $user   = Auth::user();
 
             $point = ReferralPoint::where('created_by', '=', $user->id)->first();
@@ -121,6 +123,7 @@ class ReferralController extends Controller
             $withRequest = new ReferralWithdrawRequest();
             $withRequest->amount        = $amount;
             $withRequest->destination   = $dest;
+            $withRequest->bank_name     = $bnkName;
             $withRequest->created_by    = $user->id;
             $withRequest->status        = "pending";
             $withRequest->save();
@@ -128,7 +131,7 @@ class ReferralController extends Controller
             $point->Deduct($amount);
 
             $history                = new ReferralPointHistory();
-            $history->description   = 'Withdrawal';
+            $history->description   = __('Withdrawal');
             $history->ref_id        = $point->id;
             $history->amount        = -$amount;
             $history->created_by    = $user->id;
@@ -205,6 +208,42 @@ class ReferralController extends Controller
             return redirect()->back()->with('success', __('Successfully updated.'));
         } else {
             return redirect()->back();
+        }
+    }
+
+    public function history(Request $request) {
+        if(Auth::user()->type == 'super admin'){
+            $query = ReferralPointHistory::select('*');
+
+            if(!empty($request->input('date'))){
+                $date_range = explode(' - ', $request->date);
+                $query->whereBetween('created_at', $date_range);
+            }
+
+            if(!empty($request->input('email'))) {
+                $user   = User::where('email', '=', $request->input('email'))->first();
+                if($user) {
+                    $creatorId = $user->creatorId();
+                } else {
+                    $creatorId = 0;
+                }
+                $point  = ReferralPoint::where('created_by', $creatorId)->first();
+                if($point) {
+                    $pointId = $point->id;
+                } else {
+                    $pointId = 0;
+                }
+                $query->where('ref_id', $pointId);
+            } else {
+                $query->limit(30);
+            }
+
+            $history = $query->get();
+
+            return view('referral.history', compact('history'));
+
+        } else {
+            abort(404);
         }
     }
 }

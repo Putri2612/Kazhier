@@ -166,6 +166,7 @@ Route::group(
                 Route::post('withdraw/request', [ReferralController::class, 'RequestWithdraw'])->name('withdraw.request');
                 Route::put('withdraw/{id}/process', [ReferralController::class, 'ProcessWithdrawRequest'])->name('withdraw.process');
                 Route::delete('withdraw/{id}/cancel', [ReferralController::class, 'CancelWithdrawRequest'])->name('withdraw.cancel');
+                Route::get('withdraw/history', [ReferralController::class, 'history'])->name('history');
             }
         );
 

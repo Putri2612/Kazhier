@@ -231,7 +231,7 @@ div.dataTables_wrapper div.dataTables_filter input {
     border-bottom: unset;
 }
 
-.datepicker-range{
+.datepicker-range, .rounded-control{
     border-radius: 20px;
     min-height: 42px;
     padding-left: 20px !important;

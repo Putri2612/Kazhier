@@ -89,7 +89,7 @@
                             <a href="{{ route('referral.withdraw') }}" class="nav-link">{{ __('Withdraw Request') }}</a>
                         </li>
                         <li class="{{ Request::route()->getName() == 'referral.history' }}">
-                            <a href="#" class="nav-link">{{ __('Transaction History') }}</a>
+                            <a href="{{ route('referral.history') }}" class="nav-link">{{ __('Transaction History') }}</a>
                         </li>
                     </ul>
                 </li>
