@@ -8,8 +8,8 @@
 @section('content')
     <section class="section">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12 pt-4">
+            <div class="row justify-content-end">
+                <div class="col-auto pt-4">
                     <div class="changeLanguage float-right me-1 position-relative">
                         <select name="language" id="language" class="form-control w-25 position-absolute selectric" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             @foreach(Utility::languages() as $language)
@@ -30,6 +30,11 @@
                     <div class="card card-primary">
                         <div class="card-header"><h4>{{__('Forgot Password')}}</h4></div>
                         <div class="card-body">
+                            @if ($message = Session::get('status'))
+                            <div class="alert alert-success" role="alert">
+                                {!! $message !!}
+                            </div>
+                            @endif
                             <p class="text-muted">{{__('Enter your email address and we will send you an email with instructions to reset your password.')}}</p>
                             {{Form::open(array('route'=>'password.email','method'=>'post','id'=>'loginForm'))}}
 
