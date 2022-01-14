@@ -84,25 +84,20 @@
 </div>
 <div class="row" style="display: none" id="withdraw">
     <div class="col-md-12">
-        @php
-            $now    = now();
-            $date   = $now->day;
-            $processingDate = config('referral.withdrawalDate');
-            if($date > $processingDate) {
-                $now->addMonth();
-            }
-            $now->day = $processingDate;
-        @endphp
         <p class="lead">{{ __('Withdraw') }}</p>
-        <div class="col-12 mb-3">{!! __('Our staff will process your request on <strong>:date</strong>', ['date' => Auth::user()->dateFormat($now)]) !!}</div>
+        <div class="col-12 mb-3">{!! __('Our staff will process your request within 1-3 working days') !!}</div>
         {{ Form::open(['route' => 'referral.withdraw.request', 'method' => 'POST', 'class' => 'row']) }}
-        <div class="form-group col-md-6">
+        <div class="form-group col-12 col-md-4">
             {{ Form::label('amount', __('Amount')) }}
             {{ Form::text('amount', null, ['class' => 'form-control', 'data-is-number', 'required']) }}
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-12 col-md-4">
             {{ Form::label('account', __('Account Number')) }}
             {{ Form::text('account', null, ['class' => 'form-control', 'required']) }}
+        </div>
+        <div class="form-group col-12 col-md-4">
+            {{ Form::label('bank_name', __('Bank Name')) }}
+            {{ Form::text('bank_name', null, ['class' => 'form-control', 'required']) }}
         </div>
         <div class="col-md-12 text-end">
             {{ Form::submit(__('Withdraw'), ['class' => 'btn btn-primary']) }}

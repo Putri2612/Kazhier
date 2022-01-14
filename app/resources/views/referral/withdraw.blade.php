@@ -20,6 +20,7 @@
             <h1>{{__('Withdraw Request')}}</h1>
             <div class="section-header-breadcrumb">
                 <div class="breadcrumb-item active"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></div>
+                <div class="breadcrumb-item active"><a href="#">{{__('Referral')}}</a></div>
                 <div class="breadcrumb-item">{{__('Withdraw Request')}}</div>
             </div>
         </div>
@@ -50,6 +51,7 @@
                                                     <tr>
                                                         <th>{{ __('User') }}</th>
                                                         <th>{{ __('Bank Account') }}</th>
+                                                        <th>{{ __('Bank Name') }}</th>
                                                         <th>{{ __('Amount') }}</th>
                                                         <th>{{ __('Status') }}</th>
                                                         <th>{{ __('Action') }}</th>
@@ -58,8 +60,9 @@
                                                 <tbody>
                                                     @foreach ($req as $request)
                                                         <tr class="font-style">
-                                                            <td>{{ $request->user()->name }}</td>
+                                                            <td>{{ $request->user->name }}</td>
                                                             <td>{{ $request->destination }}</td>
+                                                            <td>{{ $request->bank_name }}</td>
                                                             <td>{{ $request->amount }}</td>
                                                             <td>{{ $request->status }}</td>
                                                             <td>

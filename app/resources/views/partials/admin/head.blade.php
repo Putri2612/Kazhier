@@ -6,7 +6,8 @@
     @endphp
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>{{(Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'AccountGo')}} - @yield('page-title')</title>
+    <title>{{(Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'Kazhier')}} - @yield('page-title')</title>
+    <link rel="canonical" href="{{ Request::url() }}">
 
     <link rel="icon" href="{{$logo.'/'.(isset($company_favicon) && !empty($compa4ny_favicon)?$company_favicon:'favicon.png').'?'.rand()}}" type="image" sizes="16x16">
 

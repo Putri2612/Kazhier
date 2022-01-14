@@ -90,7 +90,7 @@
                             <div class="form-group">
                                 <div class="custom-control custom-checkbox required">
                                     <input type="checkbox" required name="agree" class="custom-control-input" id="agree">
-                                    <label class="custom-control-label" for="agree">{{__('I agree with') }} <a href="{{ route('tos.show') }}">{{ __('the terms and conditions') }}</a></label>
+                                    <label class="custom-control-label" for="agree">{!! __('I agree with <a href=":link">the terms and conditions</a>', ['link' => route('tos.show')]) !!}</label>
                                 </div>
                             </div>
                             <div class="form-group">

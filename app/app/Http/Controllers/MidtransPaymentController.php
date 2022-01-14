@@ -206,7 +206,7 @@ class MidtransPaymentController extends Controller
                 $history->description   = __(':name bought a plan', ['name' => $user->name]);
                 $history->amount        = 25000;
                 $history->ref_id        = $referralPoint->id;
-                $history->created_by    = $user->referred_by;
+                $history->created_by    = $user->id;
                 $history->save();
             }
         } else if ($transaction == 'deny') {

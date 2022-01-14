@@ -13,6 +13,7 @@ class ReferralWithdrawRequest extends Model
         'amount',
         'destination',
         'status',
+        'bank_name',
         'created_by'
     ];
 
@@ -23,6 +24,6 @@ class ReferralWithdrawRequest extends Model
     ];
 
     public function user() {
-        return $this->belongsTo(User::class, 'created_by')->first();
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

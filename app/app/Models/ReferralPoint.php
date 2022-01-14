@@ -17,6 +17,10 @@ class ReferralPoint extends Model
         return $this->hasMany(ReferralPointHistory::class)->get();
     }
 
+    public function Owner() {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
     public function Add($amount) {
         $this->point += $amount;
         $this->save();

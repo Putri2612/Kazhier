@@ -14,4 +14,12 @@ class ReferralPointHistory extends Model
         'amount',
         'ref_id',
     ];
+
+    public function Point() {
+        return $this->belongsTo(ReferralPoint::class, 'ref_id', 'id');
+    }
+
+    public function Creator() {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
 }
