@@ -22,6 +22,7 @@ class Customer extends Authenticatable
         'contact',
         'avatar',
         'is_active',
+        'category_id',
         'created_by',
         'email_verified_at',
         'billing_name',
@@ -48,6 +49,9 @@ class Customer extends Authenticatable
 
     public $settings;
 
+    public function category(){
+        return $this->belongsTo(CustomerCategory::class, 'category_id', 'id');
+    }
 
     public function authId()
     {

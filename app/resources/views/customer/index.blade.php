@@ -56,14 +56,18 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <div class="d-flex justify-content-between w-100 mb-3 crd">
-                    <h4 class="fw-normal">{{__('Manage Customer')}}</h4>
-                    @can('create customer')
-                        <a href="#" data-size="2xl" data-url="{{ route('customer.create') }}" data-ajax-popup="true" data-title="{{__('Create New Customer')}}" class="btn btn-icon icon-left btn-primary commonModal btn-round">
-                            <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                            <span class="btn-inner--text"> {{__('Create')}}</span>
-                        </a>
-                    @endcan
+                <div class="row mb-3 crd">
+                    <h4 class="fw-normal col-6">{{__('Manage Customer')}}</h4>
+                    <div class="col-6 text-end row justify-content-end">
+                        <div class="col-auto">
+                            @can('create customer')
+                                <a href="#" data-size="2xl" data-url="{{ route('customer.create') }}" data-ajax-popup="true" data-title="{{__('Create New Customer')}}" class="btn btn-icon icon-left btn-primary commonModal btn-round">
+                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                    <span class="btn-inner--text"> {{__('Create')}}</span>
+                                </a>
+                            @endcan
+                        </div>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -76,21 +80,20 @@
                                         <th> {{__('Name')}}</th>
                                         <th> {{__('Contact')}}</th>
                                         <th> {{__('Email')}}</th>
-                                        <th></th>
+                                        <th> {{ __('Category') }} </th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach ($customers as $k=>$customer)
+                                        @php
+                                            $category = $customer->category? $customer->category->name : __('General customer');
+                                        @endphp
                                         <tr class="cust_tr" id="cust_detail" data-url="{{route('customer.show',$customer['id'])}}" data-id="{{$customer['id']}}">
                                             <td><a href="#" class="btn btn-outline-primary">{{ AUth::user()->customerNumberFormat($customer['customer_id']) }}</a></td>
                                             <td class="font-style">{{$customer['name']}}</td>
                                             <td>{{$customer['contact']}}</td>
                                             <td>{{$customer['email']}}</td>
-                                            <td>
-                                                @if($customer['is_active']==0)
-                                                    <i class="fa fa-lock" title="Inactive"></i>
-                                                @endif
-                                            </td>
+                                            <td>{{ $category }}</td>
                                         </tr>
                                     @endforeach
                                     </tbody>

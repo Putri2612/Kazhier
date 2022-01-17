@@ -129,9 +129,20 @@
                 </li>
             @endif
             @if(Gate::check('manage customer'))
-                <li class="{{ (Request::segment(1) == 'customer')?'active':''}}">
-                    <a class="nav-link" href="{{ route('customer.index') }}">
-                        <i class="far fa-user"></i> <span>{{__('Customer')}}</span></a>
+                <li class="dropdown {{ (Request::segment(1) == 'customer' || Request::segment(1) == 'customer-category')?'active':''}}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="far fa-user"></i> <span>{{__('Customer')}}</span></a>
+                    <ul class="dropdown-menu {{ (Request::segment(1) == 'customer' || Request::segment(1) == 'customer-category')?'display:block':''}}">
+                        @can('manage user')
+                            <li class="{{ (Request::segment(1) == 'customer' ? ' active' : '') }}">
+                                <a class="nav-link" href="{{ route('customer.index') }}">{{__('Customer')}}</a>
+                            </li>
+                        @endcan
+                        {{-- @can('manage user category') --}}
+                            <li class="{{ (Request::segment(1) == 'customer-category' ? ' active' : '') }}">
+                                <a class="nav-link" href="{{ route('customer-category.index') }}">{{__('Category')}}</a>
+                            </li>
+                        {{-- @endcan --}}
+                    </ul>
                 </li>
             @endif
             @if(Gate::check('manage vender'))

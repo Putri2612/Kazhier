@@ -40,6 +40,12 @@
             </div>
         </div>
     </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group">
+            {{Form::label('category_id',__('Category'))}}
+            {{Form::select('category_id',$categories, null,array('class'=>'form-control font-style selectric'))}}
+        </div>
+    </div>
     {{-- <div class="col-lg-4 col-md-4 col-sm-6">
         <div class="form-group">
             {{Form::label('password',__('Password'))}}

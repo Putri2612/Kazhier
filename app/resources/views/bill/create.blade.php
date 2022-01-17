@@ -100,7 +100,7 @@
                     var item = JSON.parse(data);
 
                     $(el.parent().parent().find('.quantity')).val(1);
-                    $(el.parent().parent().find('.price')).val(item.product.sale_price);
+                    $(el.parent().parent().find('.price')).val(item.product.purchase_price);
                     $(el.parent().parent().find('.tax')).val(item.taxRate);
                     $(el.parent().parent().find('.unit')).html(item.unit);
                     $(el.parent().parent().find('.discount')).val(0);

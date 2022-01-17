@@ -1,6 +1,6 @@
 {{ Form::open(array('url' => 'productservice', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="form-group">
             {{ Form::label('name', __('Name')) }}
             <div class="input-group">
@@ -13,7 +13,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="form-group">
             {{ Form::label('sku', __('SKU')) }}
             <div class="input-group">
@@ -23,6 +23,19 @@
                     </div>
                 </div>
                 {{ Form::text('sku', '', array('class' => 'form-control','required'=>'required')) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            {{ Form::label('quantity', __('Quantity')) }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <i class="fas fa-box"></i>
+                    </div>
+                </div>
+                {{ Form::text('quantity', '', array('class' => 'form-control','required'=>'required', 'data-is-number')) }}
             </div>
         </div>
     </div>

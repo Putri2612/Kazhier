@@ -27,6 +27,12 @@
             </div>
         </div>
     </div>
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            {{Form::label('category_id',__('Category'))}}
+            {{Form::select('category_id',$categories, null,array('class'=>'form-control font-style selectric'))}}
+        </div>
+    </div>
     @if(!$customFields->isEmpty())
         <div class="col-md-6">
             <div class="tab-pane fade show" id="tab-2" role="tabpanel">

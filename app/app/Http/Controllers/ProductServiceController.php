@@ -12,6 +12,7 @@ use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProductServiceController extends Controller
@@ -71,14 +72,15 @@ class ProductServiceController extends Controller
         {
 
             $rules = [
-                'name' => 'required',
-                'sku' => 'required',
-                'sale_price' => 'required',
-                'purchase_price' => 'required',
-                'tax_id' => 'required',
-                'category_id' => 'required',
-                'unit_id' => 'required',
-                'type' => 'required',
+                'name'              => 'required',
+                'sku'               => 'required',
+                'quantity'          => 'required',
+                'sale_price'        => 'required',
+                'purchase_price'    => 'required',
+                'tax_id'            => 'required',
+                'category_id'       => 'required',
+                'unit_id'           => 'required',
+                'type'              => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -103,6 +105,7 @@ class ProductServiceController extends Controller
             $productService->unit_id        = $request->input('unit_id');
             $productService->type           = $request->input('type');
             $productService->category_id    = $request->input('category_id');
+            $productService->quantity       = $request->input('quantity');
             $productService->created_by     = \Auth::user()->creatorId();
             $productService->save();
             CustomField::saveData($productService, $request->input('customField'));
@@ -158,17 +161,18 @@ class ProductServiceController extends Controller
             {
 
                 $rules = [
-                    'name' => 'required',
-                    'sku' => 'required',
-                    'sale_price' => 'required',
-                    'purchase_price' => 'required',
-                    'tax_id' => 'required',
-                    'category_id' => 'required',
-                    'unit_id' => 'required',
-                    'type' => 'required',
+                    'name'              => 'required',
+                    'sku'               => 'required',
+                    'quantity'          => 'required',
+                    'sale_price'        => 'required',
+                    'purchase_price'    => 'required',
+                    'tax_id'            => 'required',
+                    'category_id'       => 'required',
+                    'unit_id'           => 'required',
+                    'type'              => 'required',
                 ];
 
-                $validator = \Validator::make($request->all(), $rules);
+                $validator = Validator::make($request->all(), $rules);
 
                 if($validator->fails())
                 {
@@ -189,6 +193,7 @@ class ProductServiceController extends Controller
                 $productService->unit_id        = $request->input('unit_id');
                 $productService->type           = $request->input('type');
                 $productService->category_id    = $request->input('category_id');
+                $productService->quantity       = $request->input('quantity');
                 $productService->created_by     = \Auth::user()->creatorId();
                 $productService->save();
                 CustomField::saveData($productService, $request->input('customField'));

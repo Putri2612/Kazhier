@@ -106,9 +106,9 @@ class InvoiceController extends Controller
 
     public function customer(Request $request)
     {
-        $customer = Customer::where('id', '=', $request->id)->first();
+        $customer = Customer::where('id', '=', $request->id)->where('created_by', Auth::user()->creatorId())->first();
 
-        return view('invoice.customer_detail', compact('customer'));
+        return response()->json(['view' => view('invoice.customer_detail', compact('customer'))->render(), 'category' => $customer->category]) ;
     }
 
     public function product(Request $request)
@@ -118,7 +118,8 @@ class InvoiceController extends Controller
         $data['unit']        = $product->unit ? $product->unit->name : '';
         $data['taxRate']     = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
         $salePrice           = $product->sale_price;
-        $quantity            = 1;
+        $quantity            = $product->quantity > 0 ? 1 : 0;
+        $data['stock']       = $product->quantity;
         $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
         $product->sale_price = $this->FloatToReadableNumber($salePrice);
         $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + $taxPrice);
@@ -159,7 +160,7 @@ class InvoiceController extends Controller
             $invoice->ref_number     = $request->input('ref_number');
             $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
             $invoice->created_by     = Auth::user()->creatorId();
-            $invoice->served_by      = $user->id;
+            $invoice->served_by      = Auth::user()->id;
             $invoice->save();
             CustomField::saveData($invoice, $request->input('customField'));
             $products = $request->input('items');
@@ -169,6 +170,10 @@ class InvoiceController extends Controller
                 $tax        = $this->ReadableNumberToFloat($product['tax']);
                 $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
                 $price      = $this->ReadableNumberToFloat($product['price']);
+
+                $item = ProductService::find($product['item']);
+                $item->quantity -= $quantity;
+                $item->save();
                 
                 $invoiceProduct             = new InvoiceProduct();
                 $invoiceProduct->invoice_id = $invoice->id;
@@ -270,12 +275,20 @@ class InvoiceController extends Controller
                     $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
                     $price      = $this->ReadableNumberToFloat($product['price']);
 
+                    $stockChange = $quantity;
+
                     $invoiceProduct = InvoiceProduct::find($product['id']);
                     if($invoiceProduct == null)
                     {
                         $invoiceProduct             = new InvoiceProduct();
                         $invoiceProduct->invoice_id = $invoice->id;
+                    } else {
+                        $stockChange -= $invoiceProduct->quantity;
                     }
+
+                    $item = ProductService::find($product['item']);
+                    $item->quantity -= $stockChange;
+                    $item->save();
 
                     $invoiceProduct->product_id = $product['item'];
                     $invoiceProduct->quantity   = $quantity;

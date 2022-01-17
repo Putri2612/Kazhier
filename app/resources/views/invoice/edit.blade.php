@@ -6,6 +6,8 @@
     <script src="{{asset('assets/js/jquery.repeater.min.js')}}"></script>
     <script>
         var selector = "body";
+        const discount  = {},
+            products    = {};
         if ($(selector + " .repeater").length) {
             var $dragAndDrop = $("body .repeater tbody").sortable({
                 handle: '.sort-handler'
@@ -89,7 +91,14 @@
                 cache: false,
                 success: function (data) {
                     // console.log(data);
-                    $('#customer_detail').html(data);
+                    $('#customer_detail').html(data.view);
+                    if(data.category) {
+                        discount.amount = (data.category.discount_type ? data.category.discount : data.category.discount / 100);
+                        discount.max    = data.category.max_discount;
+                    } else {
+                        discount.amount = 0;
+                        discount.max    = 0;
+                    }
                 },
 
             });
@@ -107,32 +116,54 @@
         });
 
         function changeItem(element) {
-            var iteams_id = element.val();
-            var url = element.data('url');
-            var el = element;
-            $.ajax({
-                url: url,
-                type: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': jQuery('#token').val()
-                },
-                data: {
-                    'product_id': iteams_id
-                },
-                cache: false,
-                success: function (data) {
-                    var item = JSON.parse(data);
+            var item_id = element.val();
+            if(!item_id.includes('new') && !products[item_id]){
+                var url = element.data('url');
+                var el = element;
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': jQuery('#token').val()
+                    },
+                    data: {
+                        'product_id': item_id
+                    },
+                    cache: false,
+                    success: function (data) {
+                        var item = JSON.parse(data);
 
-                    $(el.parent().parent().find('.quantity')).val(1);
-                    $(el.parent().parent().find('.price')).val(item.product.sale_price);
-                    $(el.parent().parent().find('.tax')).val(item.taxRate);
-                    $(el.parent().parent().find('.unit')).html(item.unit);
-                    $(el.parent().parent().find('.discount')).val(0);
-                    $(el.parent().parent().find('.amount')).html(item.totalAmount);
+                        let discount = 0;
+                        if(discount.hasOwnProperty('discount')) {
+                            discount = discount.amount;
+                            discount = discount > 1 ? discount : discount * item.product.sale_price;
+                        }
+                        
+                        if(discount.hasOwnProperty('maxDiscount')) {
+                            discount = (discount > discount.max && discount.max > 0) ? discount.max : discount;
+                        }
 
-                    UpdateSubTotal();
-                },
-            });
+                        let productData = value.find(data => data.product_id == item_id),
+                            existingStock = productData ? productData.quantity : 0;
+                        
+
+                        products[item.product.id] = {
+                            'name' : item.product.name,
+                            'stock': item.stock + existingStock
+                        };
+                        $(el.parent().parent().find('.quantity')).val(existingStock ? existingStock : 1);
+                        $(el.parent().parent().find('.price')).val(item.product.sale_price);
+                        $(el.parent().parent().find('.tax')).val(item.taxRate);
+                        $(el.parent().parent().find('.unit')).html(item.unit);
+                        $(el.parent().parent().find('.discount')).val(discount);
+                        $(el.parent().parent().find('.amount')).html(item.totalAmount);
+
+                        UpdateSubTotal();
+                    },
+                });
+            } else if (products[item_id]) {
+                toastrs('Error', "{{__('The same item has already listed')}}", 'error');
+            }
         }
 
         document.addEventListener('keyup', (event) => {
@@ -158,7 +189,7 @@
             }
 
             if(doChange) {
-                UpdateInvoiceAndBillItemData(target);
+                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products});
             }
         });
 

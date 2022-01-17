@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\CustomField;
 use App\Mail\UserCreate;
+use App\Models\CustomerCategory;
 use App\Models\Plan;
 use App\Models\Transaction;
 use File;
@@ -42,9 +43,12 @@ class CustomerController extends Controller
     {
         if(Auth::user()->can('create customer'))
         {
-            $customFields = CustomField::where('module', '=', 'customer')->get();
+            $customFields   = CustomField::where('module', '=', 'customer')->where('created_by', Auth::user()->creatorId())->get();
+            $categories     = CustomerCategory::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $categories->prepend(__('General customer'), null);
+            $categories     = $categories->union(['new.customer-category' => __('Create new customer category')]);
 
-            return view('customer.create', compact('customFields'));
+            return view('customer.create', compact('customFields', 'categories'));
         }
         else
         {
@@ -59,15 +63,15 @@ class CustomerController extends Controller
         {
 
             $rules = [
-                'name' => 'required',
-                'contact' => 'required',
-                'email' => 'email',
-                'billing_name' => 'required',
-                'billing_phone' => 'required',
-                'billing_address' => 'required',
-                'shipping_name' => 'required',
-                'shipping_phone' => 'required',
-                'shipping_address' => 'required',
+                'name'              => 'required',
+                'contact'           => 'required',
+                'email'             => 'email',
+                'billing_name'      => 'required',
+                'billing_phone'     => 'required',
+                'billing_address'   => 'required',
+                'shipping_name'     => 'required',
+                'shipping_phone'    => 'required',
+                'shipping_address'  => 'required',
             ];
 
             $validator = \Validator::make($request->all(), $rules);
@@ -127,10 +131,13 @@ class CustomerController extends Controller
         {
             $customer              = Customer::find($id);
             $customer->customField = CustomField::getData($customer, 'customer');
+            $categories     = CustomerCategory::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $categories->prepend(__('General customer'), null);
+            $categories     = $categories->union(['new.customer-category' => __('Create new customer category')]);
 
             $customFields = CustomField::where('module', '=', 'customer')->get();
 
-            return view('customer.edit', compact('customer', 'customFields'));
+            return view('customer.edit', compact('customer', 'customFields', 'categories'));
         }
         else
         {

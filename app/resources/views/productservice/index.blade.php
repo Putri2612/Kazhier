@@ -48,62 +48,125 @@
                                     <a href="{{route('productservice.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
                                 </div>
                                 {{ Form::close() }}
-                                <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
-                                    <div class="table-responsive">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
-                                                    <thead class="thead-light">
-                                                    <tr role="row">
-                                                        <th>{{__('Name')}}</th>
-                                                        <th> {{__('Sku')}}</th>
-                                                        <th>{{__('Sale Price')}}</th>
-                                                        <th>{{__('Purchase Price')}}</th>
-                                                        <th>{{__('Tax')}}</th>
-                                                        <th>{{__('Category')}}</th>
-                                                        <th> {{__('Unit')}}</th>
-                                                        <th>{{__('Type')}}</th>
-                                                        <th>{{__('Description')}}</th>
-                                                        <th class="text-end">{{__('Action')}}</th>
-                                                    </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                    @foreach ($productServices as $productService)
-                                                        <tr class="font-style">
-                                                            <td>{{ $productService->name}}</td>
-                                                            <td>{{ $productService->sku }}</td>
-                                                            <td>{{ \Auth::user()->priceFormat($productService->sale_price) }}</td>
-                                                            <td>{{  \Auth::user()->priceFormat($productService->purchase_price )}}</td>
-                                                            <td>{{ $productService->taxes?$productService->taxes->name :'' }}</td>
-                                                            <td>{{ $productService->category?$productService->category->name:'' }}</td>
-                                                            <td>{{ $productService->unit?$productService->unit->name:'' }}</td>
-                                                            <td>{{ $productService->type }}</td>
-                                                            <td>{{ $productService->description }}</td>
-
-                                                            @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
-                                                                <td class="action text-end">
-                                                                    @can('edit product & service')
-                                                                        <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('delete product & service')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('productservice.destroy', $productService->id) }}">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
-
-                                                    </tbody>
-                                                </table>
+                                <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link active" id="product-tab" data-bs-toggle="tab" data-bs-target="#details" role="tab" aria-controls="" aria-selected="true">
+                                            {{__('Product & Service Details')}}
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#" class="nav-link" id="income-tab" data-bs-toggle="tab" data-bs-target="#stock" role="tab" aria-controls="" aria-selected="false">
+                                            {{__('Product Stock')}}
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane fade show active" id="details" role="tabpanel" aria-labelledby="{{ __('Product & Service Details') }}">
+                                        <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                            <div class="table-responsive">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <table class="table table-flush dataTable">
+                                                            <thead class="thead-light">
+                                                            <tr role="row">
+                                                                <th>{{__('Name')}}</th>
+                                                                <th>{{__('Sku')}}</th>
+                                                                <th>{{__('Sale Price')}}</th>
+                                                                <th>{{__('Purchase Price')}}</th>
+                                                                <th>{{__('Tax')}}</th>
+                                                                <th>{{__('Category')}}</th>
+                                                                <th>{{__('Type')}}</th>
+                                                                <th>{{__('Description')}}</th>
+                                                                <th class="text-end">{{__('Action')}}</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            @foreach ($productServices as $productService)
+                                                                <tr class="font-style">
+                                                                    <td>{{ $productService->name}}</td>
+                                                                    <td>{{ $productService->sku }}</td>
+                                                                    <td>{{ \Auth::user()->priceFormat($productService->sale_price) }}</td>
+                                                                    <td>{{  \Auth::user()->priceFormat($productService->purchase_price )}}</td>
+                                                                    <td>{{ $productService->taxes?$productService->taxes->name :'' }}</td>
+                                                                    <td>{{ $productService->category?$productService->category->name:'' }}</td>
+                                                                    <td>{{ $productService->type }}</td>
+                                                                    <td>{{ $productService->description }}</td>
+        
+                                                                    @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
+                                                                        <td class="action text-end">
+                                                                            @can('edit product & service')
+                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                                </a>
+                                                                            @endcan
+                                                                            @can('delete product & service')
+                                                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('productservice.destroy', $productService->id) }}">
+                                                                                    <i class="fas fa-trash"></i>
+                                                                                </a>
+                                                                            @endcan
+                                                                        </td>
+                                                                    @endif
+                                                                </tr>
+                                                            @endforeach
+        
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div class="tab-pane fade" id="stock" role="tabpanel" aria-labelledby="{{ __('Product & Service Stock') }}">
+                                        <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                            <div class="table-responsive">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <table class="table table-flush dataTable">
+                                                            <thead class="thead-light">
+                                                            <tr role="row">
+                                                                <th>{{__('Name')}}</th>
+                                                                <th>{{__('Sku')}}</th>
+                                                                <th>{{__('Category')}}</th>
+                                                                <th>{{__('Quantity')}}</th>
+                                                                <th>{{__('Unit')}}</th>
+                                                                <th>{{__('Type')}}</th>
+                                                                <th class="text-end">{{__('Action')}}</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            @foreach ($productServices as $productService)
+                                                                <tr class="font-style">
+                                                                    <td>{{ $productService->name}}</td>
+                                                                    <td>{{ $productService->sku }}</td>
+                                                                    <td>{{ $productService->category?$productService->category->name:'' }}</td>
+                                                                    <td>{{ $productService->quantity }}</td>
+                                                                    <td>{{ $productService->unit?$productService->unit->name:'' }}</td>
+                                                                    <td>{{ $productService->type }}</td>
+        
+                                                                    @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
+                                                                        <td class="action text-end">
+                                                                            @can('edit product & service')
+                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                                    <i class="fas fa-pencil-alt"></i>
+                                                                                </a>
+                                                                            @endcan
+                                                                            @can('delete product & service')
+                                                                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('productservice.destroy', $productService->id) }}">
+                                                                                    <i class="fas fa-trash"></i>
+                                                                                </a>
+                                                                            @endcan
+                                                                        </td>
+                                                                    @endif
+                                                                </tr>
+                                                            @endforeach
+        
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

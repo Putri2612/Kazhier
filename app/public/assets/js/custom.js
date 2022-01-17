@@ -148,7 +148,7 @@ const ValidateForm = (event) => {
 
 // Inputs
 
-const ReadableToProcessable = input => input.replace(/\./g, '').replace(/,/g, '.');
+const ReadableToProcessable = input => parseFloat(input.replace(/\./g, '').replace(/,/g, '.'));
 const ProcessableToReadable = input => input.toFixed(2).toString().replace(/\./g, ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
 const UpdateSubTotal        = () => {
@@ -163,7 +163,7 @@ const UpdateSubTotal        = () => {
     document.querySelector('.totalAmount').innerHTML = subTotal;
 }
 
-const UpdateInvoiceAndBillItemData  = target => {
+const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
     let element = target;
     while(!element.getAttribute('data-is-item')) element = element.parentNode;
 
@@ -174,6 +174,33 @@ const UpdateInvoiceAndBillItemData  = target => {
         totalPrice  = (quantity * price),
         taxPrice    = (tax / 100) * (totalPrice),
         amount      = ProcessableToReadable((totalPrice + taxPrice) - discount);
+
+    if(additionalData.products) {
+        const id    = element.querySelector('.item').value,
+            product = additionalData.products[id];
+
+        if(quantity > product.stock) {
+            toastrs('Error', 'Not enough stock', 'error');
+            element.querySelector('.quantity').value = ProcessableToReadable(product.stock);
+        }
+    }
+
+    if(additionalData.discount.amount) {
+        const CustomerDiscount = additionalData.discount;
+        if(CustomerDiscount.amount > 1 && CustomerDiscount.amount > discount) {
+            discount = CustomerDiscount.amount;
+        } else if(CustomerDiscount.amount <= 1) {
+            let tempDiscount = price * CustomerDiscount.amount;
+            if(tempDiscount > CustomerDiscount.max && CustomerDiscount.max > 0) {
+                tempDiscount = CustomerDiscount.max;
+            }
+
+            if(tempDiscount > discount) {
+                discount = tempDiscount;
+            }
+        }
+        element.querySelector('.discount').value = ProcessableToReadable(discount);
+    }
     
     element.querySelector('.amount').innerHTML = amount;
 
@@ -275,6 +302,20 @@ const CopyFromInput = (InputSelector, ButtonSelector) => {
         toastrs('Copied', 'code copied', 'success');
     });
 }
+
+// Selectric 
+const SelectricChangeCallbacks = [
+    (event) => {
+        if(event.target.value.includes('new')){
+            let url     = window.location.href,
+                pos     = url.indexOf('/app/'),
+                target  = event.target.value.split('.')[1],
+                destination = url.substring(0, pos + 5) + target;
+
+            window.location.href = destination;
+        }
+    }
+];
 
 
 // Data logging
@@ -608,14 +649,9 @@ function common_bind_select(selector = "body") {
             disableOnMobile: false,
             nativeOnMobile: false,
         }).on('change', event => {
-            if(event.target.value.includes('new')){
-                let url     = window.location.href,
-                    pos     = url.indexOf('/app/'),
-                    target  = event.target.value.split('.')[1],
-                    destination = url.substring(0, pos + 5) + target;
-
-                window.location.href = destination;
-            }
+            SelectricChangeCallbacks.forEach(callback => {
+                callback(event);
+            });
         });
     }
     if ($(".jscolor").length) {

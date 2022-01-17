@@ -21,6 +21,7 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BillController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CreditNoteController;
+use App\Http\Controllers\CustomerCategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DashboardController;
@@ -192,6 +193,7 @@ Route::group(
         Route::resource('productservice', ProductServiceController::class);
 
         Route::resource('customer', CustomerController::class);
+        Route::resource('customer-category', CustomerCategoryController::class);
 
         Route::resource('vender', VenderController::class);
 

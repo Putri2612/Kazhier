@@ -48,6 +48,9 @@
 
         }
 
+        const discount  = {},
+            products    = {};
+
         $(document).on('change', '#customer', function () {
             var id = $(this).val();
             if(!id.includes('new')){
@@ -67,8 +70,14 @@
                     },
                     cache: false,
                     success: function (data) {
-                        // console.log(data);
-                        $('#customer_detail').html(data);
+                        $('#customer_detail').html(data.view);
+                        if(data.category) {
+                            discount.amount = (data.category.discount_type ? data.category.discount : data.category.discount / 100);
+                            discount.max    = data.category.max_discount;
+                        } else {
+                            discount.amount = 0;
+                            discount.max    = 0;
+                        }
                     },
 
                 });
@@ -84,7 +93,7 @@
 
         $(document).on('change', '.item', function () {
             var items_id = $(this).val();
-            if(!items_id.includes('new')){
+            if(!items_id.includes('new') && !products[items_id]){
                 var url = $(this).data('url');
                 var el = $(this);
                 $.ajax({
@@ -100,16 +109,33 @@
                     success: function (data) {
                         var item = JSON.parse(data);
 
+                        let discount = 0;
+                        if(discount.hasOwnProperty('amount')) {
+                            discount = discount.amount;
+                            discount = discount > 1 ? discount : discount * item.product.sale_price;
+                        }
+                        
+                        if(discount.hasOwnProperty('max')) {
+                            discount = (discount > discount.max && discount.max > 0) ? discount.max : discount;
+                        }
+
+                        products[item.product.id] = {
+                            'name' : item.product.name,
+                            'stock': item.stock
+                        };
                         $(el.parent().parent().find('.quantity')).val(1);
                         $(el.parent().parent().find('.price')).val(item.product.sale_price);
                         $(el.parent().parent().find('.tax')).val(item.taxRate);
                         $(el.parent().parent().find('.unit')).html(item.unit);
-                        $(el.parent().parent().find('.discount')).val(0);
+                        $(el.parent().parent().find('.discount')).val(discount);
                         $(el.parent().parent().find('.amount')).html(item.totalAmount);
 
                         UpdateSubTotal();
                     },
                 });
+            } else if (products[items_id]) {
+                toastrs('Error', "{{__('The same item has already listed')}}", 'error');
+                $(el).val(null);
             }
         });
 
@@ -136,19 +162,9 @@
             }
 
             if(doChange) {
-                UpdateInvoiceAndBillItemData(target);
+                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products});
             }
         });
-
-        // $(document).on('click', '#discount_apply', function () {
-        //     var checkedValue = $('#discount_apply:checked').val();
-        //     if (checkedValue == 'on') {
-        //         $(".discount").removeAttr('disabled')
-        //     } else {
-        //         $(".discount").attr("disabled", true);
-        //     }
-        //
-        // })
     </script>
 @endpush
 @section('content')
@@ -239,12 +255,12 @@
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        {{-- <div class="col-md-6">
                                             <div class="custom-control custom-checkbox mt-4">
                                                 <input class="custom-control-input" type="checkbox" name="discount_apply" id="discount_apply">
                                                 <label class="custom-control-label" for="discount_apply">{{__('Discount Apply')}}</label>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         @if(!$customFields->isEmpty())
                                             <div class="col-md-6">
                                                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">
