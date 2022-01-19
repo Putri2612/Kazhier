@@ -47,7 +47,7 @@
                                                             @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
                                                                 <td class="action text-end">
                                                                     @can('edit constant payment method')
-                                                                        <a href="#!" data-url="{{ route('payment-method.edit',$paymentMethod->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment Method')}}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" data-url="{{ route('payment-method.edit',$paymentMethod->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment Method')}}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

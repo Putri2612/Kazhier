@@ -82,7 +82,7 @@
                                                                     <td>{{$debitNote->description}}</td>
                                                                     <td class="text-end">
                                                                         @can('edit debit note')
-                                                                            <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                            <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-bs-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                 <i class="fas fa-pencil-alt"></i>
                                                                             </a>
                                                                         @endcan

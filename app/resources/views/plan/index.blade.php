@@ -60,7 +60,7 @@
                                         <p class="font-style">{{$plan->duration}}</p>
                                         <div class="text-center">
                                             @can('edit plan')
-                                                <a title="Edit Plan" href="#" class="view-btn" data-url="{{ route('plans.edit',$plan->id) }}" data-ajax-popup="true" data-title="{{__('Edit Plan')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}"><i class="far fa-edit"></i></a>
+                                                <a title="Edit Plan" href="#" class="view-btn" data-url="{{ route('plans.edit',$plan->id) }}" data-ajax-popup="true" data-title="{{__('Edit Plan')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}"><i class="far fa-edit"></i></a>
                                             @endcan
                                             @can('delete plan')
                                             <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('plans.destroy', $plan->id) }}">

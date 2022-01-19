@@ -55,7 +55,13 @@
                                                             <td class="font-style">{{ $asset->description }}</td>
                                                             <td class="action text-end">
                                                                 @can('edit assets')
-                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-assets.edit',$asset->id) }}" data-ajax-popup="true" data-title="{{__('Edit Assets')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" 
+                                                                        class="btn btn-primary btn-action me-1" 
+                                                                        data-url="{{ route('account-assets.edit',$asset->id) }}" 
+                                                                        data-ajax-popup="true" 
+                                                                        data-title="{{__('Edit Assets')}}" 
+                                                                        data-bs-toggle="tooltip" 
+                                                                        title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan

@@ -49,12 +49,12 @@
                                                             <td class="font-style">{{ $equity->description }}</td>
                                                             <td class="action text-end">
                                                                 @can('edit equities')
-                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-equities.edit',$equity->id) }}" data-ajax-popup="true" data-title="{{__('Edit Equities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-equities.edit',$equity->id) }}" data-ajax-popup="true" data-title="{{__('Edit Equities')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan
                                                                 @can('delete equities')
-                                                                    <a href="#" class="btn btn-danger btn-action" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$equity->id}}').submit();">
+                                                                    <a href="#" class="btn btn-danger btn-action" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$equity->id}}').submit();">
                                                                         <i class="fas fa-trash"></i>
                                                                     </a>
                                                                     {!! Form::open(['method' => 'DELETE', 'route' => ['account-equities.destroy', $equity->id],'id'=>'delete-form-'.$equity->id]) !!}

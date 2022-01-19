@@ -35,7 +35,7 @@
             </div>
             <div class="row text-end mb-10">
                 <div class="col-12">
-                    <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
                         <i class="fas fa-filter"></i>{{__('Filter')}}
                     </a>
                     <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">

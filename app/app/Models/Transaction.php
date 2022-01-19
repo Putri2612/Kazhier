@@ -28,7 +28,7 @@ class Transaction extends Model
 
     public function bankAccount()
     {
-        return $this->hasOne(BankAccount::class, 'id', 'account')->first();
+        return $this->hasOne(BankAccount::class, 'id', 'account');
     }
 
 

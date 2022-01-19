@@ -78,7 +78,7 @@
                                                             <td>{{ \Auth::user()->priceFormat( $transfer->amount)}}</td>
                                                             <td>{{ !empty($transfer->paymentMethod())?$transfer->paymentMethod()->name:''}}</td>
                                                             <td>
-                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('transfer.show',$transfer->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-toggle="tooltip" data-original-title="{{__('Reference')}}"">
+                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('transfer.show',$transfer->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-bs-toggle="tooltip" data-original-title="{{__('Reference')}}"">
                                                                     <i class="fas fa-paperclip"></i>
                                                                 </a>
                                                             </td>
@@ -87,7 +87,7 @@
                                                             @if(Gate::check('edit transfer') || Gate::check('delete transfer'))
                                                                 <td class="action text-end">
                                                                     @can('edit transfer')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('transfer.edit',$transfer->id) }}" data-ajax-popup="true" data-title="{{__('Edit Amount Transfer')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('transfer.edit',$transfer->id) }}" data-ajax-popup="true" data-title="{{__('Edit Amount Transfer')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

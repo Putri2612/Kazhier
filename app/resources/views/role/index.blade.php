@@ -53,7 +53,7 @@
                                                         <td class="action">
 
                                                             @can('edit role')
-                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('roles.edit',$role->id) }}" data-size="xl" data-ajax-popup="true" data-toggle="tooltip" data-original-title="{{__('Edit')}}" data-title="{{__('Update Role')}}">
+                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('roles.edit',$role->id) }}" data-size="xl" data-ajax-popup="true" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}" data-title="{{__('Update Role')}}">
                                                                     <i class="fas fa-pencil-alt"></i>
                                                                 </a>
                                                             @endcan

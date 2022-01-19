@@ -37,7 +37,7 @@
                         <div class="card-header-action">
                             <div class="dropdown ">
     
-                                <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
+                                <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
                                     <i class="fas fa-filter"></i>{{__('Filter')}}
                                 </a>
     

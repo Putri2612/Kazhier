@@ -68,7 +68,7 @@
                     <div class="d-flex justify-content-between w-100">
                         <h4 class="fw-normal">{{__('Income Vs Expense Summary')}}</h4> <h4 class="fw-400">{{$currentYear}}</h4>
                     </div>
-                    <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
+                    <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
                         <i class="fas fa-filter"></i>{{__('Filter')}}
                     </a>
                     <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">

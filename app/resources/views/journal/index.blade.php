@@ -77,7 +77,7 @@
                                                                                 data-url="{{route((is_a($data, 'App\Models\Revenue') ? 'revenue.show' : is_a($data, 'App\Models\Payment') ? 'payment.show' : 'transfer.show'),$data->id) }}" 
                                                                                 data-ajax-popup="true" 
                                                                                 data-title="{{__('View Reference')}}" 
-                                                                                data-toggle="tooltip" 
+                                                                                data-bs-toggle="tooltip" 
                                                                                 data-original-title="{{__('Reference')}}"">
                                                                                 {{$num++}}
                                                                             </a>

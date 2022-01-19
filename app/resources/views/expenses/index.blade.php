@@ -60,7 +60,7 @@
                                                             <td class="text-center">
 
                                                                 @if($expense->attachment)
-                                                                    <a href="{{asset(Storage::url('app/public/attachment/'. $expense->attachment))}}" download="" class="table-action" data-toggle="tooltip" data-original-title="{{__('Download')}}">
+                                                                    <a href="{{asset(Storage::url('app/public/attachment/'. $expense->attachment))}}" download="" class="table-action" data-bs-toggle="tooltip" data-original-title="{{__('Download')}}">
                                                                         <i class="fa fa-download"></i>
                                                                     </a>
                                                                 @endif
@@ -68,12 +68,12 @@
                                                             @if(Gate::check('edit expense') || Gate::check('delete expense'))
                                                                 <td class="action text-end">
                                                                     @can('edit expense')
-                                                                        <a href="#!" class="table-action" data-url="{{ route('expenses.edit',$expense->id) }}" data-ajax-popup="true" data-title="{{__('Edit Expense')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="table-action" data-url="{{ route('expenses.edit',$expense->id) }}" data-ajax-popup="true" data-title="{{__('Edit Expense')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="far fa-edit"></i>
                                                                         </a>
                                                                     @endcan
                                                                     @can('delete expense')
-                                                                        <a href="#!" class="table-action table-action-delete" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$expense->id}}').submit();">
+                                                                        <a href="#!" class="table-action table-action-delete" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$expense->id}}').submit();">
                                                                             <i class="far fa-trash-alt"></i>
                                                                         </a>
                                                                         {!! Form::open(['method' => 'DELETE', 'route' => ['expenses.destroy', $expense->id],'id'=>'delete-form-'.$expense->id]) !!}

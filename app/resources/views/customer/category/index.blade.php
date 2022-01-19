@@ -66,7 +66,7 @@
                                             <td>{{Auth::user()->priceFormat($category->max_discount)}}</td>
                                             <td class="action text-end">
                                                 {{-- @can('edit payment') --}}
-                                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('customer-category.edit',$category->id) }}" data-ajax-popup="true" data-title="{{__('Edit Customer Category')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('customer-category.edit',$category->id) }}" data-ajax-popup="true" data-title="{{__('Edit Customer Category')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
                                                 {{-- @endcan

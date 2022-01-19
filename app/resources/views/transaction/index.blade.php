@@ -18,7 +18,7 @@
                         <h4 class="col-6 fw-normal">{{__('Manage Transaction')}}</h4>
                         <div class="col-6 text-end">
                             <div class="dropdown">
-                                <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
+                                <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
                                 <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                     {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET')) }}
                                     <div class="form-group">

@@ -54,16 +54,16 @@
                                 <div class="setting-tab">
                                     <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                         <li class="nav-item">
-                                            <a class="nav-link active" id="home-tab3" data-toggle="tab" href="#personal_info" role="tab" aria-controls="" aria-selected="true">{{__('Personal Info')}}</a>
+                                            <a class="nav-link active" id="home-tab3" data-bs-toggle="tab" href="#personal_info" role="tab" aria-controls="" aria-selected="true">{{__('Personal Info')}}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="billing-tab3" data-toggle="tab" href="#billing" role="tab" aria-controls="" aria-selected="false">{{__('Billing Info')}}</a>
+                                            <a class="nav-link" id="billing-tab3" data-bs-toggle="tab" href="#billing" role="tab" aria-controls="" aria-selected="false">{{__('Billing Info')}}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="shipping-tab3" data-toggle="tab" href="#shipping" role="tab" aria-controls="" aria-selected="false">{{__('Shipping Info')}}</a>
+                                            <a class="nav-link" id="shipping-tab3" data-bs-toggle="tab" href="#shipping" role="tab" aria-controls="" aria-selected="false">{{__('Shipping Info')}}</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" id="profile-tab3" data-toggle="tab" href="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
+                                            <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" href="#change_password" role="tab" aria-controls="" aria-selected="false">{{__('Change Password')}}</a>
                                         </li>
                                     </ul>
                                     <div class="tab-content" id="myTabContent2">

@@ -109,7 +109,7 @@
                                 <div class="col-lg-12">
                                     <div class="text-end">
                                         @if(!empty($invoicePayment))
-                                            <a href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" class="btn btn-primary btn-action me-1 float-right">
+                                            <a href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-bs-toggle="tooltip" data-original-title="{{__('Credit Note')}}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Add Credit Note')}}
                                             </a>
                                         @endif
@@ -350,7 +350,7 @@
                                             <td class="text-center">{{$creditNote->description}}</td>
                                             <td class="text-end">
                                                 @can('edit credit note')
-                                                    <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                    <a data-url="{{ route('invoice.edit.credit.note',[$creditNote->invoice,$creditNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-bs-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                         <i class="fas fa-pencil-alt"></i>
                                                     </a>
                                                 @endcan

@@ -55,7 +55,7 @@
                                                             <td class="font-style">{{ $liability->description }}</td>
                                                             <td class="action text-end">
                                                                 @can('edit liabilities')
-                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-liabilities.edit',$liability->id) }}" data-ajax-popup="true" data-title="{{__('Edit Liabilities')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('account-liabilities.edit',$liability->id) }}" data-ajax-popup="true" data-title="{{__('Edit Liabilities')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan

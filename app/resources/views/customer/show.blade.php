@@ -5,7 +5,7 @@
         </div>
         <div class="col text-end ">
             @can('edit customer')
-                <a href="#!" class="btn btn-primary btn-action me-1" data-size="2xl" data-url="{{ route('customer.edit',$customer['id']) }}" data-ajax-popup="true" data-title="{{__('Edit Customer')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                <a href="#!" class="btn btn-primary btn-action me-1" data-size="2xl" data-url="{{ route('customer.edit',$customer['id']) }}" data-ajax-popup="true" data-title="{{__('Edit Customer')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                     <i class="fas fa-pencil-alt"></i>
                 </a>
             @endcan

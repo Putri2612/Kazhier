@@ -95,6 +95,9 @@ class LedgerController extends Controller
             $ledger        = array();
 
             foreach($ledger_data as $data){
+                $description = '';
+                $debit = 0;
+                $credit = 0;
                 if($isCategory){
                     if(is_a($data, 'App\Models\Revenue') || is_a($data, 'App\Models\Payment')){
                         $description = $data->description;
@@ -102,8 +105,6 @@ class LedgerController extends Controller
                         $description = \Auth::user()->invoiceNumberFormat($data->invoice_id).' Payment';
                     } else if(is_a($data, 'App\Models\BillPayment')){
                         $description = \Auth::user()->billNumberFormat($data->invoice_id).' Payment';
-                    } else {
-                        $description = '';
                     }
                     $ledger[] = array(
                         'date' => $data->date,

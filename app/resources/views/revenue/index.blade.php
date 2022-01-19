@@ -98,7 +98,13 @@
                                                             <td>{{  !empty($revenue->category)?$revenue->category->name:''}}</td>
                                                             <td>{{  !empty($revenue->paymentMethod)?$revenue->paymentMethod->name:''}}</td>
                                                             <td>
-                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('revenue.show',$revenue->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-toggle="tooltip" data-original-title="{{__('Reference')}}"">
+                                                                <a href="#!" 
+                                                                    class="btn btn-secondary" 
+                                                                    data-url="{{route('revenue.show',$revenue->id) }}" 
+                                                                    data-ajax-popup="true" 
+                                                                    title="{{__('View Reference')}}" 
+                                                                    data-bs-toggle="tooltip" 
+                                                                    data-original-title="{{__('Reference')}}">
                                                                     <i class="fas fa-paperclip"></i>
                                                                 </a>
                                                             </td>
@@ -107,7 +113,7 @@
                                                             @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
                                                                 <td class="action text-end">
                                                                     @can('edit revenue')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('revenue.edit',$revenue->id) }}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('revenue.edit',$revenue->id) }}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}" data-bs-toggle="tooltip" title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

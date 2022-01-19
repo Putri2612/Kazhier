@@ -55,7 +55,7 @@
                                                                 <td>{{ ($default->value != null ? $default->value : '-') }}</td>
                                                                 <td class="action text-end">
                                                                     @can('edit defaults')
-                                                                        <a href="#" data-url="{{ route('defaults.edit', $default->id) }}" class="btn btn-primary btn-action me-1" data-ajax-popup="true" data-title="{{ __('Edit Default Value') }}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#" data-url="{{ route('defaults.edit', $default->id) }}" class="btn btn-primary btn-action me-1" data-ajax-popup="true" data-title="{{ __('Edit Default Value') }}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

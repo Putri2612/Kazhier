@@ -61,7 +61,7 @@
                                                             @if(Gate::check('edit bank account') || Gate::check('delete bank account'))
                                                                 <td class="action text-end">
                                                                     @can('edit bank account')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('bank-account.edit',$account->id) }}" data-ajax-popup="true" data-title="{{__('Edit Bank Detail')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('bank-account.edit',$account->id) }}" data-ajax-popup="true" data-title="{{__('Edit Bank Detail')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

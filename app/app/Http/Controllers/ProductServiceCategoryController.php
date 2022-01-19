@@ -53,7 +53,7 @@ class ProductServiceCategoryController extends Controller
     public function createSuggestions(Request $request) {
         $request->validate(['type' => 'required']);
 
-        $types      = ['product service', 'revenue', 'payment'];
+        $types      = ['product service', 'income', 'expense'];
         $typeID     = $request->input('type');
         $type       = $types[$typeID];
         $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', $typeID)->get()->pluck('name');

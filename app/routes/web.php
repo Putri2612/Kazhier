@@ -221,8 +221,8 @@ Route::group(
 
         // Tax, category, unit, method
         Route::resource('taxes', TaxController::class);
-        Route::resource('product-category', ProductServiceCategoryController::class);
         Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion');
+        Route::resource('product-category', ProductServiceCategoryController::class);
 
         Route::resource('product-unit', ProductServiceUnitController::class);
         Route::resource('payment-method', PaymentMethodController::class);
@@ -323,6 +323,7 @@ Route::group(
 
                 Route::get('invoice-report', [ReportController::class, 'invoiceReport'])->name('invoice');
                 Route::get('account-statement-report', [ReportController::class, 'accountStatement'])->name('account.statement');
+                Route::get('export/{name}', [ReportController::class, 'export'])->name('export');
             }
         );
         Route::get('journal', [JournalController::class, 'index'])->name('journal.index');

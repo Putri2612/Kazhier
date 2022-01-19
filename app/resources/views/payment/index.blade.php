@@ -96,7 +96,7 @@
                                                             <td>{{  !empty($payment->category)?$payment->category->name:''}}</td>
                                                             <td>{{  !empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
                                                             <td>
-                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('payment.show',$payment->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-toggle="tooltip" data-original-title="{{__('Reference')}}"">
+                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('payment.show',$payment->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-bs-toggle="tooltip" data-original-title="{{__('Reference')}}"">
                                                                     <i class="fas fa-paperclip"></i>
                                                                 </a>
                                                             </td>
@@ -105,7 +105,7 @@
                                                             @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
                                                                 <td class="action text-end">
                                                                     @can('edit payment')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('payment.edit',$payment->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('payment.edit',$payment->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

@@ -128,7 +128,7 @@
                                                             @if(Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
                                                                 <td class="action text-end">
                                                                     @can('duplicate invoice')
-                                                                        <a href="#" class="btn btn-success btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$invoice->id}}').submit();">
+                                                                        <a href="#" class="btn btn-success btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$invoice->id}}').submit();">
                                                                             <i class="fas fa-copy"></i>
                                                                             {!! Form::open(['method' => 'get', 'route' => ['invoice.duplicate', $invoice->id],'id'=>'duplicate-form-'.$invoice->id]) !!}
                                                                             {!! Form::close() !!}
@@ -136,17 +136,17 @@
                                                                     @endcan
                                                                     @can('show invoice')
                                                                         @if(\Auth::guard('customer')->check())
-                                                                            <a href="{{ route('customer.invoice.show',$invoice->id) }}" class="btn btn-info btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('customer.invoice.show',$invoice->id) }}" class="btn btn-info btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @else
-                                                                            <a href="{{ route('invoice.show',$invoice->id) }}" class="btn btn-info btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('invoice.show',$invoice->id) }}" class="btn btn-info btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @endif
                                                                     @endcan
                                                                     @can('edit invoice')
-                                                                        <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

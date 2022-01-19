@@ -12,8 +12,6 @@
 const DataTable = (element) => {
     const lastIndex = element.querySelectorAll('thead th').length - 1,
         lastColumnOption = {select: lastIndex, sortable: false}
-    
-        console.log(lastColumnOption);
     return new simpleDatatables.DataTable(element, {
         columns: [
             lastColumnOption
@@ -118,6 +116,16 @@ const CanNavigate = () => {
         }
     });
 }
+
+// Tooltips
+
+const toolTipsItem = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')),
+    toolTips    = [];
+toolTipsItem.forEach(item => {
+    toolTips.push(new bootstrap.Tooltip(item, {
+        boundary: document.body
+    }));
+})
 
 
 // Forms
@@ -365,13 +373,10 @@ const userActivity = () => {
 }
 
 const checkActivity = () => {
-    console.log('check');
     if(document.hasFocus()){
-        console.log('di laman');
         if(!sessionStorage.getItem('last-active') || !userActivities.focus) {
             getActivity();
         } else {
-            console.log(sessionStorage, 'a');
             const now   = moment(new Date()),
                 db      = moment(new Date(sessionStorage.getItem('db-active'))),
                 stored  = moment(new Date(sessionStorage.getItem('last-active'))),
@@ -390,7 +395,6 @@ const checkActivity = () => {
         }
         userActivities.focus = 1;
     } else {
-        console.log('tidak di laman')
         userActivities.focus = 0;
     }
 }
@@ -467,13 +471,11 @@ document.addEventListener('click', event => {
     if(target.hasAttribute('data-status-update')) {
         const url   = target.getAttribute('data-status-url'),
             status  = target.getAttribute('data-status-update');
-            console.log(url, status);
         ConfirmStatusModal(url, status);
     } else if(target.parentNode.hasAttribute('data-status-update')){
         target = target.parentNode;
         const url   = target.getAttribute('data-status-url'),
             status  = target.getAttribute('data-status-update');
-            console.log(url, status);
         ConfirmStatusModal(url, status);
     }
 });

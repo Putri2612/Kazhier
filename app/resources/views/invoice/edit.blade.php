@@ -309,7 +309,7 @@
                     <div class="card-header">
                         <h4>{{__('Product & Services')}}</h4>
                         <div class="card-header-action">
-                            <a href="#" data-repeater-create="" class="btn btn-icon icon-left btn-primary" data-toggle="modal" data-target="#add-bank">
+                            <a href="#" data-repeater-create="" class="btn btn-icon icon-left btn-primary" data-bs-toggle="modal" data-target="#add-bank">
                                 <i class="fas fa-plus"></i>{{__('Add Item')}}
                             </a>
                         </div>

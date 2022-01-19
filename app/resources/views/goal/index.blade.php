@@ -55,7 +55,7 @@
                                                             <td class="font-style">{{ $goal->is_display==1 ? __('Yes') :__('No') }}</td>
                                                             <td class="action text-end">
                                                                 @can('edit goal')
-                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('goal.edit',$goal->id) }}" data-ajax-popup="true" data-title="{{__('Edit Goal')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('goal.edit',$goal->id) }}" data-ajax-popup="true" data-title="{{__('Edit Goal')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                         <i class="fas fa-pencil-alt"></i>
                                                                     </a>
                                                                 @endcan

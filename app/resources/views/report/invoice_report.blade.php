@@ -66,7 +66,7 @@
                     <div class="card-header-action">
                         <div class="dropdown ">
 
-                            <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
+                            <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
                                 <i class="fas fa-filter"></i>{{__('Filter')}}
                             </a>
                             <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">
@@ -104,10 +104,10 @@
                             <div class="d-flex justify-content-between w-100">
                                 <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link active" id="profile-tab3" data-toggle="tab" href="#summary" role="tab" aria-controls="" aria-selected="false">{{__('Summary')}}</a>
+                                        <a class="nav-link active" id="profile-tab3" data-bs-toggle="tab" href="#summary" role="tab" aria-controls="" aria-selected="false">{{__('Summary')}}</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" id="contact-tab4" data-toggle="tab" href="#invoices" role="tab" aria-controls="" aria-selected="false">{{__('Invoices')}}</a>
+                                        <a class="nav-link" id="contact-tab4" data-bs-toggle="tab" href="#invoices" role="tab" aria-controls="" aria-selected="false">{{__('Invoices')}}</a>
                                     </li>
                                 </ul>
                             </div>

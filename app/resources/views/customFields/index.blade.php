@@ -49,7 +49,7 @@
                                                             @if(Gate::check('edit constant custom field') || Gate::check('delete constant custom field'))
                                                                 <td class="action text-end">
                                                                     @can('edit constant custom field')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('custom-field.edit',$field->id) }}" data-ajax-popup="true" data-title="{{__('Edit Custom Field')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('custom-field.edit',$field->id) }}" data-ajax-popup="true" data-title="{{__('Edit Custom Field')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

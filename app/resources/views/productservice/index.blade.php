@@ -95,7 +95,7 @@
                                                                     @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
                                                                         <td class="action text-end">
                                                                             @can('edit product & service')
-                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                     <i class="fas fa-pencil-alt"></i>
                                                                                 </a>
                                                                             @endcan
@@ -146,7 +146,7 @@
                                                                     @if(Gate::check('edit product & service') || Gate::check('delete product & service'))
                                                                         <td class="action text-end">
                                                                             @can('edit product & service')
-                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                                <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('productservice.edit',$productService->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Service')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                                     <i class="fas fa-pencil-alt"></i>
                                                                                 </a>
                                                                             @endcan

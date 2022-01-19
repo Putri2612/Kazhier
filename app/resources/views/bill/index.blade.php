@@ -123,7 +123,7 @@
                                                             @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
                                                                 <td class="action text-end">
                                                                     @can('duplicate bill')
-                                                                        <a href="#" class="btn btn-success btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$bill->id}}').submit();">
+                                                                        <a href="#" class="btn btn-success btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$bill->id}}').submit();">
                                                                             <i class="fas fa-copy"></i>
                                                                             {!! Form::open(['method' => 'get', 'route' => ['bill.duplicate', $bill->id],'id'=>'duplicate-form-'.$bill->id]) !!}
                                                                             {!! Form::close() !!}
@@ -131,17 +131,17 @@
                                                                     @endcan
                                                                     @can('show bill')
                                                                         @if(\Auth::guard('vender')->check())
-                                                                            <a href="{{ route('vender.bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('vender.bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @else
-                                                                            <a href="{{ route('bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Detail')}}">
+                                                                            <a href="{{ route('bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
                                                                                 <i class="fas fa-eye"></i>
                                                                             </a>
                                                                         @endif
                                                                     @endcan
                                                                     @can('edit bill')
-                                                                        <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action me-1" data-toggle="tooltip" data-original-title="{{__('Edit')}}">
+                                                                        <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
                                                                             <i class="fas fa-pencil-alt"></i>
                                                                         </a>
                                                                     @endcan

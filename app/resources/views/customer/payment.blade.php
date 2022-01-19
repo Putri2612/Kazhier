@@ -20,7 +20,7 @@
                                 <h4>{{__('Manage Payment')}}</h4>
                                 <div class="card-header-action">
                                     <div class="dropdown">
-                                        <a href="#" data-toggle="dropdown" class="btn btn-icon icon-left btn-primary"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
+                                        <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
                                         <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
                                             {{ Form::open(array('route' => array('customer.payment'),'method' => 'GET')) }}
 
