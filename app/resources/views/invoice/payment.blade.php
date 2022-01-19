@@ -50,7 +50,7 @@
         {{ Form::textarea('description', '', array('class' => 'form-control')) }}
     </div>
     <div class="col-md-12 text-end">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('Cancel')}}</button>
         {{Form::submit(__('Add'),array('class'=>'btn btn-primary'))}}
     </div>
 </div>

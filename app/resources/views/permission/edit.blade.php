@@ -12,7 +12,7 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn dark btn-outline" data-dismiss="modal">{{__('Cancel')}}</button>
+    <button type="button" class="btn dark btn-outline" data-bs-dismiss="modal">{{__('Cancel')}}</button>
     {{Form::submit(__('Update'),array('class'=>'btn green'))}}
 </div>
 {{Form::close()}}

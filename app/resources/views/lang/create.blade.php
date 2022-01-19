@@ -11,7 +11,7 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{__('Cancel')}}</button>
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('Cancel')}}</button>
     {{Form::submit(__('Create'),array('class'=>'btn btn-primary'))}}
 </div>
 {{ Form::close() }}
