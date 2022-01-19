@@ -7,6 +7,7 @@ use App\Models\BillPayment;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\Payment;
+use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transfer;
 use Carbon\Carbon;
@@ -23,12 +24,13 @@ trait DataGetter{
         return $revenuesQuery->get();
     }
 
-    public function GetRevenuesWithCategory($category, $month = null, $year = null){
+    public function GetRevenuesWithCategory($category, $month = null, $year = null, $account = null){
         $revenuesQuery = Revenue::where('created_by', '=', Auth::user()->creatorId())
                             ->where('category_id', '=', $category);
 
         if( $month ) { $revenuesQuery->whereRaw('month(`date`) = ?', $month); }
         if( $year ) { $revenuesQuery->whereRaw('year(`date`) = ?', $year); }
+        if( $account ) { $revenuesQuery->where('account_id', '=', $account); }
 
         return $revenuesQuery->get();
     }
@@ -55,6 +57,8 @@ trait DataGetter{
         return Revenue::where('created_by', '=', Auth::user()->creatorId())->get();
     }
 
+
+    // Payments
     public function GetPayments($month, $year, $account = null){
         $paymentQuery = Payment::where('created_by', '=', Auth::user()->creatorId())
                             ->whereRaw('year(`date`) = ?', $year)
@@ -96,6 +100,8 @@ trait DataGetter{
         return Payment::where('created_by', '=', Auth::user()->creatorId())->get();
     }
 
+
+    // Transfers
     public function GetTransfers($month, $year, $account = null){
         $transferQuery = Transfer::where('created_by', '=', Auth::user()->creatorId())
                             ->whereRaw('year(`date`) = ?', $year)
@@ -120,10 +126,12 @@ trait DataGetter{
         return Transfer::where('created_by', '=', Auth::user()->creatorId())->get();
     }
 
+
+    // Invoices
     public function GetInvoices($month, $year){
         $dateQuery  = "(
             ( year(`issue_date`) = {$year} AND month(`issue_date`) = {$month} ) OR
-            ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} ) OR
+            ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} )
         )";
 
         return Invoice::where('created_by', '=', Auth::user()->creatorId())
@@ -138,7 +146,7 @@ trait DataGetter{
         if ( $month && $year ) {
             $invoiceQuery->whereRaw("(
                 ( year(`issue_date`) = {$year} AND month(`issue_date`) = {$month} ) OR
-                ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} ) OR
+                ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} )
             )");
         } else if ( $month && is_null($year) ){
             $invoiceQuery->whereRaw("(
@@ -186,28 +194,23 @@ trait DataGetter{
         return $paymentQuery->get();
     }
 
-    public function GetInvoicePaymentsWithCategory($category, $month = null, $year = null){
+    public function GetInvoicePaymentsWithCategory($category, $month = null, $year = null, $account = null){
         $Invoices = $this->GetInvoicesWithCategory($category, $month, $year);
         
         if(empty($Invoices)){
             return [];
         }
 
-        $count      = 0;
-        $idQuery    = "(";
-        foreach( $Invoices as $Invoice ){
-            if($count){ $idQuery .= " OR "; }
-            $idQuery .= "`invoice_id` = {$Invoice->id}";
-            $count++;
-        }
-        $idQuery    .= ")";
+        $count  = 0;
+        $ids    = $Invoices->pluck('id')->toArray();
 
         $paymentQuery = InvoicePayment::where('created_by', '=', Auth::user()->creatorId());
 
-        if( $month ) { $paymentQuery->whereRaw('month(`date`) = ?', $month); }
-        if( $year ) { $paymentQuery->whereRaw('year(`date`) = ?', $year); }
+        if( $month )    { $paymentQuery->whereRaw('month(`date`) = ?', $month); }
+        if( $year )     { $paymentQuery->whereRaw('year(`date`) = ?', $year); }
+        if( $account )  { $paymentQuery->where('account_id', '=', $account); }
 
-        return $paymentQuery->whereRaw($idQuery)->get();
+        return $paymentQuery->whereIn('invoice_id', $ids)->get();
     }
 
     public function GetInvoicePaymentsBefore( $month, $year, $account = null ) {
@@ -229,18 +232,12 @@ trait DataGetter{
             return [];
         }
 
-        $count      = 0;
-        $idQuery    = "(";
-        foreach( $Invoices as $Invoice ){
-            if($count){ $idQuery .= " OR "; }
-            $idQuery .= "`invoice_id` = {$Invoice->id}";
-            $count++;
-        }
-        $idQuery    .= ")";
+        $count  = 0;
+        $ids    = $Invoices->pluck('id');
 
         return InvoicePayment::where('created_by', '=', Auth::user()->creatorId())
                 ->where('date', '<', $date)
-                ->whereRaw($idQuery)
+                ->whereIn('invoice_id', $ids)
                 ->get();
     }
 
@@ -248,10 +245,12 @@ trait DataGetter{
         return InvoicePayment::where('created_by', '=', Auth::user()->creatorId())->get();
     }
 
+
+    // Bills
     public function GetBills($month, $year){
         $dateQuery  = "(
             ( year(`bill_date`) = {$year} AND month(`bill_date`) = {$month} ) OR
-            ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} ) OR
+            ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} ) 
         )";
 
         return Bill::where('created_by', '=', Auth::user()->creatorId())
@@ -266,7 +265,7 @@ trait DataGetter{
         if ( $month && $year ) {
             $billQuery->whereRaw("(
                 ( year(`bill_date`) = {$year} AND month(`bill_date`) = {$month} ) OR
-                ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} ) OR
+                ( year(`due_date`) = {$year} AND month(`due_date`) = {$month} )
             )");
         } else if ( $month && is_null($year) ){
             $billQuery->whereRaw("(
@@ -321,21 +320,15 @@ trait DataGetter{
             return [];
         }
 
-        $count      = 0;
-        $idQuery    = "(";
-        foreach( $Bills as $Bill ){
-            if($count){ $idQuery .= " OR "; }
-            $idQuery .= "`bill_id` = {$Bill->id}";
-            $count++;
-        }
-        $idQuery    .= ")";
+        $count  = 0;
+        $ids    = $Bills->pluck('id');
 
         $paymentQuery = BillPayment::where('created_by', '=', Auth::user()->creatorId());
 
         if( $month ) { $paymentQuery->whereRaw('month(`date`) = ?', $month); }
         if( $year ) { $paymentQuery->whereRaw('year(`date`) = ?', $year); }
 
-        return $paymentQuery->whereRaw($idQuery)->get();
+        return $paymentQuery->whereIn('bill_id', $ids)->get();
     }
 
     public function GetBillPaymentsBefore( $month, $year, $account = null ) {
@@ -355,17 +348,11 @@ trait DataGetter{
         if(empty($Bills)){ return []; }
 
         $count      = 0;
-        $idQuery    = "(";
-        foreach( $Bills as $Bill ){
-            if($count){ $idQuery .= " OR "; }
-            $idQuery .= "`bill_id` = {$Bill->id}";
-            $count++;
-        }
-        $idQuery    .= ")";
+        $ids    = $Bills->pluck('id');
 
         return BillPayment::where('created_by', '=', Auth::user()->creatorId())
                 ->where('date', '<', $date)
-                ->whereRaw($idQuery)
+                ->whereIn('bill_id', $ids)
                 ->get();
     }
 
@@ -374,4 +361,203 @@ trait DataGetter{
     }
 
 
+    // Income
+
+    public function GetIncomeSummary($year = null, $account = null, $category = null, $customer = null) {
+        if(!$year) { $year = date('Y'); }
+        $incomes = Revenue::selectRaw('sum(amount) as amount, MONTH(date) as month,YEAR(date) as year, category_id');
+        $incomes->where('created_by', '=', Auth::user()->creatorId());
+        $incomes->whereRAW('YEAR(date) =?', [$year]);
+        if(!empty($account))
+        {
+            $incomes->where('account_id', '=', $account);
+        }
+        if(!empty($category))
+        {
+            $incomes->where('category_id', '=', $category);
+        }
+
+        if(!empty($customer))
+        {
+            $incomes->where('customer_id', '=', $customer);
+        }
+        $incomes->groupBy('month', 'year', 'category_id');
+        $incomes = $incomes->get();
+        
+        $tmpArray = [];
+        foreach($incomes as $income){
+            $tmpArray[$income->category_id][$income->month] = $income->amount;
+        }
+        $incomeData = [];
+        foreach($tmpArray as $category_id => $income)
+        {
+            $category        = ProductServiceCategory::where('id', '=', $category_id)->first();
+            $tmp             = [];
+            $tmp['category'] = !empty($category) ? $category->name : '';
+            $tmp['data']     = [];
+            for($i = 1; $i <= 12; $i++)
+            {
+                $tmp['data'][$i] = array_key_exists($i, $income) ? $income[$i] : 0;
+            }
+            $incomeData[] = $tmp;
+        }
+
+        $incomes = $incomes->pluck('amount', 'month')->toArray();
+        for($i = 1; $i <= 12; $i++)
+        {
+            $incomeTotal[] = array_key_exists($i, $incomes) ? $incomes[$i] : 0;
+        }
+
+        //---------------------------INVOICE INCOME-----------------------------------------------
+
+        $invoices = Invoice:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,invoice_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
+        $invoices->whereRAW('YEAR(send_date) =?', [$year]);
+        if(!empty($customer))
+        {
+            $invoices->where('customer_id', '=', $customer);
+        }
+        $invoices        = $invoices->get();
+        $invoiceTmpArray = [];
+        foreach($invoices as $invoice)
+        {
+            $invoiceTmpArray[$invoice->category_id][$invoice->month][] = $invoice->getTotal();
+        }
+
+        $invoiceArray = [];
+        foreach($invoiceTmpArray as $cat_id => $record)
+        {
+            $category            = ProductServiceCategory::where('id', '=', $cat_id)->first();
+
+            $invoice             = [];
+            $invoice['category'] = !empty($category) ? $category->name : '';
+            $invoice['data']     = [];
+            for($i = 1; $i <= 12; $i++)
+            {
+
+                $invoice['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
+            }
+            $invoiceArray[] = $invoice;
+        }
+
+        $invoiceTotalArray = [];
+        foreach($invoices as $invoice)
+        {
+            $invoiceTotalArray[$invoice->month][] = $invoice->getTotal();
+        }
+        for($i = 1; $i <= 12; $i++)
+        {
+            $invoiceTotal[] = array_key_exists($i, $invoiceTotalArray) ? array_sum($invoiceTotalArray[$i]) : 0;
+        }
+
+        $chartIncomeArr = array_map(
+            function (){
+                return array_sum(func_get_args());
+            }, $incomeTotal, $invoiceTotal
+        );
+
+        $data['chartIncomeArr'] = $chartIncomeArr;
+        $data['incomeArr']      = $incomeData;
+        $data['invoiceArray']   = $invoiceArray;
+        
+        return $data;
+    }
+
+    public function GetExpenseSummary($year = null, $account = null, $category = null, $vender = null) {
+        $expenses = Payment::selectRaw('sum(amount) as amount,MONTH(date) as month,YEAR(date) as year, category_id');
+            $expenses->where('created_by', '=', Auth::user()->creatorId());
+            $expenses->whereRAW('YEAR(date) =?', [$year]);
+            if(!empty($account))
+            {
+                $expenses->where('account_id', '=', $account);
+            }
+            if(!empty($category))
+            {
+                $expenses->where('category_id', '=', $category);
+            }
+            if(!empty($vender))
+            {
+                $expenses->where('vender_id', '=', $vender);
+            }
+            $expenses->groupBy('month', 'year', 'category_id');
+            $expenses = $expenses->get();
+            $tmpArray = [];
+            foreach($expenses as $expense)
+            {
+                $tmpArray[$expense->category_id][$expense->month] = $expense->amount;
+            }
+            $array = [];
+            foreach($tmpArray as $cat_id => $record)
+            {
+                $category        = ProductServiceCategory::where('id', '=', $cat_id)->first();
+                $tmp             = [];
+                $tmp['category'] = !empty($category) ? $category->name : '';
+                $tmp['data']     = [];
+                for($i = 1; $i <= 12; $i++)
+                {
+                    $tmp['data'][$i] = array_key_exists($i, $record) ? $record[$i] : 0;
+                }
+                $array[] = $tmp;
+            }
+            
+            $expenses = $expenses->pluck('amount', 'month')->toArray();
+
+            for($i = 1; $i <= 12; $i++)
+            {
+                $expenseTotal[] = array_key_exists($i, $expenses) ? $expenses[$i] : 0;
+            }
+
+            //     ------------------------------------BILL EXPENSE----------------------------------------------------
+
+            $bills = Bill:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,bill_id,id')->where('created_by', Auth::user()->creatorId())->where('status', '!=', 0);
+            $bills->whereRAW('YEAR(send_date) =?', [$year]);
+            if(!empty($customer))
+            {
+                $bills->where('vender_id', '=', $vender);
+            }
+            $bills        = $bills->get();
+            $billTmpArray = [];
+            foreach($bills as $bill)
+            {
+                $billTmpArray[$bill->category_id][$bill->month][] = $bill->getTotal();
+            }
+
+            $billArray = [];
+            foreach($billTmpArray as $cat_id => $record)
+            {
+                $category = ProductServiceCategory::where('id', '=', $cat_id)->first();
+
+                $bill             = [];
+                $bill['category'] = !empty($category) ? $category->name : '';
+                $bill['data']     = [];
+                for($i = 1; $i <= 12; $i++)
+                {
+
+                    $bill['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
+                }
+                $billArray[] = $bill;
+            }
+
+            $billTotalArray = [];
+            foreach($bills as $bill)
+            {
+                $billTotalArray[$bill->month][] = $bill->getTotal();
+            }
+            for($i = 1; $i <= 12; $i++)
+            {
+                $billTotal[] = array_key_exists($i, $billTotalArray) ? array_sum($billTotalArray[$i]) : 0;
+            }
+
+            $chartExpenseArr = array_map(
+                function (){
+                    return array_sum(func_get_args());
+                }, $expenseTotal, $billTotal
+            );
+
+
+            $data['chartExpenseArr'] = $chartExpenseArr;
+            $data['expenseArr']      = $array;
+            $data['billArray']       = $billArray;
+
+            return $data;
+    }
 }
