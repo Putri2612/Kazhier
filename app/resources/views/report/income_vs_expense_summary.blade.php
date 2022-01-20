@@ -31,6 +31,24 @@
                             data:{!! json_encode($profit) !!},
                         }]
                     },
+                    plugins: {
+                        beforeRender: (x, options) => {
+                            const chart = x.chart,
+                                dataset = x.data.datasets[0],
+                                yScale  = x.scales['y-axis-0'],
+                                yPos    = yScale.getPixelForValue(0);
+                            
+                            const gradientFill = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
+                            gradientFill.addColorStop(0, '#0087f8');
+                            gradientFill.addColorStop(yPos / chart.height, '#0087f8');
+                            gradientFill.addColorStop(yPos / chart.height, '#ff5909');
+                            gradientFill.addColorStop(1, '#ff5909');
+
+                            const model = x.data.datasets[0]._meta[Object.keys(dataset._meta)[0]].dataset._model;
+                            model.borderColor = gradientFill;
+
+                        }
+                    }
                 });
                 $this.data('chart', salesChart);
             };
@@ -63,56 +81,45 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-end mb-10">
+            <div class="row mb-10">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between w-100">
-                        <h4 class="fw-normal">{{__('Income Vs Expense Summary')}}</h4> <h4 class="fw-400">{{$currentYear}}</h4>
+                    {{ Form::open(array('route' => array('report.income.vs.expense.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
+                    <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                        {{ Form::label('year', __('Year')) }}
+                        {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
                     </div>
-                    <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
-                        <i class="fas fa-filter"></i>{{__('Filter')}}
-                    </a>
-                    <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">
-                        <i class="fas fa-download"></i>{{__('Download')}}
-                    </a>
-                    <div class="card-header-action">
-                        <div class="dropdown">
-
-                            <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
-                                {{ Form::open(array('route' => array('report.income.vs.expense.summary'),'method' => 'GET')) }}
-                                <div class="form-group">
-                                    {{ Form::label('year', __('Year')) }}
-                                    {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ Form::label('account', __('Account')) }}
-                                    {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ Form::label('category', __('Category')) }}
-                                    {{ Form::select('category',$category,isset($_GET['category'])?$_GET['category']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ Form::label('customer', __('Customer')) }}
-                                    {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="form-group">
-                                    {{ Form::label('vender', __('Vendor')) }}
-                                    {{ Form::select('vender',$vender,isset($_GET['vender'])?$_GET['vender']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                    <a href="{{route('report.income.vs.expense.summary')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                </div>
-                                {{ Form::close() }}
-                            </div>
-                        </div>
+                    <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                        {{ Form::label('account', __('Account')) }}
+                        {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
                     </div>
+                    <div class="form-group col-12 col-md-4 col-lg-3 col-xxl-2">
+                        {{ Form::label('category', __('Category')) }}
+                        {{ Form::select('category',$category,isset($_GET['category'])?$_GET['category']:'', array('class' => 'form-control font-style selectric')) }}
+                    </div>
+                    <div class="form-group col-12 col-md-4 col-lg-3 col-xxl-2">
+                        {{ Form::label('customer', __('Customer')) }}
+                        {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
+                    </div>
+                    <div class="form-group col-12 col-md-4 col-lg-3 col-xxl-2">
+                        {{ Form::label('vender', __('Vendor')) }}
+                        {{ Form::select('vender',$vender,isset($_GET['vender'])?$_GET['vender']:'', array('class' => 'form-control font-style selectric')) }}
+                    </div>
+                    <div class="col-auto text-end">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                        <a href="{{route('report.income.vs.expense.summary')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                        @php
+                            $param = explode('?', Request::getRequestUri());
+                            $param = count($param) > 1 ? '?'.$param[1] : ''
+                        @endphp
+                        <a href="{!! route('report.export', 'income-vs-expense-summary').$param !!}" class="btn btn-dark"><i class="fas fa-download"></i></a>
+                    </div>
+                    {{ Form::close() }}
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-12" id="chart-container">
-                    <div class="card">
+                    <div class="card py-4">
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
@@ -126,6 +133,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">

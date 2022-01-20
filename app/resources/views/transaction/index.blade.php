@@ -16,30 +16,23 @@
                 <div class="col-12">
                     <div class="row crd mb-3">
                         <h4 class="col-6 fw-normal">{{__('Manage Transaction')}}</h4>
-                        <div class="col-6 text-end">
-                            <div class="dropdown">
-                                <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary btn-round"><i class="fas fa-filter"></i>{{__('Filter')}}</a>
-                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown w-64">
-                                    {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET')) }}
-                                    <div class="form-group">
-                                        {{ Form::label('date', __('Date')) }}
-                                        {{ Form::text('date', isset($_GET['date'])?$_GET['date']:'', array('class' => 'form-control datepicker-range')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('account', __('Account')) }}
-                                        {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                        <a href="{{route('transaction.index')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                    </div>
-                                    {{ Form::close() }}
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="card">
                         <div class="card-body">
+                            {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET', 'class' => 'row justify-content-end pt-3 pb-5 mb-5')) }}
+                                <div class="form-group col-12 col-md-6 col-lg-auto col-xxl-2">
+                                    {{ Form::label('date', __('Date')) }}
+                                    {{ Form::text('date', isset($_GET['date'])?$_GET['date']:'', array('class' => 'form-control datepicker-range')) }}
+                                </div>
+                                <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                                    {{ Form::label('account', __('Account')) }}
+                                    {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <a href="{{route('transaction.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                                </div>
+                            {{ Form::close() }}
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">

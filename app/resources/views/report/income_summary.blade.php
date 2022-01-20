@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Dashboard')}}
+    {{__('Income Summary')}}
 @endsection
 
 @push('script-page')
@@ -49,30 +49,11 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-end mb-10">
+            <div class="row mb-10">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between w-100">
-                        <h4 class="fw-normal">{{__('Income Summary')}}</h4>
-                        <h4 class="fw-400">{{$currentYear}}</h4>
-                    </div>
                     <div class="row justify-content-end">
-                        <div class="col-auto">
-                            @php
-                                $param = explode('?', Request::getRequestUri());
-                                $param = count($param) > 1 ? '?'.$param[1] : ''
-                            @endphp
-                            <a href="{!! route('report.export', ['income-summary']).$param !!}" class="btn btn-icon icon-left btn-primary btn-round" target="_blank">
-                                <i class="fas fa-download"></i>{{__('Download')}}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            {{ Form::open(array('route' => array('report.income.summary'),'method' => 'GET', 'class' => 'row justify-content-end')) }}
+                        <div class="col">
+                            {{ Form::open(array('route' => array('report.income.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
                                 <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                                     {{ Form::label('year', __('Year')) }}
                                     {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
@@ -89,12 +70,49 @@
                                     {{ Form::label('customer', __('Customer')) }}
                                     {{ Form::select('customer',$customer,isset($_GET['customer'])?$_GET['customer']:'', array('class' => 'form-control font-style selectric')) }}
                                 </div>
-                                <div class="text-end">
+                                <div class="col-auto text-end">
                                     <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
                                     <a href="{{route('report.income.summary')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                                    @php
+                                        $param = explode('?', Request::getRequestUri());
+                                        $param = count($param) > 1 ? '?'.$param[1] : ''
+                                    @endphp
+                                    <a href="{!! route('report.export', ['income-summary']).$param !!}" class="btn btn-dark"><i class="fas fa-download"></i></a>
                                 </div>
                             {{ Form::close() }}
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('Income Summary') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Date') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('January') }} {{ $currentYear }} - {{ __('December') }} {{ $currentYear }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card py-4">
                         <div class="card-body" id="chart-container">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
@@ -108,6 +126,8 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="card">
                         <div class="card-body" id="table-container">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">

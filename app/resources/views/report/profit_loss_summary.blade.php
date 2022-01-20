@@ -1,25 +1,7 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Dashboard')}}
+    {{__('Profit && Loss Summary')}}
 @endsection
-@push('script-page')
-    <script src="{{ asset('assets/js/jspdf.min.js') }} "></script>
-    <script src="{{ asset('assets/js/html2canvas.min.js') }} "></script>
-    <script>
-        var year = '{{$currentYear}}';
-
-        function saveAsPDF() {
-            html2canvas(document.getElementById("chart-container"), {
-                onrendered: function (canvas) {
-                    var img = canvas.toDataURL();
-                    var doc = new jsPDF("p", "pt", "a2");
-                    doc.addImage(img, 10, 10);
-                    doc.save(year + '_profit_and_loss_report.pdf');
-                }
-            });
-        }
-    </script>
-@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -30,46 +12,64 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="d-flex justify-content-between w-100">
-                <h4 class="fw-normal">{{__('Profit && Loss Summary')}}</h4> <h4 class="fw-400">{{$currentYear}}</h4>
-            </div>
-            <div class="row text-end mb-10">
+            <div class="row mb-10">
                 <div class="col-12">
-                    <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
-                        <i class="fas fa-filter"></i>{{__('Filter')}}
-                    </a>
-                    <a href="#" onclick="saveAsPDF();" class="btn btn-icon icon-left btn-primary pdf-btn" id="download-buttons">
-                        <i class="fas fa-download"></i>{{__('Download')}}
-                    </a>
-                    <div class="card-header-action">
-                        <div class="dropdown">
-                            <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown">
-                                {{ Form::open(array('route' => array('report.profit.loss.summary'),'method' => 'GET')) }}
-                                <div class="form-group">
-                                    {{ Form::label('year', __('Year')) }}
-                                    {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                    <a href="{{route('report.profit.loss.summary')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                </div>
-                                {{ Form::close() }}
-                            </div>
+                    {{ Form::open(array('route' => array('report.profit.loss.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('year', __('Year')) }}
+                            {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
                         </div>
-                    </div>
+                        <div class="col-auto text-end">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            <a href="{{route('report.profit.loss.summary')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                            @php
+                                $param = explode('?', Request::getRequestUri());
+                                $param = count($param) > 1 ? '?'.$param[1] : ''
+                            @endphp
+                            <a href="{!! route('report.export', ['profit-loss-summary']).$param !!}" class="btn btn-dark">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    {{ Form::close() }}
                 </div>
             </div>
             <div class="row">
                 <div class="col-12" id="chart-container">
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('Profit && Loss Summary') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Date') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('January') }} {{ $currentYear }} - {{ __('December') }} {{ $currentYear }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">
-                                        <div class="row">
+                                        <div class="row mb-5">
                                             <div class="col-sm-12">
                                                 <h4>{{__('Income')}}</h4>
-                                                <table class="table table-flush border font-style" id="dataTable-manual">
+                                                <table class="table table-flush font-style" id="dataTable-manual">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th width="25%">{{__('Category')}}</th>
@@ -108,7 +108,7 @@
                                                     @endif
                                                     <div class="row">
                                                         <div class="col-sm-12">
-                                                            <table class="table table-flush border" id="dataTable-manual">
+                                                            <table class="table table-flush" id="dataTable-manual">
                                                                 <tbody>
                                                                 <tr>
                                                                     <td colspan="13"><b><h6>{{__('Total Income =  Revenue + Invoice ')}}</h6></b></td>
@@ -127,10 +127,10 @@
                                                 </table>
                                             </div>
                                         </div>
-                                        <div class="row">
+                                        <div class="row mb-5">
                                             <div class="col-sm-12">
                                                 <h4>{{__('Expense')}}</h4>
-                                                <table class="table table-flush border font-style" id="dataTable-manual">
+                                                <table class="table table-flush font-style" id="dataTable-manual">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th width="25%">{{__('Category')}}</th>
@@ -168,7 +168,7 @@
                                                     @endif
                                                     <div class="row">
                                                         <div class="col-sm-12">
-                                                            <table class="table table-flush border" id="dataTable-manual">
+                                                            <table class="table table-flush" id="dataTable-manual">
                                                                 <tbody>
                                                                 <tr>
                                                                     <td colspan="13"><b><h6>{{__('Total Expense =  Payment + Bill ')}}</h6></b></td>
@@ -185,7 +185,7 @@
                                                     </div>
                                                     <div class="row">
                                                         <div class="col-sm-12">
-                                                            <table class="table table-flush border" id="dataTable-manual">
+                                                            <table class="table table-flush" id="dataTable-manual">
                                                                 <tbody>
                                                                 <tr>
                                                                     <td colspan="13"><b><h6>{{__('Net Profit = Total Income - Total Expense ')}}</h6></b></td>
@@ -204,8 +204,6 @@
                                                 </table>
                                             </div>
                                         </div>
-
-
                                     </div>
                                 </div>
                             </div>

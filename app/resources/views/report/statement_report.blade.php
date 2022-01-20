@@ -2,24 +2,6 @@
 @section('page-title')
     {{__('Account Statement')}}
 @endsection
-@push('script-page')
-    <script src="{{ asset('assets/js/jspdf.min.js') }} "></script>
-    <script src="{{ asset('assets/js/html2canvas.min.js') }} "></script>
-    <script>
-
-        $(document).ready(function() {
-            $('#custom-dataTable').DataTable( {
-                dom: 'Bfrtip',
-                buttons: [
-                    'excelHtml5',
-                    'csvHtml5',
-                    'pdfHtml5'
-                ],
-                "order": [[0, "desc"]]
-            } );
-        } );
-    </script>
-@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -30,48 +12,78 @@
             </div>
         </div>
         <div class="section-body">
-            <div class="row text-end mb-10">
+            <div class="row mb-10">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between w-100 mb-3">
-                        <h4 class="fw-normal">{{__('Statement Summary')}}</h4>
-                        <div class="card-header-action">
-                            <div class="dropdown ">
-    
-                                <a href="#" data-bs-toggle="dropdown" class="btn btn-icon icon-left btn-primary">
-                                    <i class="fas fa-filter"></i>{{__('Filter')}}
-                                </a>
-    
-                                <div class="dropdown-menu dropdown-list dropdown-menu-end Filter-dropdown ">
-                                    {{ Form::open(array('route' => array('report.account.statement'),'method' => 'GET')) }}
-                                    <div class="form-group">
-                                        {{ Form::label('account', __('Account')) }}
-                                        {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('from', __('From')) }}
-                                        {{ Form::text('from', isset($_GET['from'])?$_GET['from']:null, array('class' => 'form-control datepicker')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('to', __('To')) }}
-                                        {{ Form::text('to', isset($_GET['to'])?$_GET['to']:null, array('class' => 'form-control datepicker')) }}
-                                    </div>
-                                    <div class="form-group">
-                                        {{ Form::label('type', __('Type')) }}
-                                        {{ Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control font-style selectric')) }}
-                                    </div>
-                                    <div class="text-end">
-                                        <button type="submit" class="btn btn-primary">{{__('Search')}}</button>
-                                        <a href="{{route('report.account.statement')}}" class="btn btn-danger">{{__('Reset')}}</a>
-                                    </div>
-                                    {{ Form::close() }}
-                                </div>
-                            </div>
+                    {{ Form::open(array('route' => array('report.account.statement'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('account', __('Account')) }}
+                            {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
                         </div>
-                    </div>
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('date', __('Date')) }}
+                            {{ Form::text('date', isset($_GET['date'])?$_GET['date']:null, array('class' => 'form-control datepicker-range')) }}
+                        </div>
+                        <div class="form-group col-12 col-md-12 col-lg-3 col-xxl-2">
+                            {{ Form::label('type', __('Type')) }}
+                            {{ Form::select('type',$types,isset($_GET['type'])?$_GET['type']:'', array('class' => 'form-control font-style selectric')) }}
+                        </div>
+                        <div class="col-auto text-end">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            <a href="{{route('report.account.statement')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                        </div>
+                    {{ Form::close() }}
                 </div>
             </div>
             <div class="row">
                 <div class="col-12" id="statement-container">
+                    <div class="row align-items-stretch">
+                        <div class="col-12 col-md-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('Account Statement Summary') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Type') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ isset($_GET['type']) ? $_GET['type'] : __('All')}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Date') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        @php
+                                            $dateFrom   = explode(' ',Auth::user()->dateFormat($from));
+                                            $dateTo     = explode(' ',Auth::user()->dateFormat($to));
+                                        @endphp
+                                        @foreach ($dateFrom as $dtFrom)
+                                            {{ __($dtFrom).' ' }}
+                                        @endforeach
+                                        -
+                                        @foreach ($dateTo as $dtTo)
+                                            {{ __($dtTo).' ' }}
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
@@ -81,22 +93,12 @@
                                             <div class="col-sm-12">
                                                 <table class="table table-flush tbl-border" >
                                                     <tbody>
-                                                    <tr>
-                                                        <th> {{__('Account')}}</th>
-                                                        <td>{{!empty($_GET['account'])?$accountName->holder_name.' , '.$accountName->bank_name:'All'}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th> {{__('From')}}</th>
-                                                        <td>{{isset($_GET['from'])?$_GET['from']:$from}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th> {{__('To')}}</th>
-                                                        <td>{{isset($_GET['to'])?$_GET['to']:$to}}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th> {{__('Type')}}</th>
-                                                        <td>{{isset($_GET['type'])?$_GET['type']:'All'}}</td>
-                                                    </tr>
+                                                    @foreach ($displayAccount as $acc)
+                                                        <tr>
+                                                            <th>{{ $acc->name }}</th>
+                                                            <td>{{ Auth::user()->priceFormat($acc->balance) }}</td>
+                                                        </tr>
+                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                                 
