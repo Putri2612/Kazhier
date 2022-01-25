@@ -63,19 +63,39 @@ class LoginController extends Controller
             auth()->logout();
         }
 
-        if($user->type == 'company')
+        if($user->type != 'super admin')
         {
-            
-            if(date('Y-m-d') > $user->plan_expire_date)
+            $paidUser = User::find($user->creatorId());
+            // $user = 
+
+            // if(date('Y-m-d') > $user->plan_expire_date){
+            //     $user->plan             = 0;
+            //     $user->plan_expire_date = null;
+            //     $user->save();
+
+            //     $users      = User::where('created_by', '=', Auth::user()->creatorId())->update(['is_active' => 0]);
+            //     $accounts   = BankAccount::where('created_by', '=', Auth::user()->creatorId())->update(['deleted_at' => now()]);
+
+            //     if(Auth::user()->type != 'company' && !Auth::user()->is_active) {
+            //         auth()->logout();
+            //     } else if(Auth::user()->type == 'company') {
+                    
+            //     }
+            // }
+            if(date('Y-m-d') > $paidUser->plan_expire_date)
             {
-                $user->plan             = 0;
-                $user->plan_expire_date = null;
-                $user->save();
+                $paidUser->plan             = 0;
+                $paidUser->plan_expire_date = null;
+                $paidUser->save();
 
-                $users      = User::where('created_by', '=', Auth::user()->creatorId())->update(['is_active' => 0]);
-                $accounts   = BankAccount::where('created_by', '=', Auth::user()->creatorId())->update(['deleted_at' => now()]);
+                $users      = User::where('created_by', '=', $paidUser->creatorId())->update(['is_active' => 0]);
+                $accounts   = BankAccount::where('created_by', '=', $paidUser->creatorId())->update(['deleted_at' => now()]);
 
-                return redirect()->route('dashboard')->with('error', 'Your plan expired limit is over, please upgrade your plan');
+                if(Auth::user()->type != 'company' && !Auth::user()->is_active) {
+                    auth()->logout();
+                } else {
+                    return redirect()->route('plan.expired')->with('error', 'Your plan expired limit is over, please upgrade your plan');
+                }
             }
         }
     }

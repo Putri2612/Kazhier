@@ -5,6 +5,37 @@
 @endphp
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
+        @if (Auth::user()->type != 'super admin' && (!Auth::user()->plan || Auth::user()->plan_expire_date < date('Y-m-d')))
+        <div class="sidebar-brand">
+            <a href="#">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
+            </a>
+        </div>
+        <div class="sidebar-brand sidebar-brand-sm">
+            <a href="#">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png').'?'.rand()}}" alt="">
+            </a>
+        </div>
+        <ul class="sidebar-menu">
+            @if(Gate::check('manage plan') || Gate::check('manage order'))
+                <li class="dropdown {{ (Request::segment(1) == 'plans' || Request::segment(1) == 'orders')?' active':''}}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-trophy"></i><span>{{__('Plan')}}</span></a>
+                    <ul class="dropdown-menu">
+                        @can('manage plan')
+                            <li class="{{ (Request::segment(1) == 'plans')?'active':''}}">
+                                <a class="nav-link" href="{{ route('plans.index') }}"><span>{{__('Plan')}}</span></a>
+                            </li>
+                        @endcan
+                        @can('manage order')
+                            <li class="{{ (Request::segment(1) == 'orders')?'active':''}}">
+                                <a class="nav-link" href="{{ route('order.index') }}"><span>{{__('Past Purchase')}}</span></a>
+                            </li>
+                        @endcan
+                    </ul>
+                </li>
+            @endif
+        </ul>
+        @else
         <div class="sidebar-brand">
             <a href="{{route('dashboard')}}">
                 <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
@@ -400,8 +431,7 @@
                     <a class="nav-link" href="{{ route('company.setting') }}"><i class="fas fa-sliders-h"></i> <span>{{  __('Company Setting') }} </span></a>
                 </li>
             @endif
-
-
         </ul>
+        @endif
     </aside>
 </div>

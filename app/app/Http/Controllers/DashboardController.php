@@ -16,6 +16,7 @@ use App\Models\ProductServiceUnit;
 use App\Models\Projects;
 use App\Models\Revenue;
 use App\Models\Tax;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class
@@ -38,6 +39,9 @@ DashboardController extends Controller
      */
     public function index()
     {
+        if(date('Y-m-d') > Auth::user()->plan_expire_date){
+            return redirect()->route('plan.expired');
+        }
         if(\Auth::user()->type == 'super admin')
         {
             $user                       = \Auth::user();

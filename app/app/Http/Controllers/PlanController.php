@@ -8,6 +8,7 @@ use App\Traits\CanProcessNumber;
 use App\Traits\CanUploadFile;
 use File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PlanController extends Controller
 {
@@ -205,5 +206,15 @@ class PlanController extends Controller
             );
         }
         return json_encode($planArray);
+    }
+
+    public function expired() {
+        if(date('Y-m-d') > Auth::user()->plan_expire_date){
+            $plans = Plan::get();
+
+            return view('plan.expired', compact('plans'));
+        } else {
+            return redirect()->route('dashboard');
+        }
     }
 }

@@ -300,6 +300,7 @@ Route::group(
 
         // Plan & order
 
+        Route::get('plans/expired', [PlanController::class, 'expired'])->name('plan.expired');
         Route::resource('plans', PlanController::class);
 
         Route::get('/orders', [MidtransPaymentController::class, 'index'])->name('order.index');
