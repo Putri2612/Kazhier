@@ -1105,7 +1105,7 @@ table tr:hover .table-links {
     border-radius: 30px;
     font-size: 12px; }
 .badge.badge-warning {
-    color: #fff; }
+    background-color: #ffc107; }
 .badge.badge-primary {
     background-color: #0087f8; }
 .badge.badge-secondary {
