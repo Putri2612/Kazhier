@@ -25,7 +25,8 @@ class CustomerController extends Controller
                 'customer_name'     => $customer->name,
                 'customer_cell'     => $customer->contact,
                 'customer_address'  => $customer->billing_address,
-                'customer_email'    => $email
+                'customer_email'    => $email,
+                'customer_category' => $customer->category_id,
             ]);
         }
 
@@ -48,10 +49,11 @@ class CustomerController extends Controller
             'created_by'    => Auth::user()->creatorId()
         ],[
             'contact'           => $request->input('customer_cell'),
-            'email'             => $request->has('customer_email') ? $request->input('customer_email') : '',
+            'email'             => $request->has('customer_email') ? $request->input('customer_email') : 'noemail@example.com',
             'billing_name'      => $request->input('customer_name'),
             'billing_phone'     => $request->input('customer_cell'),
             'billing_address'   => $request->input('customer_address'),
+            'category_id'       => empty($request->input('customer_category')) ? null : $request->input('customer_category'),
             'customer_id'       => $this->CustomerNumber()
         ]);
 
