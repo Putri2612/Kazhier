@@ -144,7 +144,8 @@ Route::group(
         'middleware' => [
             'auth',
             'xss',
-            'verified'
+            'verified',
+            'plan'
         ]
     ], function () {
 
@@ -378,6 +379,7 @@ Route::group(
     }
 );
 
+Route::get('/', function () { return redirect()->route('user.login');} );
 Route::get('app', function () { return redirect()->route('user.login');} );
 
 Auth::routes(['verify' => true]);

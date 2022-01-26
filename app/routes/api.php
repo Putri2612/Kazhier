@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\api\Auth\AuthController;
 use App\Http\Controllers\api\BankAccountController;
+use App\Http\Controllers\api\CustomerCategoryController;
 use App\Http\Controllers\api\CustomerController;
+use App\Http\Controllers\api\ExpenseController;
 use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\api\ProductServiceCategoryController;
 use App\Http\Controllers\api\ProductServiceController;
@@ -29,7 +31,7 @@ Route::as('api.')->group(
         Route::post('login', [AuthController::class, 'login'])->name('login');
         // Route::post('register', [AuthController::class, 'register'])->name('register');
 
-        Route::group(['middleware' => 'auth:api'], function() {
+        Route::group(['middleware' => ['auth:api', 'plan']], function() {
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
             Route::get('bank-account', [BankAccountController::class, 'get'])->name('bank-account.get');
@@ -43,6 +45,14 @@ Route::as('api.')->group(
             Route::get('customer', [CustomerController::class, 'get'])->name('customer.get');
             Route::post('customer/create', [CustomerController::class, 'create'])->name('customer.create');
             Route::delete('customer/{id}/delete', [CustomerController::class, 'destroy'])->name('customer.destroy');
+            
+            Route::post('customer-category/create', [CustomerCategoryController::class, 'create'])->name('customer-category.create');
+            Route::get('customer-category/{category_id}', [CustomerCategoryController::class, 'get'])->name('customer-category.get');
+            Route::delete('customer-category/{category_id}/delete', [CustomerCategoryController::class, 'destroy'])->name('customer-category.destroy');
+
+            Route::get('expense', [ExpenseController::class, 'get'])->name('expense.get');
+            Route::post('expense/create', [ExpenseController::class, 'create'])->name('expense.create');
+            Route::delete('expense/{expense_id}/delete', [ExpenseController::class, 'destroy'])->name('expense.destroy');
 
             Route::get('order', [OrderController::class, 'index'])->name('order.index');
             Route::post('order/create', [OrderController::class, 'create'])->name('order.create');
