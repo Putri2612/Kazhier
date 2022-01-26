@@ -24,7 +24,6 @@ class ReferralController extends Controller
     public function redeem(){
         if(Auth::user()->type == 'company'){
             $point  = ReferralPoint::where('created_by', '=', Auth::user()->id)->first()->point;
-            $price  = Plan::find(Auth::user()->plan)->price;
             $plans  = Plan::get();
 
             return view('referral.redeem', compact('point', 'plans'));

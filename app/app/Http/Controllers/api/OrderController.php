@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
+use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
@@ -109,6 +110,10 @@ class OrderController extends Controller
             $tax        = $product->product_tax;
             $discount   = isset($product->discount) ? $product->discount : 0;
             $price      = $product->product_price;
+
+            $item   = ProductService::find($product->product_id);
+            $item->quantity -= $quantity;
+            $item->save();
             
             $invoiceProduct             = new InvoiceProduct();
             $invoiceProduct->invoice_id = $invoice->id;
