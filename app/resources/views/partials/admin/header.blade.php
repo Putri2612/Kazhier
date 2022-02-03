@@ -53,7 +53,7 @@
         @endcan
         <li class="dropdown">
             <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-                <img alt="image" src="{{(!empty($users->avatar)? $profile.'/'.$users->avatar : $profile.'/avatar.png').'?'.rand()}}" class="rounded-circle me-1">
+                <img alt="image" src="{{(!empty($users->avatar)? $profile.'/'.$users->avatar : $profile.'/avatar.png')}}" class="rounded-circle me-1">
                 <div class="d-sm-none d-lg-inline-block">{{__('Hi')}}, {{\Auth::user()->name}}</div>
             </a>
             <div class="dropdown-menu dropdown-menu-end">

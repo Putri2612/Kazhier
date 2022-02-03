@@ -33,12 +33,13 @@ use App\Models\Transaction;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
 use Carbon\Carbon;
-use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Session;
 use Spatie\Permission\Models\Role;
 
@@ -49,10 +50,10 @@ class UserController extends Controller
 
     public function index()
     {
-        $user = \Auth::user();
-        if(\Auth::user()->can('manage user'))
+        $user = Auth::user();
+        if(Auth::user()->can('manage user'))
         {
-            if(\Auth::user()->type == 'super admin')
+            if(Auth::user()->type == 'super admin')
             {
                 $users = User::where('created_by', '=', $user->creatorId())->where('type', '=', 'company')->get();
             }
@@ -75,9 +76,9 @@ class UserController extends Controller
     {
         $customFields = CustomField::where('module', '=', 'user')->get();
 
-        $user  = \Auth::user();
+        $user  = Auth::user();
         $roles = Role::where('created_by', '=', $user->creatorId())->get()->pluck('name', 'id');
-        if(\Auth::user()->can('create user'))
+        if(Auth::user()->can('create user'))
         {
             return view('user.create', compact('roles', 'customFields'));
         }
@@ -90,11 +91,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create user'))
+        if(Auth::user()->can('create user'))
         {
-            if(\Auth::user()->type == 'super admin')
+            if(Auth::user()->type == 'super admin')
             {
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'name' => 'required|max:120',
                                        'email' => 'required|email|unique:users',
@@ -114,7 +115,7 @@ class UserController extends Controller
                 $user['password']   = Hash::make($request->password);
                 $user['type']       = 'company';
                 $user['lang']       = 'id';
-                $user['created_by'] = \Auth::user()->creatorId();
+                $user['created_by'] = Auth::user()->creatorId();
                 $user['plan']       = Plan::first()->id;
                 $user->save();
                 CustomField::saveData($user, $request->customField);
@@ -125,7 +126,7 @@ class UserController extends Controller
             }
             else
             {
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'name' => 'required|max:120',
                                        'email' => 'required|email|unique:users',
@@ -141,7 +142,7 @@ class UserController extends Controller
                 }
 
 
-                $objUser    = \Auth::user();
+                $objUser    = Auth::user();
                 $total_user = $objUser->countUsers();
                 $plan       = Plan::find($objUser->plan);
                 if($total_user < $plan->max_users || $plan->max_users == -1)
@@ -150,7 +151,7 @@ class UserController extends Controller
                     $request['password']   = Hash::make($request->password);
                     $request['type']       = $role_r->name;
                     $request['lang']       = 'id';
-                    $request['created_by'] = \Auth::user()->creatorId();
+                    $request['created_by'] = Auth::user()->creatorId();
 
                     $user = User::create($request->all());
                     CustomField::saveData($user, $request->customField);
@@ -178,9 +179,9 @@ class UserController extends Controller
     public function edit($id)
     {
 
-        $user  = \Auth::user();
+        $user  = Auth::user();
         $roles = Role::where('created_by', '=', $user->creatorId())->get()->pluck('name', 'id');
-        if(\Auth::user()->can('edit user'))
+        if(Auth::user()->can('edit user'))
         {
             $user              = User::findOrFail($id);
             $user->customField = CustomField::getData($user, 'user');
@@ -199,13 +200,13 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
 
-        if(\Auth::user()->can('edit user'))
+        if(Auth::user()->can('edit user'))
         {
-            if(\Auth::user()->type == 'super admin')
+            if(Auth::user()->type == 'super admin')
             {
                 $user = User::findOrFail($id);
 
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'name' => 'required|max:120',
                                        'email' => 'required|email|unique:users,email,' . $id,
@@ -261,12 +262,12 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete user'))
+        if(Auth::user()->can('delete user'))
         {
             $user = User::find($id);
             if($user)
             {
-                if(\Auth::user()->type == 'super admin')
+                if(Auth::user()->type == 'super admin')
                 {
                     if($user->delete_status == 0)
                     {
@@ -297,7 +298,7 @@ class UserController extends Controller
         }
     }
     public function destroyPermanently($id){
-        if(\Auth::user()->type == 'super admin'){
+        if(Auth::user()->type == 'super admin'){
             $user = User::find($id);
             if($user && $user->delete_status){
                 // bills, invoices, payments, revenues
@@ -401,7 +402,7 @@ class UserController extends Controller
 
     public function profile()
     {
-        $userDetail              = \Auth::user();
+        $userDetail              = Auth::user();
         $userDetail->customField = CustomField::getData($userDetail, 'user');
         $customFields            = CustomField::where('module', '=', 'user')->get();
         if(Auth::user()->type == 'company'){
@@ -439,7 +440,7 @@ class UserController extends Controller
 
     public function editprofile(Request $request)
     {
-        $userDetail = \Auth::user();
+        $userDetail = Auth::user();
         $user       = User::findOrFail($userDetail['id']);
         $this->validate(
             $request, [
@@ -464,30 +465,29 @@ class UserController extends Controller
 
             if(!file_exists($dir))
             {
-                mkdir($dir, 0777, true);
+                mkdir($dir, 0755, true);
             }
 
             $path = $request->file('profile')->storeAs('public/avatar/', $fileNameToStore);
 
         }
-
+        
         if(!empty($request->profile))
         {
-            $user['avatar'] = $fileNameToStore;
+            $now = time();
+            $user['avatar'] = "{$fileNameToStore}?{$now}";
         }
         $user['name']  = $request['name'];
         $user['email'] = $request['email'];
         $user->save();
         CustomField::saveData($user, $request->customField);
 
-        return redirect()->route('dashboard')->with(
-            'success', 'Profile successfully updated.'
-        );
+        return redirect()->route('dashboard')->with('success', 'Profile successfully updated.');
     }
 
     public function updatePassword(Request $request)
     {
-        if(\Auth::user()->can('change password account'))
+        if(Auth::user()->can('change password account'))
         {
             if(Auth::Check())
             {
@@ -517,7 +517,7 @@ class UserController extends Controller
             }
             else
             {
-                return redirect()->route('profile', \Auth::user()->id)->with('error', __('Something is wrong.'));
+                return redirect()->route('profile', Auth::user()->id)->with('error', __('Something is wrong.'));
             }
         }
         else
@@ -554,7 +554,7 @@ class UserController extends Controller
                     'plan_name' => $plan->name,
                     'plan_id' => $plan->id,
                     'price' => $plan->price,
-                    'price_currency' => isset(\Auth::user()->planPrice()['stripe_currency']) ? \Auth::user()->planPrice()['stripe_currency'] : '',
+                    'price_currency' => isset(Auth::user()->planPrice()['stripe_currency']) ? Auth::user()->planPrice()['stripe_currency'] : '',
                     'txn_id' => '',
                     'payment_status' => 'succeeded',
                     'receipt' => null,
@@ -572,7 +572,7 @@ class UserController extends Controller
     }
 
     public function syncData(){
-        $user = \Auth::user();
+        $user = Auth::user();
         if($user->type == 'super admin'){
             $users     = User::where('type', '=', 'company')->get();
 

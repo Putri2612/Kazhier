@@ -9,7 +9,7 @@
     <title>{{(Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'Kazhier')}} - @yield('page-title')</title>
     <link rel="canonical" href="{{ Request::url() }}">
 
-    <link rel="icon" href="{{$logo.'/'.(isset($company_favicon) && !empty($compa4ny_favicon)?$company_favicon:'favicon.png').'?'.rand()}}" type="image" sizes="16x16">
+    <link rel="icon" href="{{$logo.'/'.(isset($company_favicon) && !empty($company_favicon)?$company_favicon:'favicon.png?'.config('asset-version.img.favicon'))}}" type="image" sizes="16x16">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">

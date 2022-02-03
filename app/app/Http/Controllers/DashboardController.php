@@ -39,9 +39,6 @@ DashboardController extends Controller
      */
     public function index()
     {
-        if(date('Y-m-d') > Auth::user()->plan_expire_date){
-            return redirect()->route('plan.expired');
-        }
         if(\Auth::user()->type == 'super admin')
         {
             $user                       = \Auth::user();

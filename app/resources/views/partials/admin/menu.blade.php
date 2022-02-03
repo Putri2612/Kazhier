@@ -1,19 +1,19 @@
 @php
     $logo=asset(Storage::url('logo/'));
- $company_logo=Utility::getValByName('company_logo');
- $company_small_logo=Utility::getValByName('company_small_logo');
+    $company_logo=Utility::getValByName('company_logo');
+    $company_small_logo=Utility::getValByName('company_small_logo');
 @endphp
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         @if (Auth::user()->type != 'super admin' && (!Auth::user()->plan || Auth::user()->plan_expire_date < date('Y-m-d')))
         <div class="sidebar-brand">
             <a href="#">
-                <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png?'.config('asset-version.img.logo'))}}" alt="">
             </a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
             <a href="#">
-                <img class="img-fluid" src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png').'?'.rand()}}" alt="">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png?'.config('asset-version.img.small-logo'))}}" alt="">
             </a>
         </div>
         <ul class="sidebar-menu">
@@ -38,12 +38,12 @@
         @else
         <div class="sidebar-brand">
             <a href="{{route('dashboard')}}">
-                <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png?'.config('asset-version.img.logo'))}}" alt="">
             </a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
             <a href="{{route('dashboard')}}">
-                <img class="img-fluid" src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png').'?'.rand()}}" alt="">
+                <img class="img-fluid" src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png?'.config('asset-version.img.smalllogo'))}}" alt="">
             </a>
         </div>
         <ul class="sidebar-menu">

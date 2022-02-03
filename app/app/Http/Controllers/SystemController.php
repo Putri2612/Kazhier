@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class SystemController extends Controller
@@ -31,7 +32,7 @@ class SystemController extends Controller
 
         if(\Auth::user()->can('manage system settings'))
         {
-
+            $versions = config('asset-version');
             if($request->logo)
             {
                 $request->validate(
@@ -42,6 +43,7 @@ class SystemController extends Controller
 
                 $logoName = 'logo.png';
                 $path     = $request->file('logo')->storeAs('public/logo/', $logoName);
+                $versions['img']['logo']++;
             }
             if($request->small_logo)
             {
@@ -52,6 +54,7 @@ class SystemController extends Controller
                 );
                 $smallLogoName = 'small_logo.png';
                 $path          = $request->file('small_logo')->storeAs('public/logo/', $smallLogoName);
+                $versions['img']['small-logo']++;
             }
             if($request->favicon)
             {
@@ -62,6 +65,7 @@ class SystemController extends Controller
                 );
                 $favicon = 'favicon.png';
                 $path    = $request->file('favicon')->storeAs('public/logo/', $favicon);
+                $versions['img']['favicon']++;
             }
 
             if(!empty($request->title_text) || !empty($request->footer_text))
@@ -70,7 +74,7 @@ class SystemController extends Controller
                 unset($post['_token']);
                 foreach($post as $key => $data)
                 {
-                    \DB::insert(
+                    DB::insert(
                         'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
                                                                                                                                                      $data,
                                                                                                                                                      $key,
@@ -80,7 +84,12 @@ class SystemController extends Controller
                 }
             }
 
+            if($this->saveVersion($versions)) {
+                return redirect()->back()->with('warning', 'Logo version could not be updated.');
+            }
+
             return redirect()->back()->with('success', 'Logo successfully updated.');
+
         }
         else
         {
@@ -90,7 +99,7 @@ class SystemController extends Controller
 
     public function saveEmailSettings(Request $request)
     {
-        if(\Auth::user()->can('manage system settings'))
+        if(Auth::user()->can('manage system settings'))
         {
             $request->validate(
                 [
@@ -128,18 +137,17 @@ class SystemController extends Controller
 
     public function saveAssetVersion(Request $request) {
         if(Auth::user()->can('manage system settings')) {
-            $versions = $request->except(['_token', '_method']);
-            $data   = [];
-            foreach ($versions as $key => $version) {
+            $data = $request->except(['_token', '_method']);
+            $versions   = config('asset-version');
+            foreach ($data as $key => $version) {
                 $keyNames = explode('_', $key);
                 if(!isset($data[$keyNames[0]])) {
                     $data[$keyNames[0]] = [];
                 }
-                $data[$keyNames[0]][$keyNames[1]]  = $version;
+                $versions[$keyNames[0]][$keyNames[1]]   = intval($version);
             }
 
-            $data = var_export($data, 1);
-            if(File::put(substr(app_path(), 0, -3).'config\\asset-version.php', "<?php return {$data};")) {
+            if($this->saveVersion($versions)) {
                 return redirect()->back()->with('success', __('Setting successfully updated.'));
             }
             return redirect()->back()->with('error', __('Something bad happened.'));
@@ -150,9 +158,9 @@ class SystemController extends Controller
 
     public function saveCompanySettings(Request $request)
     {
-        if(\Auth::user()->can('manage company settings'))
+        if(Auth::user()->can('manage company settings'))
         {
-            $user = \Auth::user();
+            $user = Auth::user()->creatorId();
             $request->validate(
                 [
                     'company_name' => 'required|string|max:50',
@@ -167,11 +175,11 @@ class SystemController extends Controller
 
             foreach($post as $key => $data)
             {
-                \DB::insert(
+                DB::insert(
                     'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
                                                                                                                                                  $data,
                                                                                                                                                  $key,
-                                                                                                                                                 \Auth::user()->creatorId(),
+                                                                                                                                                 $user,
                                                                                                                                              ]
                 );
             }
@@ -185,7 +193,7 @@ class SystemController extends Controller
     }
 
     public function saveMidtransSettings(Request $request){
-        if(\Auth::user()->can('manage midtrans settings')){
+        if(Auth::user()->can('manage midtrans settings')){
             $request->validate(
                 [
                     'midtrans_server' => 'required|string',
@@ -207,7 +215,7 @@ class SystemController extends Controller
 
     public function saveStripeSettings(Request $request)
     {
-        if(\Auth::user()->can('manage stripe settings'))
+        if(Auth::user()->can('manage stripe settings'))
         {
             $request->validate(
                 [
@@ -229,7 +237,7 @@ class SystemController extends Controller
 
             foreach($post as $key => $data)
             {
-                \DB::insert(
+                DB::insert(
                     'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
                                                                                                                                                                                  $data,
                                                                                                                                                                                  $key,
@@ -250,9 +258,9 @@ class SystemController extends Controller
 
     public function saveSystemSettings(Request $request)
     {
-        if(\Auth::user()->can('manage company settings'))
+        if(Auth::user()->can('manage company settings'))
         {
-            $user = \Auth::user();
+            $user = Auth::user()->creatorId();
             $request->validate(
                 [
                     'site_currency' => 'required',
@@ -263,11 +271,11 @@ class SystemController extends Controller
 
             foreach($post as $key => $data)
             {
-                \DB::insert(
+                DB::insert(
                     'insert into settings (`value`, `name`,`created_by`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
                                                                                                                                                                                  $data,
                                                                                                                                                                                  $key,
-                                                                                                                                                                                 \Auth::user()->creatorId(),
+                                                                                                                                                                                 $user,
                                                                                                                                                                                  date('Y-m-d H:i:s'),
                                                                                                                                                                                  date('Y-m-d H:i:s'),
                                                                                                                                                                              ]
@@ -286,10 +294,11 @@ class SystemController extends Controller
     public function saveBusinessSettings(Request $request)
     {
 
-        if(\Auth::user()->can('manage business settings'))
+        if(Auth::user()->can('manage business settings'))
         {
-
-            $user = \Auth::user();
+            $now = time();
+            $user = Auth::user();
+            $creatorID = $user->creatorId();
             if($request->company_logo)
             {
 
@@ -298,18 +307,13 @@ class SystemController extends Controller
                         'company_logo' => 'image|mimes:png',
                     ]
                 );
+                
 
                 $logoName     = $user->id . '_logo.png';
                 $path         = $request->file('company_logo')->storeAs('public/logo/', $logoName);
-                $company_logo = !empty($request->company_logo) ? $logoName : 'logo.png';
+                $company_logo = !empty($request->company_logo) ? "{$logoName}?{$now}" : 'logo.png';
 
-                \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
-                                                                                                                                                 $logoName,
-                                                                                                                                                 'company_logo',
-                                                                                                                                                 \Auth::user()->creatorId(),
-                                                                                                                                             ]
-                );
+                DB::insert('insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [$company_logo,'company_logo', $creatorID ]);
             }
 
 
@@ -323,15 +327,9 @@ class SystemController extends Controller
                 $smallLogoName = $user->id . '_small_logo.png';
                 $path          = $request->file('company_small_logo')->storeAs('public/logo/', $smallLogoName);
 
-                $company_small_logo = !empty($request->company_small_logo) ? $smallLogoName : 'small_logo.png';
+                $company_small_logo = !empty($request->company_small_logo) ? "{$smallLogoName}?{$now}" : 'small_logo.png';
 
-                \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
-                                                                                                                                                 $smallLogoName,
-                                                                                                                                                 'company_small_logo',
-                                                                                                                                                 \Auth::user()->creatorId(),
-                                                                                                                                             ]
-                );
+                DB::insert('insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [$company_small_logo, 'company_small_logo', $creatorID,]);
             }
 
             if($request->company_favicon)
@@ -344,15 +342,9 @@ class SystemController extends Controller
                 $favicon = $user->id . '_favicon.png';
                 $path    = $request->file('company_favicon')->storeAs('public/logo/', $favicon);
 
-                $company_favicon = !empty($request->favicon) ? $favicon : 'favicon.png';
+                $company_favicon = !empty($request->favicon) ? "{$favicon}?{$now}" : 'favicon.png';
 
-                \DB::insert(
-                    'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
-                                                                                                                                                 $favicon,
-                                                                                                                                                 'company_favicon',
-                                                                                                                                                 \Auth::user()->creatorId(),
-                                                                                                                                             ]
-                );
+                DB::insert('insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [$company_favicon, 'company_favicon', $creatorID]);
             }
 
             if(!empty($request->title_text))
@@ -362,13 +354,7 @@ class SystemController extends Controller
                 unset($post['_token'], $post['company_logo'], $post['company_small_logo'], $post['company_favicon']);
                 foreach($post as $key => $data)
                 {
-                    \DB::insert(
-                        'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [
-                                                                                                                                                     $data,
-                                                                                                                                                     $key,
-                                                                                                                                                     \Auth::user()->creatorId(),
-                                                                                                                                                 ]
-                    );
+                    DB::insert('insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [$data, $key, $creatorID,]);
                 }
             }
             return redirect()->back()->with('success', 'Logo successfully updated.');
@@ -382,7 +368,7 @@ class SystemController extends Controller
 
     public function companyIndex()
     {
-        if(\Auth::user()->can('manage company settings'))
+        if(Auth::user()->can('manage company settings'))
         {
             $settings = Utility::settings();
 
@@ -394,5 +380,9 @@ class SystemController extends Controller
         }
     }
 
+    private function saveVersion($version) {
+        $data = var_export($version, 1);
+        return File::put(substr(app_path(), 0, -3).'config\\asset-version.php', "<?php return {$data};");
+    }
 
 }
