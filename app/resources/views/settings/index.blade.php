@@ -266,15 +266,17 @@
                                         {{Form::open(array('route'=>'asset-version.settings','method'=>'put'))}}
 
                                         @foreach (config('asset-version') as $type => $items)    
-                                            <h2 class="display-5">{{ strtoupper($type) }}</h2>
-                                            <div class="row">
-                                                @foreach ($items as $name => $version)    
-                                                    <div class="form-group col-3">
-                                                        {{Form::label("{$type}_{$name}", ucfirst($name)) }}
-                                                        {{Form::number("{$type}_{$name}",$version,array('class'=>'form-control'))}}
-                                                    </div>
-                                                @endforeach
-                                            </div>
+                                            @if ($type != 'img')
+                                                <h2 class="display-5">{{ strtoupper($type) }}</h2>
+                                                <div class="row">
+                                                    @foreach ($items as $name => $version)    
+                                                        <div class="form-group col-3">
+                                                            {{Form::label("{$type}_{$name}", ucfirst($name)) }}
+                                                            {{Form::number("{$type}_{$name}",$version,array('class'=>'form-control'))}}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                         @endforeach
                                         <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
