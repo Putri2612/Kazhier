@@ -18,14 +18,28 @@
                                     color: Charts.colors.gray[200],
                                     zeroLineColor: Charts.colors.gray[200]
                                 },
-                                ticks: {}
+                                ticks: {
+                                    callback: (label, index, labels) => {
+                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
+                                    }
+                                }
                             }]
+                        }, 
+                        tooltips: {
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
+                                    Value += ': ';
+                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
+                                    return Value;
+                                }
+                            }
                         }
                     },
                     data: {
                         labels: {!! json_encode($monthList) !!},
                         datasets: [{
-                            label: 'Income',
+                            label: '{{__('Income')}}',
                             data:{!! json_encode($chartIncomeArr) !!},
                         }]
                     },
@@ -56,7 +70,7 @@
                             {{ Form::open(array('route' => array('report.income.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
                                 <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                                     {{ Form::label('year', __('Year')) }}
-                                    {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
+                                    {{ Form::select('year',$yearList, $currentYear, array('class' => 'form-control font-style selectric')) }}
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                                     {{ Form::label('account', __('Account')) }}

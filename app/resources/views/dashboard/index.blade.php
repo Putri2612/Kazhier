@@ -18,8 +18,8 @@
                                     zeroLineColor: Charts.colors.gray[200]
                                 },
                                 ticks: {
-                                    callback: function(label, index, labels){
-                                        return label.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    callback: (label, index, labels) => {
+                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
                                     }
                                 }
                             }]
@@ -29,7 +29,7 @@
                                 label: function(tooltipItem, data) {
                                     let Value = data.datasets[tooltipItem.datasetIndex].label;
                                     Value += ': ';
-                                    Value += data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
                                     return Value;
                                 }
                             }
@@ -62,7 +62,7 @@
                                 },
                                 ticks: {
                                     callback: function(label, index, labels){
-                                        return label.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
                                     }
                                 }
                             }]
@@ -72,7 +72,7 @@
                                 label: function(tooltipItem, data) {
                                     let Value = data.datasets[tooltipItem.datasetIndex].label;
                                     Value += ': ';
-                                    Value += data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
                                     return Value;
                                 }
                             }
@@ -120,7 +120,7 @@
                                 label: function(tooltipItem, data) {
                                     let Value = data.labels[tooltipItem.index];
                                     Value += ': ';
-                                    Value += data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
                                     return Value;
                                 }
                             }

@@ -37,9 +37,12 @@ class BillController extends Controller
         {
 
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $vender->prepend('All', '');
+            $vender->prepend(__('All'), '');
 
-            $status = Invoice::$statuses;
+            $status = [];
+            foreach(Bill::$statuses as $stat) {
+                $status[] = __($stat);
+            }
 
             $query = Bill::where('created_by', '=', \Auth::user()->creatorId());
             if(!empty($request->vender))

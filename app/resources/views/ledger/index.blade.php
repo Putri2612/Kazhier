@@ -37,19 +37,61 @@
             </div>
         </div>
         <div class="section-body">
+            <div class="row mb-10">
+                <div class="col-12">
+                    <div class="row justify-content-end align-items-center">
+                        <div class="form-group col-12 col-lg-3 col-xxl-2">
+                            {{ Form::label('account', __('Account')) }}
+                            {{ Form::select('account', $accountList, (isset($_GET['account']) ? $_GET['account'] : ''), array('id' => 'change-account', 'class' => 'form-control font-style selectric'))}}
+                        </div>
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('month', __('Month')) }}
+                            {{ Form::select('month', $months, (isset($_GET['month']) ? $_GET['month'] : date('m')), array('id' => 'change-month', 'class' => 'form-control font-style selectric'))}}
+                        </div>
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('year', __('Year')) }}
+                            {{ Form::select('year', $years, $selected_year, array('id' => 'change-year', 'class' => 'form-control font-style selectric'))}}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12">
-                    <div class="row mb-3">
-                        <h4 class="col-md-6 fw-normal">{{__('Ledger Report')}}</h4>
-                        <div class="col-md-6 row">
-                            <div class="form-group col-sm-12">
-                                {{ Form::select('account', $accountList, (isset($_GET['account']) ? $_GET['account'] : ''), array('id' => 'change-account', 'class' => 'form-control font-style selectric'))}}
+                    <div class="row">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4>{{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('Ledger') }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                {{ Form::select('month', $months, (isset($_GET['month']) ? $_GET['month'] : date('m')), array('id' => 'change-month', 'class' => 'form-control font-style selectric'))}}
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4>{{ __('Date') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ isset($_GET['month']) ? $months[$_GET['month']] : $months[date('m')] }} {{ $selected_year }}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                {{ Form::select('year', $years, (isset($_GET['year']) ? $_GET['year'] : date('m')), array('id' => 'change-year', 'class' => 'form-control font-style selectric'))}}
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4>{{ __('Account') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ (isset($_GET['account']) ? $accountList[$_GET['account']] : $accountList->first()) }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -58,9 +100,9 @@
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">
-                                        <div class="row">
+                                        <div class="row pt-5 mb-3">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable no-footer">  
+                                                <table class="table table-flush dataTable no-paginate no-footer">  
                                                     <thead class="thead-light">
                                                         <tr>
                                                             <th>#</th>

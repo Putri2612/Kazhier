@@ -31,7 +31,20 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    <h4 class="fw-normal mb-3">{{__('Balance Sheet Report')}}</h4>
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{ __('Balance Sheet') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
@@ -39,7 +52,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable no-footer">  
+                                                <table class="table table-flush dataTable no-paginate no-footer">  
                                                     <thead class="thead-light">
                                                     </thead>
                                                     <tbody>
@@ -47,7 +60,7 @@
                                                             <tr>
                                                                 <td rowspan='2'>
                                                                     @if ($assetCount)
-                                                                        <table class="table table-flush dataTable no-footer">
+                                                                        <table class="table table-flush dataTable no-paginate no-footer">
                                                                             <thead class="thead-light">
                                                                                 <tr>
                                                                                     <th colspan="3" class="text-center">{{__('Assets')}}</th>
@@ -180,7 +193,7 @@
                                                                 </td>
                                                                 <td>
                                                                     @if ($liabilityCount)
-                                                                        <table class="table table-flush dataTable no-footer">
+                                                                        <table class="table table-flush dataTable no-paginate no-footer">
                                                                             <thead class="thead-light">
                                                                                 <tr>
                                                                                     <th colspan="3" class="text-center">{{__('Liabilities')}}</th>
@@ -246,7 +259,7 @@
                                                             <tr>
                                                                 <td>
                                                                     @if(!empty($equities))
-                                                                    <table class="table table-flush dataTable no-footer">
+                                                                    <table class="table table-flush dataTable no-paginate no-footer">
                                                                         <thead class="thead-light">
                                                                             <tr>
                                                                                 <th colspan="3" class="text-center">{{__('Equities')}}</th>

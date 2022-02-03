@@ -14,7 +14,7 @@ class TransactionController extends Controller
         if(\Auth::user()->can('manage transaction'))
         {
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
 
             $query = Transaction::where('created_by', '=', \Auth::user()->creatorId());
 

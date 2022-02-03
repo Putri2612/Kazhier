@@ -31,16 +31,16 @@ class PaymentController extends Controller
         if(\Auth::user()->can('manage payment'))
         {
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $vender->prepend('All', '');
+            $vender->prepend(__('All'), '');
 
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
 
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
-            $category->prepend('All', '');
+            $category->prepend(__('All'), '');
 
             $payment = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $payment->prepend('All', '');
+            $payment->prepend(__('All'), '');
 
             $query = Payment::where('created_by', '=', \Auth::user()->creatorId());
 

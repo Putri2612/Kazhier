@@ -261,7 +261,7 @@
                 </li>
             @endif
             @if(Gate::check('manage assets')  || Gate::check('manage liabilities') || Gate::check('manage equities'))
-                <li class="dropdown {{ (Request::segment(1) == 'account-assets' ||  Request::segment(1) == 'account-liabilities' || Request::segment(1) == 'account-equities' || Request::segment(1) == 'journal' || Request::segment(1) == 'ledger' || Request::segment(1) == 'balance-sheet') ? 'active' : ''}} ">
+                <li class="dropdown {{ (Request::segment(1) == 'account-assets' ||  Request::segment(1) == 'account-liabilities' || Request::segment(1) == 'account-equities') ? 'active' : ''}} ">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-balance-scale"></i> <span>{{__('Double Entry')}}</span></a>
                     <ul class="dropdown-menu">
                         @if (Gate::check('manage assets'))
@@ -321,7 +321,7 @@
             
 
             @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
-                <li class="dropdown {{ (Request::segment(1) == 'report' || Request::segment(1) == 'transaction')?' active':''}}">
+                <li class="dropdown {{ (Request::segment(1) == 'report' || Request::segment(1) == 'transaction' || Request::segment(1) == 'journal' || Request::segment(1) == 'ledger' || Request::segment(1) == 'balance-sheet')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-chart-area"></i> <span>{{__('Report')}}</span></a>
                     <ul class="dropdown-menu">
                         @can('manage transaction')

@@ -16,13 +16,14 @@ use App\Traits\CanManageBalance;
 use App\Traits\DataGetter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LedgerController extends Controller
 {
     use CanManageBalance, DataGetter;
     
     public function index(Request $request){
-        if(\Auth::user()->can('view ledger')){
+        if(Auth::user()->can('view ledger')){
             $month['01']   = __('January');
             $month['02']   = __('February');
             $month['03']   = __('March');
@@ -37,11 +38,11 @@ class LedgerController extends Controller
             $month['12']   = __('December');
             $months        = collect($month);
 
-            $years         = \Auth::user()->getAllRecordYear();
+            $years         = Auth::user()->getAllRecordYear();
 
-            $accounts      = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $accounts      = BankAccount::where('created_by', '=', Auth::user()->creatorId())->get();
             $defaultAccount= $accounts->first();
-            $categories    = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '!=', 0)->get();
+            $categories    = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->where('type', '!=', 0)->get();
             foreach($accounts as $account){
                 $accountList['account-'.$account->id] = $account->bank_name . ' ' . $account->holder_name;
             }
@@ -62,7 +63,8 @@ class LedgerController extends Controller
 
             // Pilih tahun berapa
             if( !empty($request->year) ){ $selected_year = $request->year; } 
-            else { $selected_year = date('Y'); }
+            else if( $years->contains(date('Y')) ) { $selected_year = date('Y'); }
+            else { $selected_year = $years->first(); }
             
             // Pilih bulan apa
             if( !empty($request->month) ){ $selected_month = $request->month; } 
@@ -143,7 +145,7 @@ class LedgerController extends Controller
             $ledger = collect($ledger);
             
 
-            return view('ledger.index', compact('ledger', 'count', 'months', 'years', 'accountList', 'prevBalance'));
+            return view('ledger.index', compact('ledger', 'count', 'months', 'years', 'accountList', 'prevBalance', 'selected_year'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }

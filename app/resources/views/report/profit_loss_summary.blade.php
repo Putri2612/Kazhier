@@ -17,7 +17,7 @@
                     {{ Form::open(array('route' => array('report.profit.loss.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
                         <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                             {{ Form::label('year', __('Year')) }}
-                            {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
+                            {{ Form::select('year',$yearList, $currentYear, array('class' => 'form-control font-style selectric')) }}
                         </div>
                         <div class="col-auto text-end">
                             <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
@@ -106,23 +106,19 @@
                                                             </tr>
                                                         @endforeach
                                                     @endif
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <table class="table table-flush" id="dataTable-manual">
-                                                                <tbody>
-                                                                <tr>
-                                                                    <td colspan="13"><b><h6>{{__('Total Income =  Revenue + Invoice ')}}</h6></b></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td width="25%">{{__('Total Income')}}</td>
-                                                                    @foreach($totalIncome as $income)
-                                                                        <td width="15%">{{\Auth::user()->priceFormat($income)}}</td>
-                                                                    @endforeach
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-flush" id="dataTable-manual">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="13"><b><h6>{{__('Total Income =  Revenue + Invoice ')}}</h6></b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="25%">{{__('Total Income')}}</td>
+                                                        @foreach($totalIncome as $income)
+                                                            <td width="15%">{{\Auth::user()->priceFormat($income)}}</td>
+                                                        @endforeach
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -166,40 +162,32 @@
                                                             </tr>
                                                         @endforeach
                                                     @endif
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <table class="table table-flush" id="dataTable-manual">
-                                                                <tbody>
-                                                                <tr>
-                                                                    <td colspan="13"><b><h6>{{__('Total Expense =  Payment + Bill ')}}</h6></b></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td>{{__('Total Expenses')}}</td>
-                                                                    @foreach($totalExpense as $expense)
-                                                                        <td width="15%">{{\Auth::user()->priceFormat($expense)}}</td>
-                                                                    @endforeach
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-sm-12">
-                                                            <table class="table table-flush" id="dataTable-manual">
-                                                                <tbody>
-                                                                <tr>
-                                                                    <td colspan="13"><b><h6>{{__('Net Profit = Total Income - Total Expense ')}}</h6></b></td>
-                                                                </tr>
-                                                                <tr>
-                                                                    <td width="25%">{{__('Net Profit')}}</td>
-                                                                    @foreach($netProfitArray as $i=>$profit)
-                                                                        <td width="15%"> {{\Auth::user()->priceFormat($profit)}}</td>
-                                                                    @endforeach
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-flush" id="dataTable-manual">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="13"><b><h6>{{__('Total Expense =  Payment + Bill ')}}</h6></b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>{{__('Total Expenses')}}</td>
+                                                        @foreach($totalExpense as $expense)
+                                                            <td width="15%">{{\Auth::user()->priceFormat($expense)}}</td>
+                                                        @endforeach
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table class="table table-flush" id="dataTable-manual">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="13"><b><h6>{{__('Net Profit = Total Income - Total Expense ')}}</h6></b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td width="25%">{{__('Net Profit')}}</td>
+                                                        @foreach($netProfitArray as $i=>$profit)
+                                                            <td width="15%"> {{\Auth::user()->priceFormat($profit)}}</td>
+                                                        @endforeach
+                                                    </tr>
                                                     </tbody>
                                                 </table>
                                             </div>

@@ -44,7 +44,7 @@ class ReferralController extends Controller
         }
     }
 
-    public function CheckoutPlan($code, Request $request){
+    public function CheckoutPlan(Request $request){
         if(Auth::user()->type == 'company'){
             $user       = User::find(Auth::user()->id);
             $duration   = $request->input('durations');

@@ -40,6 +40,7 @@
                     </div>
                 </div>
                 {{Form::text('max_discount',null,array('class'=>'form-control', 'data-is-number', 'data-is-required'))}}
+                <span class="text-mute">{{ __('Set the value to 0 if there is no discount limit') }}</span>
             </div>
         </div>
     </div>

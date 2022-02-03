@@ -10,6 +10,7 @@ use App\Models\Revenue;
 use App\Models\Transfer;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JournalController extends Controller
 {
@@ -31,7 +32,7 @@ class JournalController extends Controller
             $month['12']   = __('December');
             $months        = collect($month);
             
-            $years         = \Auth::user()->getAllRecordYear();
+            $years         = Auth::user()->getAllRecordYear();
             
 
             $revenuesQuery = Revenue::where('created_by', '=', \Auth::user()->creatorId());
@@ -40,11 +41,10 @@ class JournalController extends Controller
             $billsQuery    = BillPayment::where('created_by', \Auth::user()->creatorId());
             $transferQuery = Transfer::where('created_by', \Auth::user()->creatorId());
 
-            if(!empty($request->year)){
-                $selected_year = $request->year;
-            } else {
-                $selected_year = date('Y');
-            }
+            if( !empty($request->year) ) { $selected_year = $request->year; } 
+            else if( $years->contains(date('Y')) ) { $selected_year = date('Y'); }
+            else { $selected_year = $years->first(); }
+
             $revenuesQuery->whereRaw('year(`date`) = ?', array($selected_year));
             $invoicesQuery->whereRaw('year(`date`) = ?', array($selected_year));
             $paymentsQuery->whereRaw('year(`date`) = ?', array($selected_year));
@@ -71,7 +71,7 @@ class JournalController extends Controller
             $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills)->merge($transfers);
             $journal_data  = $unsorted_data->sortBy('date')->values()->all();
 
-            return view('journal.index', compact('journal_data', 'months', 'years'));
+            return view('journal.index', compact('journal_data', 'months', 'years', 'selected_year'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
         }

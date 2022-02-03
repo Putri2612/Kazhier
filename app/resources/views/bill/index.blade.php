@@ -55,7 +55,7 @@
                                 @endif
                                 <div class="form-group col-12 col-md-6 col-lg-2">
                                     {{ Form::label('status', __('Status')) }}
-                                    {{ Form::select('status', [''=>'All'] + $status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
+                                    {{ Form::select('status', [''=>__('All')] + $status,isset($_GET['status'])?$_GET['status']:'', array('class' => 'form-control font-style selectric')) }}
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg-auto">
                                     <div class="text-end">

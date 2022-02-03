@@ -32,16 +32,16 @@ class RevenueController extends Controller
         if(\Auth::user()->can('manage revenue'))
         {
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customer->prepend('All', '');
+            $customer->prepend(__('All'), '');
 
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
 
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type','=',1)->get()->pluck('name', 'id');
-            $category->prepend('All', '');
+            $category->prepend(__('All'), '');
 
             $payment = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $payment->prepend('All', '');
+            $payment->prepend(__('All'), '');
 
 
             $query = Revenue::where('created_by', '=', \Auth::user()->creatorId());

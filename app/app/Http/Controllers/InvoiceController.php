@@ -49,9 +49,12 @@ class InvoiceController extends Controller
         {
 
             $customer = Customer::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customer->prepend('All', '');
+            $customer->prepend(__('All'), '');
 
-            $status = Invoice::$statuses;
+            $status = [];
+            foreach (Invoice::$statuses as $stat) {
+                $status[] = __($stat);
+            }
 
             $query = Invoice::where('created_by', '=', Auth::user()->creatorId());
 

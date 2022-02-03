@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @section('page-title')
-    {{__('Dashboard')}}
+    {{__('Income Vs Expense Summary')}}
 @endsection
 
 @push('script-page')
@@ -20,14 +20,28 @@
                                     color: Charts.colors.gray[200],
                                     zeroLineColor: Charts.colors.gray[200]
                                 },
-                                ticks: {}
+                                ticks: {
+                                    callback: (label, index, labels) => {
+                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
+                                    }
+                                }
                             }]
+                        }, 
+                        tooltips: {
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
+                                    Value += ': ';
+                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
+                                    return Value;
+                                }
+                            }
                         }
                     },
                     data: {
                         labels: {!! json_encode($monthList) !!},
                         datasets: [{
-                            label: 'Profit',
+                            label: '{{__('Profit')}}',
                             data:{!! json_encode($profit) !!},
                         }]
                     },
@@ -86,7 +100,7 @@
                     {{ Form::open(array('route' => array('report.income.vs.expense.summary'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
                     <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                         {{ Form::label('year', __('Year')) }}
-                        {{ Form::select('year',$yearList,isset($_GET['year'])?$_GET['year']:'', array('class' => 'form-control font-style selectric')) }}
+                        {{ Form::select('year',$yearList, $currentYear, array('class' => 'form-control font-style selectric')) }}
                     </div>
                     <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
                         {{ Form::label('account', __('Account')) }}
@@ -116,7 +130,32 @@
                     {{ Form::close() }}
                 </div>
             </div>
-
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="card card-statistic-1 py-3">
+                        <div class="card-wrap">
+                            <div class="card-header py-0">
+                                <h4> {{ __('Report') }} : </h4>
+                            </div>
+                            <div class="card-body">
+                                {{ __('Income Vs Expense Summary') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card card-statistic-1 py-3">
+                        <div class="card-wrap">
+                            <div class="card-header py-0">
+                                <h4> {{ __('Date') }} : </h4>
+                            </div>
+                            <div class="card-body">
+                                {{ __('January') }} {{ $currentYear }} - {{ __('December') }} {{ $currentYear }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12" id="chart-container">
                     <div class="card py-4">

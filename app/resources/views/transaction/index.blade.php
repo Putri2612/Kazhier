@@ -14,25 +14,61 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    <div class="row crd mb-3">
-                        <h4 class="col-6 fw-normal">{{__('Manage Transaction')}}</h4>
+                    {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
+                        <div class="form-group col-12 col-md-6 col-lg-auto col-xxl-2">
+                            {{ Form::label('date', __('Date')) }}
+                            {{ Form::text('date', isset($_GET['date'])?$_GET['date']:'', array('class' => 'form-control datepicker-range')) }}
+                        </div>
+                        <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
+                            {{ Form::label('account', __('Account')) }}
+                            {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
+                        </div>
+                        <div class="col-auto text-end">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                            <a href="{{route('transaction.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
+                        </div>
+                    {{ Form::close() }}
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Report') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        {{__('Transaction History')}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="card card-statistic-1 py-3">
+                                <div class="card-wrap">
+                                    <div class="card-header py-0">
+                                        <h4> {{ __('Date') }} : </h4>
+                                    </div>
+                                    <div class="card-body">
+                                        @php
+                                            $selected_date = __('All Time');
+                                            if(isset($_GET['date'])) {
+                                                $selected_date = $_GET['date'];
+                                                $exploded = explode(' - ', $selected_date);
+                                                $formatted = [];
+                                                foreach ($exploded as $date) {
+                                                    $formatted[] = Auth::user()->dateFormat($date);
+                                                }
+                                                $selected_date = "{$formatted[0]} - {$formatted[1]}";
+                                            }
+                                        @endphp
+                                        {{ $selected_date }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET', 'class' => 'row justify-content-end pt-3 pb-5 mb-5')) }}
-                                <div class="form-group col-12 col-md-6 col-lg-auto col-xxl-2">
-                                    {{ Form::label('date', __('Date')) }}
-                                    {{ Form::text('date', isset($_GET['date'])?$_GET['date']:'', array('class' => 'form-control datepicker-range')) }}
-                                </div>
-                                <div class="form-group col-12 col-md-6 col-lg-3 col-xxl-2">
-                                    {{ Form::label('account', __('Account')) }}
-                                    {{ Form::select('account',$account,isset($_GET['account'])?$_GET['account']:'', array('class' => 'form-control font-style selectric')) }}
-                                </div>
-                                <div class="text-end">
-                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-                                    <a href="{{route('transaction.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
-                                </div>
-                            {{ Form::close() }}
+                            
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
                                     <div class="table-responsive">

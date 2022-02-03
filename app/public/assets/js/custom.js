@@ -513,7 +513,9 @@ $(document).ready(function () {
     let dataTables = document.querySelectorAll('table.dataTable');
     if(dataTables.length) {
         dataTables.forEach(table => {
-            DataTable(table);
+            if(!table.classList.contains('no-paginate')) {
+                DataTable(table);
+            }
         });
     }
     dataTables = document.querySelector('#dataTable');

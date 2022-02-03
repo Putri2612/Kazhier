@@ -31,24 +31,27 @@ class ReportController extends Controller
         if(\Auth::user()->can('income report'))
         {
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customer->prepend('All', '');
+            $customer->prepend(__('All'), '');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
-            $category->prepend('All', '');
+            $category->prepend(__('All'), '');
 
-            if(isset($request->year))
+            $yearList   = Auth::user()->getAllRecordYear();
+            
+            if(!empty($request->input('year')))
             {
-                $year = $request->year;
-            }
-            else
-            {
+                $year = $request->input('year');
+            } else if($yearList->contains(date('Y'))) {
                 $year = date('Y');
+            } else {
+                $year = $yearList->first();
             }
+
             $data = $this->GetIncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
 
             $data['monthList']      = $month = $this->yearMonth();
-            $data['yearList']       = $this->yearList();
+            $data['yearList']       = $yearList;
             $data['currentYear']    = $year;
             $data['account']        = $account;
             $data['customer']       = $customer;
@@ -69,26 +72,27 @@ class ReportController extends Controller
         if(\Auth::user()->can('expense report'))
         {
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $vender->prepend('All', '');
+            $vender->prepend(__('All'), '');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
-            $category->prepend('All', '');
+            $category->prepend(__('All'), '');
 
+            $yearList   = Auth::user()->getAllRecordYear();
             
-            if(isset($request->year))
+            if(!empty($request->input('year')))
             {
-                $year = $request->year;
-            }
-            else
-            {
+                $year = $request->input('year');
+            } else if($yearList->contains(date('Y'))) {
                 $year = date('Y');
+            } else {
+                $year = $yearList->first();
             }
 
             $data                   = $this->GetExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));
             $data['currentYear']    = $year;
             $data['monthList']      = $month = $this->yearMonth();
-            $data['yearList']       = $this->yearList();
+            $data['yearList']       = $yearList;
             $data['account']        = $account;
             $data['vender']         = $vender;
             $data['category']       = $category;
@@ -108,26 +112,29 @@ class ReportController extends Controller
         if(\Auth::user()->can('income vs expense report'))
         {
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
-            $account->prepend('All', '');
+            $account->prepend(__('All'), '');
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $vender->prepend('All', '');
+            $vender->prepend(__('All'), '');
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $customer->prepend('All', '');
+            $customer->prepend(__('All'), '');
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $category->prepend('All', '');
+            $category->prepend(__('All'), '');
 
-            if(isset($request->year))
+            $yearList   = Auth::user()->getAllRecordYear();
+            
+            if(!empty($request->input('year')))
             {
-                $year = $request->year;
-            }
-            else
-            {
+                $year = $request->input('year');
+            } else if($yearList->contains(date('Y'))) {
                 $year = date('Y');
+            } else {
+                $year = $yearList->first();
             }
+
             $data = $this->GetIncomeVSExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'), $request->input('vender'));
             $data['currentYear'] = $year;
             $data['monthList'] = $month = $this->yearMonth();
-            $data['yearList']  = $this->yearList();
+            $data['yearList']  = $yearList;
 
             
             $data['account']             = $account;
@@ -228,8 +235,19 @@ class ReportController extends Controller
 
         if(Auth::user()->can('loss & profit report'))
         {
-            $data = $this->GetProfitLoss($request->input('year'));
-            $data['yearList']  = $this->yearList();
+            $yearList   = Auth::user()->getAllRecordYear();
+            
+            if(!empty($request->input('year')))
+            {
+                $year = $request->input('year');
+            } else if($yearList->contains(date('Y'))) {
+                $year = date('Y');
+            } else {
+                $year = $yearList->first();
+            }
+
+            $data = $this->GetProfitLoss($year);
+            $data['yearList']       = $yearList;
 
             return view('report.profit_loss_summary', $data);
         }
@@ -280,7 +298,7 @@ class ReportController extends Controller
             $year     = date('Y');
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'customer_id');
 
-            $customer->prepend('All', '');
+            $customer->prepend(__('All'), '');
 
             $status = Invoice::$statuses;
 
@@ -347,7 +365,7 @@ class ReportController extends Controller
         {
             $year   = date('Y');
             $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'vender_id');
-            $vender->prepend('All', '');
+            $vender->prepend(__('All'), '');
 
             $status = Invoice::$statuses;
 
