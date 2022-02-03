@@ -16,10 +16,10 @@
     <link href="{{ asset('assets/modules/bootstrap-toastr/toastr.min.css') }}" rel="stylesheet" type="text/css"/>
 
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="{{ asset('assets/css/components.min.css')}} ">
-    <link rel="stylesheet" href="{{ asset('assets/css/kaka.css')}} ">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css')}}">
-    <link rel="stylesheet" href="{{ asset('assets/css/custom1.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/components.min.css')}}?{{ config('asset-version.css.components') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/kaka.css')}}?{{ config('asset-version.css.kaka') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css')}}?{{ config('asset-version.css.style') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom1.css')}}?{{ config('asset-version.css.custom1') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600;1,700;1,800&display=swap" rel="stylesheet">
@@ -45,8 +45,8 @@
 <script src="{{ asset('assets/modules/jquery-selectric/jquery.selectric.min.js') }} "></script>
 <script src="{{ asset('assets/modules/bootstrap-toastr/toastr.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('assets/modules/bootstrap-toastr/ui-toastr.min.js') }}" type="text/javascript"></script>
-<script src="{{ asset('assets/js/scripts.js')}} "></script>
-<script src="{{ asset('assets/js/custom.js')}} "></script>
+<script src="{{ asset('assets/js/scripts.js')}}?{{ config('asset-version.js.scripts') }}"></script>
+<script src="{{ asset('assets/js/custom.js')}}?{{ config('asset-version.js.custom') }}"></script>
 
 @stack('page-script')
 

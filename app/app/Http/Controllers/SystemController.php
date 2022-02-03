@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Utility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\File;
 
 class SystemController extends Controller
 {
@@ -121,6 +124,28 @@ class SystemController extends Controller
             return redirect()->back()->with('error', 'Permission denied.');
         }
 
+    }
+
+    public function saveAssetVersion(Request $request) {
+        if(Auth::user()->can('manage system settings')) {
+            $versions = $request->except(['_token', '_method']);
+            $data   = [];
+            foreach ($versions as $key => $version) {
+                $keyNames = explode('_', $key);
+                if(!isset($data[$keyNames[0]])) {
+                    $data[$keyNames[0]] = [];
+                }
+                $data[$keyNames[0]][$keyNames[1]]  = $version;
+            }
+
+            $data = var_export($data, 1);
+            if(File::put(substr(app_path(), 0, -3).'config\\asset-version.php', "<?php return {$data};")) {
+                return redirect()->back()->with('success', __('Setting successfully updated.'));
+            }
+            return redirect()->back()->with('error', __('Something bad happened.'));
+        } else {
+            return redirect()->back()->with('error', 'Permission denied.');
+        }
     }
 
     public function saveCompanySettings(Request $request)

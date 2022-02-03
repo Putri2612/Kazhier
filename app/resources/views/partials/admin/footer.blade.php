@@ -15,7 +15,7 @@
 <script src="{{ asset('assets/modules/chart/Chart.min.js') }} "></script>
 <script src="{{ asset('assets/modules/chart/Chart.extension.js') }} "></script>
 
-<script src="{{ asset('assets/js/InputSuggestion.js') }}"></script>
+<script src="{{ asset('assets/js/InputSuggestion.js') }}?{{ config('asset-version.js.inputsuggestion') }}"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 
@@ -29,11 +29,18 @@
 <script src="{{ asset('assets/modules/nicescroll/jquery.nicescroll.min.js')}} "></script>
 
 <script src="{{ asset('assets/js/jscolor.js') }} "></script>
-<script src="{{ asset('assets/js/scripts.min.js').'?'.time() }}"></script>
-<script src="{{ asset('assets/js/custom.min.js').'?'.time() }}"></script>
+<script src="{{ asset('assets/js/scripts.min.js') }}?{{ config('asset-version.js.scripts') }}"></script>
+<script src="{{ asset('assets/js/custom.min.js') }}?{{ config('asset-version.js.custom') }}"></script>
 <script src="{{ asset('assets/js/jquery-ui.min.js') }}"></script>
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5ENX028256"></script>
 <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5ENX028256');
+
     loginUser('{!! Auth::user()->cryptId() !!}');
     checkActivity();
     userActivity();

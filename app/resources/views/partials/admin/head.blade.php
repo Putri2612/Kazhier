@@ -24,11 +24,10 @@
 
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" href="https://bin.irimold.web.id/fonts/Poppins/Poppins.min.css"/>
-    <link rel="stylesheet" href="{{ asset('assets/css/components.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/kaka.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/custom.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/components.min.css') }}?{{ config('asset-version.css.components', 1) }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/style.min.css') }}?{{ config('asset-version.css.style', 1) }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/kaka.css') }}?{{ config('asset-version.css.kaka', 1) }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/custom.min.css') }}?{{ config('asset-version.css.custom', 1) }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 

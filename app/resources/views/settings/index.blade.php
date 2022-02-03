@@ -37,6 +37,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#midtrans-setting" href="#midtrans-setting" role="tab" aria-controls="" aria-selected="false">{{__('Midtrans Setting')}}</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#asset-version-setting" href="#asset-version-setting" role="tab" aria-controls="" aria-selected="false">{{__('Asset Version Setting')}}</a>
+                                </li>
                             </ul>
                             <div class="tab-content" id="myTabContent2">
                                 <div class="tab-pane fade fade show active" id="site-setting" role="tabpanel" aria-labelledby="profile-tab3">
@@ -252,6 +255,27 @@
                                             {{__('Set Midtrans Payment Notification URL to ')}}
                                             <a href="#">{{'https://'.$uri.$url.'midtrans/callback'}}</a>
                                         </p>
+                                        <div class="card-footer text-end">
+                                            {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
+                                        </div>
+                                        {{Form::close()}}
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="asset-version-setting" role="tabpanel" aria-labelledby="contact-tab4">
+                                    <div class="stripe-setting-wrap">
+                                        {{Form::open(array('route'=>'asset-version.settings','method'=>'put'))}}
+
+                                        @foreach (config('asset-version') as $type => $items)    
+                                            <h2 class="display-5">{{ strtoupper($type) }}</h2>
+                                            <div class="row">
+                                                @foreach ($items as $name => $version)    
+                                                    <div class="form-group col-3">
+                                                        {{Form::label("{$type}_{$name}", ucfirst($name)) }}
+                                                        {{Form::number("{$type}_{$name}",$version,array('class'=>'form-control'))}}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endforeach
                                         <div class="card-footer text-end">
                                             {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                         </div>

@@ -182,6 +182,7 @@ Route::group(
         Route::post('store-language', [LanguageController::class, 'storeLanguage'])->name('store.language');
 
         Route::resource('systems', SystemController::class);
+        Route::put('asset-version-settings', [SystemController::class, 'saveAssetVersion'])->name('asset-version.settings');
         Route::post('email-settings', [SystemController::class, 'saveEmailSettings'])->name('email.settings');
         Route::post('company-settings', [SystemController::class, 'saveCompanySettings'])->name('company.settings');
         Route::post('stripe-settings', [SystemController::class, 'saveStripeSettings'])->name('stripe.settings');
