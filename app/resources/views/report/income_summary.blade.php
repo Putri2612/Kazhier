@@ -5,51 +5,39 @@
 
 @push('script-page')
     <script>
-        var SalesChart = (function () {
-            var $chart = $('#chart-sales');
+        ChartsConstant.locale = '{{ Config::get('app.locale') }}';
 
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {
-                                    callback: (label, index, labels) => {
-                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
-                                    }
-                                }
-                            }]
-                        }, 
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
+        const Canvas    = document.querySelector('#income-chart').getContext('2d'),
+            DisplayChart= new Chart(Canvas, {
+                type: 'line',
+                data: {
+                    labels: @json($monthList),
+                    datasets: [{
+                        label: '{{__('Income')}}',
+                        borderColor: '#0087f8',
+                        backgroundColor: '#0087f833',
+                        fill: true,
+                        data: @json($chartData),
+                    }]
+                }, 
+                options: {
+                    scales: {
+                        yAxis: {
+                            min: 0,
+                            ticks: {
+                                callback: ChartsConstant.Callbacks.ticks
                             }
                         }
                     },
-                    data: {
-                        labels: {!! json_encode($monthList) !!},
-                        datasets: [{
-                            label: '{{__('Income')}}',
-                            data:{!! json_encode($chartIncomeArr) !!},
-                        }]
-                    },
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ChartsConstant.Callbacks.tooltipsLabel
+                            }
+                        }
+                    }
+                }
+            });
         var year = '{{$currentYear}}';
     </script>
 @endpush
@@ -133,7 +121,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <canvas id="chart-sales" height="300"></canvas>
+                                                <canvas id="income-chart" height="300"></canvas>
                                             </div>
                                         </div>
                                     </div>
@@ -162,10 +150,10 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Revenue :')}}</h6></b></td>
                                                     </tr>
-                                                    @foreach($incomeArr as $i=>$income)
+                                                    @foreach($revenues as $revenues)
                                                         <tr>
-                                                            <td>{{$income['category']}}</td>
-                                                            @foreach($income['data'] as $j=>$data)
+                                                            <td>{{$revenues['category']}}</td>
+                                                            @foreach($revenues['data'] as $data)
                                                                 <td>{{\Auth::user()->priceFormat($data)}}</td>
                                                             @endforeach
                                                         </tr>
@@ -173,10 +161,10 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Invoice :')}}</h6></b></td>
                                                     </tr>
-                                                    @foreach($invoiceArray as $i=>$invoice)
+                                                    @foreach($invoices as $invoice)
                                                         <tr>
                                                             <td>{{$invoice['category']}}</td>
-                                                            @foreach($invoice['data'] as $j=>$data)
+                                                            @foreach($invoice['data'] as $data)
                                                                 <td>{{\Auth::user()->priceFormat($data)}}</td>
                                                             @endforeach
                                                         </tr>
@@ -186,7 +174,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>{{__('Total')}}</td>
-                                                        @foreach($chartIncomeArr as $i=>$income)
+                                                        @foreach($chartData as $income)
                                                             <td>{{\Auth::user()->priceFormat($income)}}</td>
                                                         @endforeach
                                                     </tr>
@@ -199,7 +187,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

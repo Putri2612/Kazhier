@@ -15,8 +15,8 @@
             <td></td>
             <th colspan="{{count($month) + 3}}"><b>{{__('Invoice : ')}}</b></th>
         </tr>
-        @if(!empty($invoiceIncomeArray))
-            @foreach($invoiceIncomeArray as $invoice)
+        @if(!empty($invoiceIncome))
+            @foreach($invoiceIncome as $invoice)
                 <tr>
                     <td colspan="2"></td>
                     <td colspan="2">{{$invoice['category']}}</td>
@@ -31,8 +31,8 @@
             <td></td>
             <th colspan="{{count($month) + 3}}"><b>{{__('Revenue : ')}}</b></th>
         </tr>
-        @if(!empty($revenueIncomeArray))
-            @foreach($revenueIncomeArray as $revenue)
+        @if(!empty($revenueIncome))
+            @foreach($revenueIncome as $revenue)
                 <tr>
                     <td colspan="2"></td>
                     <td colspan="2">{{$revenue['category']}}</td>
@@ -57,8 +57,8 @@
             <td></td>
             <th colspan="{{count($month) + 3}}"><b>{{__('Bill : ')}}</b></th>
         </tr>
-        @if(!empty($billExpenseArray))
-            @foreach($billExpenseArray as $bill)
+        @if(!empty($billExpense))
+            @foreach($billExpense as $bill)
                 <tr>
                     <td colspan="2"></td>
                     <td colspan="2">{{$bill['category']}}</td>
@@ -72,8 +72,8 @@
             <td></td>
             <th colspan="{{count($month) + 3}}"><b>{{__('Payment : ')}}</b></th>
         </tr>
-        @if(!empty($expenseArray))
-            @foreach($expenseArray as $expense)
+        @if(!empty($paymentExpense))
+            @foreach($paymentExpense as $expense)
                 <tr>
                     <td colspan="2"></td>
                     <td colspan="2">{{$expense['category']}}</td>

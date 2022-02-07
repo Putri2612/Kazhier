@@ -17,11 +17,14 @@ use App\Models\Projects;
 use App\Models\Revenue;
 use App\Models\Tax;
 use App\Models\User;
+use App\Traits\TimeGetter;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class
 DashboardController extends Controller
 {
+    use TimeGetter;
     /**
      * Create a new controller instance.
      *
@@ -39,9 +42,9 @@ DashboardController extends Controller
      */
     public function index()
     {
-        if(\Auth::user()->type == 'super admin')
+        if(Auth::user()->type == 'super admin')
         {
-            $user                       = \Auth::user();
+            $user                       = Auth::user();
             $user['total_user']         = $user->countCompany();
             $user['total_paid_user']    = $user->countPaidCompany();
             $user['total_orders']       = Order::total_orders();
@@ -57,63 +60,46 @@ DashboardController extends Controller
         }
         else
         {
+            $creatorId = Auth::user()->creatorId();
             
-            $data['latestIncome']  = Revenue::where('created_by', '=', \Auth::user()->creatorId())->orderBy('date', 'desc')->limit(5)->get();
-            $data['latestExpense'] = Payment::where('created_by', '=', \Auth::user()->creatorId())->orderBy('date', 'desc')->limit(5)->get();
+            $data['latestIncome']  = Revenue::where('created_by', '=', $creatorId)->orderBy('date', 'desc')->limit(5)->get();
+            $data['latestExpense'] = Payment::where('created_by', '=', $creatorId)->orderBy('date', 'desc')->limit(5)->get();
 
+            $incomeCategoryData = $this->GetCategoryData();
+            $data['incomeCategoryColor'] = $incomeCategoryData['colors'];
+            $data['incomeCategory']      = $incomeCategoryData['categories'];
+            $data['incomeCategoryAmount']= $incomeCategoryData['amounts'];
 
-            $incomeCategory = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get();
-            $inColor        = array();
-            $inCategory     = array();
-            $inAmount       = array();
-            for($i = 0; $i < count($incomeCategory); $i++)
-            {
-                $inColor[]    = '#' . $incomeCategory[$i]->color;
-                $inCategory[] = $incomeCategory[$i]->name;
-                $inAmount[]   = $incomeCategory[$i]->incomeCategoryRevenueAmount();
+            $expenseCategoryData = $this->GetCategoryData('expense');
+            $data['expenseCategoryColor'] = $expenseCategoryData['colors'];
+            $data['expenseCategory']      = $expenseCategoryData['categories'];
+            $data['expenseCategoryAmount']= $expenseCategoryData['amounts'];
+
+            $data['IncomeExpenseChart'] = $this->GetIncomeAndExpenseChart(Auth::user());
+            $data['CashFlowChart']      = $this->GetCashFlowChart(Auth::user());
+
+            $data['currentYear']    = date('Y');
+            $data['currentMonth']   = date('M');
+            $data['months']         = $this->Months();
+            $data['years']          = Auth::user()->getAllRecordYear();
+            if($data['years']->contains([$data['currentYear']])) {
+                $data['years'][$data['currentYear']] = $data['currentYear'];
             }
 
-
-            $data['incomeCategoryColor'] = $inColor;
-            $data['incomeCategory']      = $inCategory;
-            $data['incomeCatAmount']     = $inAmount;
-
-
-            $expenseCategory = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get();
-            $exColor         = array();
-            $exCategory      = array();
-            $exAmount        = array();
-            for($i = 0; $i < count($expenseCategory); $i++)
-            {
-                $exColor[]    = '#' . $expenseCategory[$i]->color;
-                $exCategory[] = $expenseCategory[$i]->name;
-                $exAmount[]   = $expenseCategory[$i]->expenseCategoryAmount();
-            }
-
-            $data['expenseCategoryColor'] = $exColor;
-            $data['expenseCategory']      = $exCategory;
-            $data['expenseCatAmount']     = $exAmount;
-
-            $data['incExpBarChartData']  = \Auth::user()->getincExpBarChartData();
-            $data['incExpLineChartData'] = \Auth::user()->getIncExpLineChartDate();
-
-            $data['currentYear']  = date('Y');
-            $data['currentMonth'] = date('M');
-
-            $constant['taxes']         = Tax::where('created_by', \Auth::user()->creatorId())->count();
-            $constant['category']      = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->count();
-            $constant['units']         = ProductServiceUnit::where('created_by', \Auth::user()->creatorId())->count();
-            $constant['paymentMethod'] = PaymentMethod::where('created_by', \Auth::user()->creatorId())->count();
-            $constant['bankAccount']   = BankAccount::where('created_by', \Auth::user()->creatorId())->count();
+            $constant['taxes']         = Tax::where('created_by', $creatorId)->count();
+            $constant['category']      = ProductServiceCategory::where('created_by', $creatorId)->count();
+            $constant['units']         = ProductServiceUnit::where('created_by', $creatorId)->count();
+            $constant['paymentMethod'] = PaymentMethod::where('created_by', $creatorId)->count();
+            $constant['bankAccount']   = BankAccount::where('created_by', $creatorId)->count();
             $data['constant']          = $constant;
-            $data['bankAccountDetail'] = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get();
-            $data['recentInvoice']     = Invoice::where('created_by', '=', \Auth::user()->creatorId())->orderBy('issue_date', 'desc')->limit(5)->get();
-            $data['weeklyInvoice']     = \Auth::user()->weeklyInvoice();
-            $data['monthlyInvoice']    = \Auth::user()->monthlyInvoice();
-            $data['recentBill']        = Bill::where('created_by', '=', \Auth::user()->creatorId())->orderBy('bill_date', 'desc')->limit(5)->get();
-            $data['weeklyBill']        = \Auth::user()->weeklyBill();
-            $data['monthlyBill']       = \Auth::user()->monthlyBill();
-            $data['goals']             = Goal::where('created_by', '=', \Auth::user()->creatorId())->where('is_display', 1)->get();
+            $data['bankAccountDetail'] = BankAccount::where('created_by', '=', $creatorId)->get();
+            $data['recentInvoice']     = Invoice::where('created_by', '=', $creatorId)->orderBy('issue_date', 'desc')->limit(5)->get();
+            $data['weeklyInvoice']     = Auth::user()->weeklyInvoice();
+            $data['monthlyInvoice']    = Auth::user()->monthlyInvoice();
+            $data['recentBill']        = Bill::where('created_by', '=', $creatorId)->orderBy('bill_date', 'desc')->limit(5)->get();
+            $data['weeklyBill']        = Auth::user()->weeklyBill();
+            $data['monthlyBill']       = Auth::user()->monthlyBill();
+            $data['goals']             = Goal::where('created_by', '=', $creatorId)->where('is_display', 1)->get();
 
             return view('dashboard.index', $data);
         }
@@ -143,12 +129,55 @@ DashboardController extends Controller
         foreach($arrDuration as $date => $label)
         {
 
-            $data               = Order::select(\DB::raw('count(*) as total'))->whereDate('created_at', '=', $date)->first();
+            $data               = Order::select(DB::raw('count(*) as total'))->whereDate('created_at', '=', $date)->first();
             $arrTask['label'][] = $label;
             $arrTask['data'][]  = $data->total;
         }
 
         return $arrTask;
+    }
+
+    public function GetCashFlow($month = null, $year = null) {
+        if(Auth::user()->type != 'super admin') {
+            return response()->json($this->GetCashFlowChart(Auth::user(), $month, $year));
+        }
+    }
+
+    public function GetIncomeExpense($year = null) {
+        if(Auth::user()->type != 'super admin') {
+            return response()->json($this->GetIncomeAndExpenseChart(Auth::user(), $year));
+        }
+    }
+
+    public function GetCategoryData($type = 'income', $year = null) {
+        if(Auth::user()->type != 'super admin'){
+            return $this->GetCategoryChart(Auth::user(), $year, $type);
+        }
+    }
+
+    private function GetCashFlowChart(User $user, $month = null, $year = null) {
+        return $user->getCashFlowChart($month, $year);
+    }
+
+    private function GetIncomeAndExpenseChart(User $user, $year = null) {
+        return $user->getIncomeAndExpenseChart($year);
+    }
+
+    private function GetCategoryChart(User $user, $year = null, $type = 'income') {
+        $types = ['income' => 1, 'expense' => 2];
+        $category = ProductServiceCategory::where('created_by', '=', $user->creatorId())->where('type', '=', $types[$type])->get();
+
+        
+        foreach($category as $cat) {
+            $colors[]       = '#' . $cat->color;
+            $categories[]   = $cat->name;
+            if($type == 'income') {
+                $amounts[]      = $cat->incomeCategoryAmount($year);
+            } else if($type == 'expense') {
+                $amounts[]      = $cat->expenseCategoryAmount($year);
+            }
+        }
+        return ['colors' => $colors, 'categories' => $categories, 'amounts' => $amounts];
     }
 }
 

@@ -363,206 +363,180 @@ trait DataGetter{
 
     // Reports
 
-    public function GetIncomeSummary($year = null, $account = null, $category = null, $customer = null) {
-        if(!$year) { $year = date('Y'); }
-        $incomes = Revenue::selectRaw('sum(amount) as amount, MONTH(date) as month,YEAR(date) as year, category_id');
-        $incomes->where('created_by', '=', Auth::user()->creatorId());
-        $incomes->whereRAW('YEAR(date) =?', [$year]);
-        if(!empty($account))
-        {
-            $incomes->where('account_id', '=', $account);
-        }
-        if(!empty($category))
-        {
-            $incomes->where('category_id', '=', $category);
+    private function Summarize($input) {
+        $categorized    = [];
+        foreach($input as $dat){
+            $categorized[$dat->category_id][$dat->month] = $dat->amount;
         }
 
-        if(!empty($customer))
-        {
-            $incomes->where('customer_id', '=', $customer);
-        }
-        $incomes->groupBy('month', 'year', 'category_id');
-        $incomes = $incomes->get();
-        
-        $tmpArray = [];
-        foreach($incomes as $income){
-            $tmpArray[$income->category_id][$income->month] = $income->amount;
-        }
-        $incomeData = [];
-        foreach($tmpArray as $category_id => $income)
-        {
+        $summarizedData = [];
+        $totalAmount    = [];
+        foreach($categorized as $category_id => $amount) {
             $category        = ProductServiceCategory::where('id', '=', $category_id)->first();
-            $tmp             = [];
-            $tmp['category'] = !empty($category) ? $category->name : '';
-            $tmp['data']     = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-                $tmp['data'][$i] = array_key_exists($i, $income) ? $income[$i] : 0;
+            $tmp             = [
+                'category'  => !empty($category) ? $category->name : '',
+                'data'      => []
+            ];
+            for($i = 1; $i <= 12; $i++) {
+                $tmp['data'][$i]    = array_key_exists($i, $amount) ? $amount[$i] : 0;
+                $totalAmount[]      = array_key_exists($i, $amount) ? $amount[$i] : 0;
             }
-            $incomeData[] = $tmp;
+            $summarizedData[] = $tmp;
         }
 
-        $incomes = $incomes->pluck('amount', 'month')->toArray();
-        for($i = 1; $i <= 12; $i++)
-        {
-            $incomeTotal[] = array_key_exists($i, $incomes) ? $incomes[$i] : 0;
-        }
+        return ['summary' => $summarizedData, 'total' => $totalAmount];
+    }
+
+    public function GetIncomeSummary($year = null, $account = null, $category = null, $customer = null) {
+        $creatorId = Auth::user()->creatorId();
+        if(!$year) { $year = date('Y'); }
+
+        $revenues = Revenue::selectRaw('sum(amount) as amount, MONTH(date) as month,YEAR(date) as year, category_id')
+                    ->where('created_by', $creatorId)
+                    ->whereRAW('YEAR(date) =?', [$year]);
+
+        if(!empty($account))    { $revenues->where('account_id', '=', $account); }
+        if(!empty($category))   { $revenues->where('category_id', '=', $category); }
+        if(!empty($customer))   { $revenues->where('customer_id', '=', $customer); }
+
+        $revenues = $revenues->groupBy('month', 'year', 'category_id')->get();
+        
+        $revenueData = $this->Summarize($revenues);
 
         //---------------------------INVOICE INCOME-----------------------------------------------
 
-        $invoices = Invoice:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,invoice_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
-        $invoices->whereRAW('YEAR(send_date) =?', [$year]);
-        if(!empty($customer))
-        {
-            $invoices->where('customer_id', '=', $customer);
-        }
-        $invoices        = $invoices->get();
-        $invoiceTmpArray = [];
-        foreach($invoices as $invoice)
-        {
-            $invoiceTmpArray[$invoice->category_id][$invoice->month][] = $invoice->getTotal();
-        }
+        $invoices = Invoice::where('invoices.created_by', $creatorId)->where('invoices.status', '!=', 0);
+        
+        if(!empty($customer)) { $invoices->where('customer_id', '=', $customer); }
+        if(!empty($category)) { $invoices->where('category_id', '=', $category); }
+        
+        $invoices->rightJoin('invoice_payments', function($join) use($account, $year) {
+            $join->on('invoices.id', '=', 'invoice_payments.invoice_id')
+                ->whereRaw('YEAR(date) = ?', $year);
+            if(!empty($account))    { $join->where('account_id', '=', $account); }
+        });
 
-        $invoiceArray = [];
-        foreach($invoiceTmpArray as $cat_id => $record)
-        {
-            $category            = ProductServiceCategory::where('id', '=', $cat_id)->first();
+        $invoices = $invoices->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        
+        $invoiceData = $this->Summarize($invoices);
 
-            $invoice             = [];
-            $invoice['category'] = !empty($category) ? $category->name : '';
-            $invoice['data']     = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-
-                $invoice['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-            }
-            $invoiceArray[] = $invoice;
-        }
-
-        $invoiceTotalArray = [];
-        foreach($invoices as $invoice)
-        {
-            $invoiceTotalArray[$invoice->month][] = $invoice->getTotal();
-        }
-        for($i = 1; $i <= 12; $i++)
-        {
-            $invoiceTotal[] = array_key_exists($i, $invoiceTotalArray) ? array_sum($invoiceTotalArray[$i]) : 0;
-        }
-
-        $chartIncomeArr = array_map(
+        $chartData = array_map(
             function (){
                 return array_sum(func_get_args());
-            }, $incomeTotal, $invoiceTotal
+            }, $revenueData['total'], $invoiceData['total']
         );
 
-        $data['chartIncomeArr'] = $chartIncomeArr;
-        $data['incomeArr']      = $incomeData;
-        $data['invoiceArray']   = $invoiceArray;
+        $data['chartData']  = $chartData;
+        $data['revenues']   = $revenueData['summary'];
+        $data['invoices']   = $invoiceData['summary'];
         
         return $data;
     }
 
     public function GetExpenseSummary($year = null, $account = null, $category = null, $vender = null) {
-        $expenses = Payment::selectRaw('sum(amount) as amount,MONTH(date) as month,YEAR(date) as year, category_id');
-            $expenses->where('created_by', '=', Auth::user()->creatorId());
-            $expenses->whereRAW('YEAR(date) =?', [$year]);
-            if(!empty($account))
-            {
-                $expenses->where('account_id', '=', $account);
-            }
-            if(!empty($category))
-            {
-                $expenses->where('category_id', '=', $category);
-            }
-            if(!empty($vender))
-            {
-                $expenses->where('vender_id', '=', $vender);
-            }
-            $expenses->groupBy('month', 'year', 'category_id');
-            $expenses = $expenses->get();
-            $tmpArray = [];
-            foreach($expenses as $expense)
-            {
-                $tmpArray[$expense->category_id][$expense->month] = $expense->amount;
-            }
-            $array = [];
-            foreach($tmpArray as $cat_id => $record)
-            {
-                $category        = ProductServiceCategory::where('id', '=', $cat_id)->first();
-                $tmp             = [];
-                $tmp['category'] = !empty($category) ? $category->name : '';
-                $tmp['data']     = [];
-                for($i = 1; $i <= 12; $i++)
-                {
-                    $tmp['data'][$i] = array_key_exists($i, $record) ? $record[$i] : 0;
-                }
-                $array[] = $tmp;
-            }
-            
-            $expenses = $expenses->pluck('amount', 'month')->toArray();
+        $creatorId = Auth::user()->creatorId();
+        if(!$year) { $year = date('Y'); }
 
-            for($i = 1; $i <= 12; $i++)
-            {
-                $expenseTotal[] = array_key_exists($i, $expenses) ? $expenses[$i] : 0;
-            }
+        $payments = Payment::selectRaw('sum(amount) as amount,MONTH(date) as month, category_id')
+                ->where('created_by', '=', $creatorId)
+                ->whereRAW('YEAR(date) =?', [$year]);
 
-            //     ------------------------------------BILL EXPENSE----------------------------------------------------
+        if(!empty($account)) { $payments->where('account_id', '=', $account); }
+        if(!empty($category)) { $payments->where('category_id', '=', $category); }
+        if(!empty($vender)) { $payments->where('vender_id', '=', $vender); }
 
-            $bills = Bill:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,bill_id,id')->where('created_by', Auth::user()->creatorId())->where('status', '!=', 0);
-            $bills->whereRAW('YEAR(send_date) =?', [$year]);
-            if(!empty($customer))
-            {
-                $bills->where('vender_id', '=', $vender);
-            }
-            $bills        = $bills->get();
-            $billTmpArray = [];
-            foreach($bills as $bill)
-            {
-                $billTmpArray[$bill->category_id][$bill->month][] = $bill->getTotal();
-            }
+        $payments = $payments->groupBy('month', 'category_id')->get();
+        $paymentData = $this->Summarize($payments);
 
-            $billArray = [];
-            foreach($billTmpArray as $cat_id => $record)
-            {
-                $category = ProductServiceCategory::where('id', '=', $cat_id)->first();
+        //     ------------------------------------BILL EXPENSE----------------------------------------------------
 
-                $bill             = [];
-                $bill['category'] = !empty($category) ? $category->name : '';
-                $bill['data']     = [];
-                for($i = 1; $i <= 12; $i++)
-                {
+        $bills = Bill::where('bills.created_by', $creatorId)->where('bills.status', '!=', 0);
+        
+        if(!empty($customer)) { $bills->where('vender_id', '=', $vender); }
+        if(!empty($category)) { $bills->where('category_id', '=', $category); }
+        
+        $bills->rightJoin('bill_payments', function($join) use($account, $year) {
+            $join->on('bills.id', '=', 'bill_payments.bill_id')
+                ->whereRaw('YEAR(date) = ?', $year);
+            if(!empty($account))    { $join->where('account_id', '=', $account); }
+        });
 
-                    $bill['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-                }
-                $billArray[] = $bill;
-            }
+        $bills = $bills->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        
+        $billData = $this->Summarize($bills);
 
-            $billTotalArray = [];
-            foreach($bills as $bill)
-            {
-                $billTotalArray[$bill->month][] = $bill->getTotal();
-            }
-            for($i = 1; $i <= 12; $i++)
-            {
-                $billTotal[] = array_key_exists($i, $billTotalArray) ? array_sum($billTotalArray[$i]) : 0;
-            }
-
-            $chartExpenseArr = array_map(
-                function (){
-                    return array_sum(func_get_args());
-                }, $expenseTotal, $billTotal
-            );
+        $chartData = array_map(
+            function (){
+                return array_sum(func_get_args());
+            }, $paymentData['total'], $billData['total']
+        );
 
 
-            $data['chartExpenseArr'] = $chartExpenseArr;
-            $data['expenseArr']      = $array;
-            $data['billArray']       = $billArray;
+        $data['chartData']  = $chartData;
+        $data['payments']   = $paymentData['summary'];
+        $data['bills']      = $billData['summary'];
 
-            return $data;
+        return $data;
+    }
+
+    private function Quarterize($input) {
+        $categorized = [];
+        foreach($input as $data) {
+            $categorized[$data->category_id][$data->month] = $data->amount;
+        }
+
+        $JanMar  = $AprJun = $JulSep = $OctDec = 0;
+        $outputData = [];
+        foreach($categorized as $category_id => $data) {
+
+            $tmp             = [];
+            $tmp['category'] = !empty(ProductServiceCategory::where('id', '=', $category_id)->first()) ? ProductServiceCategory::where('id', '=', $category_id)->first()->name : '';
+            $sumData         = [];
+            for($i = 1; $i <= 12; $i++) {
+                $sumData[] = array_key_exists($i, $data) ? $data[$i] : 0;
+            }
+
+            $firstQuarter = array_slice($sumData, 0, 3);
+            $secondQuarter = array_slice($sumData, 3, 3);
+            $thirdQuarter = array_slice($sumData, 6, 3);
+            $forthQuarter = array_slice($sumData, 9, 3);
+
+
+            $total[__('Jan-Mar')] = $sum_1 = array_sum($firstQuarter);
+            $total[__('Apr-Jun')] = $sum_2 = array_sum($secondQuarter);
+            $total[__('Jul-Sep')] = $sum_3 = array_sum($thirdQuarter);
+            $total[__('Oct-Dec')] = $sum_4 = array_sum($forthQuarter);
+            $total[__('Total')]   = array_sum( [$sum_1, $sum_2, $sum_3, $sum_4] );
+
+            $JanMar += $sum_1;
+            $AprJun += $sum_2;
+            $JulSep += $sum_3;
+            $OctDec += $sum_4;
+
+            $tmp['amount']  = array_values($total);
+
+            $outputData[] = $tmp;
+
+        }
+
+        $Total = [
+            $JanMar,
+            $AprJun,
+            $JulSep,
+            $OctDec,
+            array_sum( [$JanMar, $AprJun, $JulSep, $OctDec] ),
+        ];
+
+        return ['data' => $outputData, 'total' => $Total];
     }
 
     public function GetProfitLoss($year = null) {
         if(!$year) { $year = date('Y'); }
+        $creatorId = Auth::user()->creatorId();
         $data['month']     = [
             'Jan-Mar',
             'Apr-Jun',
@@ -574,301 +548,68 @@ trait DataGetter{
 
         // -------------------------------REVENUE INCOME-------------------------------------------------
 
-        $incomes = Revenue::selectRaw('sum(revenues.amount) as amount,MONTH(date) as month,YEAR(date) as year,category_id');
-        $incomes->where('created_by', '=', \Auth::user()->creatorId());
-        $incomes->whereRAW('YEAR(date) =?', [$year]);
-        $incomes->groupBy('month', 'year', 'category_id');
-        $incomes        = $incomes->get();
-        $tmpIncomeArray = [];
-        foreach($incomes as $income)
-        {
-            $tmpIncomeArray[$income->category_id][$income->month] = $income->amount;
-        }
+        $revenues = Revenue::selectRaw('sum(revenues.amount) as amount,MONTH(date) as month, category_id')
+                    ->where('created_by', $creatorId)
+                    ->whereRAW('YEAR(date) = ?', $year)
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        
+        $quarterizedRevenues = $this->Quarterize($revenues);
 
-        $incomeCatAmount_1  = $incomeCatAmount_2 = $incomeCatAmount_3 = $incomeCatAmount_4 = 0;
-        $revenueIncomeArray = array();
-        foreach($tmpIncomeArray as $cat_id => $record)
-        {
-
-            $tmp             = [];
-            $tmp['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $sumData         = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-                $sumData[] = array_key_exists($i, $record) ? $record[$i] : 0;
-            }
-
-            $month_1 = array_slice($sumData, 0, 3);
-            $month_2 = array_slice($sumData, 3, 3);
-            $month_3 = array_slice($sumData, 6, 3);
-            $month_4 = array_slice($sumData, 9, 3);
-
-
-            $incomeData[__('Jan-Mar')] = $sum_1 = array_sum($month_1);
-            $incomeData[__('Apr-Jun')] = $sum_2 = array_sum($month_2);
-            $incomeData[__('Jul-Sep')] = $sum_3 = array_sum($month_3);
-            $incomeData[__('Oct-Dec')] = $sum_4 = array_sum($month_4);
-            $incomeData[__('Total')]   = array_sum(
-                array(
-                    $sum_1,
-                    $sum_2,
-                    $sum_3,
-                    $sum_4,
-                )
-            );
-
-            $incomeCatAmount_1 += $sum_1;
-            $incomeCatAmount_2 += $sum_2;
-            $incomeCatAmount_3 += $sum_3;
-            $incomeCatAmount_4 += $sum_4;
-
-            $data['month'] = array_keys($incomeData);
-            $tmp['amount'] = array_values($incomeData);
-
-            $revenueIncomeArray[] = $tmp;
-
-        }
-
-        $data['incomeCatAmount'] = $incomeCatAmount = [
-            $incomeCatAmount_1,
-            $incomeCatAmount_2,
-            $incomeCatAmount_3,
-            $incomeCatAmount_4,
-            array_sum(
-                array(
-                    $incomeCatAmount_1,
-                    $incomeCatAmount_2,
-                    $incomeCatAmount_3,
-                    $incomeCatAmount_4,
-                )
-            ),
-        ];
-
-        $data['revenueIncomeArray'] = $revenueIncomeArray;
+        $data['revenueIncome'] = $quarterizedRevenues['data'];
+        $data['revenueTotal'] = $totalRevenue = $quarterizedRevenues['total'];
 
         //-----------------------INVOICE INCOME---------------------------------------------
 
-        $invoices = Invoice:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,invoice_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
-        $invoices->whereRAW('YEAR(send_date) =?', [$year]);
-        $invoices        = $invoices->get();
-        $invoiceTmpArray = [];
-        foreach($invoices as $invoice)
-        {
-            $invoiceTmpArray[$invoice->category_id][$invoice->month][] = $invoice->getTotal();
-        }
-
-        $invoiceCatAmount_1 = $invoiceCatAmount_2 = $invoiceCatAmount_3 = $invoiceCatAmount_4 = 0;
-        $invoiceIncomeArray = array();
-        foreach($invoiceTmpArray as $cat_id => $record)
-        {
-
-            $invoiceTmp             = [];
-            $invoiceTmp['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $invoiceSumData         = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-                $invoiceSumData[] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-
-            }
-
-            $month_1                          = array_slice($invoiceSumData, 0, 3);
-            $month_2                          = array_slice($invoiceSumData, 3, 3);
-            $month_3                          = array_slice($invoiceSumData, 6, 3);
-            $month_4                          = array_slice($invoiceSumData, 9, 3);
-            $invoiceIncomeData[__('Jan-Mar')] = $sum_1 = array_sum($month_1);
-            $invoiceIncomeData[__('Apr-Jun')] = $sum_2 = array_sum($month_2);
-            $invoiceIncomeData[__('Jul-Sep')] = $sum_3 = array_sum($month_3);
-            $invoiceIncomeData[__('Oct-Dec')] = $sum_4 = array_sum($month_4);
-            $invoiceIncomeData[__('Total')]   = array_sum(
-                array(
-                    $sum_1,
-                    $sum_2,
-                    $sum_3,
-                    $sum_4,
-                )
-            );
-            $invoiceCatAmount_1               += $sum_1;
-            $invoiceCatAmount_2               += $sum_2;
-            $invoiceCatAmount_3               += $sum_3;
-            $invoiceCatAmount_4               += $sum_4;
-
-            $invoiceTmp['amount'] = array_values($invoiceIncomeData);
-
-            $invoiceIncomeArray[] = $invoiceTmp;
-
-        }
-
-        $data['invoiceIncomeCatAmount'] = $invoiceIncomeCatAmount = [
-            $invoiceCatAmount_1,
-            $invoiceCatAmount_2,
-            $invoiceCatAmount_3,
-            $invoiceCatAmount_4,
-            array_sum(
-                array(
-                    $invoiceCatAmount_1,
-                    $invoiceCatAmount_2,
-                    $invoiceCatAmount_3,
-                    $invoiceCatAmount_4,
-                )
-            ),
-        ];
-
-
-        $data['invoiceIncomeArray'] = $invoiceIncomeArray;
+        $invoices = Invoice::where('invoices.created_by', $creatorId)->where('invoices.status', '!=', 0)
+                    ->rightJoin('invoice_payments', function($join) use($year) {
+                        $join->on('invoices.id', '=', 'invoice_payments.invoice_id')
+                            ->whereRaw('YEAR(date) = ?', $year);
+                    })
+                    ->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        $quarterizedInvoices    = $this->Quarterize($invoices);
+        $data['invoiceIncome']  = $quarterizedInvoices['data'];
+        $data['invoiceTotal']   = $totalInvoice = $quarterizedInvoices['total'];
 
         $data['totalIncome'] = $totalIncome = array_map(
             function (){
                 return array_sum(func_get_args());
-            }, $invoiceIncomeCatAmount, $incomeCatAmount
+            }, $totalRevenue, $totalInvoice
         );
 
         //---------------------------------PAYMENT EXPENSE-----------------------------------
 
-        $expenses = Payment::selectRaw('sum(payments.amount) as amount,MONTH(date) as month,YEAR(date) as year,category_id');
-        $expenses->where('created_by', '=', \Auth::user()->creatorId());
-        $expenses->whereRAW('YEAR(date) =?', [$year]);
-        $expenses->groupBy('month', 'year', 'category_id');
-        $expenses = $expenses->get();
+        $payments = Payment::selectRaw('sum(payments.amount) as amount,MONTH(date) as month,category_id')
+                    ->where('created_by', '=', $creatorId)
+                    ->whereRAW('YEAR(date) =?', $year)
+                    ->groupBy('month', 'category_id')
+                    ->get();
 
-        $tmpExpenseArray = [];
-        foreach($expenses as $expense)
-        {
-            $tmpExpenseArray[$expense->category_id][$expense->month] = $expense->amount;
-        }
-
-        $expenseArray       = [];
-        $expenseCatAmount_1 = $expenseCatAmount_2 = $expenseCatAmount_3 = $expenseCatAmount_4 = 0;
-        foreach($tmpExpenseArray as $cat_id => $record)
-        {
-            $tmp             = [];
-            $tmp['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $expenseSumData  = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-                $expenseSumData[] = array_key_exists($i, $record) ? $record[$i] : 0;
-
-            }
-
-            $month_1 = array_slice($expenseSumData, 0, 3);
-            $month_2 = array_slice($expenseSumData, 3, 3);
-            $month_3 = array_slice($expenseSumData, 6, 3);
-            $month_4 = array_slice($expenseSumData, 9, 3);
-
-            $expenseData[__('Jan-Mar')] = $sum_1 = array_sum($month_1);
-            $expenseData[__('Apr-Jun')] = $sum_2 = array_sum($month_2);
-            $expenseData[__('Jul-Sep')] = $sum_3 = array_sum($month_3);
-            $expenseData[__('Oct-Dec')] = $sum_4 = array_sum($month_4);
-            $expenseData[__('Total')]   = array_sum(
-                array(
-                    $sum_1,
-                    $sum_2,
-                    $sum_3,
-                    $sum_4,
-                )
-            );
-
-            $expenseCatAmount_1 += $sum_1;
-            $expenseCatAmount_2 += $sum_2;
-            $expenseCatAmount_3 += $sum_3;
-            $expenseCatAmount_4 += $sum_4;
-
-            $data['month'] = array_keys($expenseData);
-            $tmp['amount'] = array_values($expenseData);
-
-            $expenseArray[] = $tmp;
-
-        }
-
-        $data['expenseCatAmount'] = $expenseCatAmount = [
-            $expenseCatAmount_1,
-            $expenseCatAmount_2,
-            $expenseCatAmount_3,
-            $expenseCatAmount_4,
-            array_sum(
-                array(
-                    $expenseCatAmount_1,
-                    $expenseCatAmount_2,
-                    $expenseCatAmount_3,
-                    $expenseCatAmount_4,
-                )
-            ),
-        ];
-        $data['expenseArray']     = $expenseArray;
+        $quarterizedPayment     = $this->Quarterize($payments);
+        $data['paymentExpense'] = $quarterizedPayment['data'];
+        $data['paymentTotal']   = $totalPayment = $quarterizedPayment['total'];
 
         //    ----------------------------EXPENSE BILL-----------------------------------------------------------------------
 
-        $bills = Bill:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,bill_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
-        $bills        = $bills->get();
-        $billTmpArray = [];
-        foreach($bills as $bill)
-        {
-            $billTmpArray[$bill->category_id][$bill->month][] = $bill->getTotal();
-        }
-
-        $billExpenseArray       = [];
-        $billExpenseCatAmount_1 = $billExpenseCatAmount_2 = $billExpenseCatAmount_3 = $billExpenseCatAmount_4 = 0;
-        foreach($billTmpArray as $cat_id => $record)
-        {
-            $billTmp             = [];
-            $billTmp['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $billExpensSumData   = [];
-            for($i = 1; $i <= 12; $i++)
-            {
-                $billExpensSumData[] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-            }
-
-            $month_1 = array_slice($billExpensSumData, 0, 3);
-            $month_2 = array_slice($billExpensSumData, 3, 3);
-            $month_3 = array_slice($billExpensSumData, 6, 3);
-            $month_4 = array_slice($billExpensSumData, 9, 3);
-
-            $billExpenseData[__('Jan-Mar')] = $sum_1 = array_sum($month_1);
-            $billExpenseData[__('Apr-Jun')] = $sum_2 = array_sum($month_2);
-            $billExpenseData[__('Jul-Sep')] = $sum_3 = array_sum($month_3);
-            $billExpenseData[__('Oct-Dec')] = $sum_4 = array_sum($month_4);
-            $billExpenseData[__('Total')]   = array_sum(
-                array(
-                    $sum_1,
-                    $sum_2,
-                    $sum_3,
-                    $sum_4,
-                )
-            );
-
-            $billExpenseCatAmount_1 += $sum_1;
-            $billExpenseCatAmount_2 += $sum_2;
-            $billExpenseCatAmount_3 += $sum_3;
-            $billExpenseCatAmount_4 += $sum_4;
-
-            $data['month']     = array_keys($billExpenseData);
-            $billTmp['amount'] = array_values($billExpenseData);
-
-            $billExpenseArray[] = $billTmp;
-
-        }
-
-        $data['billExpenseCatAmount'] = $billExpenseCatAmount = [
-            $billExpenseCatAmount_1,
-            $billExpenseCatAmount_2,
-            $billExpenseCatAmount_3,
-            $billExpenseCatAmount_4,
-            array_sum(
-                array(
-                    $billExpenseCatAmount_1,
-                    $billExpenseCatAmount_2,
-                    $billExpenseCatAmount_3,
-                    $billExpenseCatAmount_4,
-                )
-            ),
-        ];
-
-        $data['billExpenseArray'] = $billExpenseArray;
-
+        $bills = Bill::where('bills.created_by', $creatorId)->where('bills.status', '!=', 0)
+                ->rightJoin('bill_payments', function($join) use($year) {
+                    $join->on('bills.id', '=', 'bill_payments.bill_id')
+                        ->whereRaw('YEAR(date) = ?', $year);
+                })
+                ->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                ->groupBy('month', 'category_id')
+                ->get();
+        
+        $quarterizedBill        = $this->Quarterize($bills);
+        $data['billExpense']    = $quarterizedBill['data'];
+        $data['billTotal']      = $totalBill = $quarterizedBill['total'];
 
         $data['totalExpense'] = $totalExpense = array_map(
             function (){
                 return array_sum(func_get_args());
-            }, $billExpenseCatAmount, $expenseCatAmount
+            }, $totalBill, $totalPayment
         );
 
 
@@ -882,149 +623,84 @@ trait DataGetter{
     }
 
     public function GetIncomeVSExpenseSummary($year = null, $account = null, $category = null, $customer = null, $vender = null) {
+        $creatorId = Auth::user()->creatorId();
         if(empty($year)) { $year = date('Y'); }
 
         // ------------------------------TOTAL PAYMENT EXPENSE-----------------------------------------------------------
-        $expensesData = Payment::selectRaw('sum(payments.amount) as amount,MONTH(date) as month,YEAR(date) as year');
-        $expensesData->where('payments.created_by', '=', \Auth::user()->creatorId());
-        $expensesData->whereRAW('YEAR(date) =?', [$year]);
-        if(!empty($account))
-        {
-            $expensesData->where('account_id', '=', $account);
-        }
-        if(!empty($category))
-        {
-            $expensesData->where('category_id', '=', $category);
-        }
-        if(!empty($vender))
-        {
-            $expensesData->where('vender_id', '=', $vender);
-        }
-        $expensesData->groupBy('month', 'year');
-        $expensesData = $expensesData->get();
+        $payments = Payment::selectRaw('sum(amount) as amount,MONTH(date) as month, category_id')
+                ->where('created_by', '=', $creatorId)
+                ->whereRAW('YEAR(date) =?', [$year]);
 
-        $expenseArr = [];
-        foreach($expensesData as $k => $expenseData)
-        {
-            $expenseArr[$expenseData->month] = $expenseData->amount;
-        }
+        if(!empty($account)) { $payments->where('account_id', '=', $account); }
+        if(!empty($category)) { $payments->where('category_id', '=', $category); }
+        if(!empty($vender)) { $payments->where('vender_id', '=', $vender); }
+
+        $payments = $payments->groupBy('month', 'category_id')->get();
+        $paymentData = $this->Summarize($payments)['total'];
 
         // ------------------------------TOTAL BILL EXPENSE-----------------------------------------------------------
 
-        $bills = Bill:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,bill_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
-        $bills->whereRAW('YEAR(send_date) =?', [$year]);
-        if(!empty($customer))
-        {
-            $bills->where('vender_id', '=', $vender);
-        }
-        $bills        = $bills->get();
-        $billTmpArray = [];
-        foreach($bills as $bill)
-        {
-            $billTmpArray[$bill->category_id][$bill->month][] = $bill->getTotal();
-        }
-        $billArray = [];
-        foreach($billTmpArray as $cat_id => $record)
-        {
-            $bill             = [];
-            $bill['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $bill['data']     = [];
-            for($i = 1; $i <= 12; $i++)
-            {
+        $bills = Bill::where('bills.created_by', $creatorId)->where('bills.status', '!=', 0);
+        
+        if(!empty($customer)) { $bills->where('vender_id', '=', $vender); }
+        if(!empty($category)) { $bills->where('category_id', '=', $category); }
+        
+        $bills->rightJoin('bill_payments', function($join) use($account, $year) {
+            $join->on('bills.id', '=', 'bill_payments.bill_id')
+                ->whereRaw('YEAR(date) = ?', $year);
+            if(!empty($account))    { $join->where('account_id', '=', $account); }
+        });
 
-                $bill['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-            }
-            $billArray[] = $bill;
-        }
-
-        $billTotalArray = [];
-        foreach($bills as $bill)
-        {
-            $billTotalArray[$bill->month][] = $bill->getTotal();
-        }
+        $bills = $bills->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        $billData = $this->Summarize($bills)['total'];
 
 
         // ------------------------------TOTAL REVENUE INCOME-----------------------------------------------------------
 
-        $incomesData = Revenue::selectRaw('sum(revenues.amount) as amount,MONTH(date) as month,YEAR(date) as year');
-        $incomesData->where('revenues.created_by', '=', \Auth::user()->creatorId());
-        $incomesData->whereRAW('YEAR(date) =?', [$year]);
-        if(!empty($account))
-        {
-            $incomesData->where('account_id', '=', $account);
-        }
-        if(!empty($category))
-        {
-            $incomesData->where('category_id', '=', $category);
-        }
-        if(!empty($customer))
-        {
-            $incomesData->where('customer_id', '=', $customer);
-        }
-        $incomesData->groupBy('month', 'year');
-        $incomesData = $incomesData->get();
-        $incomeArr   = [];
-        foreach($incomesData as $k => $incomeData)
-        {
-            $incomeArr[$incomeData->month] = $incomeData->amount;
-        }
+        $revenues = Revenue::selectRaw('sum(amount) as amount, MONTH(date) as month,YEAR(date) as year, category_id')
+                    ->where('created_by', $creatorId)
+                    ->whereRAW('YEAR(date) =?', [$year]);
 
-        // ------------------------------TOTAL INVOICE INCOME-----------------------------------------------------------
-        $invoices = Invoice:: selectRaw('MONTH(send_date) as month,YEAR(send_date) as year,category_id,invoice_id,id')->where('created_by', \Auth::user()->creatorId())->where('status', '!=', 0);
-        $invoices->whereRAW('YEAR(send_date) =?', [$year]);
-        if(!empty($customer))
-        {
-            $invoices->where('customer_id', '=', $customer);
-        }
-        $invoices        = $invoices->get();
-        $invoiceTmpArray = [];
-        foreach($invoices as $invoice)
-        {
-            $invoiceTmpArray[$invoice->category_id][$invoice->month][] = $invoice->getTotal();
-        }
+        if(!empty($account))    { $revenues->where('account_id', '=', $account); }
+        if(!empty($category))   { $revenues->where('category_id', '=', $category); }
+        if(!empty($customer))   { $revenues->where('customer_id', '=', $customer); }
 
-        $invoiceArray = [];
-        foreach($invoiceTmpArray as $cat_id => $record)
-        {
+        $revenues = $revenues->groupBy('month', 'year', 'category_id')->get();
+        
+        $revenueData = $this->Summarize($revenues)['total'];
 
-            $invoice             = [];
-            $invoice['category'] = !empty(ProductServiceCategory::where('id', '=', $cat_id)->first()) ? ProductServiceCategory::where('id', '=', $cat_id)->first()->name : '';
-            $invoice['data']     = [];
-            for($i = 1; $i <= 12; $i++)
-            {
+        //--------------------------- TOTAL INVOICE INCOME-----------------------------------------------
 
-                $invoice['data'][$i] = array_key_exists($i, $record) ? array_sum($record[$i]) : 0;
-            }
-            $invoiceArray[] = $invoice;
-        }
+        $invoices = Invoice::where('invoices.created_by', $creatorId)->where('invoices.status', '!=', 0);
+        
+        if(!empty($customer)) { $invoices->where('customer_id', '=', $customer); }
+        if(!empty($category)) { $invoices->where('category_id', '=', $category); }
+        
+        $invoices->rightJoin('invoice_payments', function($join) use($account, $year) {
+            $join->on('invoices.id', '=', 'invoice_payments.invoice_id')
+                ->whereRaw('YEAR(date) = ?', $year);
+            if(!empty($account))    { $join->where('account_id', '=', $account); }
+        });
 
-        $invoiceTotalArray = [];
-        foreach($invoices as $invoice)
-        {
-            $invoiceTotalArray[$invoice->month][] = $invoice->getTotal();
-        }
+        $invoices = $invoices->selectRaw( 'MONTH(date) AS month, sum(amount) as amount, category_id' )
+                    ->groupBy('month', 'category_id')
+                    ->get();
+        
+        $invoiceData = $this->Summarize($invoices)['total'];
         //        ----------------------------------------------------------------------------------------------------
-
-        for($i = 1; $i <= 12; $i++)
-        {
-            $paymentExpenseTotal[] = array_key_exists($i, $expenseArr) ? $expenseArr[$i] : 0;
-            $billExpenseTotal[]    = array_key_exists($i, $billTotalArray) ? array_sum($billTotalArray[$i]) : 0;
-
-            $RevenueIncomeTotal[] = array_key_exists($i, $incomeArr) ? $incomeArr[$i] : 0;
-            $invoiceIncomeTotal[] = array_key_exists($i, $invoiceTotalArray) ? array_sum($invoiceTotalArray[$i]) : 0;
-
-        }
 
         $totalIncome = array_map(
             function (){
                 return array_sum(func_get_args());
-            }, $RevenueIncomeTotal, $invoiceIncomeTotal
+            }, $invoiceData, $revenueData
         );
 
         $totalExpense = array_map(
             function (){
                 return array_sum(func_get_args());
-            }, $paymentExpenseTotal, $billExpenseTotal
+            }, $paymentData, $billData
         );
 
         $profit = [];
@@ -1035,10 +711,10 @@ trait DataGetter{
         }
 
 
-        $data['paymentExpenseTotal'] = $paymentExpenseTotal;
-        $data['billExpenseTotal']    = $billExpenseTotal;
-        $data['revenueIncomeTotal']  = $RevenueIncomeTotal;
-        $data['invoiceIncomeTotal']  = $invoiceIncomeTotal;
+        $data['paymentExpenseTotal'] = $paymentData;
+        $data['billExpenseTotal']    = $billData;
+        $data['revenueIncomeTotal']  = $revenueData;
+        $data['invoiceIncomeTotal']  = $invoiceData;
         $data['profit']              = $profit;
 
         return $data;

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\TimeGetter;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasRoles, HasApiTokens;
-    use Notifiable;
+    use Notifiable, TimeGetter;
 
     protected $appends = ['profile'];
 
@@ -378,132 +379,113 @@ class User extends Authenticatable implements MustVerifyEmail
      
     }
 
-    public function getincExpBarChartData()
-    {
-        $month[]       = __('January');
-        $month[]       = __('February');
-        $month[]       = __('March');
-        $month[]       = __('April');
-        $month[]       = __('May');
-        $month[]       = __('June');
-        $month[]       = __('July');
-        $month[]       = __('August');
-        $month[]       = __('September');
-        $month[]       = __('October');
-        $month[]       = __('November');
-        $month[]       = __('December');
-        $data['month'] = $month;
+    private function initIncomeChart () {
+        $Incomes['label']           = __('Income');
+        $Incomes['borderColor']     = '#0087f8';
+        $Incomes['backgroundColor'] = '#0087f833';
+        $Incomes['fill']            = true;
 
-
-        for($i = 1; $i <= 12; $i++)
-        {
-            $monthlyIncome = Revenue::selectRaw('sum(amount) amount')->where('created_by', '=', $this->creatorId())->whereRaw('year(`date`) = ?', array(date('Y')))->whereRaw('month(`date`) = ?', $i)->first();
-            $invoices      = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->get();
-
-            $invoiceArray = array();
-            foreach($invoices as $invoice)
-            {
-                $invoiceArray[] = $invoice->getTotal();
-            }
-            $totalIncome = (!empty($monthlyIncome) ? $monthlyIncome->amount : 0) + (!empty($invoiceArray) ? array_sum($invoiceArray) : 0);
-
-            $incomeArr['label']           = __('Income');
-            $incomeArr['backgroundColor'] = '#0087f833';
-            $incomeArr['borderColor']     = '#0087f8ff';
-            $incomeArr['data'][]          = !empty($totalIncome) ? $totalIncome : 0;
-
-            $monthlyExpense = Payment::selectRaw('sum(amount) amount')->where('created_by', '=', $this->creatorId())->whereRaw('year(`date`) = ?', array(date('Y')))->whereRaw('month(`date`) = ?', $i)->first();
-            $bills          = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRaw('year(`send_date`) = ?', array(date('Y')))->whereRaw('month(`send_date`) = ?', $i)->get();
-            $billArray      = array();
-            foreach($bills as $bill)
-            {
-                $billArray[] = $bill->getTotal();
-            }
-
-            $totalExpense                  = (!empty($monthlyExpense) ? $monthlyExpense->amount : 0) + (!empty($billArray) ? array_sum($billArray) : 0);
-            $expenseArr['label']           = __('Expense');
-            $expenseArr['backgroundColor'] = '#ff590933';
-            $expenseArr['borderColor']     = '#ff5909ff';
-            $expenseArr['data'][]          = !empty($totalExpense) ? $totalExpense : 0;
-        }
-
-        $dataArr[] = $expenseArr;
-        $dataArr[] = $incomeArr;
-        
-
-        $data['incExpArr'] = $dataArr;
-
-        return $data;
-
-
+        return $Incomes;
+    }
+    private function initExpenseChart () {
+        $Expenses['label']              = __('Expense');
+        $Expenses['borderColor']        = '#ff5909';
+        $Expenses['backgroundColor']    = '#ff590933';
+        $Expenses['fill']               = true;
+        return $Expenses;
     }
 
-    public function getIncExpLineChartDate()
-    {
-        $usr           = \Auth::user();
-        $m             = date("m");
-        // $de            = date("d");
-        $y             = date("Y");
-        $d_max;
-        $format        = 'Y-m-d';
-        $arrDate       = [];
-        $arrDateFormat = [];
+    public function getIncomeAndExpenseChart($year = null){
+        if(empty($year)) { $year = date('Y'); }
 
-        if($m < 8){
-            $d_max = ($m % 2 == 0) ? 30 : 31;
-        } else {
-            $d_max = ($m % 2 == 0) ? 31 : 30;
+        $data['months'] = $months = $this->Months();
+
+        $Incomes    = $this->initIncomeChart();
+        $Expenses   = $this->initExpenseChart();
+
+        foreach($months as $month => $name) {
+            $month++;
+            $Revenue    = Revenue::selectRaw('sum(amount) as amount')
+                ->where('created_by', $this->creatorId())
+                ->whereRaw('year(`date`) = ?', $year)
+                ->whereRaw('month(`date`) = ?', $month)
+                ->first()->amount;
+            
+            $InvoiceIDs = Invoice::select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+            $Invoice    = InvoicePayment::whereIn('id', $InvoiceIDs)
+                ->whereRaw('year(`date`) = ?', $year)
+                ->whereRaw('month(`date`) = ?', $month)
+                ->sum('amount');
+
+
+            $Incomes['data'][]= (!empty($Revenue) ? $Revenue : 0) + (!empty($Invoice) ? $Invoice : 0);
+
+            $Payment    = Payment::selectRaw('sum(amount) as amount')
+                ->where('created_by', $this->creatorId())
+                ->whereRaw('year(`date`) = ?', $year)
+                ->whereRaw('month(`date`) = ?', $month)
+                ->first()->amount;
+            
+            $BillIDs = Bill::select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+            $Bill    = BillPayment::whereIn('id', $BillIDs)
+                ->whereRaw('year(`date`) = ?', $year)
+                ->whereRaw('month(`date`) = ?', $month)
+                ->sum('amount');
+
+            $Expenses['data'][] = (!empty($Payment) ? $Payment : 0) + (!empty($Bill) ? $Bill : 0);
         }
 
-        if( (($y % 400 == 0) || ($y % 400 != 0 && $y % 100 != 0 && $y % 4 == 0)) && $m == 2 ){
-            $d_max = 29;
-        } else if( (($y % 400 != 0 && $y % 100 == 0) || ($y % 400 != 0 && $y % 100 != 0 && $y % 4 != 0)) && $m == 2 ){
-            $d_max = 28;
+        $data['data'] = [$Expenses, $Incomes];
+
+        return $data;
+    }
+    
+    public function getCashFlowChart($month = null, $year = null) {
+        if(empty($month))   { $month    = date('m'); }
+        if(empty($year))    { $year     = date('Y'); }
+
+        $days_in_a_month = Carbon::createFromFormat('d-n-Y', "01-{$month}-{$year}")->endOfMonth()->format('d');
+        $dates  = [];
+        $days   = [];
+        $formats= [];
+        $data   = [];
+
+        $Incomes    = $this->initIncomeChart();
+        $Expenses   = $this->initExpenseChart();
+
+        for($day = 1; $day <= $days_in_a_month; $day++) {
+            $time = mktime(0, 0, 0, $month, $day, $year);
+            $dates[]    = date('Y-m-d', $time);
+            $formats[]  = date('d-M', $time);
         }
 
-        for($i = 1; $i <= $d_max; $i++)
-        {
-            $date = date($format, mktime(0, 0, 0, $m, $i, $y));
+        $data['dates'] = $formats;
 
-            $arrDay[]        = date('D', mktime(0, 0, 0, $m, $i, $y));
-            $arrDate[]       = $date;
-            $arrDateFormat[] = date("d-M", strtotime($date));;
+
+        foreach($dates as $date) {
+            $Revenue    = Revenue::selectRaw('sum(amount) as amount')
+                ->where('created_by', $this->creatorId())
+                ->where('date', $date)
+                ->first()->amount;
+
+            $invoiceIDs = Invoice::select('id')
+                ->where('created_by', $this->creatorId())
+                ->get()
+                ->pluck('id');
+
+            $Invoice = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->where('date', $date)->get()->sum('amount');
+
+            $Incomes['data'][] = (!empty($Revenue) ? $Revenue : 0) + (!empty($Invoice) ? $Invoice : 0);
+
+            $Payment    = Payment::selectRaw('sum(amount) as amount')->where('created_by', $this->creatorId())->where('date', $date)->first()->amount;
+
+            $BillIDs    = Bill::select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+            $Bill       = BillPayment::whereIn('bill_id', $BillIDs)->where('date', $date)->sum('amount');
+
+            $Expenses['data'][] = (!empty($Payment) ? $Payment : 0) + (!empty($Bill) ? $Bill : 0);
         }
-        $data['day'] = $arrDateFormat;
-        for($i = 0; $i < count($arrDate); $i++)
-        {
-            $dayIncome = Revenue::selectRaw('sum(amount) amount')->where('created_by', \Auth::user()->creatorId())->whereRaw('date = ?', $arrDate[$i])->first();
 
-            $invoices     = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('send_date = ?', $arrDate[$i])->get();
-            $invoiceArray = array();
-            foreach($invoices as $invoice)
-            {
-                $invoiceArray[] = $invoice->getTotal();
-            }
-
-            $incomeArr['label']           = __('Income');
-            $incomeArr['borderColor']     = '#0087f8';
-            $incomeArr['backgroundColor'] = '#0087f833';
-            $incomeArr['data'][]          = (!empty($dayIncome->amount) ? $dayIncome->amount : 0) + (!empty($invoiceArray) ? array_sum($invoiceArray) : 0);
-
-            $dayExpense = Payment::selectRaw('sum(amount) amount')->where('created_by', \Auth::user()->creatorId())->whereRaw('date = ?', $arrDate[$i])->first();
-
-            $bills     = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('send_date = ?', $arrDate[$i])->get();
-            $billArray = array();
-            foreach($bills as $bill)
-            {
-                $billArray[] = $bill->getTotal();
-            }
-
-            $expenseArr['label']           = __('Expense');
-            $expenseArr['borderColor']     = '#ff5909';
-            $expenseArr['backgroundColor'] = '#ff590933';
-            $expenseArr['data'][]          = (!empty($dayExpense->amount) ? $dayExpense->amount : 0) + (!empty($billArray) ? array_sum($billArray) : 0);
-        }
-        
-        $dataArr[]         = $expenseArr;
-        $dataArr[]         = $incomeArr;
-        $data['incExpArr'] = $dataArr;
+        $data ['data'] = [$Expenses, $Incomes];
 
         return $data;
     }
@@ -651,18 +633,18 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function getAllRecordYear(){
-        $revenuesQuery = Revenue::where('created_by', '=', \Auth::user()->creatorId());
-        $invoicesQuery = InvoicePayment::where('created_by', \Auth::user()->creatorId());
-        $paymentsQuery = Payment::where('created_by', '=', \Auth::user()->creatorId());
-        $billsQuery = BillPayment::where('created_by', \Auth::user()->creatorId());
+        $revenuesQuery  = Revenue::where('created_by', '=', $this->creatorId());
+        $invoicesQuery  = InvoicePayment::where('created_by', $this->creatorId());
+        $paymentsQuery  = Payment::where('created_by', '=', $this->creatorId());
+        $billsQuery     = BillPayment::where('created_by', $this->creatorId());
 
-        $revenues = $revenuesQuery->get();
-        $invoices = $invoicesQuery->get();
-        $payments = $paymentsQuery->get();
-        $bills = $billsQuery->get();
+        $revenues   = $revenuesQuery->get();
+        $invoices   = $invoicesQuery->get();
+        $payments   = $paymentsQuery->get();
+        $bills      = $billsQuery->get();
 
         $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills);
-        $data = $unsorted_data->sortBy('date')->values()->all();
+        $data   = $unsorted_data->sortBy('date')->values()->all();
 
         if(!empty($data)){
             foreach ($data as $dat){

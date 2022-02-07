@@ -12,8 +12,7 @@
 
 <script src="{{ asset('assets/modules/jquery.sparkline.min.js') }} "></script>
 
-<script src="{{ asset('assets/modules/chart/Chart.min.js') }} "></script>
-<script src="{{ asset('assets/modules/chart/Chart.extension.js') }} "></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 
 <script src="{{ asset('assets/js/InputSuggestion.js') }}?{{ config('asset-version.js.inputsuggestion') }}"></script>
 
@@ -45,6 +44,21 @@
     checkActivity();
     userActivity();
     document.querySelector('#frm-logout').addEventListener('submit', logoutUser);
+
+    document.addEventListener('change', event => {
+        let target = event.target;
+
+        if(target.classList.contains('form-control') && target.tagName == 'SELECT'){
+            if(target.value.includes('new')){
+                let url     = window.location.href,
+                    pos     = url.indexOf('/app/'),
+                    location    = target.value.split('.')[1],
+                    destination = url.substring(0, pos + 5) + location;
+
+                window.location.href = destination;
+            }
+        }
+    })
 </script>
 
 <script src="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.js') }}" type="text/javascript"></script>
@@ -84,27 +98,6 @@
         day: '{{__('day')}}',
         list: '{{__('list')}}'
     };
-</script>
-
-<script>
-    
-</script>
-
-<script>
-    document.addEventListener('change', event => {
-        let target = event.target;
-
-        if(target.classList.contains('form-control') && target.tagName == 'SELECT'){
-            if(target.value.includes('new')){
-                let url     = window.location.href,
-                    pos     = url.indexOf('/app/'),
-                    location    = target.value.split('.')[1],
-                    destination = url.substring(0, pos + 5) + location;
-
-                window.location.href = destination;
-            }
-        }
-    })
 </script>
 
 @if ($message = Session::get('success'))

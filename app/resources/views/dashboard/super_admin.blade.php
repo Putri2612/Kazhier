@@ -3,39 +3,40 @@
     {{__('Dashboard')}}
 @endsection
 @push('script-page')
-
     <script>
-        var SalesChart = (function () {
-            var $chart = $('#chart-sales');
-
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {}
-                            }]
+        const Canvas = document.querySelector('#chart-sales').getContext('2d');
+        const DisplayChart = new Chart(Canvas, {
+            type: 'line',
+            options: {
+                scales: {
+                    yAxis: {
+                        min: 0,
+                        ticks: {
+                            callback: (label, index, labels) => new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label)
                         }
-                    },
-                    data: {
-                        labels:{!! json_encode($chartData['label']) !!},
-                        datasets: [{
-                            label: 'Order',
-                            data:{!! json_encode($chartData['data']) !!}
-                        }]
                     }
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
+                },
+                tooltips: {
+                    callbacks: {
+                        label: (tooltipItem, data) => {
+                            let Value = data.datasets[tooltipItem.datasetIndex].label;
+                            Value += ': ';
+                            Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
+                            return Value;
+                        }
+                    }
+                }
+            },
+            data : {
+                labels : @json($chartData['label']),
+                datasets: [{
+                    label   : 'Order',
+                    borderColor: '#0087f8',
+                    backgroundColor: '#0087f8',
+                    data    : @json($chartData['data'])
+                }]
             }
-        })();
+        })
     </script>
 @endpush
 @section('content')

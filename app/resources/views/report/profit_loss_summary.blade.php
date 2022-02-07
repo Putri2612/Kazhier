@@ -82,12 +82,12 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Revenue : ')}}</h6></b></td>
                                                     </tr>
-                                                    @if(!empty($revenueIncomeArray))
-                                                        @foreach($revenueIncomeArray as $i=>$revenue)
+                                                    @if(!empty($revenueIncome))
+                                                        @foreach($revenueIncome as $revenue)
                                                             <tr>
                                                                 <td>{{$revenue['category']}}</td>
-                                                                @foreach($revenue['amount'] as $j=>$amount)
-                                                                    <td width="15%">{{\Auth::user()->priceFormat($amount)}}</td>
+                                                                @foreach($revenue['amount'] as $amount)
+                                                                    <td width="15%">{{ Auth::user()->priceFormat($amount)}}</td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -96,12 +96,12 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Invoice : ')}}</h6></b></td>
                                                     </tr>
-                                                    @if(!empty($invoiceIncomeArray))
-                                                        @foreach($invoiceIncomeArray as $i=>$invoice)
+                                                    @if(!empty($invoiceIncome))
+                                                        @foreach($invoiceIncome as $invoice)
                                                             <tr>
                                                                 <td>{{$invoice['category']}}</td>
-                                                                @foreach($invoice['amount'] as $j=>$amount)
-                                                                    <td width="15%">{{\Auth::user()->priceFormat($amount)}}</td>
+                                                                @foreach($invoice['amount'] as $amount)
+                                                                    <td width="15%">{{Auth::user()->priceFormat($amount)}}</td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -116,7 +116,7 @@
                                                     <tr>
                                                         <td width="25%">{{__('Total Income')}}</td>
                                                         @foreach($totalIncome as $income)
-                                                            <td width="15%">{{\Auth::user()->priceFormat($income)}}</td>
+                                                            <td width="15%">{{Auth::user()->priceFormat($income)}}</td>
                                                         @endforeach
                                                     </tr>
                                                     </tbody>
@@ -139,12 +139,12 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Payment : ')}}</h6></b></td>
                                                     </tr>
-                                                    @if(!empty($expenseArray))
-                                                        @foreach($expenseArray as $i=>$expense)
+                                                    @if(!empty($paymentExpense))
+                                                        @foreach($paymentExpense as $payment)
                                                             <tr>
-                                                                <td>{{$expense['category']}}</td>
-                                                                @foreach($expense['amount'] as $j=>$amount)
-                                                                    <td width="15%">{{\Auth::user()->priceFormat($amount)}}</td>
+                                                                <td>{{$payment['category']}}</td>
+                                                                @foreach($payment['amount'] as $amount)
+                                                                    <td width="15%">{{Auth::user()->priceFormat($amount)}}</td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -152,12 +152,12 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Bill : ')}}</h6></b></td>
                                                     </tr>
-                                                    @if(!empty($billExpenseArray))
-                                                        @foreach($billExpenseArray as $i=>$bill)
+                                                    @if(!empty($billExpense))
+                                                        @foreach($billExpense as $bill)
                                                             <tr>
                                                                 <td>{{$bill['category']}}</td>
-                                                                @foreach($bill['amount'] as $j=>$amount)
-                                                                    <td width="15%">{{\Auth::user()->priceFormat($amount)}}</td>
+                                                                @foreach($bill['amount'] as $amount)
+                                                                    <td width="15%">{{Auth::user()->priceFormat($amount)}}</td>
                                                                 @endforeach
                                                             </tr>
                                                         @endforeach
@@ -172,7 +172,7 @@
                                                     <tr>
                                                         <td>{{__('Total Expenses')}}</td>
                                                         @foreach($totalExpense as $expense)
-                                                            <td width="15%">{{\Auth::user()->priceFormat($expense)}}</td>
+                                                            <td width="15%">{{Auth::user()->priceFormat($expense)}}</td>
                                                         @endforeach
                                                     </tr>
                                                     </tbody>
@@ -184,8 +184,8 @@
                                                     </tr>
                                                     <tr>
                                                         <td width="25%">{{__('Net Profit')}}</td>
-                                                        @foreach($netProfitArray as $i=>$profit)
-                                                            <td width="15%"> {{\Auth::user()->priceFormat($profit)}}</td>
+                                                        @foreach($netProfitArray as $profit)
+                                                            <td width="15%"> {{Auth::user()->priceFormat($profit)}}</td>
                                                         @endforeach
                                                     </tr>
                                                     </tbody>

@@ -7,81 +7,44 @@
     <script src="{{ asset('assets/js/jspdf.min.js') }} "></script>
     <script src="{{ asset('assets/js/html2canvas.min.js') }} "></script>
     <script>
-        var SalesChart = (function () {
-            var $chart = $('#chart-sales');
-
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {
-                                    callback: (label, index, labels) => {
-                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
-                                    }
-                                }
-                            }]
-                        }, 
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
+        const line  = context => context.p1.raw > context.p0.raw  ? '#0087f8' : '#ff5909' ;
+        const Canvas    = document.querySelector('#chart-sales').getContext('2d'),
+            DisplayChart= new Chart(Canvas, {
+                type: 'line',
+                data: {
+                    labels: @json($monthList),
+                    datasets: [{
+                        label: '{{__('Profit')}}',
+                        data: @json($profit),
+                        borderColor: '#0087f8',
+                        backgroundColor: '#0087f833',
+                        fill: {
+                            target: 'origin',
+                            above: '#0087f833',
+                            below: '#ff590933',
+                        },
+                        segment: {
+                            borderColor: ctx => line(ctx)
+                        }
+                    }]
+                }, 
+                options: {
+                    scales: {
+                        yAxis: {
+                            ticks: {
+                                callback: ChartsConstant.Callbacks.ticks
                             }
                         }
                     },
-                    data: {
-                        labels: {!! json_encode($monthList) !!},
-                        datasets: [{
-                            label: '{{__('Profit')}}',
-                            data:{!! json_encode($profit) !!},
-                        }]
-                    },
                     plugins: {
-                        beforeRender: (x, options) => {
-                            const chart = x.chart,
-                                dataset = x.data.datasets[0],
-                                yScale  = x.scales['y-axis-0'],
-                                yPos    = yScale.getPixelForValue(0);
-                            
-                            const gradientFill = chart.ctx.createLinearGradient(0, 0, 0, chart.height);
-                            gradientFill.addColorStop(0, '#0087f8');
-                            gradientFill.addColorStop(yPos / chart.height, '#0087f8');
-                            gradientFill.addColorStop(yPos / chart.height, '#ff5909');
-                            gradientFill.addColorStop(1, '#ff5909');
-
-                            const model = x.data.datasets[0]._meta[Object.keys(dataset._meta)[0]].dataset._model;
-                            model.borderColor = gradientFill;
-
+                        tooltip: {
+                            callbacks: {
+                                label: ChartsConstant.Callbacks.tooltipsLabel
+                            }
                         }
                     }
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
-        var year = '{{$currentYear}}';
-
-        function saveAsPDF() {
-            html2canvas(document.getElementById("chart-container"), {
-                onrendered: function (canvas) {
-                    var img = canvas.toDataURL();
-                    var doc = new jsPDF("p", "pt", "a2");
-                    doc.addImage(img, 10, 10);
-                    doc.save(year + '_income_vs_expense_report.pdf');
                 }
             });
-        }
 
     </script>
 @endpush

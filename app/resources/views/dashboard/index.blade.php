@@ -4,181 +4,159 @@
 @endsection
 @push('script-page')
     <script>
-        var SalesChart = (function () {
-            var $chart = $('#cash-flow');
+        const Canvas = {
+            Cashflow        : document.querySelector('#cash-flow').getContext('2d'),
+            IncomeExpense   : document.querySelector('#income-expense').getContext('2d'),
+            DoughnutIncome  : document.querySelector('#chart-doughnut-income').getContext('2d'),
+            DoughnutExpense : document.querySelector('#chart-doughnut-expense').getContext('2d'),
+        }
 
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {
-                                    callback: (label, index, labels) => {
-                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
-                                    }
-                                }
-                            }]
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
-                            }
-                        }
-                    },
-                    data: {
-                        labels: {!! json_encode($incExpLineChartData['day']) !!},
-                        datasets: {!! json_encode($incExpLineChartData['incExpArr']) !!}
+        ChartsConstant.locale = '{{ Config::get('app.locale') }}';
 
-                    },
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
-        var SalesChart = (function () {
-            var $chart = $('#incExpBarChart');
-
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {
-                                    callback: function(label, index, labels){
-                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
-                                    }
-                                }
-                            }]
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
-                            }
-                        }
-                    },
-                    data: {
-                        labels: {!! json_encode($incExpBarChartData['month']) !!},
-                        datasets: {!! json_encode($incExpBarChartData['incExpArr']) !!}
-                    },
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
-
-        var DoughnutChart = (function () {
-            var $chart = $('#chart-doughnut-income');
-
-            function init($this) {
-                var randomScalingFactor = function () {
-                    return Math.round(Math.random() * 100);
-                };
-                var doughnutChart = new Chart($this, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: {!! json_encode($incomeCatAmount) !!},
-                            backgroundColor: {!! json_encode($incomeCategoryColor) !!},
-                        }],
-                        labels: {!! json_encode($incomeCategory) !!},
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'top',
-                        },
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.labels[tooltipItem.index];
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
-                            }
+        const ChartOptions = {
+            line: {
+                scales: {
+                    yAxis: {
+                        min: 0,
+                        ticks: {
+                            callback: ChartsConstant.Callbacks.ticks
                         }
                     }
-                });
-                $this.data('chart', doughnutChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
-        var DoughnutChart = (function () {
-            var $chart = $('#chart-doughnut-expense');
-
-            function init($this) {
-                var randomScalingFactor = function () {
-                    return Math.round(Math.random() * 100);
-                };
-                var doughnutChart = new Chart($this, {
-                    type: 'doughnut',
-                    data: {
-                        datasets: [{
-                            data: {!! json_encode($expenseCatAmount) !!},
-                            backgroundColor: {!! json_encode($expenseCategoryColor) !!},
-                        }],
-                        labels: {!! json_encode($expenseCategory) !!},
-                    },
-                    options: {
-                        responsive: true,
-                        legend: {
-                            position: 'top',
-                        },
-                        animation: {
-                            animateScale: true,
-                            animateRotate: true
-                        },
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    console.log(data);
-                                    console.log(tooltipItem);
-                                    let Value = data.labels[tooltipItem.index];
-                                    Value += ': ';
-                                    Value += data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                                    return Value;
-                                }
-                            }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ChartsConstant.Callbacks.tooltipsLabel
                         }
                     }
-                });
-                $this.data('chart', doughnutChart);
-            };
-            if ($chart.length) {
-                init($chart);
+                }
+            },
+            doughnut: {
+                cutout: "75%",
+                interaction:{
+                    intersect: true,
+                },
+                legend: {
+                    position: 'top',
+                }, 
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: ChartsConstant.Callbacks.tooltipsDoughnut
+                        }
+                    }
+                }
             }
-        })();
+        }
 
+        const CreateCharts = {
+            Line: ({context, labels, datasets}) => new Chart(context, { type: 'line', data: { labels: labels, datasets: datasets }, options: ChartOptions.line }),
+            Doughnut: ({context, labels, datasets}) => new Chart(context, { type: 'doughnut', data: { datasets: datasets, labels: labels }, options: ChartOptions.doughnut }),
+        }
+
+        const DisplayCharts = {
+            Cashflow: CreateCharts.Line({
+                context: Canvas.Cashflow, 
+                labels: @json($CashFlowChart['dates']), 
+                datasets: @json($CashFlowChart['data'])
+            }),
+            IncomeExpense: CreateCharts.Line({
+                context: Canvas.IncomeExpense, 
+                labels: @json($IncomeExpenseChart['months']), 
+                datasets: @json($IncomeExpenseChart['data'])
+            }),
+
+            DoughnutIncome: CreateCharts.Doughnut({
+                context: Canvas.DoughnutIncome,
+                labels: @json($incomeCategory), 
+                datasets: [{
+                    data: @json($incomeCategoryAmount),
+                    backgroundColor: @json($incomeCategoryColor),
+                }]
+            }),
+            DoughnutExpense: CreateCharts.Doughnut({
+                context: Canvas.DoughnutExpense,
+                labels: @json($expenseCategory), 
+                datasets: [{
+                    data: @json($expenseCategoryAmount),
+                    backgroundColor: @json($expenseCategoryColor),
+                }]
+            }),
+        }
+
+        document.querySelectorAll('.underline-dropdown select').forEach(element => {
+            element.addEventListener('change', event => {
+                const target = event.currentTarget;
+                // parse url
+                let url = target.getAttribute('data-source');
+                if(target.hasAttribute('data-name')) {
+                    const values = {
+                        month   : parseInt(document.querySelector('select[data-name="cashflow-month"]').value) + 1,
+                        year    : document.querySelector('select[data-name="cashflow-year"]').value
+                    };
+
+                    url = url.replace(':year', values.year);
+                    url = url.replace(':month', values.month);
+                } else {
+                    url = url.replace(':year', target.value);
+                }
+                
+                fetch(url).then(response => {
+                    if(response.ok) {
+                        return response.json()
+                    } else {
+                        throw new Error(`{response.status}: {{__('Something bad happened')}}`)
+                    }
+                }).then(data => {
+                    const targetName = target.getAttribute('data-target'),
+                        targetChart = DisplayCharts[targetName];
+                    if(targetName.includes('Doughnut')) {
+                        const dataset = [{
+                            data : data.amounts,
+                            backgroundColor: data.colors
+                        }];
+                        targetChart.data.datasets = dataset;
+                        targetChart.data.labels = data.categories;
+                        
+                        const type      = targetName.replace('Doughnut', '').toLowerCase(),
+                            list        = document.querySelector(`.${type}-category-list`);
+                        let priceFormat = "{{ Auth::user()->priceFormat(0) }}".replace('.', '').replace(',', '');
+                        
+                        let zeros = '';
+                        for(let i = 0; i < priceFormat.match(/0/gi).length; i++) {
+                            zeros += '0';
+                        }
+
+                        priceFormat = priceFormat.replace(zeros, '0');
+                        
+                        list.innerHTML = '';
+                        data.categories.forEach((category, index) => {
+                            const amount = new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.amounts[index]),
+                                formattedAmount = priceFormat.replace('0', amount),
+                                content = `<div class="text-end mt-10">
+                                    <span class="graph-label" style="background-color: ${data.colors[index]}">${category}</span>
+                                    <span>${formattedAmount}</span>
+                                </div>`;
+                            list.insertAdjacentHTML('beforeend', content);
+                        });
+                    } else {
+                        targetChart.data.datasets   = data.data;
+                        if(targetName.includes('Cashflow')) {
+                            targetChart.data.labels   = data.dates;
+                        } else if(targetName.includes('IncomeExpense')) {
+                            targetChart.data.labels   = data.months
+                        }
+                    } 
+                    targetChart.update();
+                }).catch(error => {
+                    console.error(error);
+                })
+            });
+        });
     </script>
 @endpush
 @section('content')
@@ -323,14 +301,17 @@
                     </div>
                 </div>
             </div>
-            @php
-                $m = date("m");
-                $current_m = $incExpBarChartData['month'][$m - 1];
-            @endphp
             <div class="col-lg-9 col-md-12 col-12 col-sm-12">
                 <div class="row">
                     <h4 class="col-md-6 fw-normal">{{__('Cashflow')}}</h4>
-                    <h5 class="col-md-6 fw-400 text-md-end">{{__($current_m).' '.$currentYear}}</h5>
+                    <div class="col-md-6 fw-400 row justify-content-md-end align-items-end">
+                        <div class="col-auto underline-dropdown">
+                            {{ Form::select('cashflow_month',$months, date('n') - 1, array('class' => 'h5', 'data-source' => route('dashboard-chart.cashflow', ['month' => ':month', 'year' => ':year']), 'data-name' => 'cashflow-month', 'data-target' => 'Cashflow')) }}
+                        </div>
+                        <div class="col-auto underline-dropdown">
+                            {{ Form::select('cashflow_year',$years, $currentYear, array('class' => 'h5', 'data-source' => route('dashboard-chart.cashflow', ['month' => ':month', 'year' => ':year']), 'data-name' => 'cashflow-year', 'data-target' => 'Cashflow')) }}
+                        </div>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -342,12 +323,16 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="row">
-                    <h4 class="col-md-6 fw-normal">{{__('Income & Expense')}}</h4>
-                    <h4 class="col-md-6 fw-400 text-md-end">{{__('Current year').' - '.$currentYear}}</h4>
+                    <h4 class="col-md-8 fw-normal">{{__('Income & Expense')}}</h4>
+                    <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
+                        <div class="col-auto underline-dropdown">
+                            {{ Form::select('income_expense_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.income-expense', ['year' => ':year']), 'data-target' => 'IncomeExpense')) }}
+                        </div>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <canvas id="incExpBarChart" height="250"></canvas>
+                        <canvas id="income-expense" height="250"></canvas>
                     </div>
                 </div>
             </div>
@@ -358,17 +343,21 @@
                 <div class="row">
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-6 fw-normal">{{__('Income By Category')}}</h4>
-                            <h4 class="col-md-6 text-md-end fw-400">{{__('Current year').' - '.$currentYear}}</h4>
+                            <h4 class="col-md-8 fw-normal">{{__('Income By Category')}}</h4>
+                            <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
+                                <div class="col-auto underline-dropdown">
+                                    {{ Form::select('income_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'income', 'year' => ':year']), 'data-target' => 'DoughnutIncome')) }}
+                                </div>
+                            </div>
                         </div>
                         <div class="card">
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
                                     <div class="col-12 col-md-4">
                                         @forelse($incomeCategory as $key=>$category)
-                                            <div class="text-end mt-10">
+                                            <div class="text-end mt-10 income-category-list">
                                                 <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
-                                                <span>{{\Auth::user()->priceFormat($incomeCatAmount[$key])}}</span>
+                                                <span>{{\Auth::user()->priceFormat($incomeCategoryAmount[$key])}}</span>
                                             </div>
                                         @empty
                                             <div class="text-center">
@@ -386,17 +375,21 @@
                     </div>
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-6 fw-normal">{{__('Expense By Category')}}</h4>
-                            <h4 class="col-md-6 text-md-end fw-400">{{__('Current year').' - '.$currentYear}}</h4>
+                            <h4 class="col-md-8 fw-normal">{{__('Expense By Category')}}</h4>
+                            <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
+                                <div class="col-auto underline-dropdown">
+                                    {{ Form::select('expense_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'expense', 'year' => ':year']), 'data-target' => 'DoughnutExpense')) }}
+                                </div>
+                            </div>
                         </div>
                         <div class="card">                            
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-12 col-md-4">
+                                    <div class="col-12 col-md-4 expense-category-list">
                                         @forelse($expenseCategory as $key=>$category)
                                             <div class="text-end mt-10">
                                                 <span class="graph-label" style="background-color: {{$expenseCategoryColor[$key]}}">{{$category}}</span>
-                                                <span>{{\Auth::user()->priceFormat($expenseCatAmount[$key])}}</span>
+                                                <span>{{\Auth::user()->priceFormat($expenseCategoryAmount[$key])}}</span>
                                             </div>
                                         @empty
                                             <div class="text-center">

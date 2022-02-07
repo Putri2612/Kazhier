@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class ProductServiceCategory extends Model
 {
@@ -24,38 +25,33 @@ class ProductServiceCategory extends Model
         return $this->hasMany(Revenue::class, 'category_id', 'id');
     }
 
-    public function incomeCategoryRevenueAmount()
+    public function incomeCategoryAmount($year = null)
     {
-        $year    = date('Y');
-        $revenue = $this->hasMany(Revenue::class, 'category_id', 'id')->where('created_by', \Auth::user()->creatorId())->whereRAW('YEAR(date) =?', [$year])->sum('amount');
+        if(empty($year)) { $year    = date('Y'); }
+        $creatorID = Auth::user()->creatorId();
 
-        $invoices     = $this->hasMany(Invoice::class, 'category_id', 'id')->where('created_by', \Auth::user()->creatorId())->whereRAW('YEAR(send_date) =?', [$year])->get();
-        $invoiceArray = array();
-        foreach($invoices as $invoice)
-        {
-            $invoiceArray[] = $invoice->getTotal();
-        }
-        $totalIncome = (!empty($revenue) ? $revenue : 0) + (!empty($invoiceArray) ? array_sum($invoiceArray) : 0);
+        $revenue    = $this->hasMany(Revenue::class, 'category_id', 'id')->where('created_by', $creatorID)->whereRAW('YEAR(date) =?', $year)->sum('amount');
+
+        $invoiceIDs = $this->hasMany(Invoice::class, 'category_id', 'id')->where('created_by', $creatorID)->get()->pluck('id');
+        $invoices   = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('YEAR(date) = ?', $year)->sum('amount');
+        
+        $totalIncome = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? $invoices : 0);
 
         return $totalIncome;
-
     }
 
-    public function expenseCategoryAmount()
+    public function expenseCategoryAmount($year = null)
     {
-        $year    = date('Y');
-        $payment = $this->hasMany(Payment::class, 'category_id', 'id')->where('created_by', \Auth::user()->creatorId())->whereRAW('YEAR(date) =?', [$year])->sum('amount');
+        if(empty($year)) { $year    = date('Y'); }
+        $creatorID = Auth::user()->creatorId();
 
-        $bills     = $this->hasMany(Bill::class, 'category_id', 'id')->where('created_by', \Auth::user()->creatorId())->whereRAW('YEAR(send_date) =?', [$year])->get();
-        $billArray = array();
-        foreach($bills as $bill)
-        {
-            $billArray[] = $bill->getTotal();
-        }
+        $payment = $this->hasMany(Payment::class, 'category_id', 'id')->where('created_by', $creatorID)->whereRAW('YEAR(date) =?', $year)->sum('amount');
 
-        $totalExpense = (!empty($payment) ? $payment : 0) + (!empty($billArray) ? array_sum($billArray) : 0);
+        $billIDs    = $this->hasMany(Bill::class, 'category_id', 'id')->where('created_by', $creatorID)->get()->pluck('id');
+        $bills      = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('YEAR(date) = ?', $year)->sum('amount');
+
+        $totalExpense = (!empty($payment) ? $payment : 0) + (!empty($bills) ? $bills : 0);
 
         return $totalExpense;
-
     }
 }

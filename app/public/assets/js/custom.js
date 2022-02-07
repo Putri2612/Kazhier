@@ -325,6 +325,33 @@ const SelectricChangeCallbacks = [
     }
 ];
 
+// Dashboard chart dropdowns
+
+const underlineDropdowns = document.querySelectorAll('.underline-dropdown');
+if(underlineDropdowns.length) {
+    underlineDropdowns.forEach(element => {
+        element.addEventListener('click', event => {
+            if(event.target.nodeName == 'SELECT'){
+                if(!event.currentTarget.hasAttribute('disable-update')){
+                    if(!event.currentTarget.classList.contains('is-active')){
+                        event.currentTarget.classList.add('is-active');
+                    } else {
+                        event.currentTarget.classList.remove('is-active');
+                    }
+                }
+            }
+        });
+        document.addEventListener('mouseup', event => {
+            if(element.classList.contains('is-active')){
+                element.classList.remove('is-active');
+                element.setAttribute('disable-update', true);
+                setTimeout(() => {
+                    element.removeAttribute('disable-update');
+                }, 300);
+            }
+        })
+    })
+}
 
 // Data logging
 
@@ -479,6 +506,107 @@ document.addEventListener('click', event => {
         ConfirmStatusModal(url, status);
     }
 });
+
+// ChartJS defaults
+const ChartsConstant = {
+    colors : {
+        gray: {
+            100: '#f6f9fc',
+            200: '#e9ecef',
+            300: '#dee2e6',
+            400: '#ced4da',
+            500: '#adb5bd',
+            600: '#8898aa',
+            700: '#525f7f',
+            800: '#32325d',
+            900: '#212529'
+        },
+        theme: {
+            default     : '#172b4d',
+            primary     : '#0087f8',
+            secondary   : '#f4f5f7',
+            info        : '#11cdef',
+            success     : '#2dce89',
+            danger      : '#f5365c',
+            warning     : '#fb6340'
+        },
+        black: '#12263F',
+        white: '#FFFFFF',
+        transparent: 'transparent',
+    }, 
+    locale : 'id',
+    Callbacks : {
+        ticks : (label, index, labels) => new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(label),
+        tooltipsLabel : (context) => {
+            let label = context.dataset.label || '';
+            if(label) { label += ' : '; }
+            if(context.parsed.y !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(context.parsed.y)}
+            return label;
+        },
+        tooltipsDoughnut: (context) => {
+            let label = context.label || '';
+            if(label) { label += ' : ' }
+            if(context.parsed !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(context.parsed)}
+            return label;
+        }
+    }
+};
+
+if(window.Chart) {
+    // Fonts
+
+    Chart.defaults.font.family  = "'Poppins', 'Segoe UI', 'Arial'";
+    Chart.defaults.font.size    = 11;
+    Chart.defaults.font.weight  = '500';
+    Chart.defaults.font.color   = '#999';
+
+    Chart.defaults.responsive           = true;
+    Chart.defaults.maintainAspectRatio  = false;
+
+    // Axis
+
+    Chart.defaults.scale.grid.borderDash = [2];
+    Chart.defaults.scale.grid.borderDashOffset = [2];
+    Chart.defaults.scale.grid.color = ChartsConstant.colors.gray[300];
+    Chart.defaults.scale.grid.drawBorder = false;
+    Chart.defaults.scale.grid.drawTicks = false;
+    Chart.defaults.scale.grid.drawOnChartArea = true;
+
+    Chart.defaults.scale.beginsAtZero   = true;
+
+    Chart.defaults.scale.ticks.padding  = 10;
+    Chart.defaults.scale.ticks.callback= value => {
+        if(!(value % 10)) {
+            return value;
+        }
+    }
+
+    // Interaction
+    Chart.defaults.interaction.intersect = false;
+
+    // Elements
+
+    Chart.defaults.elements.line.tension = .4;
+    Chart.defaults.elements.line.borderWidth = 4;
+    Chart.defaults.elements.line.borderCapStyle = 'rounded';
+
+    // Legend
+
+    Chart.defaults.plugins.legend.display = false;
+
+    // Tooltip
+
+    Chart.defaults.plugins.tooltip.backgroundColor  = '#000';
+    Chart.defaults.plugins.tooltip.titleFont = {
+        family : "'Poppins', 'Segoe UI', 'Arial'",
+        color  : '#fff',
+        size   : 20,
+        weight : 'bold'
+    }
+    Chart.defaults.plugins.tooltip.padding          = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius     = 3;
+
+}
 
 // Template default programs below (a bit modified tho)
 
@@ -898,300 +1026,287 @@ function taskCheckbox() {
     }
 })(jQuery, this, 0);
 
-var Charts = (function () {
+// var Charts = (function () {
 
-    // Variable
+//     // Variable
 
-    var $toggle = $('[data-toggle="chart"]');
-    var mode = 'light';//(themeMode) ? themeMode : 'light';
-    var fonts = {
-        base: 'Open Sans'
-    }
+//     var $toggle = $('[data-toggle="chart"]');
+//     var mode = 'light';//(themeMode) ? themeMode : 'light';
+//     var fonts = {
+//         base: 'Open Sans'
+//     }
 
-    // Colors
-    var colors = {
-        gray: {
-            100: '#f6f9fc',
-            200: '#e9ecef',
-            300: '#dee2e6',
-            400: '#ced4da',
-            500: '#adb5bd',
-            600: '#8898aa',
-            700: '#525f7f',
-            800: '#32325d',
-            900: '#212529'
-        },
-        theme: {
-            'default': '#172b4d',
-            'primary': '#5e72e4',
-            'secondary': '#f4f5f7',
-            'info': '#11cdef',
-            'success': '#2dce89',
-            'danger': '#f5365c',
-            'warning': '#fb6340'
-        },
-        black: '#12263F',
-        white: '#FFFFFF',
-        transparent: 'transparent',
-    };
-
-
-    // Methods
-
-    // Chart.js global options
-    function chartOptions() {
-
-        // Options
-        var options = {
-            defaults: {
-                global: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    defaultColor: (mode == 'dark') ? colors.gray[700] : colors.gray[600],
-                    defaultFontColor: (mode == 'dark') ? colors.gray[700] : colors.gray[600],
-                    defaultFontFamily: fonts.base,
-                    defaultFontSize: 13,
-                    layout: {
-                        padding: 0
-                    },
-                    legend: {
-                        display: false,
-                        position: 'bottom',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 16
-                        }
-                    },
-                    elements: {
-                        point: {
-                            radius: 0,
-                            backgroundColor: colors.theme['primary']
-                        },
-                        line: {
-                            tension: .4,
-                            borderWidth: 4,
-                            borderColor: colors.theme['primary'],
-                            backgroundColor: colors.transparent,
-                            borderCapStyle: 'rounded'
-                        },
-                        rectangle: {
-                            backgroundColor: colors.theme['warning']
-                        },
-                        arc: {
-                            backgroundColor: colors.theme['primary'],
-                            borderColor: (mode == 'dark') ? colors.gray[800] : colors.white,
-                            borderWidth: 4
-                        }
-                    },
-                    tooltips: {
-                        enabled: true,
-                        mode: 'index',
-                        intersect: false,
-                    }
-                },
-                doughnut: {
-                    cutoutPercentage: 83,
-                    legendCallback: function (chart) {
-                        var data = chart.data;
-                        var content = '';
-
-                        data.labels.forEach(function (label, index) {
-                            var bgColor = data.datasets[0].backgroundColor[index];
-
-                            content += '<span class="chart-legend-item">';
-                            content += '<i class="chart-legend-indicator" style="background-color: ' + bgColor + '"></i>';
-                            content += label;
-                            content += '</span>';
-                        });
-
-                        return content;
-                    }
-                }
-            }
-        }
-
-        // yAxes
-        Chart.scaleService.updateScaleDefaults('linear', {
-            gridLines: {
-                borderDash: [2],
-                borderDashOffset: [2],
-                color: (mode == 'dark') ? colors.gray[900] : colors.gray[300],
-                drawBorder: false,
-                drawTicks: false,
-                drawOnChartArea: true,
-                zeroLineWidth: 0,
-                zeroLineColor: 'rgba(0,0,0,0)',
-                zeroLineBorderDash: [2],
-                zeroLineBorderDashOffset: [2]
-            },
-            ticks: {
-                beginAtZero: true,
-                padding: 10,
-                callback: function (value) {
-                    if (!(value % 10)) {
-                        return value
-                    }
-                }
-            }
-        });
-
-        // xAxes
-        Chart.scaleService.updateScaleDefaults('category', {
-            gridLines: {
-                drawBorder: false,
-                drawOnChartArea: false,
-                drawTicks: false
-            },
-            ticks: {
-                padding: 20
-            },
-            maxBarThickness: 10
-        });
-
-        return options;
-
-    }
-
-    // Parse global options
-    function parseOptions(parent, options) {
-        for (var item in options) {
-            if (typeof options[item] !== 'object') {
-                parent[item] = options[item];
-            } else {
-                parseOptions(parent[item], options[item]);
-            }
-        }
-    }
-
-    // Push options
-    function pushOptions(parent, options) {
-        for (var item in options) {
-            if (Array.isArray(options[item])) {
-                options[item].forEach(function (data) {
-                    parent[item].push(data);
-                });
-            } else {
-                pushOptions(parent[item], options[item]);
-            }
-        }
-    }
-
-    // Pop options
-    function popOptions(parent, options) {
-        for (var item in options) {
-            if (Array.isArray(options[item])) {
-                options[item].forEach(function (data) {
-                    parent[item].pop();
-                });
-            } else {
-                popOptions(parent[item], options[item]);
-            }
-        }
-    }
-
-    // Toggle options
-    function toggleOptions(elem) {
-        var options = elem.data('add');
-        var $target = $(elem.data('target'));
-        var $chart = $target.data('chart');
-
-        if (elem.is(':checked')) {
-
-            // Add options
-            pushOptions($chart, options);
-
-            // Update chart
-            $chart.update();
-        } else {
-
-            // Remove options
-            popOptions($chart, options);
-
-            // Update chart
-            $chart.update();
-        }
-    }
-
-    // Update options
-    function updateOptions(elem) {
-        var options = elem.data('update');
-        var $target = $(elem.data('target'));
-        var $chart = $target.data('chart');
-
-        // Parse options
-        parseOptions($chart, options);
-
-        // Toggle ticks
-        toggleTicks(elem, $chart);
-
-        // Update chart
-        $chart.update();
-    }
-
-    // Toggle ticks
-    function toggleTicks(elem, $chart) {
-
-        if (elem.data('prefix') !== undefined || elem.data('prefix') !== undefined) {
-            var prefix = elem.data('prefix') ? elem.data('prefix') : '';
-            var suffix = elem.data('suffix') ? elem.data('suffix') : '';
-
-            // Update ticks
-            $chart.options.scales.yAxes[0].ticks.callback = function (value) {
-                if (!(value % 10)) {
-                    return prefix + value + suffix;
-                }
-            }
-
-            // Update tooltips
-            $chart.options.tooltips.callbacks.label = function (item, data) {
-                var label = data.datasets[item.datasetIndex].label || '';
-                var yLabel = item.yLabel;
-                var content = '';
-
-                if (data.datasets.length > 1) {
-                    content += '<span class="popover-body-label mr-auto">' + label + '</span>';
-                }
-
-                content += '<span class="popover-body-value">' + prefix + yLabel + suffix + '</span>';
-                return content;
-            }
-
-        }
-    }
+//     // Colors
+//     var colors = {
+//         gray: {
+//             100: '#f6f9fc',
+//             200: '#e9ecef',
+//             300: '#dee2e6',
+//             400: '#ced4da',
+//             500: '#adb5bd',
+//             600: '#8898aa',
+//             700: '#525f7f',
+//             800: '#32325d',
+//             900: '#212529'
+//         },
+//         theme: {
+//             'default': '#172b4d',
+//             'primary': '#5e72e4',
+//             'secondary': '#f4f5f7',
+//             'info': '#11cdef',
+//             'success': '#2dce89',
+//             'danger': '#f5365c',
+//             'warning': '#fb6340'
+//         },
+//         black: '#12263F',
+//         white: '#FFFFFF',
+//         transparent: 'transparent',
+//     };
 
 
-    // Events
+//     // Methods
 
-    // Parse global options
-    if (window.Chart) {
-        parseOptions(Chart, chartOptions());
-    }
+//     // Chart.js global options
+//     // function chartOptions() {
 
-    // Toggle options
-    $toggle.on({
-        'change': function () {
-            var $this = $(this);
+//     //     // Options
+//     //     var options = {
+//     //         defaults: {
+//     //             responsive: true,
+//     //             maintainAspectRatio: false,
+//     //             defaultColor: (mode == 'dark') ? colors.gray[700] : colors.gray[600],
+//     //             defaultFontColor: (mode == 'dark') ? colors.gray[700] : colors.gray[600],
+//     //             defaultFontFamily: fonts.base,
+//     //             defaultFontSize: 13,
+//     //             layout: {
+//     //                 padding: 0
+//     //             },
+//     //             elements: {
+//     //                 point: {
+//     //                     radius: 0,
+//     //                     backgroundColor: colors.theme['primary']
+//     //                 },
+//     //                 line: {
+//     //                     tension: .4,
+//     //                     borderWidth: 4,
+//     //                     borderColor: colors.theme['primary'],
+//     //                     backgroundColor: colors.transparent,
+//     //                     borderCapStyle: 'rounded'
+//     //                 },
+//     //                 bar: {
+//     //                     backgroundColor: colors.theme['warning']
+//     //                 },
+//     //                 arc: {
+//     //                     backgroundColor: colors.theme['primary'],
+//     //                     borderColor: (mode == 'dark') ? colors.gray[800] : colors.white,
+//     //                     borderWidth: 4
+//     //                 }
+//     //             },
+//     //             plugins: {
+//     //                 legend: {
+//     //                     display: false,
+//     //                     position: 'bottom',
+//     //                     labels: {
+//     //                         usePointStyle: true,
+//     //                         padding: 16
+//     //                     }
+//     //                 },
+//     //                 tooltip: {
+//     //                     enabled: true,
+//     //                     mode: 'index',
+//     //                     intersect: false,
+//     //                 }
+//     //             }
+//     //         },
+//     //         overrides: {
+//     //             doughnut: {
+//     //                 cutoutPercentage: 83,
+//     //                 legendCallback: function (chart) {
+//     //                     var data = chart.data;
+//     //                     var content = '';
 
-            if ($this.is('[data-add]')) {
-                toggleOptions($this);
-            }
-        },
-        'click': function () {
-            var $this = $(this);
+//     //                     data.labels.forEach(function (label, index) {
+//     //                         var bgColor = data.datasets[0].backgroundColor[index];
 
-            if ($this.is('[data-update]')) {
-                updateOptions($this);
-            }
-        }
-    });
+//     //                         content += '<span class="chart-legend-item">';
+//     //                         content += '<i class="chart-legend-indicator" style="background-color: ' + bgColor + '"></i>';
+//     //                         content += label;
+//     //                         content += '</span>';
+//     //                     });
+
+//     //                     return content;
+//     //                 }
+//     //             }
+//     //         }
+//     //     }
+
+//     //     // Axes
+//     //     // Chart.defaults.scale.grid = {
+//     //     //     borderDash: [2],
+//     //     //     borderDashOffset: [2],
+//     //     //     color: (mode == 'dark') ? colors.gray[900] : colors.gray[300],
+//     //     //     drawBorder: false,
+//     //     //     drawTicks: false,
+//     //     //     drawOnChartArea: true,
+//     //     //     zeroLineWidth: 0,
+//     //     //     zeroLineColor: 'rgba(0,0,0,0)',
+//     //     //     zeroLineBorderDash: [2],
+//     //     //     zeroLineBorderDashOffset: [2]
+//     //     // };
+//     //     // Chart.defaults.scale.ticks= {
+//     //     //     beginAtZero: true,
+//     //     //     padding: 10,
+//     //     //     callback: function (value) {
+//     //     //         if (!(value % 10)) {
+//     //     //             return value
+//     //     //         }
+//     //     //     }
+//     //     // };
+
+//     //     return options;
+
+//     // }
+
+//     // Parse global options
+//     function parseOptions(parent, options) {
+//         for (var item in options) {
+//             if (typeof options[item] !== 'object') {
+//                 parent[item] = options[item];
+//             } else {
+//                 parseOptions(parent[item], options[item]);
+//             }
+//         }
+//     }
+
+//     // Push options
+//     function pushOptions(parent, options) {
+//         for (var item in options) {
+//             if (Array.isArray(options[item])) {
+//                 options[item].forEach(function (data) {
+//                     parent[item].push(data);
+//                 });
+//             } else {
+//                 pushOptions(parent[item], options[item]);
+//             }
+//         }
+//     }
+
+//     // Pop options
+//     function popOptions(parent, options) {
+//         for (var item in options) {
+//             if (Array.isArray(options[item])) {
+//                 options[item].forEach(function (data) {
+//                     parent[item].pop();
+//                 });
+//             } else {
+//                 popOptions(parent[item], options[item]);
+//             }
+//         }
+//     }
+
+//     // Toggle options
+//     function toggleOptions(elem) {
+//         var options = elem.data('add');
+//         var $target = $(elem.data('target'));
+//         var $chart = $target.data('chart');
+
+//         if (elem.is(':checked')) {
+
+//             // Add options
+//             pushOptions($chart, options);
+
+//             // Update chart
+//             $chart.update();
+//         } else {
+
+//             // Remove options
+//             popOptions($chart, options);
+
+//             // Update chart
+//             $chart.update();
+//         }
+//     }
+
+//     // Update options
+//     function updateOptions(elem) {
+//         var options = elem.data('update');
+//         var $target = $(elem.data('target'));
+//         var $chart = $target.data('chart');
+
+//         // Parse options
+//         parseOptions($chart, options);
+
+//         // Toggle ticks
+//         toggleTicks(elem, $chart);
+
+//         // Update chart
+//         $chart.update();
+//     }
+
+//     // Toggle ticks
+//     function toggleTicks(elem, $chart) {
+
+//         if (elem.data('prefix') !== undefined || elem.data('prefix') !== undefined) {
+//             var prefix = elem.data('prefix') ? elem.data('prefix') : '';
+//             var suffix = elem.data('suffix') ? elem.data('suffix') : '';
+
+//             // Update ticks
+//             $chart.options.scales.yAxes[0].ticks.callback = function (value) {
+//                 if (!(value % 10)) {
+//                     return prefix + value + suffix;
+//                 }
+//             }
+
+//             // Update tooltips
+//             $chart.options.tooltips.callbacks.label = function (item, data) {
+//                 var label = data.datasets[item.datasetIndex].label || '';
+//                 var yLabel = item.yLabel;
+//                 var content = '';
+
+//                 if (data.datasets.length > 1) {
+//                     content += '<span class="popover-body-label mr-auto">' + label + '</span>';
+//                 }
+
+//                 content += '<span class="popover-body-value">' + prefix + yLabel + suffix + '</span>';
+//                 return content;
+//             }
+
+//         }
+//     }
 
 
-    // Return
+//     // Events
 
-    return {
-        colors: colors,
-        fonts: fonts,
-        mode: mode
-    };
+//     // Parse global options
+//     if (window.Chart) {
+//         parseOptions(Chart, chartOptions());
+//     }
 
-})();
+//     // Toggle options
+//     $toggle.on({
+//         'change': function () {
+//             var $this = $(this);
+
+//             if ($this.is('[data-add]')) {
+//                 toggleOptions($this);
+//             }
+//         },
+//         'click': function () {
+//             var $this = $(this);
+
+//             if ($this.is('[data-update]')) {
+//                 updateOptions($this);
+//             }
+//         }
+//     });
+
+
+//     // Return
+
+//     return {
+//         colors: colors,
+//         fonts: fonts,
+//         mode: mode
+//     };
+
+// })();

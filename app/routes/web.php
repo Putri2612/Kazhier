@@ -150,6 +150,12 @@ Route::group(
     ], function () {
 
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::prefix('dashboard/charts')->as('dashboard-chart.')->group(function() {
+            Route::get('cash-flow/{month}/{year}', [DashboardController::class, 'GetCashFlow'])->name('cashflow');
+            Route::get('income-expense/{year}', [DashboardController::class, 'GetIncomeExpense'])->name('income-expense');
+            Route::get('doughnut/{type}/{year}', [DashboardController::class, 'GetCategoryData'])->name('category');
+        });
+
         Route::get('user/{id}/plan', [UserController::class, 'upgradePlan'])->name('plan.upgrade');
 
         Route::get('user/{id}/plan/{pid}', [UserController::class, 'activePlan'])->name('plan.active');
@@ -406,6 +412,7 @@ Route::post('/midtrans/callback', [MidtransPaymentController::class, 'handlePaym
 
 Route::get('/proposal/preview/{template}/{color}', [ProposalController::class, 'previewProposal'])->name('proposal.preview');
 Route::post('/proposal/template/setting', [ProposalController::class, 'saveProposalTemplateSettings'])->name('proposal.template.setting');
+
 // Route::group(
 //     [
 //         'middleware' => [

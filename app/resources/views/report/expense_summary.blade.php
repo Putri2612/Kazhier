@@ -5,54 +5,37 @@
 
 @push('script-page')
     <script>
-        var SalesChart = (function () {
-            var $chart = $('#chart-sales');
-
-            function init($this) {
-                var salesChart = new Chart($this, {
-                    type: 'line',
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                gridLines: {
-                                    color: Charts.colors.gray[200],
-                                    zeroLineColor: Charts.colors.gray[200]
-                                },
-                                ticks: {
-                                    callback: (label, index, labels) => {
-                                        return new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(label);
-                                    }
-                                }
-                            }]
-                        }, 
-                        tooltips: {
-                            callbacks: {
-                                label: function(tooltipItem, data) {
-                                    let Value = data.datasets[tooltipItem.datasetIndex].label;
-                                    Value += ': ';
-                                    Value += `${new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index])}`
-                                    return Value;
-                                }
+        const Canvas    = document.querySelector('#expense-chart').getContext('2d'),
+            DisplayChart= new Chart(Canvas, {
+                type: 'line',
+                data: {
+                    labels: @json($monthList),
+                    datasets: [{
+                        label: '{{__('Expense')}}',
+                        borderColor: '#ff5909',
+                        backgroundColor: '#ff590933',
+                        fill: true,
+                        data: @json($chartData),
+                    }]
+                }, 
+                options: {
+                    scales: {
+                        yAxis: {
+                            min: 0,
+                            ticks: {
+                                callback: ChartsConstant.Callbacks.ticks
                             }
                         }
                     },
-                    data: {
-                        labels: {!! json_encode($monthList) !!},
-                        datasets: [{
-                            label: '{{ __('Expense') }}',
-                            data:{!! json_encode($chartExpenseArr) !!},
-                            borderColor: '#ff0000b8',
-                            backgroundColor: '#ff0000b8',
-                            fill: '!0',
-                        }]
-                    },
-                });
-                $this.data('chart', salesChart);
-            };
-            if ($chart.length) {
-                init($chart);
-            }
-        })();
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ChartsConstant.Callbacks.tooltipsLabel
+                            }
+                        }
+                    }
+                }
+            });
     </script>
 @endpush
 @section('content')
@@ -135,7 +118,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <canvas id="chart-sales" height="300"></canvas>
+                                                <canvas id="expense-chart" height="300"></canvas>
                                             </div>
                                         </div>
                                     </div>
@@ -165,22 +148,22 @@
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Payment :')}}</h6></b></td>
                                                     </tr>
-                                                    @foreach($expenseArr as $i=>$expense)
+                                                    @foreach($payments as $payment)
                                                         <tr>
-                                                            <td>{{$expense['category']}}</td>
-                                                            @foreach($expense['data'] as $j=>$data)
-                                                                <td>{{\Auth::user()->priceFormat($data)}}</td>
+                                                            <td>{{$payment['category']}}</td>
+                                                            @foreach($payment['data'] as $data)
+                                                                <td>{{ Auth::user()->priceFormat($data)}}</td>
                                                             @endforeach
                                                         </tr>
                                                     @endforeach
                                                     <tr>
                                                         <td colspan="13"><b><h6>{{__('Bill :')}}</h6></b></td>
                                                     </tr>
-                                                    @foreach($billArray as $i=>$bill)
+                                                    @foreach($bills as $bill)
                                                         <tr>
                                                             <td>{{$bill['category']}}</td>
-                                                            @foreach($bill['data'] as $j=>$data)
-                                                                <td>{{\Auth::user()->priceFormat($data)}}</td>
+                                                            @foreach($bill['data'] as $data)
+                                                                <td>{{ Auth::user()->priceFormat($data)}}</td>
                                                             @endforeach
                                                         </tr>
                                                     @endforeach
@@ -189,8 +172,8 @@
                                                     </tr>
                                                     <tr>
                                                         <td>{{__('Total')}}</td>
-                                                        @foreach($chartExpenseArr as $i=>$expense)
-                                                            <td>{{\Auth::user()->priceFormat($expense)}}</td>
+                                                        @foreach($chartData as $expense)
+                                                            <td>{{ Auth::user()->priceFormat($expense)}}</td>
                                                         @endforeach
                                                     </tr>
                                                     </tbody>
