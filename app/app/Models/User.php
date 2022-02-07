@@ -412,7 +412,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->first()->amount;
             
             $InvoiceIDs = Invoice::select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
-            $Invoice    = InvoicePayment::whereIn('id', $InvoiceIDs)
+            $Invoice    = InvoicePayment::whereIn('invoice_id', $InvoiceIDs)
                 ->whereRaw('year(`date`) = ?', $year)
                 ->whereRaw('month(`date`) = ?', $month)
                 ->sum('amount');
@@ -427,7 +427,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->first()->amount;
             
             $BillIDs = Bill::select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
-            $Bill    = BillPayment::whereIn('id', $BillIDs)
+            $Bill    = BillPayment::whereIn('bill_id', $BillIDs)
                 ->whereRaw('year(`date`) = ?', $year)
                 ->whereRaw('month(`date`) = ?', $month)
                 ->sum('amount');

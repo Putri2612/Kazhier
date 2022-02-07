@@ -353,9 +353,9 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-12 col-md-4">
+                                    <div class="col-12 col-md-4 income-category-list">
                                         @forelse($incomeCategory as $key=>$category)
-                                            <div class="text-end mt-10 income-category-list">
+                                            <div class="text-end mt-10">
                                                 <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
                                                 <span>{{\Auth::user()->priceFormat($incomeCategoryAmount[$key])}}</span>
                                             </div>

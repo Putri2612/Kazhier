@@ -379,7 +379,11 @@ trait DataGetter{
             ];
             for($i = 1; $i <= 12; $i++) {
                 $tmp['data'][$i]    = array_key_exists($i, $amount) ? $amount[$i] : 0;
-                $totalAmount[]      = array_key_exists($i, $amount) ? $amount[$i] : 0;
+                if(!empty($totalAmount[$i])){
+                    $totalAmount[$i]    += array_key_exists($i, $amount) ? $amount[$i] : 0;
+                } else {
+                    $totalAmount[$i]    = array_key_exists($i, $amount) ? $amount[$i] : 0;
+                }
             }
             $summarizedData[] = $tmp;
         }
@@ -705,6 +709,7 @@ trait DataGetter{
 
         $profit = [];
         $keys   = array_keys($totalIncome + $totalExpense);
+
         foreach($keys as $v)
         {
             $profit[$v] = (empty($totalIncome[$v]) ? 0 : $totalIncome[$v]) - (empty($totalExpense[$v]) ? 0 : $totalExpense[$v]);
