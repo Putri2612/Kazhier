@@ -33,6 +33,9 @@ class ExpenseController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create payment')){
+            return $this->UnauthorizedResponse();
+        }
         $validator = Validator::make($request->all(), [
             'expense_amount'            => 'required',
             'expense_date'              => 'required',
@@ -103,6 +106,10 @@ class ExpenseController extends Controller
     }
 
     public function destroy($expense_id) {
+        if(!Auth::user()->can('delete payment')) {
+            return $this->UnauthorizedResponse();
+        }
+
         $user = Auth::user();
         $payment = Payment::where('created_by', $user->creatorId())->where('id', $expense_id)->first();
 

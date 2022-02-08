@@ -40,6 +40,10 @@ class ProductServiceController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create product & service')) {
+            return $this->UnauthorizedResponse();
+        }
+
         $validator = Validator::make($request->all(), [
             'product_name'          => 'required',
             'product_code'          => 'required',
@@ -88,6 +92,9 @@ class ProductServiceController extends Controller
     }
 
     public function destroy($product_id) {
+        if(!Auth::user()->can('delete product & service')) {
+            return $this->UnauthorizedResponse();
+        }
         $user   = Auth::user();
         $product = ProductService::where('created_by', $user->creatorId())->where('id', $product_id)->first();
         if(empty($product)) {

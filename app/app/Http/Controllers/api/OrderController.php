@@ -48,6 +48,10 @@ class OrderController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create invoice')){
+            return $this->UnauthorizedResponse();
+        }
+
         $validator  = Validator::make($request->all(), [
             'order_date'            => 'required',
             'order_time'            => 'required',
@@ -158,6 +162,9 @@ class OrderController extends Controller
     }
 
     public function destroy($order_id) {
+        if(!Auth::user()->can('delete invoice')) {
+            return $this->UnauthorizedResponse();
+        }
         $user       = Auth::user();
         $creatorID  = $user->creatorId();
         $order      = Invoice::where('created_by', '=', $creatorID)->where('id', '=', $order_id)->first();

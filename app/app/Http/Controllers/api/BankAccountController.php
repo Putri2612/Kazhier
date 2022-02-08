@@ -33,6 +33,9 @@ class BankAccountController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create bank account')) {
+            return $this->UnauthorizedResponse();
+        }
         $validator  = Validator::make($request->all(), [
             'account_holder_name'       => 'required',
             'account_bank_name'         => 'required',
@@ -72,6 +75,9 @@ class BankAccountController extends Controller
     }
 
     public function destroy($account_id) {
+        if(!Auth::user()->can('delete bank account')) {
+            return $this->UnauthorizedResponse();
+        }
         $user = Auth::user();
         
         $account = BankAccount::where('created_by', '=', $user->creatorId())

@@ -35,6 +35,9 @@ class SupplierController extends Controller
     }
 
     public function create (Request $request) {
+        if(!Auth::user()->can('create vender')) {
+            return $this->UnauthorizedResponse();
+        }
         $validator = Validator::make($request->all(), [
             'suppliers_name'    => 'required',
             'suppliers_cell'    => 'required',
@@ -72,6 +75,9 @@ class SupplierController extends Controller
     }
 
     public function destroy($supplier_id) {
+        if(!Auth::user()->can('delete vender')) {
+            return $this->UnauthorizedResponse();
+        }
         $user       = Auth::user();
         $creatorId  = $user->creatorId();
         $category = Vender::where('created_by', '=', $creatorId)->where('id' ,'=', $supplier_id)->first();

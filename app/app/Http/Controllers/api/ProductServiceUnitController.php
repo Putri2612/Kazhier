@@ -29,6 +29,9 @@ class ProductServiceUnitController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create constant unit')) {
+            return $this->UnauthorizedResponse();
+        }
         $validator = Validator::make($request->all(), [
             'unit_name' => 'required'
         ]);
@@ -53,6 +56,9 @@ class ProductServiceUnitController extends Controller
     }
 
     public function destroy($unit_id) {
+        if(!Auth::user()->can('delete constant unit')) {
+            return $this->UnauthorizedResponse();
+        }
         $user = Auth::user();
         $unit = ProductServiceUnit::where('id', $unit_id)->where('created_by', $user->creatorId())->first();
 

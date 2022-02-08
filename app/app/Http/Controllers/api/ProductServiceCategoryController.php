@@ -36,6 +36,10 @@ class ProductServiceCategoryController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create constant category')) {
+            return $this->UnauthorizedResponse();
+        }
+
         $validator = Validator::make($request->all(), [
             'category_name' => 'required'
         ]);
@@ -64,6 +68,9 @@ class ProductServiceCategoryController extends Controller
     }
 
     public function destroy($id) {
+        if(!Auth::user()->can('delete constant category')) {
+            return $this->UnauthorizedResponse();
+        }
         $user       = Auth::user();
         $creatorId  = $user->creatorId();
         $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('id' ,'=', $id)->first();

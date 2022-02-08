@@ -33,6 +33,7 @@ Route::as('api.')->group(
 
         Route::group(['middleware' => ['auth:api', 'plan']], function() {
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+            Route::get('role-and-permission', [AuthController::class, 'RolePermission'])->name('role-and-permission');
 
             Route::get('bank-account', [BankAccountController::class, 'get'])->name('bank-account.get');
             Route::post('bank-account/create', [BankAccountController::class, 'create'])->name('bank-account.create');

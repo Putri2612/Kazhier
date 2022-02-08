@@ -30,6 +30,9 @@ class TaxController extends Controller
     }
     
     public function create(Request $request) {
+        if(!Auth::user()->can('create constant tax')) {
+            return $this->UnauthorizedResponse();
+        }
         $validator = Validator::make($request->all(), [
             'tax_name'  => 'required',
             'tax_rate'  => 'required'
@@ -57,6 +60,9 @@ class TaxController extends Controller
     }
 
     public function destroy($tax_id) {
+        if(!Auth::user()->can('delete constant tax')){
+            return $this->UnauthorizedResponse();
+        }
         $tax = Tax::where('created_by', Auth::user()->creatorId())->where('id', $tax_id)->first();
 
         if(empty($tax)){

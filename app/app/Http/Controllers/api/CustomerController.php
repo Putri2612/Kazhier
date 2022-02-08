@@ -34,6 +34,9 @@ class CustomerController extends Controller
     }
 
     public function create(Request $request) {
+        if(!Auth::user()->can('create customer')) {
+            return $this->UnauthorizedResponse();
+        }
         $validator = Validator::make($request->all(), [
             'customer_name'     => 'required',
             'customer_cell'     => 'required',
@@ -67,6 +70,9 @@ class CustomerController extends Controller
     }
 
     public function destroy($id) {
+        if(!Auth::user()->can('delete customer')) {
+            return $this->UnauthorizedResponse();
+        }
         $user       = Auth::user();
         $creatorId  = $user->creatorId();
         $category = Customer::where('created_by', '=', $creatorId)->where('id' ,'=', $id)->first();

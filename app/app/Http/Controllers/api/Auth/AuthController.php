@@ -56,4 +56,16 @@ class AuthController extends Controller
 
         return $this->SuccessWithoutDataResponse('logged out');
     }
+
+    public function RolePermission() {
+        $roles          = Auth::user()->getRoleNames();
+        $permissions    = Auth::user()->getAllPermissions()->pluck('name');
+
+        $output = [
+            'roles'         => $roles,
+            'permissions'   => $permissions
+        ];
+
+        return $this->SuccessResponse($output);
+    }
 }
