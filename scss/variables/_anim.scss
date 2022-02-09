@@ -1,0 +1,12 @@
+@use "sass:math";
+
+@for $number from 0 through 3 {
+    @keyframes partnerSpin-#{$number} {
+        @for $i from 0 through 8 {
+            #{math.div($i, 8) * 100%} {
+                transform: translate3d(calc(-50% + 100px * math.sin($number * 90deg + $i * 45deg)), -50%, 100px * math.cos($number * 90deg + $i * 45deg));
+                opacity: math.cos($number * 90deg + $i * 45deg);
+            }
+        }
+    }
+}

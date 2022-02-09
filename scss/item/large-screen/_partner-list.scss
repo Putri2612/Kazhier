@@ -1,0 +1,21 @@
+.partner-list{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0%;
+    justify-content: center;
+    align-items: center;
+    transform-style: unset;
+    height: unset;
+    perspective: unset;
+    li{
+        position: relative;
+        top: unset;
+        left: unset;
+        opacity: 1;
+        margin: 45px;
+        animation: none !important;
+    }
+}
