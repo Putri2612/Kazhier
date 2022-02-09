@@ -41,7 +41,7 @@ class PlanExpired
             'payment.export',
         ];
         if(Auth::check()) {
-            if(Auth::user()->type == 'company'){
+            if(Auth::user()->type == 'company' && Auth::user()->initialized){
                 if(date('Y-m-d') > Auth::user()->plan_expire_date) {
                     $route = $request->route()->getAction('as');
                     if(Auth::user()->type != 'company' && !Auth::user()->is_active) {

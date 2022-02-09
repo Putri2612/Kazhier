@@ -82,8 +82,8 @@ DashboardController extends Controller
             $data['currentMonth']   = date('M');
             $data['months']         = $this->Months();
             $data['years']          = Auth::user()->getAllRecordYear();
-            if($data['years']->contains([$data['currentYear']])) {
-                $data['years'][$data['currentYear']] = $data['currentYear'];
+            if(!$data['years']->contains([$data['currentYear']])) {
+                $data['years']->put($data['currentYear'], $data['currentYear']);
             }
 
             $constant['taxes']         = Tax::where('created_by', $creatorId)->count();
@@ -167,7 +167,9 @@ DashboardController extends Controller
         $types = ['income' => 1, 'expense' => 2];
         $category = ProductServiceCategory::where('created_by', '=', $user->creatorId())->where('type', '=', $types[$type])->get();
 
-        
+        $colors     = [];
+        $amounts    = [];
+        $categories = [];
         foreach($category as $cat) {
             $colors[]       = '#' . $cat->color;
             $categories[]   = $cat->name;
