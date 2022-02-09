@@ -455,7 +455,7 @@ class ReportController extends Controller
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend(__('All'), '');
 
-            $displayAccount = BankAccount::selectRaw('CONCAT(holder_name, " - ", bank_name) AS name, current_balance AS balance');
+            $displayAccount = BankAccount::selectRaw('CONCAT(holder_name, " - ", bank_name) AS name, current_balance AS balance')->where('created_by', Auth::user()->creatorId());
             if(!empty($request->input('account'))) {
                 $displayAccount->where('id', $request->input('account'));
             }

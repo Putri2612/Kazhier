@@ -382,7 +382,7 @@ class UserController extends Controller
                 
                 // bank account & balance
                 BankAccount::where('created_by', '=', $user->creatorId())->delete();
-                \DB::delete('DELETE FROM balance WHERE created_by = ?', $user->creatorId());
+                DB::delete('DELETE FROM balance WHERE created_by = ?', $user->creatorId());
                 
                 // sub users
                 User::where('created_by', '=', $user->creatorId())->delete();
@@ -572,36 +572,35 @@ class UserController extends Controller
     }
 
     public function syncData(){
-        $user = Auth::user();
-        if($user->type == 'super admin'){
+        if(Auth::user()->type == 'super admin'){
             $users     = User::where('type', '=', 'company')->get();
 
-            foreach ($users as $usr){
-                DB::delete('DELETE FROM balance WHERE created_by = ?', array($usr->id));
+            foreach ($users as $user){
+                DB::delete('DELETE FROM balance WHERE created_by = ?', array($user->id));
 
-                $revenues = Revenue::where('created_by', '=', $usr->id)->get();
+                $revenues = Revenue::where('created_by', '=', $user->id)->get();
                 foreach($revenues as $revenue){
-                    $this->AddBalance($revenue->account_id, $revenue->amount, $revenue->date);
+                    $this->AddBalance($revenue->account_id, $revenue->amount, $revenue->date, $user);
                 }
 
-                $payments = Payment::where('created_by', '=', $usr->id)->get();
+                $payments = Payment::where('created_by', '=', $user->id)->get();
                 foreach($payments as $payment){
-                    $this->AddBalance($payment->account_id, -$payment->amount, $payment->date);
+                    $this->AddBalance($payment->account_id, -$payment->amount, $payment->date, $user);
                 }
 
-                $invoicePayments = InvoicePayment::where('created_by', '=', $usr->id)->get();
+                $invoicePayments = InvoicePayment::where('created_by', '=', $user->id)->get();
                 foreach($invoicePayments as $invoicePayment){
-                    $this->AddBalance($invoicePayment->account_id, $invoicePayment->amount, $invoicePayment->date);
+                    $this->AddBalance($invoicePayment->account_id, $invoicePayment->amount, $invoicePayment->date, $user);
                 }
 
-                $billPayments = BillPayment::where('created_by', '=', $usr->id)->get();
+                $billPayments = BillPayment::where('created_by', '=', $user->id)->get();
                 foreach($billPayments as $billPayment){
-                    $this->AddBalance($billPayment->account_id, -$billPayment->amount, $billPayment->date);
+                    $this->AddBalance($billPayment->account_id, -$billPayment->amount, $billPayment->date, $user);
                 }
 
-                $transfers = Transfer::where('created_by', '=', $usr->id)->get();
+                $transfers = Transfer::where('created_by', '=', $user->id)->get();
                 foreach($transfers as $transfer){
-                    $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date);
+                    $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date, $user);
                 }
             }
             return redirect()->back()->with('success', __('Data synchronized.'));
