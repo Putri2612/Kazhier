@@ -286,48 +286,33 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function todayIncome()
     {
-        $revenue      = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('Date(date) = CURDATE()')->where('created_by', \Auth::user()->creatorId())->sum('amount');
-        $invoices     = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('Date(send_date) = CURDATE()')->get();
-        $invoiceArray = array();
-        foreach($invoices as $invoice)
-        {
-            $invoiceArray[] = $invoice->getTotal();
-        }
-        $totalIncome = (!empty($revenue) ? $revenue : 0) + (!empty($invoiceArray) ? array_sum($invoiceArray) : 0);
+        $revenue        = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('Date(date) = CURDATE()')->where('created_by', $this->creatorId())->sum('amount');
+        $invoiceIDs     = Invoice:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+        $invoices       = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('Date(date) = CURDATE()')->sum('amount');
+        $totalIncome    = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? array_sum($invoices) : 0);
 
         return $totalIncome;
     }
 
     public function todayExpense()
     {
-        $payment = Payment::where('created_by', '=', $this->creatorId())->where('created_by', \Auth::user()->creatorId())->whereRaw('Date(date) = CURDATE()')->sum('amount');
+        $payment        = Payment::where('created_by', '=', $this->creatorId())->where('created_by', $this->creatorId())->whereRaw('Date(date) = CURDATE()')->sum('amount');
 
-        $bills = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('Date(send_date) = CURDATE()')->get();
+        $billIDs        = Bill:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+        $bills          = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('Date(date) = CURDATE()')->sum('amount');
 
-        $billArray = array();
-        foreach($bills as $bill)
-        {
-            $billArray[] = $bill->getTotal();
-        }
-
-        $totalExpense = (!empty($payment) ? $payment : 0) + (!empty($billArray) ? array_sum($billArray) : 0);
+        $totalExpense   = (!empty($payment) ? $payment : 0) + (!empty($bills) ? array_sum($bills) : 0);
 
         return $totalExpense;
     }
 
     public function incomeCurrentMonth()
     {
-        $currentMonth = date('m');
-        $revenue      = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
-
-        $invoices = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
-
-        $invoiceArray = array();
-        foreach($invoices as $invoice)
-        {
-            $invoiceArray[] = $invoice->getTotal();
-        }
-        $totalIncome = (!empty($revenue) ? $revenue : 0) + (!empty($invoiceArray) ? array_sum($invoiceArray) : 0);
+        $currentMonth   = date('m');
+        $revenue        = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $invoiceIDs     = Invoice:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+        $invoices       = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $totalIncome    = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? array_sum($invoices) : 0);
 
         return $totalIncome;
 
@@ -339,14 +324,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $payment = Payment::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
 
-        $bills     = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
-        $billArray = array();
-        foreach($bills as $bill)
-        {
-            $billArray[] = $bill->getTotal();
-        }
+        $billIDs        = Bill:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
+        $bills          = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
 
-        $totalExpense = (!empty($payment) ? $payment : 0) + (!empty($billArray) ? array_sum($billArray) : 0);
+        $totalExpense   = (!empty($payment) ? $payment : 0) + (!empty($bills) ? array_sum($bills) : 0);
 
         return $totalExpense;
     }
