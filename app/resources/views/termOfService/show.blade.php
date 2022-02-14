@@ -2,6 +2,7 @@
 @section('title')
     {{ __('Term of Service') }}
 @endsection
+@section('page-description'){{ __('By using :appName, you agree to the following term of service.',['appName' => $appName]) }}@endsection
 @section('content')
     <section class="section">
         <div class="container mt-5">

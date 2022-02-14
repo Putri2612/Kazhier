@@ -75,6 +75,7 @@
 
     dropzones.import = new Dropzone('.import-dropzone', {
         acceptedFiles: '.xlsx, .csv, .xls',
+        dictDefaultMessage: '{{ __('Drop files here to upload') }}',
     })
     dropzones.import.on('success', (file, response) => {
         document.querySelector('input[name="path"]').value = response.path;

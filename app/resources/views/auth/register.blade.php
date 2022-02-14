@@ -1,10 +1,12 @@
 @extends('layouts.auth')
 @php
     $logo=asset(Storage::url('logo/'));
+    $appName = (Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'Kazhier');
 @endphp
 @section('page-title')
     {{__('Register')}}
 @endsection
+@section('page-description'){{ __('Create :appName account with your email. Start recording your transactions with :appName',['appName' => $appName]) }}@endsection
 @section('content')
     <section class="section">
         <div class="container-fluid">

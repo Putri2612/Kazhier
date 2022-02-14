@@ -1,11 +1,14 @@
 @extends('layouts.auth')
 @php
     $logo=asset(Storage::url('logo/'));
-
 @endphp
 @section('page-title')
     {{__('Login')}}
 @endsection
+@section('page-description')
+    {{ __('Login with your verified email and password to start using the application.') }}
+@endsection
+
 @section('content')
     <section class="section">
         <div class="container-fluid">
