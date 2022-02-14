@@ -198,6 +198,9 @@ Route::group(
         Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
 
         Route::get('productservice/export', [ProductServiceController::class, 'export'])->name('productservice.export');
+        Route::get('productservice/import', [ProductServiceController::class, 'import'])->name('productservice.import');
+        Route::put('productservice/import/', [ProductServiceController::class, 'storeImport'])->name('productservice.import.store');
+        Route::post('productservice/import/header', [ProductServiceController::class, 'getImportHeadings'])->name('productservice.import.headings');
         Route::resource('productservice', ProductServiceController::class);
 
         Route::resource('customer', CustomerController::class);
@@ -255,6 +258,9 @@ Route::group(
 
                 Route::post('customer', [InvoiceController::class, 'customer'])->name('customer');
                 Route::get('export', [InvoiceController::class, 'export'])->name('export');
+                Route::get('import', [InvoiceController::class, 'import'])->name('import');
+                Route::post('import/headings', [InvoiceController::class, 'getImportHeadings'])->name('import.headings');
+                Route::put('import/store', [InvoiceController::class, 'storeImport'])->name('import.store');
                 Route::post('product/destroy', [InvoiceController::class, 'productDestroy'])->name('product.destroy');
                 Route::post('product', [InvoiceController::class, 'product'])->name('product');
 
@@ -269,6 +275,9 @@ Route::group(
         Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
 
         Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
+        Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
+        Route::post('revenue/import/heading', [RevenueController::class, 'getImportHeadings'])->name('revenue.import.headings');
+        Route::put('revenue/import/store', [RevenueController::class, 'storeImport'])->name('revenue.import.store');
         Route::resource('revenue', RevenueController::class);
         // Expense
 
@@ -288,6 +297,9 @@ Route::group(
                 Route::delete('{id}/payment/{pid}/destroy', [BillController::class, 'paymentDestroy'])->name('payment.destroy');
 
                 Route::get('export', [BillController::class, 'export'])->name('export');
+                Route::get('import', [BillController::class, 'import'])->name('import');
+                Route::post('import/headings', [BillController::class, 'getImportHeadings'])->name('import.headings');
+                Route::put('import/store', [BillController::class, 'storeImport'])->name('import.store');
                 Route::post('product/destroy', [BillController::class, 'productDestroy'])->name('product.destroy');
                 Route::post('product', [BillController::class, 'product'])->name('product');
                 Route::post('vender', [BillController::class, 'vender'])->name('vender');
@@ -302,6 +314,9 @@ Route::group(
         Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
 
         Route::get('payment/export', [PaymentController::class, 'export'])->name('payment.export');
+        Route::get('payment/import', [PaymentController::class, 'import'])->name('payment.import');
+        Route::post('payment/import/heading', [PaymentController::class, 'getImportHeadings'])->name('payment.import.headings');
+        Route::put('payment/import/store', [PaymentController::class, 'storeImport'])->name('payment.import.store');
         Route::resource('payment', PaymentController::class);
 
         Route::resource('expenses', ExpenseController::class);

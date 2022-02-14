@@ -19,7 +19,13 @@
                         <div class="col-6 row text-end justify-content-end">
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
-                                <a href="{{ route('payment.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="#" data-url="{{ route('payment.import') }}" data-ajax-popup="true" data-title="{{__('Import Payment')}}" class="btn btn-icon icon-left btn-warning">
+                                    <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
+                                    <span class="btn-inner--text"> {{__('Import')}}</span>
+                                </a>
+                            </div>    
+                            <div class="col-auto">
+                                <a href="{{ route('payment.export') }}" class="btn btn-icon icon-left btn-success">
                                     <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                     <span class="btn-inner--text"> {{__('Export')}}</span>
                                 </a>
@@ -27,7 +33,7 @@
                             @endif
                             @can('create payment')
                             <div class="col-auto">
-                                <a href="#" data-url="{{ route('payment.create') }}" data-ajax-popup="true" data-title="{{__('Create New Payment')}}" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="#" data-url="{{ route('payment.create') }}" data-ajax-popup="true" data-title="{{__('Create New Payment')}}" class="btn btn-icon icon-left btn-primary">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
                                 </a>
@@ -61,8 +67,8 @@
                                 </div>
 
                                 <div class="text-end">
-                                    <button type="submit" class="btn btn-round btn-primary"><i class="fas fa-search"></i></button>
-                                    <a href="{{route('payment.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <a href="{{route('payment.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                                 </div>
                                 {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\RevenueExport;
+use App\Imports\RevenueImport;
 use App\Models\BankAccount;
 use App\Models\Customer;
 use App\Models\InvoicePayment;
@@ -12,20 +13,28 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transaction;
+use App\Traits\CanImport;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use App\Traits\CanUploadFile;
+use Exception;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 
 class RevenueController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanUploadFile, CanRedirect;
+    use CanManageBalance,
+        CanProcessNumber,
+        CanUploadFile,
+        CanRedirect, 
+        CanImport;
     
     public function index(Request $request)
     {
@@ -302,6 +311,70 @@ class RevenueController extends Controller
     public function export() {
         if(Auth::user()->type == 'company'){
             return Excel::download(new RevenueExport, 'revenues.xlsx');
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function import() {
+        if(Auth::user()->type == 'company'){
+            return view('revenue.import');
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function storeImport(Request $request) {
+        if(Auth::user()->type == 'company') {
+            $validator = Validator::make($request->all(), [
+                'date'          => 'required',
+                'amount'        => 'required',
+                'account'       => 'required',
+                'category'      => 'required',
+                'payment_method'=> 'required',
+                'path'          => 'required',
+            ]);
+
+            if($validator->fails()) {
+                $message = '';
+                foreach($validator->errors()->all() as $error) {
+                    $message .= "{$error} \n";
+                }
+                return response($message, 400);
+            }
+
+            $headings = [
+                'date'          => $request->input('date'),
+                'amount'        => $request->input('amount'),
+                'account'       => $request->input('account'),
+                'category'      => $request->input('category'),
+                'payment_method'=> $request->input('payment_method'),
+                'description'   => $request->input('description'),
+                'customer'      => $request->input('customer'),
+            ];
+
+            if(Storage::exists($request->input('path'))) {
+                try {
+                    Excel::import(new RevenueImport($headings, Auth::user()), storage_path('app/').$request->input('path'));
+                } catch(NoFileException $noData) {
+                    $failed = $noData->getMessage();
+                } catch (Exception $e) {
+                    $fails = $e->getMessage();
+                }
+                $output['message'] = __('Import success');
+                
+                if(!empty($fails)) {
+                    $output['fails'] = $fails;
+                }
+                if(!empty($failed)) {
+                    $output['failed'] = $failed;
+                }
+
+                Storage::delete($request->input('path'));
+                return response()->json($output);
+            } else {
+                return response(__('File not found', 404));
+            }
         } else {
             return $this->RedirectDenied();
         }

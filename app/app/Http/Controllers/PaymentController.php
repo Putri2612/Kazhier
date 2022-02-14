@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PaymentExport;
+use App\Imports\PaymentImport;
 use App\Models\BankAccount;
 use App\Models\BillPayment;
 use App\Mail\BillPaymentCreate;
@@ -12,37 +13,44 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Vender;
+use App\Traits\CanImport;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use App\Traits\CanUploadFile;
+use Exception;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 
 class PaymentController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanUploadFile, CanRedirect;
+    use CanManageBalance, CanProcessNumber, CanUploadFile, CanRedirect, CanImport;
 
     public function index(Request $request)
     {
-        if(\Auth::user()->can('manage payment'))
+        if(Auth::user()->can('manage payment'))
         {
-            $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $creatorId = Auth::user()->creatorId();
+            $vender = Vender::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $vender->prepend(__('All'), '');
 
-            $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
+            $account = BankAccount::where('created_by', '=', $creatorId)->get()->pluck('holder_name', 'id');
             $account->prepend(__('All'), '');
 
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 2)->get()->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
-            $payment = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $payment = PaymentMethod::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $payment->prepend(__('All'), '');
 
-            $query = Payment::where('created_by', '=', \Auth::user()->creatorId());
+            $query = Payment::where('created_by', '=', $creatorId);
 
             if(!empty($request->date))
             {
@@ -83,21 +91,22 @@ class PaymentController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create payment'))
+        if(Auth::user()->can('create payment'))
         {
-            $venders    = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $creatorId = Auth::user()->creatorId();
+            $venders    = Vender::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $venders->prepend(__('Select vender'), null);
             $venders    = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 2)->get()->pluck('name', 'id');
             $categories->prepend(__('Select category'), null);
             $categories = $categories->union(['new.product-category' => __('Create new category')]);
 
-            $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $payments   = PaymentMethod::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $payments->prepend(__('Select payment method'), null);
             $payments   = $payments->union(['new.payment-method' => __('Create new payment method')]);
 
-            $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts   = BankAccount::select('*', DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', $creatorId)->get()->pluck('name', 'id');
             $accounts->prepend(__('Select bank account'), null);
             $accounts   = $accounts->union(['new.bank-account' => __('Create new bank account')]);
 
@@ -113,10 +122,10 @@ class PaymentController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create payment'))
+        if(Auth::user()->can('create payment'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'date' => 'required',
                                    'amount' => 'required',
@@ -142,7 +151,7 @@ class PaymentController extends Controller
             $payment->category_id    = $request->input('category_id');
             $payment->payment_method = $request->input('payment_method');
             $payment->description    = $request->input('description');
-            $payment->created_by     = \Auth::user()->creatorId();
+            $payment->created_by     = Auth::user()->creatorId();
 
             if($request->hasFile('reference')){
                 $payment->reference  = $this->UploadFile($request->file('reference'), 'reference');
@@ -168,8 +177,8 @@ class PaymentController extends Controller
                 $payment         = new BillPayment();
                 $payment->name   = $vender['name'];
                 $payment->method = $payment_method['name'];
-                $payment->date   = \Auth::user()->dateFormat($request->input('date'));
-                $payment->amount = \Auth::user()->priceFormat($amount);
+                $payment->date   = Auth::user()->dateFormat($request->input('date'));
+                $payment->amount = Auth::user()->priceFormat($amount);
                 $payment->bill   = '';
 
                 try {
@@ -193,21 +202,22 @@ class PaymentController extends Controller
 
     public function edit(Payment $payment)
     {
-        if(\Auth::user()->can('edit payment'))
+        if(Auth::user()->can('edit payment'))
         {
-            $venders    = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $creatorId = Auth::user()->creatorId();
+            $venders    = Vender::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $venders->prepend(__('Select vender'), null);
             $venders    = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 2)->get()->pluck('name', 'id');
             $categories->prepend(__('Select category'), null);
             $categories = $categories->union(['new.product-category' => __('Create new category')]);
 
-            $payments   = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $payments   = PaymentMethod::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $payments->prepend(__('Select payment method'), null);
             $payments   = $payments->union(['new.payment-method' => __('Create new payment method')]);
 
-            $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $accounts   = BankAccount::select('*', DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', $creatorId)->get()->pluck('name', 'id');
             $accounts->prepend(__('Select bank account'), null);
             $accounts   = $accounts->union(['new.bank-account' => __('Create new bank account')]);
 
@@ -224,10 +234,10 @@ class PaymentController extends Controller
 
     public function update(Request $request, Payment $payment)
     {
-        if(\Auth::user()->can('edit payment'))
+        if(Auth::user()->can('edit payment'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'date' => 'required',
                                    'amount' => 'required',
@@ -282,9 +292,9 @@ class PaymentController extends Controller
 
     public function destroy(Payment $payment)
     {
-        if(\Auth::user()->can('delete payment'))
+        if(Auth::user()->can('delete payment'))
         {
-            if($payment->created_by == \Auth::user()->creatorId())
+            if($payment->created_by == Auth::user()->creatorId())
             {
                 if($payment->reference != "nofile.svg"){
                     $this->DeleteFile($payment->reference, 'reference');
@@ -313,6 +323,70 @@ class PaymentController extends Controller
     public function export() {
         if(Auth::user()->type == 'company'){
             return Excel::download(new PaymentExport, 'payments.xlsx');
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function import() {
+        if(Auth::user()->type == 'company'){
+            return view('payment.import');
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function storeImport(Request $request) {
+        if(Auth::user()->type == 'company') {
+            $validator = Validator::make($request->all(), [
+                'date'          => 'required',
+                'amount'        => 'required',
+                'account'       => 'required',
+                'category'      => 'required',
+                'payment_method'=> 'required',
+                'path'          => 'required',
+            ]);
+
+            if($validator->fails()) {
+                $message = '';
+                foreach($validator->errors()->all() as $error) {
+                    $message .= "{$error} \n";
+                }
+                return response($message, 400);
+            }
+
+            $headings = [
+                'date'          => $request->input('date'),
+                'amount'        => $request->input('amount'),
+                'account'       => $request->input('account'),
+                'category'      => $request->input('category'),
+                'payment_method'=> $request->input('payment_method'),
+                'vender'        => $request->input('vender'),
+                'description'   => $request->input('description'),
+            ];
+
+            if(Storage::exists($request->input('path'))) {
+                try {
+                    Excel::import(new PaymentImport($headings, Auth::user()), storage_path('app/').$request->input('path'));
+                } catch(NoFileException $noData) {
+                    $failed = $noData->getMessage();
+                } catch (Exception $e) {
+                    $fails = $e->getMessage();
+                }
+                $output['message'] = __('Import success');
+                
+                if(!empty($fails)) {
+                    $output['fails'] = $fails;
+                }
+                if(!empty($failed)) {
+                    $output['failed'] = $failed;
+                }
+
+                Storage::delete($request->input('path'));
+                return response()->json($output);
+            } else {
+                return response(__('File not found', 404));
+            }
         } else {
             return $this->RedirectDenied();
         }

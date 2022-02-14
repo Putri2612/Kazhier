@@ -15,11 +15,17 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3 crd">
-                        <h4 class="col-6 fw-normal">{{__('Manage Product & Service')}}</h4>
-                        <div class="col-6 row text-end justify-content-end">
+                        <h4 class="col-12 col-md-6 fw-normal">{{__('Manage Product & Service')}}</h4>
+                        <div class="col-12 col-md-6 row text-end justify-content-end">
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
-                                <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="#" data-url="{{ route('productservice.import') }}" data-ajax-popup="true" data-title="{{__('Import Product')}}" class="btn btn-icon icon-left btn-warning">
+                                    <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
+                                    <span class="btn-inner--text"> {{__('Import')}}</span>
+                                </a>
+                            </div>
+                            <div class="col-auto">
+                                <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-success">
                                     <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                     <span class="btn-inner--text"> {{__('Export')}}</span>
                                 </a>
@@ -27,7 +33,7 @@
                             @endif
                             @can('create product & service')
                             <div class="col-auto">
-                                <a href="#" data-url="{{ route('productservice.create') }}" data-ajax-popup="true" data-title="{{__('Create New Product')}}" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="#" data-url="{{ route('productservice.create') }}" data-ajax-popup="true" data-title="{{__('Create New Product')}}" class="btn btn-icon icon-left btn-primary">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
                                 </a>
@@ -44,8 +50,8 @@
                                     {{ Form::select('category', $category,null, array('class' => 'form-control font-style selectric','required'=>'required')) }}
                                 </div>
                                 <div class="form-group text-end col-12 col-md-6 col-lg-auto">
-                                    <button type="submit" class="btn btn-round btn-primary"><i class="fas fa-search"></i></button>
-                                    <a href="{{route('productservice.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    <a href="{{route('productservice.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                                 </div>
                                 {{ Form::close() }}
                                 <ul class="nav nav-pills mb-3" id="myTab3" role="tablist">

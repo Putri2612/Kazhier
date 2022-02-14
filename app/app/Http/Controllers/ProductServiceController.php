@@ -3,54 +3,62 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProductServiceExport;
+use App\Imports\ProductServiceImport;
 use App\Models\CustomField;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
+use App\Traits\CanImport;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
+use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 
 class ProductServiceController extends Controller
 {
-    use CanProcessNumber, CanRedirect;
+    use CanProcessNumber, CanRedirect, CanImport;
     public function index(Request $request)
     {
 
-        if(\Auth::user()->can('manage product & service'))
+        if(Auth::user()->can('manage product & service'))
         {
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name', 'id');
+            $creatorId = Auth::user()->creatorId();
+            $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
             if(!empty($request->input('category')))
             {
 
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->where('category_id', $request->input('category'))->get();
+                $productServices = ProductService::where('created_by', '=', $creatorId)->where('category_id', $request->input('category'))->get();
             }
             else
             {
-                $productServices = ProductService::where('created_by', '=', \Auth::user()->creatorId())->get();
+                $productServices = ProductService::where('created_by', '=', $creatorId)->get();
             }
 
             return view('productservice.index', compact('productServices', 'category'));
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
 
     public function create()
     {
-        if(\Auth::user()->can('create product & service'))
+        if(Auth::user()->can('create product & service'))
         {
+            $creatorId = Auth::user()->creatorId();
             $customFields = CustomField::where('module', '=', 'product')->get();
-            $category     = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name', 'id');
-            $unit         = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $tax          = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $category     = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
+            $unit         = ProductServiceUnit::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
+            $tax          = Tax::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
 
             $category   = $category->union(['new.product-category' => __('Create new category')]);
             $unit       = $unit->union(['new.product-unit' => __('Create new unit')]);
@@ -68,7 +76,7 @@ class ProductServiceController extends Controller
     public function store(Request $request)
     {
 
-        if(\Auth::user()->can('create product & service'))
+        if(Auth::user()->can('create product & service'))
         {
 
             $rules = [
@@ -83,7 +91,7 @@ class ProductServiceController extends Controller
                 'type'              => 'required',
             ];
 
-            $validator = \Validator::make($request->all(), $rules);
+            $validator = Validator::make($request->all(), $rules);
 
             if($validator->fails())
             {
@@ -106,7 +114,7 @@ class ProductServiceController extends Controller
             $productService->type           = $request->input('type');
             $productService->category_id    = $request->input('category_id');
             $productService->quantity       = $request->input('quantity');
-            $productService->created_by     = \Auth::user()->creatorId();
+            $productService->created_by     = Auth::user()->creatorId();
             $productService->save();
             CustomField::saveData($productService, $request->input('customField'));
 
@@ -114,7 +122,7 @@ class ProductServiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -122,13 +130,14 @@ class ProductServiceController extends Controller
     public function edit($id)
     {
         $productService = ProductService::find($id);
-        if(\Auth::user()->can('edit product & service'))
+        $creatorId = Auth::user()->creatorId();
+        if(Auth::user()->can('edit product & service'))
         {
-            if($productService->created_by == \Auth::user()->creatorId())
+            if($productService->created_by == $creatorId)
             {
-                $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name', 'id');
-                $unit     = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
-                $tax      = Tax::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+                $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
+                $unit     = ProductServiceUnit::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
+                $tax      = Tax::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
 
                 $productService->customField = CustomField::getData($productService, 'product');
                 $customFields                = CustomField::where('module', '=', 'product')->get();
@@ -153,11 +162,12 @@ class ProductServiceController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        if(\Auth::user()->can('edit product & service'))
+        
+        if(Auth::user()->can('edit product & service'))
         {
+            $creatorId = Auth::user()->creatorId();
             $productService = ProductService::find($id);
-            if($productService->created_by == \Auth::user()->creatorId())
+            if($productService->created_by == $creatorId)
             {
 
                 $rules = [
@@ -194,7 +204,7 @@ class ProductServiceController extends Controller
                 $productService->type           = $request->input('type');
                 $productService->category_id    = $request->input('category_id');
                 $productService->quantity       = $request->input('quantity');
-                $productService->created_by     = \Auth::user()->creatorId();
+                $productService->created_by     = $creatorId;
                 $productService->save();
                 CustomField::saveData($productService, $request->input('customField'));
 
@@ -202,22 +212,22 @@ class ProductServiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete product & service'))
+        if(Auth::user()->can('delete product & service'))
         {
             $productService = ProductService::find($id);
-            if($productService->created_by == \Auth::user()->creatorId())
+            if($productService->created_by == Auth::user()->creatorId())
             {
                 $productService->delete();
 
@@ -225,12 +235,12 @@ class ProductServiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -242,4 +252,73 @@ class ProductServiceController extends Controller
         }
     }
 
+    public function import() {
+        if(Auth::user()->type == 'company'){
+            return view('productservice.import');
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
+
+    public function storeImport(Request $request) {
+        if(Auth::user()->type == 'company'){
+            $validator = Validator::make($request->all(), [
+                'name'          => 'required|alpha_num',
+                'sku'           => 'required|alpha_num',
+                'quantity'      => 'alpha_num',
+                'sale_price'    => 'required|alpha_num',
+                'purchase_price'=> 'required|alpha_num',
+                'tax'           => 'alpha_num',
+                'category'      => 'alpha_num',
+                'unit'          => 'required|alpha_num',
+                'type'          => 'alpha_num',
+                'path'          => 'required|alpha_num'
+            ]);
+
+            if($validator->fails()) {
+                $message = '';
+                foreach($validator->errors()->all() as $error) {
+                    $message .= "{$error} \n";
+                }
+                return response($message, 400);
+            }
+
+            $headings = [
+                'name'          => $request->input('name'),
+                'sku'           => $request->input('sku'),
+                'quantity'      => $request->input('quantity'),
+                'sale_price'    => $request->input('sale_price'),
+                'purchase_price'=> $request->input('purchase_price'),
+                'tax'           => $request->input('tax'),
+                'category'      => $request->input('category'),
+                'unit'          => $request->input('unit'),
+                'type'          => $request->input('type'),
+            ];
+
+            if(Storage::exists($request->input('path'))) {
+                try {
+                    Excel::import(new ProductServiceImport($headings, Auth::user()), storage_path('app/').$request->input('path'));
+                } catch(NoFileException $noData) {
+                    $failed = $noData->getMessage();
+                } catch (Exception $e) {
+                    $fails = $e->getMessage();
+                }
+                $output['message'] = __('Import success');
+                
+                if(!empty($fails)) {
+                    $output['fails'] = $fails;
+                }
+                if(!empty($failed)) {
+                    $output['failed'] = $failed;
+                }
+
+                Storage::delete($request->input('path'));
+                return response()->json($output);
+            } else {
+                return response(__('File not found', 404));
+            }
+        } else {
+            return $this->RedirectDenied();
+        }
+    }
 }
