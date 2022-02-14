@@ -7,6 +7,9 @@
 
 "use strict";
 
+// constants 
+const FormWizard = {}
+
 // Data Tables
 
 const DataTable = (element) => {
@@ -153,6 +156,10 @@ const ValidateForm = (event) => {
         return form.submit();
     }
 }
+
+// Dropzone
+
+const dropzones = {}
 
 // Inputs
 

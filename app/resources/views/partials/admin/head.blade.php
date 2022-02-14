@@ -22,6 +22,7 @@
 
     @stack('css-page')
 
+    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/modules/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="{{ asset('assets/css/components.min.css') }}?{{ config('asset-version.css.components', 1) }}">
