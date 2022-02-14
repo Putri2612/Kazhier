@@ -19,6 +19,7 @@ use App\Models\Utility;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -29,14 +30,15 @@ use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
 {
-    use CanManageBalance, CanProcessNumber;
+    use CanManageBalance, CanProcessNumber, CanRedirect;
 
     public function index(Request $request)
     {
         if(\Auth::user()->can('manage bill'))
         {
+            $creatorId = Auth::user()->creatorId();
 
-            $vender = Vender::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $vender = Vender::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $vender->prepend(__('All'), '');
 
             $status = [];
@@ -44,7 +46,7 @@ class BillController extends Controller
                 $status[] = __($stat);
             }
 
-            $query = Bill::where('created_by', '=', \Auth::user()->creatorId());
+            $query = Bill::where('created_by', '=', $creatorId);
             if(!empty($request->vender))
             {
                 $query->where('id', '=', $request->vender);
@@ -65,7 +67,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission Denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -75,17 +77,18 @@ class BillController extends Controller
 
         if(\Auth::user()->can('create bill'))
         {
+            $creatorId = Auth::user()->creatorId();
             $customFields   = CustomField::where('module', '=', 'bill')->get();
-            $category       = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
+            $category       = ProductServiceCategory::where('created_by', $creatorId)->where('type', 2)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
             $category       = $category->union(['new.product-category' => __('Create new category')]);
 
             $bill_number    = \Auth::user()->billNumberFormat($this->billNumber());
-            $venders        = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $venders        = Vender::where('created_by', $creatorId)->get()->pluck('name', 'id');
             $venders->prepend(__('Select Vender'), '');
             $venders        = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $product_services   = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = ProductService::where('created_by', $creatorId)->get()->pluck('name', 'id');
             $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
 
             return view('bill.create', compact('venders', 'bill_number', 'product_services', 'category', 'customFields'));
@@ -125,7 +128,7 @@ class BillController extends Controller
             $bill->category_id      = $request->input('category_id');
             $bill->order_number     = $request->input('order_number');
             $bill->discount_apply   = $request->has('discount_apply') ? 1 : 0;
-            $bill->created_by       = \Auth::user()->creatorId();
+            $bill->created_by       = Auth::user()->creatorId();
             $bill->save();
             CustomField::saveData($bill, $request->input('customField'));
             $products = $request->input('items');
@@ -135,6 +138,11 @@ class BillController extends Controller
                 $tax        = $this->ReadableNumberToFloat($product['tax']);
                 $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
                 $price      = $this->ReadableNumberToFloat($product['price']);
+
+                $item = ProductService::find($product['item']);
+                $item->quantity += $quantity;
+                $item->save();
+
                 $billProduct             = new BillProduct();
                 $billProduct->bill_id    = $bill->id;
                 $billProduct->product_id = $product['item'];
@@ -149,27 +157,16 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
-    }
-
-    function venderNumber()
-    {
-        $latest = Vender::where('created_by', '=', \Auth::user()->creatorId())->latest()->first();
-        if(!$latest)
-        {
-            return 1;
-        }
-
-        return $latest->customer_id + 1;
     }
 
     public function show(Bill $bill)
     {
 
-        if(\Auth::user()->can('show bill'))
+        if(Auth::user()->can('show bill'))
         {
-            if($bill->created_by == \Auth::user()->creatorId())
+            if($bill->created_by == Auth::user()->creatorId())
             {
                 $billPayment = BillPayment::where('bill_id', $bill->id)->first();
                 $vender      = $bill->vender;
@@ -179,30 +176,31 @@ class BillController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
 
     public function edit(Bill $bill)
     {
-        if(\Auth::user()->can('edit bill'))
+        if(Auth::user()->can('edit bill'))
         {
-            $category   = ProductServiceCategory::where('created_by', \Auth::user()->creatorId())->where('type', 2)->get()->pluck('name', 'id');
+            $creatorId = Auth::user()->creatorId();
+            $category   = ProductServiceCategory::where('created_by', $creatorId)->where('type', 2)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
             $category   = $category->union(['new.product-category' => __('Create new category')]);
 
-            $bill_number    = \Auth::user()->billNumberFormat($this->billNumber());
-            $venders        = Vender::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $bill_number    = Auth::user()->billNumberFormat($this->billNumber());
+            $venders        = Vender::where('created_by', $creatorId)->get()->pluck('name', 'id');
             $venders->prepend(__('Select Vender'), '');
             $venders        = $venders->union(['new.vender' => __('Create new vender')]);
 
-            $product_services   = ProductService::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = ProductService::where('created_by', $creatorId)->get()->pluck('name', 'id');
             $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
 
             $bill->customField  = CustomField::getData($bill, 'bill');
@@ -219,7 +217,7 @@ class BillController extends Controller
 
     public function update(Request $request, Bill $bill)
     {
-        if(\Auth::user()->can('edit bill'))
+        if(Auth::user()->can('edit bill'))
         {
 
             if($bill->created_by == \Auth::user()->creatorId())
@@ -253,12 +251,20 @@ class BillController extends Controller
                     $tax        = $this->ReadableNumberToFloat($product['tax']);
                     $discount   = isset($product['discount']) ? $this->ReadableNumberToFloat($product['discount']) : 0;
                     $price      = $this->ReadableNumberToFloat($product['price']);
+
+                    $stockChange = $quantity;
                     $billProduct = BillProduct::find($product['id']);
-                    if($billProduct == null)
-                    {
+                    if($billProduct == null) {
                         $billProduct = new BillProduct();
+                        $billProduct->bill_id    = $bill->id;
+                    } else {
+                        $stockChange -= $billProduct->quantity;
                     }
-                    $billProduct->bill_id    = $bill->id;
+
+                    $item = ProductService::find($product['item']);
+                    $item->quantity += $stockChange;
+                    $item->save();
+
                     $billProduct->product_id = $product['item'];
                     $billProduct->quantity   = $quantity;
                     $billProduct->tax        = $tax;
@@ -272,12 +278,12 @@ class BillController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -294,12 +300,12 @@ class BillController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
 
     }
@@ -340,7 +346,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -374,7 +380,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
 
     }
@@ -393,7 +399,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
 
         }
     }
@@ -509,7 +515,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -543,7 +549,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission Denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -562,12 +568,12 @@ class BillController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -679,7 +685,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -777,7 +783,7 @@ class BillController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
 
     }

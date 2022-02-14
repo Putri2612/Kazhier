@@ -24,6 +24,7 @@ use App\Models\Transaction;
 use App\Models\Utility;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +36,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
-    use CanManageBalance, CanProcessNumber;
+    use CanManageBalance, CanProcessNumber, CanRedirect;
 
     public function __construct()
     {
@@ -78,7 +79,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission Denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -211,7 +212,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -305,12 +306,12 @@ class InvoiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -340,12 +341,12 @@ class InvoiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -362,12 +363,12 @@ class InvoiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -382,7 +383,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -411,7 +412,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission Denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -429,12 +430,12 @@ class InvoiceController extends Controller
             }
             else
             {
-                return redirect()->back()->with('error', __('Permission denied.'));
+                return $this->RedirectDenied();
             }
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -469,7 +470,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -488,7 +489,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -602,7 +603,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -724,7 +725,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
     }
 
@@ -823,7 +824,7 @@ class InvoiceController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', __('Permission denied.'));
+            return $this->RedirectDenied();
         }
 
     }
