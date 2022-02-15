@@ -21,8 +21,7 @@ use App\Traits\TimeGetter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class
-DashboardController extends Controller
+class DashboardController extends Controller
 {
     use TimeGetter;
     /**

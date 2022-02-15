@@ -263,16 +263,16 @@ class ProductServiceController extends Controller
     public function storeImport(Request $request) {
         if(Auth::user()->type == 'company'){
             $validator = Validator::make($request->all(), [
-                'name'          => 'required|alpha_num',
-                'sku'           => 'required|alpha_num',
-                'quantity'      => 'alpha_num',
-                'sale_price'    => 'required|alpha_num',
-                'purchase_price'=> 'required|alpha_num',
-                'tax'           => 'alpha_num',
-                'category'      => 'alpha_num',
-                'unit'          => 'required|alpha_num',
-                'type'          => 'alpha_num',
-                'path'          => 'required|alpha_num'
+                'name'          => 'required|string|regex:/^[\w\-\s]*/i',
+                'sku'           => 'required|string|regex:/^[\w\-\s]*/i',
+                'quantity'      => 'string|regex:/^[\w\-\s]*/i',
+                'sale_price'    => 'required|string|regex:/^[\w\-\s]*/i',
+                'purchase_price'=> 'required|string|regex:/^[\w\-\s]*/i',
+                'tax'           => 'string|regex:/^[\w\-\s]*/i',
+                'category'      => 'string|regex:/^[\w\-\s]*/i',
+                'unit'          => 'required|string|regex:/^[\w\-\s]*/i',
+                'type'          => 'string|regex:/^[\w\-\s]*/i',
+                'path'          => 'required|string|regex:/^[\w\-\s]*/i'
             ]);
 
             if($validator->fails()) {

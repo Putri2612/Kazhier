@@ -125,7 +125,7 @@ class ProductServiceImport implements ToCollection, WithHeadingRow, WithEvents
                 $type   = 'product';
                 if(!empty($headings['type']) && $headings['type'] != '---') {
                     $typeValidator = Validator::make($collection, [
-                        $headings['type'] => 'string|regex:/^[a-zA-Z\s]*/i',
+                        $headings['type'] => 'alpha',
                     ]);
                     if($typeValidator->fails()) {
                         $message = __('Type invalid');
@@ -133,6 +133,9 @@ class ProductServiceImport implements ToCollection, WithHeadingRow, WithEvents
                     } else {
                         $type = $collection[$headings['type']];
                     }
+                }
+                if($type != 'product' && $type != 'service') {
+                    $type = 'product';
                 }
 
                 $quantity   = 0;
