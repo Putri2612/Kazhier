@@ -2,6 +2,9 @@
 @section('title')
     {{ __('Term of Service') }}
 @endsection
+@php
+    $appName = (Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'Kazhier');
+@endphp
 @section('page-description'){{ __('By using :appName, you agree to the following term of service.',['appName' => $appName]) }}@endsection
 @section('content')
     <section class="section">
@@ -12,7 +15,7 @@
                         <img class="img-fluid logo-img" style="width:140px" src="{{asset('storage/logo/logo.png')}}" alt="logo">
                     </div>
                     <div class="card card-primary">
-                        <a href="{{ Request::getSchemeAndHttpHost() }}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+                        <a role="button" class="back-btn return-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header">
                             <div>
                                 <div class="display-6">{{ __('Term of Service') }}</div><br/>

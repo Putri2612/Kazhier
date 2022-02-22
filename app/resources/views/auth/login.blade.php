@@ -31,7 +31,7 @@
                         <img class="img-fluid logo-img" style="width:140px" src="{{$logo.'/logo.png'}}" alt="image">
                     </div>
                     <div class="card card-primary">
-                        <a href="{{ Request::getSchemeAndHttpHost() }}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+                        <a role="button" class="back-btn return-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header">
                             <h4>{{__('User Login')}}</h4>
                         </div>

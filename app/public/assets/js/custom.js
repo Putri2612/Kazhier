@@ -490,6 +490,24 @@ const sendActivity = () => {
     }).catch(error => console.error(error));
 }
 
+// return button
+
+const returnBack = (target) => {
+    let back = 1;
+    if(target.hasAttribute('href')) {
+        back = 2;
+    }
+
+    history.back(-back);
+}
+
+const returnBtn = document.querySelectorAll('.return-btn');
+if(returnBtn.length) {
+    returnBtn.forEach(element => {
+        element.addEventListener('click', event => returnBack(event.target));
+    });
+}
+
 
 // Document event listener
 document.addEventListener('click', event => {

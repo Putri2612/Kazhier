@@ -30,7 +30,7 @@
                     </div>
 
                     <div class="card card-primary">
-                        <a href="{{ Request::getSchemeAndHttpHost() }}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+                        <a role="button" class="back-btn return-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header"><h4>{{ __('Free Sign Up') }}</h4></div>
 
                         <div class="card-body">
