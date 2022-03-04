@@ -33,6 +33,7 @@ use App\Http\Controllers\EULAController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FrontEndErrorController;
 use App\Http\Controllers\GoalController;
+use App\Http\Controllers\ImportSampleController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\LanguageController;
@@ -381,6 +382,12 @@ Route::group(
         Route::get('/dialog-empty-input', [DialogController::class, 'EmptyInput']);
         Route::get('/dialog-status-update', [DialogController::class, 'StatusUpdate']);
         Route::get('/dialog-confirm-delete', [DialogController::class, 'ConfirmDelete']);
+
+        Route::prefix('samples')->as('samples.')->group(
+            function() {
+                Route::get('import/{name}', [ImportSampleController::class, 'get'])->name('import');
+            }
+        );
     }
 );
 

@@ -1,8 +1,16 @@
-<div class="progress wizard-progress">
+<div class="progress wizard-progress mb-3">
     <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
 </div>
-{{ Form::open(['route' => 'payment.import.headings', 'class' => 'dropzone import-dropzone wizard-form collapse', 'enctype' => 'multipart/form-data']) }}
-{{ Form::close() }}
+<div class="wizard-form collapse mb-3">
+    <div class="d-grid gap-2 mb-3">
+        <a href="{{ route('samples.import', 'payment') }}" class="btn btn-primary btn-icon icon-left">
+            <span class="btn-inner--icon"><i class="fas fa-download"></i></span>
+            <span class="btn-inner--text"> {{__('Sample')}}</span>
+        </a>
+    </div>
+    {{ Form::open(['route' => 'payment.import.headings', 'class' => 'dropzone import-dropzone', 'enctype' => 'multipart/form-data']) }}
+    {{ Form::close() }}
+</div>
 {{ Form::open(['method' => 'PUT', 'route' => 'payment.import.store', 'class' => 'wizard-form collapse pt-3']) }}
     <p class="h4">{{ __('Please select the appropriate column names') }}</p>
     {{ Form::hidden('path', '') }}

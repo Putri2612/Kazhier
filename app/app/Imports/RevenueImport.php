@@ -132,12 +132,15 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                     $message = __('Bank account invalid');
                     $fails  .= "Error: {$message} on row {$this->row}\n";
                 } else if($this->user->getPlan->max_bank_accounts > $this->user->countBankAccount()){
+                    $exploded   = explode('-', $collection[$headings['account']]);
+                    $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
+                    $holder_name= count($exploded) > 1 ? $exploded[1] : $exploded[0];
                     $account = BankAccount::firstOrNew([
-                        'holder_name' => $collection[$headings['account']],
-                        'created_by' => $this->user->creatorId()
+                        'holder_name'   => $holder_name,
+                        'bank_name'     => $bank_name,
+                        'created_by'    => $this->user->creatorId()
                     ]);
                     if(!$account->exists) {
-                        $account->bank_name         = 'Bank Indonesia';
                         $account->bank_address      = 'Indonesia';
                         $account->account_number    = '000';
                         $account->opening_balance   = 100000;

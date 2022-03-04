@@ -19,7 +19,7 @@
                         <div class="col-6 text-end row justify-content-end">
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
-                                <a href="#" data-url="{{ route('revenue.import') }}" data-ajax-popup="true" data-title="{{__('Import Product')}}" class="btn btn-icon icon-left btn-warning">
+                                <a href="#" data-url="{{ route('revenue.import') }}" data-ajax-popup="true" data-title="{{__('Import Revenue')}}" class="btn btn-icon icon-left btn-warning">
                                     <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
                                     <span class="btn-inner--text"> {{__('Import')}}</span>
                                 </a>
