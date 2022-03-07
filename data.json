@@ -1,5 +1,0 @@
-[
-    {"name":"Gratis","price":0,"max_users":0,"max_account":1,"duration":"Unlimited"},
-    {"name":"Premium","price":100000,"max_users":3,"max_account":5,"duration":"month"},
-    {"name":"Platinum","price":500000,"max_users":6,"max_account":8,"duration":"month"}
-]
