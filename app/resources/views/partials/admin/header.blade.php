@@ -1,8 +1,12 @@
 @php
-    $users=\Auth::user();
-    $profile=asset(Storage::url('avatar/'));
-    $currantLang = $users->currentLanguage();
-    $languages=Utility::languages();
+    $users          = Auth::user();
+    $profile        = asset(Storage::url('avatar/'));
+    $currantLang    = $users->currentLanguage();
+    $languages      = Utility::languages();
+    $userPlan       = $users->getPlan;
+    if($userPlan) {
+        $pricier    = \App\Models\Plan::where('price', '>', $userPlan->price)->count();
+    }
 @endphp
 <div class="navbar-bg"></div>
 <nav class="navbar navbar-expand-lg main-navbar">
@@ -18,6 +22,19 @@
     </form>
 
     <ul class="navbar-nav navbar-end">
+        @if ($users->can('manage plan') && $userPlan)
+            <li>
+                <a href="{{ route('plans.index') }}" class="nav-link nav-link-lg">
+                    @if ($pricier)
+                        <span><i class="fa-solid fa-circle-up"></i></span>
+                        <span class="d-sm-none d-lg-inline"> {{__('Upgrade')}}</span>
+                    @else
+                        <span><i class="fa-solid fa-arrows-rotate"></i></span>
+                        <span class="d-sm-none d-lg-inline"> {{__('Extend')}}</span>
+                    @endif
+                </a>
+            </li>
+        @endif
         @can('manage language')
             <li class="dropdown dropdown-list-toggle">
                 <a href="#" data-bs-toggle="dropdown" class="nav-link notification-toggle nav-link-lg language-dd">
