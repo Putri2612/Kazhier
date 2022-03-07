@@ -136,11 +136,11 @@
                                             <ul class="col-12">
                                                 <li style='list-style-type: none'>
                                                     <i class="fas fa-user-tie"></i>
-                                                    <p>{{$plan->max_users}} {{__('Users')}}</p>
+                                                    <p>{!!Auth::user()->planFeatureNumberFormat($plan->max_users)!!} {{__('Users')}}</p>
                                                 </li>
                                                 <li style='list-style-type: none'>
                                                     <i class="fas fa-user-plus"></i>
-                                                    <p>{{$plan->max_bank_accounts}} {{__('Bank Accounts')}}</p>
+                                                    <p>{!!Auth::user()->planFeatureNumberFormat($plan->max_bank_accounts)!!} {{__('Bank Accounts')}}</p>
                                                 </li>
                                             </ul>
 

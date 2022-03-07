@@ -261,7 +261,7 @@ class User extends Authenticatable implements MustVerifyEmail
                       0,
                       1,
                   ]
-        )->where('created_by', '=', \Auth::user()->id)->count();
+        )->where('created_by', '=', $this->id)->count();
     }
 
     public function countCustomers()
@@ -337,8 +337,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $revenue      = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
         $payment      = Payment::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
 
-        $invoices     = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
-        $bills        = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
+        $invoices     = Invoice:: select('*')->where('created_by', $this->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
+        $bills        = Bill:: select('*')->where('created_by', $this->creatorId())->whereRAW('MONTH(send_date) = ?', [$currentMonth])->get();
 
         $invoiceArray = array();
         foreach($invoices as $invoice)
@@ -499,7 +499,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function planPrice()
     {
-        $user = \Auth::user();
+        $user = $this;
         if($user->type == 'super admin')
         {
             $userId = $user->id;
@@ -520,6 +520,23 @@ class User extends Authenticatable implements MustVerifyEmail
         return "{$symbol} {$formatted_price}";
     }
 
+    public function planFeatureNumberFormat($number) {
+        if($number < 0) {
+            $number = '&infin;';
+        }
+        return $number;
+    }
+
+    public function planDurationFormat($duration) {
+        if(strtoupper($duration) == 'YEAR') {
+            $duration = __('Annually');
+        } else if(strtoupper($duration) == 'MONTH') {
+            $duration = __('Monthly');
+        }
+
+        return $duration;
+    }
+
     public function currentPlan()
     {
         return $this->hasOne(Plan::class, 'id', 'plan');
@@ -529,7 +546,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $staticstart  = date('Y-m-d', strtotime('last Week'));
         $currentDate  = date('Y-m-d');
-        $invoices     = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
+        $invoices     = Invoice:: select('*')->where('created_by', $this->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
         $invoiceTotal = 0;
         $invoicePaid  = 0;
         $invoiceDue   = 0;
@@ -551,7 +568,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $staticstart  = date('Y-m-d', strtotime('last Month'));
         $currentDate  = date('Y-m-d');
-        $invoices     = Invoice:: select('*')->where('created_by', \Auth::user()->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
+        $invoices     = Invoice:: select('*')->where('created_by', $this->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
         $invoiceTotal = 0;
         $invoicePaid  = 0;
         $invoiceDue   = 0;
@@ -573,7 +590,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $staticstart = date('Y-m-d', strtotime('last Week'));
         $currentDate = date('Y-m-d');
-        $bills       = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
+        $bills       = Bill:: select('*')->where('created_by', $this->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
         $billTotal   = 0;
         $billPaid    = 0;
         $billDue     = 0;
@@ -595,7 +612,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $staticstart = date('Y-m-d', strtotime('last Month'));
         $currentDate = date('Y-m-d');
-        $bills       = Bill:: select('*')->where('created_by', \Auth::user()->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
+        $bills       = Bill:: select('*')->where('created_by', $this->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
         $billTotal   = 0;
         $billPaid    = 0;
         $billDue     = 0;
