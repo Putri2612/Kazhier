@@ -329,6 +329,7 @@ const SelectricChangeCallbacks = [
 
             window.location.href = destination;
         }
+        WatchChange(event.target, true);
     }
 ];
 
