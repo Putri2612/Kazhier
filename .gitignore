@@ -17,7 +17,3 @@ yarn-error.log
 *.ps1
 resources/debug/ajaxDebug.html
 *.zip
-app/Classes/Tokopedia/Auth.php
-app/Imports/BillImport.php
-app/Imports/InvoiceImport.php
-app/Invokables/SyncTokopediaStock.php
