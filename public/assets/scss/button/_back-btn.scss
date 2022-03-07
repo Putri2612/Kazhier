@@ -1,0 +1,21 @@
+.back-btn{
+    display: block;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin: 10px;
+    background-color: transparent;
+    border-radius: 50%;
+    transition: 0.2s linear;
+
+    &:hover{background-color: $light;}
+    &:active{background-color: $dark-light;}
+
+    i::before{
+        position: absolute;
+        top:50%;
+        left:50%;
+        font-size: 20px;
+        transform: translate(-50%, -50%);
+    }
+}
