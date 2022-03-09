@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'transfer', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => 'transfer.store', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('from_account', __('From Account')) }}

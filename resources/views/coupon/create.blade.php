@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'coupons','method' =>'post')) }}
+{{ Form::open(array('route' => 'coupons','method' =>'post')) }}
 <div class="row">
     <div class="form-group col-md-12">
         {{Form::label('name',__('Name'))}}

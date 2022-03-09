@@ -1,4 +1,4 @@
-{{Form::open(array('url'=>'users','method'=>'post'))}}
+{{Form::open(array('route'=>'users.store','method'=>'post'))}}
 <div class="row">
 
     <div class="col-md-6">

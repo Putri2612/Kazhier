@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'taxes', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => 'taxes.store', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{ Form::label('name', __('Tax Rate Name')) }}

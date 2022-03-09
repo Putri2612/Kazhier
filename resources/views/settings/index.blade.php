@@ -44,7 +44,7 @@
                             <div class="tab-content" id="myTabContent2">
                                 <div class="tab-pane fade fade show active" id="site-setting" role="tabpanel" aria-labelledby="profile-tab3">
                                     <div class="company-setting-wrap">
-                                        {{Form::model($settings,array('url'=>'systems','method'=>'POST','enctype' => "multipart/form-data"))}}
+                                        {{Form::model($settings,array('route'=>'systems.store','method'=>'POST','enctype' => "multipart/form-data"))}}
                                         <div class="card-body">
                                             <div class="card-body">
                                                 <div class="row">

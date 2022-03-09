@@ -10,7 +10,7 @@
                 <div class="card-header">
                     <h4>{{__('Create Role')}} </h4>
                 </div>
-                {{Form::open(array('url'=>'roles','method'=>'post'))}}
+                {{Form::open(array('route'=>'roles.store','method'=>'post'))}}
                     <div class="card-body">
                         <div class="form-group">
                             {{Form::label('name',__('Name'))}}

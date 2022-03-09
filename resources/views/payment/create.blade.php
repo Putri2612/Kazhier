@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'payment', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => 'payment.store', 'enctype' => 'multipart/form-data', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('date', __('Date')) }}

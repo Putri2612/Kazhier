@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'product-unit')) }}
+{{ Form::open(array('route' => 'product-unit.store')) }}
 <div class="row">
     <div class="form-group col-md-12">
         {{ Form::label('name', __('Unit Name')) }}

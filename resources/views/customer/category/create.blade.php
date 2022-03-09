@@ -1,4 +1,4 @@
-{{Form::open(array('url'=>'customer-category','method'=>'post', 'onsubmit' => 'return ValidateForm(event)'))}}
+{{Form::open(array('route'=>'customer-category.store','method'=>'post', 'onsubmit' => 'return ValidateForm(event)'))}}
 <div class="row">
     <div class="form-group col-6">
         {{Form::label('name',__('Name'),array('class'=>'')) }}

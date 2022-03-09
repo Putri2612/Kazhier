@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'account-liabilities')) }}
+{{ Form::open(array('route' => 'account-liabilities.store')) }}
 <div class="row">
     <div class="form-group col-md-6">
         {{ Form::label('name', __('Name')) }}

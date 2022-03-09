@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'custom-field')) }}
+{{ Form::open(array('route' => 'custom-field.store')) }}
 <div class="row">
     <div class="form-group col-md-12">
         {{Form::label('name',__('Custom Field Name'))}}

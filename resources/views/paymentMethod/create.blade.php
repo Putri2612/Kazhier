@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'payment-method')) }}
+{{ Form::open(array('route' => 'payment-method.store')) }}
 <div class="row">
     <div class="form-group col-md-12">
         {{ Form::label('name', __('Payment Method')) }}

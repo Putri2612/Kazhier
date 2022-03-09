@@ -1,4 +1,4 @@
-{{Form::open(array('url'=>'permissions','method'=>'post'))}}
+{{Form::open(array('route'=>'permissions.store','method'=>'post'))}}
 <div class="card-body">
     <div class="form-group">
         {{Form::label('name',__('Name'))}}

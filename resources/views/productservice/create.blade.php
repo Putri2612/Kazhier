@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'productservice', 'onsubmit' => 'return ValidateForm(event)')) }}
+{{ Form::open(array('route' => 'productservice.store', 'onsubmit' => 'return ValidateForm(event)')) }}
 <div class="row">
     <div class="col-md-4">
         <div class="form-group">

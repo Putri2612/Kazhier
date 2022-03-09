@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'expenses','enctype' => "multipart/form-data")) }}
+{{ Form::open(array('route' => 'expenses.store','enctype' => "multipart/form-data")) }}
 <div class="row">
     <div class="form-group  col-md-6">
         {{ Form::label('category_id', __('Category')) }}

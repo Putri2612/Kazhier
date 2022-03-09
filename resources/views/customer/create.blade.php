@@ -1,4 +1,4 @@
-{{Form::open(array('url'=>'customer','method'=>'post', 'onsubmit' => 'return ValidateForm(event)'))}}
+{{Form::open(array('route'=>'customer.store','method'=>'post', 'onsubmit' => 'return ValidateForm(event)'))}}
 <h4 class="sub-title">{{__('Basic Info')}}</h4>
 <div class="row">
     <div class="col-lg-4 col-md-4 col-sm-6">

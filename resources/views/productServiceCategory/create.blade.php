@@ -1,4 +1,4 @@
-{{ Form::open(array('url' => 'product-category', 'autocomplete' => 'off')) }}
+{{ Form::open(array('route' => 'product-category.store', 'autocomplete' => 'off')) }}
 <div class="row">
     <div class="form-group  col-md-12">
         <div class="input-group">

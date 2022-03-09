@@ -159,7 +159,7 @@
             </div>
         </div>
         <div class="section-body">
-            {{ Form::open(array('url' => 'bill', 'onsubmit' => 'return ValidateForm(event)')) }}
+            {{ Form::open(array('route' => 'bill.store', 'onsubmit' => 'return ValidateForm(event)')) }}
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="row">
                 <div class="col-12">

@@ -196,8 +196,11 @@
     <footer>
         <section class="social-media-footer">
             <div class="kakakonten">
-                <a href="https://instagram.com/https://www.instagram.com/kazhier.official/" class="social-item">
-                    <i class="fab fa-instagram"></i>
+                <a href="https://www.instagram.com/kazhier.official/" class="social-item">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com/Kazhier-101082205801767/" class="social-item">
+                    <i class="fa-brands fa-facebook"></i>
                 </a>
             </div>
         </section>
@@ -210,7 +213,7 @@
                 </div>
                 <div class="col col-md-6">
                     <div class="footer-navigation pb-3">
-                        <a href="#">Syarat & Ketentuan</a> |
+                        <a href="{{ route('tos.show') }}">Syarat & Ketentuan</a> |
                         <a href="#">Tentang Kami</a> |
                         <a href="mailto:hello@kazhier.com">Hubungi Kami</a>
                     </div>

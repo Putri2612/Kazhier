@@ -149,7 +149,7 @@
             </div>
         </div>
         <div class="section-body">
-            {{ Form::open(array('url' => 'proposal')) }}
+            {{ Form::open(array('route' => 'proposal.store')) }}
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <div class="row">
                 <div class="col-12">
