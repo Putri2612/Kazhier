@@ -1,3 +1,3 @@
-## Kakabiz
+## Kazhier Web
 
-Kuylah harus bisa jadi...
+Program Kazhier yang dibuat dengan Laravel
