@@ -271,7 +271,7 @@ const WatchChange = (input, testOtherInput = false) => {
     if(
         (!input.value || input.value == '' || (input.nodeName == 'SELECT' && input.value == '0')) 
         && 
-        (input.hasAttribute('data-is-required') || input.hasAttribute('required'))
+        ((input.hasAttribute('data-is-required') && !input.hasAttribute('data-is-not-highlighted')) || input.hasAttribute('required'))
     ){
         if(input.nodeName == 'SELECT' && input.classList.contains('selectric')) {
             input.parentNode.parentNode.querySelector('div.selectric').classList.add('is-invalid');

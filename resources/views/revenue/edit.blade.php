@@ -35,7 +35,7 @@
     <div class="form-group  col-md-6">
         <div class="input-group">
             {{ Form::label('customer_id', __('Customer')) }}
-            {{ Form::select('customer_id', $customers,null, array('class' => 'form-control customer-sel font-style selectric', 'data-is-required')) }}
+            {{ Form::select('customer_id', $customers,null, array('class' => 'form-control customer-sel font-style selectric', 'data-is-required', 'data-is-not-highlighted')) }}
         </div>
     </div>
     <div class="form-group  col-md-12">
