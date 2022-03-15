@@ -6,6 +6,7 @@ use App\Http\Controllers\api\CustomerCategoryController;
 use App\Http\Controllers\api\CustomerController;
 use App\Http\Controllers\api\ExpenseController;
 use App\Http\Controllers\api\OrderController;
+use App\Http\Controllers\api\PaymentMethodController;
 use App\Http\Controllers\api\ProductServiceCategoryController;
 use App\Http\Controllers\api\ProductServiceController;
 use App\Http\Controllers\api\ProductServiceUnitController;
@@ -37,6 +38,7 @@ Route::as('api.')->group(
 
             Route::get('bank-account', [BankAccountController::class, 'get'])->name('bank-account.get');
             Route::post('bank-account/create', [BankAccountController::class, 'create'])->name('bank-account.create');
+            Route::put('bank-account/{account_id}/edit', [BankAccountController::class, 'edit'])->name('bank-account.edit');
             Route::delete('bank-account/{account_id}/delete', [BankAccountController::class, 'destroy'])->name('bank-account.destroy');
             
             Route::post('category/create', [ProductServiceCategoryController::class, 'create'])->name('category.create');
@@ -57,6 +59,7 @@ Route::as('api.')->group(
 
             Route::get('order', [OrderController::class, 'index'])->name('order.index');
             Route::post('order/create', [OrderController::class, 'create'])->name('order.create');
+            Route::put('order/{order_id}/edit', [OrderController::class, 'edit'])->name('order.edit');
             Route::delete('order/{order_id}/delete', [OrderController::class, 'destroy'])->name('order.destroy');
 
             Route::post('product-service/create', [ProductServiceController::class, 'create'])->name('product-service.create');
@@ -74,6 +77,11 @@ Route::as('api.')->group(
             Route::post('supplier/create', [SupplierController::class, 'create'])->name('supplier.create');
             Route::get('supplier/{id}', [SupplierController::class, 'get'])->name('supplier.get');
             Route::delete('supplier/{id}/delete', [SupplierController::class, 'destroy'])->name('supplier.destroy');
+
+            Route::post('payment-method/create', [PaymentMethodController::class, 'create'])->name('payment-method.create');
+            Route::put('payment-method/{method_id}/edit', [PaymentMethodController::class, 'edit'])->name('payment-method.edit');
+            Route::delete('payment-method/{method_id}/delete', [PaymentMethodController::class, 'destroy'])->name('payment-method.destroy');
+            Route::get('payment-method/{method_id}', [PaymentMethodController::class, 'get'])->name('payment-method.get');
         });
     }
 );
