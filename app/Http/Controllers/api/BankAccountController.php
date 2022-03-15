@@ -74,6 +74,40 @@ class BankAccountController extends Controller
         }
     }
 
+    public function edit(Request $request, $bank_account_id) {
+        if(!Auth::user()->can('edit bank account')) {
+            return $this->UnauthorizedResponse();
+        }
+        $validator  = Validator::make($request->all(), [
+            'account_holder_name'       => 'required',
+            'account_bank_name'         => 'required',
+            'account_number'            => 'required',
+            'account_opening_balance'   => 'required',
+            'account_contact_number'    => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse('One or more parameter is missing');
+        }
+
+        $user       = Auth::user();
+        $creatorId  = $user->creatorId();
+        $bankAccount = BankAccount::where('created_by', $creatorId)->where('id', $bank_account_id)->first();
+
+        if(empty($bankAccount)) {
+            return $this->NotFoundResponse();
+        }
+        $bankAccount->holder_name       = $request->input('account_holder_name');
+        $bankAccount->bank_name         = $request->input('account_bank_name');
+        $bankAccount->account_number    = $request->input('account_number');
+        $bankAccount->opening_balance   = $request->input('account_opening_balance');
+        $bankAccount->contact_number    = $request->input('account_contact_number');
+        $bankAccount->bank_address      = $request->has('account_bank_address') ? $request->input('account_bank_address') : '';
+        $bankAccount->save();
+        
+        return $this->EditSuccessResponse();
+    }
+
     public function destroy($account_id) {
         if(!Auth::user()->can('delete bank account')) {
             return $this->UnauthorizedResponse();

@@ -64,7 +64,14 @@ class OrderController extends Controller
         ]);
 
         if($validator->fails()){
-            return $this->FailedResponse('One or more parameter is missing');
+            $message = '';
+            foreach($validator->errors()->all() as $key => $fail) {
+                $message .= $fail;
+                if($key < count($validator->errors()->all())) {
+                    $message .= '\n';
+                }
+            }
+            return $this->FailedResponse($message);
         }
         
         $user       = Auth::user();
@@ -159,6 +166,158 @@ class OrderController extends Controller
         $invoice->save();
 
         return $this->CreateSuccessResponse();
+    }
+
+    public function edit(Request $request, $order_id) {
+        if(!Auth::user()->can('edit invoice')){
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator  = Validator::make($request->all(), [
+            'order_date'            => 'required',
+            'order_time'            => 'required',
+            'order_category_id'     => 'required',
+            'customer_name'         => 'required',
+            'products'              => 'required',
+            'order_price'           => 'required',
+            'order_payment_method'  => 'required',
+            'payment_method'        => 'required',
+        ]);
+
+        if($validator->fails()){
+            $message = '';
+            foreach($validator->errors()->all() as $key => $fail) {
+                $message .= $fail;
+                if($key < count($validator->errors()->all())) {
+                    $message .= '\n';
+                }
+            }
+            return $this->FailedResponse($message);
+        }
+        $user       = Auth::user();
+        $creatorID  = $user->creatorId();
+        $products   = $request->input('products');
+
+        // return response()->json(json_decode($products));
+        $products   = gettype($products) == 'string' ? json_decode($products): $products;
+
+        $customer   = Customer::firstOrNew([
+            'name'      => $request->input('customer_name'),
+            'created_by'=> $creatorID,
+        ], [
+            'email'             => $request->has('customer_email') ? $request->input('customer_email') : 'noemail@example.com',
+            'contact'           => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
+            'billing_name'      => $request->input('customer_name'),
+            'billing_phone'     => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
+            'billing_address'   => $request->has('customer_address') ? $request->input('customer_address') : 'no address',
+            'shipping_name'     => $request->input('customer_name'),
+            'shipping_phone'    => $request->has('customer_phone') ? $request->input('customer_phone') : '000000',
+            'shipping_address'  => $request->has('customer_address') ? $request->input('customer_address') : 'no address',
+            'customer_id'       => $this->CustomerNumber(),
+        ]);
+        if(!$customer->exists){
+            $customer->save();
+        }
+
+        $invoice = Invoice::where('id', $order_id)->where('created_by', $creatorID)->first();
+        if(empty($invoice)) {
+            return $this->NotFoundResponse();
+        }
+
+        $datetime = $request->input('order_date') . ' ' . $request->input('order_time');
+        $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
+
+        $invoice->customer_id       = $customer->id;
+        $invoice->status            = 2;
+        $invoice->issue_date        = $datetime;
+        $invoice->due_date          = $datetime;
+        $invoice->category_id       = $request->input('order_category_id');
+        $invoice->ref_number        = $request->has('ref_number') ? $request->input('ref_number') : '';
+        $invoice->customer_tax      = $request->has('customer_tax') && boolval($request->input('customer_tax'));
+        $invoice->save();
+
+        $removedProduct = InvoiceProduct::where('invoice_id', $invoice->id)->whereNotIn('product_id', collect($products)->pluck('product_id'))->get();
+        foreach($removedProduct as $product) {
+            $item = ProductService::find($product->product_id);
+            if(!empty($item)) {
+                $item->quantity += $product->quantity;
+                $item->save();
+            }
+            $product->delete();
+        }
+
+        foreach($products as $product) {
+            if(gettype($product) == 'string') {
+                $product = json_decode($product);
+            }
+            $quantity   = $product->product_qty;
+            $tax        = $product->product_tax;
+            $discount   = isset($product->discount) ? $product->discount : 0;
+            $price      = $product->product_price;
+
+            $stockChange = $quantity;
+            $item   = ProductService::find($product->product_id);
+            if(empty($item)) {
+                continue;
+            }
+
+            $invoiceProduct = InvoiceProduct::find($product->product_id);
+            if($invoiceProduct == null)
+            {
+                $invoiceProduct             = new InvoiceProduct();
+                $invoiceProduct->invoice_id = $invoice->id;
+            } else {
+                $stockChange -= $invoiceProduct->quantity;
+            }
+
+            $item->quantity -= $stockChange;
+            $item->save();
+            
+            $invoiceProduct->product_id = $product->product_id;
+            $invoiceProduct->quantity   = $quantity;
+            $invoiceProduct->tax        = $tax;
+            $invoiceProduct->discount   = $discount;
+            $invoiceProduct->price      = $price;
+            $invoiceProduct->save();
+        }
+
+        $bankAccount    = BankAccount::where('id', '=', $request->input('order_payment_method'))->where('created_by', '=', $creatorID)->first();
+        if($bankAccount) {
+            $accountId  = $bankAccount->id;
+        } else {
+            $accountId  = BankAccount::select('id')->where('created_by', '=', $creatorID)->first()->id;
+        }
+
+        $invoicePayment                 = InvoicePayment::where('invoice_id', $invoice->id)->first();
+
+        if(!empty($invoicePayment)) {
+            $prevAmount     = $invoicePayment->amount;
+            $prevAccount    = $invoicePayment->account_id;
+            $this->AddBalance($prevAccount, -$prevAccount, $request->input('order_date'));
+            
+        } else {
+            $invoicePayment = new InvoicePayment();
+            $invoicePayment->invoice_id = $invoice->id;
+        }
+
+
+        $invoicePayment->date           = $request->input('order_date');
+        $invoicePayment->amount         = $request->input('order_price');
+        $invoicePayment->account_id     = $accountId;
+        $invoicePayment->payment_method = $request->input('payment_method');
+        $invoicePayment->save();
+        $this->AddBalance($accountId, $request->input('order_price'), $request->input('order_date'));
+
+        if($invoice->getDue() == 0) {
+            $invoice->status = 4;
+        } else if ($invoice->getDue() == $invoice->getTotal()) {
+            $invoice->status = 2;
+        } else {
+            $invoice->status = 3;
+        }
+        $invoice->save();
+
+        return $this->EditSuccessResponse();
     }
 
     public function destroy($order_id) {
