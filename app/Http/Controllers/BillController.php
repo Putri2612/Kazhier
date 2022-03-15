@@ -246,6 +246,17 @@ class BillController extends Controller
                 CustomField::saveData($bill, $request->input('customField'));
                 $products = $request->input('items');
 
+                $removedProducts = BillProduct::where('bill_id', $bill->id)->whereNotIn(collect($products)->pluck('item'))->get();
+
+                foreach ($removedProducts as $product) {
+                    $item = ProductService::find($product['item']);
+                    if(!empty($item)) {
+                        $item->quantity -= $product->quantity;
+                        $item->save();
+                    }
+                    $product->delete();
+                }
+
                 foreach($products as $product){
                     $quantity   = $this->ReadableNumberToFloat($product['quantity']);
                     $tax        = $this->ReadableNumberToFloat($product['tax']);

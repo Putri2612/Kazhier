@@ -118,6 +118,8 @@ class InvoiceController extends Controller
     public function product(Request $request)
     {
 
+        $taxPaidByUser = $request->has('paid_by_user') && $request->input('paid_by_user') == 'true';
+
         $data['product']     = $product = ProductService::find($request->product_id);
         $data['unit']        = $product->unit ? $product->unit->name : '';
         $data['taxRate']     = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
@@ -126,14 +128,14 @@ class InvoiceController extends Controller
         $data['stock']       = $product->quantity;
         $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
         $product->sale_price = $this->FloatToReadableNumber($salePrice);
-        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + $taxPrice);
+        $product->purchase_price = $this->FloatToReadableNumber($product->purchase_price);
+        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + ($taxPaidByUser ? $taxPrice : 0));
 
         return json_encode($data);
     }
 
     public function store(Request $request)
     {
-
         if(Auth::user()->can('create invoice'))
         {
             $validator = \Validator::make(
@@ -163,6 +165,7 @@ class InvoiceController extends Controller
             $invoice->category_id    = $request->input('category_id');
             $invoice->ref_number     = $request->input('ref_number');
             $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
+            $invoice->customer_tax   = $request->has('customer_tax');
             $invoice->created_by     = Auth::user()->creatorId();
             $invoice->served_by      = Auth::user()->id;
             $invoice->save();
@@ -244,7 +247,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice)
     {
 
-        if(Auth::user()->can('edit bill'))
+        if(Auth::user()->can('edit invoice'))
         {
             if($invoice->created_by == Auth::user()->creatorId())
             {
@@ -269,9 +272,20 @@ class InvoiceController extends Controller
                 $invoice->ref_number     = $request->input('ref_number');
                 $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
                 $invoice->category_id    = $request->input('category_id');
+                $invoice->customer_tax   = $request->has('customer_tax');
                 $invoice->save();
                 CustomField::saveData($invoice, $request->input('customField'));
                 $products = $request->input('items');
+
+                $removedProduct = InvoiceProduct::where('invoice_id', $invoice->id)->whereNotIn('product_id', collect($products)->pluck('item'))->get();
+                foreach($removedProduct as $product) {
+                    $item = ProductService::find($product->product_id);
+                    if(!empty($item)) {
+                        $item->quantity += $product->quantity;
+                        $item->save();
+                    }
+                    $product->delete();
+                }
 
                 foreach($products as $product) {
                     $quantity   = $this->ReadableNumberToFloat($product['quantity']);
