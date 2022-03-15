@@ -36,6 +36,10 @@ trait ApiResponse {
         return $this->SuccessWithoutDataResponse($message);
     }
 
+    public function EditSuccessResponse($message = 'Data successfully edited') {
+        return $this->SuccessWithoutDataResponse($message);
+    }
+
     public function FetchSuccessResponse($data) {
         return response()->json($data);
     }
