@@ -134,10 +134,10 @@ class BankAccountController extends Controller
 
     public function update(Request $request, BankAccount $bankAccount)
     {
-        if(Auth::user()->can('create bank account'))
+        if(Auth::user()->can('edit bank account'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), 
                 [
                     'holder_name' => 'required',
