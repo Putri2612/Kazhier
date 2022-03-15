@@ -74,7 +74,7 @@ class ProductServiceController extends Controller
             'created_by'    => $creatorId,
         ], [
             'sku'           => $request->input('product_code'),
-            'category_id'   => $category,
+            'category_id'   => $category->id,
             'sale_price'    => $request->input('product_sell_price'),
             'purchase_price'=> $request->input('product_buy_price'),
             'unit_id'       => $request->input('product_weight_unit_id'),
@@ -89,6 +89,62 @@ class ProductServiceController extends Controller
         } else {
             return $this->FailedDataExistResponse();
         }
+    }
+    
+    public function edit(Request $request, $product_id) {
+        if(!Auth::user()->can('edit product & service')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'product_name'          => 'required',
+            'product_code'          => 'required',
+            'category_id'           => 'required',
+            'product_sell_price'    => 'required',
+            'product_buy_price'     => 'required',
+            'product_weight_unit_id'=> 'required',
+            'product_stock'         => 'required',
+            'product_tax_id'        => 'required'
+        ]);
+
+        if($validator->fails()) {
+            $message = '';
+            foreach($validator->errors()->all() as $key => $fail) {
+                $message .= $fail;
+                if($key < count($validator->errors()->all())) {
+                    $message .= '\n';
+                }
+            }
+            return $this->FailedResponse($message);
+        }
+
+        $user = Auth::user();
+        $creatorId = $user->creatorId();
+        $types  = [1 => 'product', 2 => 'service'];
+        $type   = $request->has('product_type') ? $request->input('product_type') : 1;
+
+        $category = ProductServiceCategory::find($request->input('category_id'));
+        if($category->created_by != $creatorId) {
+            $category = ProductServiceCategory::where('created_by', $creatorId)->first()->id;
+        }
+
+        $product_service = ProductService::where('created_by', $creatorId)->where('id', $product_id)->first();
+        if(empty($product_service)) {
+            return $this->NotFoundResponse();
+        }
+
+        $product_service->name              = $request->input('product_name');
+        $product_service->sku               = $request->input('product_code');
+        $product_service->category_id       = $category->id;
+        $product_service->sale_price        = $request->input('product_sell_price');
+        $product_service->purchase_price    = $request->input('product_buy_price');
+        $product_service->unit_id           = $request->input('product_weight_unit_id');
+        $product_service->quantity          = $request->input('product_stock');
+        $product_service->tax_id            = $request->input('product_tax_id');
+        $product_service->type              = $types[$type];
+        $product_service->save();
+
+        return $this->EditSuccessResponse();
     }
 
     public function destroy($product_id) {

@@ -47,7 +47,7 @@ class CustomerCategoryController extends Controller
         $creatorId = $user->creatorId();
         
         $category                   = new CustomerCategory();
-        $category->name             = $request->input('name');
+        $category->name             = $request->input('category_name');
         $category->discount         = $discount;
         $category->discount_type    = $type;
         $category->max_discount     = $maxDiscount;
@@ -55,6 +55,36 @@ class CustomerCategoryController extends Controller
         $category->save();
 
         return $this->CreateSuccessResponse();
+    }
+
+    public function edit(Request $request, $category_id) {
+        $validator = Validator::make($request->all(), [
+            'category_name'             => 'required',
+        ]);
+        if($validator->fails()) {
+            return $this->FailedResponse('Category name is missing');
+        }
+
+        $discount       = empty($request->input('category_discount')) ? 0 : $request->input('category_discount');
+        $maxDiscount    = empty($request->input('category_max_discount')) ? 0 : $request->input('category_max_discount');
+        $type           = empty($request->input('category_discount_type')) ? 1 : $request->input('category_discount_type');
+
+        $user = Auth::user();
+        $creatorId = $user->creatorId();
+        
+        $category                   = CustomerCategory::where('created_by', $creatorId)->where('id', $category_id)->first();
+
+        if(empty($category)) {
+            return $this->NotFoundResponse();
+        }
+
+        $category->name             = $request->input('category_name');
+        $category->discount         = $discount;
+        $category->discount_type    = $type;
+        $category->max_discount     = $maxDiscount;
+        $category->save();
+
+        return $this->EditSuccessResponse();
     }
 
     public function destroy($category_id) {

@@ -67,6 +67,36 @@ class ProductServiceCategoryController extends Controller
         }
     }
 
+    public function edit(Request $request, $category_id) {
+        if(!Auth::user()->can('create constant category')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'category_name' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse('Category name is missing');
+        }
+
+        $type   = $request->has('category_type') ? $request->input('category_type') : 0;
+        $color  = $request->has('category_color') ? $request->input('category_color') : $this->defaultColor[$type];
+
+        $category = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('id', $category_id)->first();
+
+        if(empty($category)) {
+            return $this->NotFoundResponse();
+        }
+
+        $category->name     = $request->input('category_name');
+        $category->type     = $type;
+        $category->color    = $color;
+        $category->save();
+        
+        return $this->EditSuccessResponse();
+    }
+
     public function destroy($id) {
         if(!Auth::user()->can('delete constant category')) {
             return $this->UnauthorizedResponse();

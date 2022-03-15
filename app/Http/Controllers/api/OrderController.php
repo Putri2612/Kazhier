@@ -198,7 +198,6 @@ class OrderController extends Controller
         $creatorID  = $user->creatorId();
         $products   = $request->input('products');
 
-        // return response()->json(json_decode($products));
         $products   = gettype($products) == 'string' ? json_decode($products): $products;
 
         $customer   = Customer::firstOrNew([

@@ -43,18 +43,22 @@ Route::as('api.')->group(
             
             Route::post('category/create', [ProductServiceCategoryController::class, 'create'])->name('category.create');
             Route::get('category/{type}', [ProductServiceCategoryController::class, 'get'])->name('category.get');
-            Route::delete('category/{id}/delete', [ProductServiceCategoryController::class, 'destroy'])->name('category.destroy');
+            Route::put('category/{category_id}/edit', [ProductServiceCategoryController::class, 'edit'])->name('category.edit');
+            Route::delete('category/{category_id}/delete', [ProductServiceCategoryController::class, 'destroy'])->name('category.destroy');
 
             Route::get('customer', [CustomerController::class, 'get'])->name('customer.get');
             Route::post('customer/create', [CustomerController::class, 'create'])->name('customer.create');
+            Route::put('customer/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit');
             Route::delete('customer/{id}/delete', [CustomerController::class, 'destroy'])->name('customer.destroy');
             
             Route::post('customer-category/create', [CustomerCategoryController::class, 'create'])->name('customer-category.create');
             Route::get('customer-category/{category_id}', [CustomerCategoryController::class, 'get'])->name('customer-category.get');
+            Route::put('customer-category/{category_id}/edit', [CustomerCategoryController::class, 'edit'])->name('customer-category.edit');
             Route::delete('customer-category/{category_id}/delete', [CustomerCategoryController::class, 'destroy'])->name('customer-category.destroy');
 
             Route::get('expense', [ExpenseController::class, 'get'])->name('expense.get');
             Route::post('expense/create', [ExpenseController::class, 'create'])->name('expense.create');
+            Route::put('expense/{expense_id}/edit', [ExpenseController::class, 'edit'])->name('expense.edit');
             Route::delete('expense/{expense_id}/delete', [ExpenseController::class, 'destroy'])->name('expense.destroy');
 
             Route::get('order', [OrderController::class, 'index'])->name('order.index');
@@ -64,14 +68,17 @@ Route::as('api.')->group(
 
             Route::post('product-service/create', [ProductServiceController::class, 'create'])->name('product-service.create');
             Route::get('product-service/{product_id}', [ProductServiceController::class, 'get'])->name('product-service.get');
+            Route::put('product-service/{product_id}/edit', [ProductServiceController::class, 'edit'])->name('product-service.edit');
             Route::delete('product-service/{product_id}/delete', [ProductServiceController::class, 'destroy'])->name('product-service.destroy');
             
             Route::post('unit/create', [ProductServiceUnitController::class, 'create'])->name('unit.create');
-            Route::get('unit/{id}', [ProductServiceUnitController::class, 'get'])->name('unit.get');
-            Route::delete('unit/{id}/delete', [ProductServiceUnitController::class, 'destroy'])->name('unit.destroy');
+            Route::get('unit/{unit_id}', [ProductServiceUnitController::class, 'get'])->name('unit.get');
+            Route::put('unit/{unit_id}/edit', [ProductServiceUnitController::class, 'edit'])->name('unit.edit');
+            Route::delete('unit/{unit_id}/delete', [ProductServiceUnitController::class, 'destroy'])->name('unit.destroy');
             
             Route::post('tax/create', [TaxController::class, 'create'])->name('tax.create');
             Route::get('tax/{id}', [TaxController::class, 'get'])->name('tax.get');
+            Route::put('tax/{id}/edit', [TaxController::class, 'edit'])->name('tax.edit');
             Route::delete('tax/{id}/delete', [TaxController::class, 'destroy'])->name('tax.destroy');
 
             Route::post('supplier/create', [SupplierController::class, 'create'])->name('supplier.create');

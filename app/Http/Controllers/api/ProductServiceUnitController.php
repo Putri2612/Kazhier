@@ -55,6 +55,28 @@ class ProductServiceUnitController extends Controller
         }
     }
 
+    public function edit(Request $request, $unit_id) {
+        if(!Auth::user()->can('create constant unit')) {
+            return $this->UnauthorizedResponse();
+        }
+        $validator = Validator::make($request->all(), [
+            'unit_name' => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse('Unit name is missing');
+        }
+
+        $unit = ProductServiceUnit::where('id', $unit_id)->where('created_by', Auth::user()->creatorId())->first();
+        if(empty($unit)) {
+            return $this->NotFoundResponse();
+        }
+        $unit->name = $request->input('unit_name');
+        $unit->save();
+        
+        return $this->EditSuccessResponse();
+    }
+
     public function destroy($unit_id) {
         if(!Auth::user()->can('delete constant unit')) {
             return $this->UnauthorizedResponse();

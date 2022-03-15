@@ -59,6 +59,40 @@ class TaxController extends Controller
         }
     }
 
+    public function edit(Request $request, $tax_id) {
+        if(!Auth::user()->can('edit constant tax')) {
+            return $this->UnauthorizedResponse();
+        }
+        $validator = Validator::make($request->all(), [
+            'tax_name'  => 'required',
+            'tax_rate'  => 'required'
+        ]);
+
+        if($validator->fails()) {
+            $message = '';
+            foreach($validator->errors()->all() as $key => $fail) {
+                $message .= $fail;
+                if($key < count($validator->errors()->all())) {
+                    $message .= '\n';
+                }
+            }
+            return $this->FailedResponse($message);
+        }
+
+        $user = Auth::user();
+
+        $tax = Tax::where('id', $tax_id)->where('created_by', $user->creatorId())->first();
+        if(empty($tax)) {
+            return $this->NotFoundResponse();
+        }
+
+        $tax->name  = $request->input('tax_name');
+        $tax->rate  = $request->input('tax_rate');
+        $tax->save();
+            
+        return $this->EditSuccessResponse();
+    }
+
     public function destroy($tax_id) {
         if(!Auth::user()->can('delete constant tax')){
             return $this->UnauthorizedResponse();
