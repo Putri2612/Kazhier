@@ -47,6 +47,25 @@ class OrderController extends Controller
         return $this->FetchSuccessResponse($data);
     }
 
+    public function detail($order_id) {
+        $items = InvoiceProduct::select(
+                    'invoice_products.id AS order_details_id',
+                    'invoice_products.invoice_id',
+                    'invoice_products.quantity AS product_quantity',
+                    'product_services.name AS product_name',
+                    'product_service_units.name AS product_weight',
+                    'invoice_products.price AS product_price',
+                    'invoices.issue_date AS product_order_date',
+                )
+                ->where('invoice_products.invoice_id', $order_id)
+                ->where('invoices.created_by', Auth::user()->creatorId())
+                ->join('product_services', 'invoice_products.product_id', '=', 'product_services.id')
+                ->join('invoices', 'invoice_products.invoice_id', '=', 'invoices.id')
+                ->join('product_service_units', 'product_services.unit_id', '=', 'product_service_units.id')
+                ->get();
+        return $this->FetchSuccessResponse($items);
+    }
+
     public function create(Request $request) {
         if(!Auth::user()->can('create invoice')){
             return $this->UnauthorizedResponse();

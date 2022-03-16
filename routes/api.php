@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\Auth\AuthController;
 use App\Http\Controllers\api\BankAccountController;
+use App\Http\Controllers\api\CompanyController;
 use App\Http\Controllers\api\CustomerCategoryController;
 use App\Http\Controllers\api\CustomerController;
 use App\Http\Controllers\api\ExpenseController;
@@ -33,6 +34,9 @@ Route::as('api.')->group(
         // Route::post('register', [AuthController::class, 'register'])->name('register');
 
         Route::group(['middleware' => ['auth:api', 'plan']], function() {
+            Route::get('company', [CompanyController::class, 'get'])->name('company.get');
+            Route::put('company/edit', [CompanyController::class, 'update'])->name('company.update');
+            
             Route::post('logout', [AuthController::class, 'logout'])->name('logout');
             Route::get('role-and-permission', [AuthController::class, 'RolePermission'])->name('role-and-permission');
 
@@ -65,6 +69,7 @@ Route::as('api.')->group(
             Route::post('order/create', [OrderController::class, 'create'])->name('order.create');
             Route::put('order/{order_id}/edit', [OrderController::class, 'edit'])->name('order.edit');
             Route::delete('order/{order_id}/delete', [OrderController::class, 'destroy'])->name('order.destroy');
+            Route::get('order/{order_id}/detail', [OrderController::class, 'detail'])->name('order.detail');
 
             Route::post('product-service/create', [ProductServiceController::class, 'create'])->name('product-service.create');
             Route::get('product-service/{product_id}', [ProductServiceController::class, 'get'])->name('product-service.get');

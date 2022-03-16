@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Utility;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +45,23 @@ class AuthController extends Controller
             $user   = Auth::user();
             $token  = $user->createToken('KazhierPAC')->accessToken;
 
-            return  $this->FetchSuccessResponse(['token' => $token]);
+            $settings = Utility::settings();
+
+            $data = [
+                'value'             => 'success',
+                'token'             => $token,
+                'name'              => $user->name, 
+                'id'                => $user->id,
+                'user_type'         => $user->type,
+                'shop_name'         => empty($settings['company_name']) ? $user->name : $settings['company_name'], 
+                'shop_contact'      => empty($settings['company_telephone']) ? null : $settings['company_telephone'],
+                'shop_email'        => empty($settings['company_email']) ? $user->email : $settings['company_email'],
+                'shop_address'      => empty($settings['company_address']) ? null : $settings['company_address'],
+                'currency_symbol'   => empty($settings['site_currency_symbol']) ? 'Rp' : $settings['site_currency_symbol'],
+                'shop_status'       => $user->is_active && $user->plan ? 'active' : 'inactive',
+            ];
+
+            return  $this->FetchSuccessResponse($data);
         } else {
             return $this->FailedResponse('Incorrect email or password');
         }
