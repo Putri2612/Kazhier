@@ -30,11 +30,11 @@
                         <div class="card-body">
                             <p>
                                 <span>
-                                    {{ __('Press the plus (+) button on the left panel to add a category') }}
-                                    {!! __('or press the <strong>"create new"</strong> on the right panel to create your own category.') !!}
+                                    {{ __('Press the plus (+) button on the left panel to add a unit') }}
+                                    {!! __('or press the <strong>"create new"</strong> on the right panel to create your own unit.') !!}
                                 </span> <br/>
                                 <span class="text-danger">
-                                    {{ __('Press the minus(-) button on the right panel to remove a category') }}
+                                    {{ __('Press the minus(-) button on the right panel to remove a unit') }}
                                 </span>
                             </p>
                             {{ Form::open(array('route' => 'initial-setup.unit', 'method' => 'post')) }}

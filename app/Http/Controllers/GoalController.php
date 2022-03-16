@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Goal;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 
 class GoalController extends Controller
 {
+    use CanProcessNumber;
 
     public function index()
     {

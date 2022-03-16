@@ -28,6 +28,9 @@
                         callbacks: {
                             label: ChartsConstant.Callbacks.tooltipsLabel
                         }
+                    },
+                    legend: {
+                        display: true
                     }
                 }
             },
@@ -547,59 +550,93 @@
                 </div>
                 
                 <div class="card">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="card-header">
-                                <h6><b>{{__('Weekly Statistics')}}</b></h6>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled list-unstyled-border">
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceTotal'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoicePaid'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                    <div class="d-lg-none">
+                        <div class="card-header">
+                            <ul class="nav nav-pills mb-3" id="myTab0" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="weekly-invoice-tab0" data-bs-toggle="tab" href="#weekly-invoice" data-bs-target="#weekly-invoice" role="tab" aria-controls="" aria-selected="true">{{__('Weekly Statistics')}}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="monthly-invoice-tab0" data-bs-toggle="tab" href="#monthly-invoice" data-bs-target="#monthly-invoice" role="tab" aria-controls="" aria-selected="false">{{__('Monthly Statistics')}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent0">
+                                <div class="tab-pane fade show active media" id="weekly-invoice" role="tabpanel">
+                                    <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceTotal'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyInvoice['invoicePaid'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceDue'])}}</div>
+                                </div>
+                                <div class="tab-pane fade media" id="monthly-invoice" role="tabpanel">
+                                    <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceTotal'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyInvoice['invoicePaid'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceDue'])}}</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="card-header">
-                                <h6><b>{{__('Monthly Statistics')}}</b></h6>
+                    </div>
+                    <div class="d-none d-lg-block">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card-header">
+                                    <h6><b>{{__('Weekly Statistics')}}</b></h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled list-unstyled-border">
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceTotal'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoicePaid'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceDue'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled list-unstyled-border">
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceTotal'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoicePaid'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div class="col-6">
+                                <div class="card-header">
+                                    <h6><b>{{__('Monthly Statistics')}}</b></h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled list-unstyled-border">
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceTotal'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Invoice Generated')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoicePaid'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceDue'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -672,59 +709,93 @@
                 </div>
                 
                 <div class="card">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="card-header">
-                                <h6><b>{{__('Weekly Statistics')}}</b></h6>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled list-unstyled-border">
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billTotal'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billPaid'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                    <div class="d-lg-none">
+                        <div class="card-header">
+                            <ul class="nav nav-pills mb-3" id="myTab0" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="weekly-bill-tab0" data-bs-toggle="tab" href="#weekly-bill" data-bs-target="#weekly-bill" role="tab" aria-controls="" aria-selected="true">{{__('Weekly Statistics')}}</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="monthly-bill-tab0" data-bs-toggle="tab" href="#monthly-bill" data-bs-target="#monthly-bill" role="tab" aria-controls="" aria-selected="false">{{__('Monthly Statistics')}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="myTabContent0">
+                                <div class="tab-pane fade show active media" id="weekly-bill" role="tabpanel">
+                                    <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billTotal'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billPaid'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billDue'])}}</div>
+                                </div>
+                                <div class="tab-pane fade media" id="monthly-bill" role="tabpanel">
+                                    <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billTotal'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billPaid'])}}</div>
+                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billDue'])}}</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="card-header">
-                                <h6><b>{{__('Monthly Statistics')}}</b></h6>
+                    </div>
+                    <div class="d-none d-lg-block">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="card-header">
+                                    <h6><b>{{__('Weekly Statistics')}}</b></h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled list-unstyled-border">
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billTotal'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billPaid'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($weeklyBill['billDue'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <ul class="list-unstyled list-unstyled-border">
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billTotal'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billPaid'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
-                                        </div>
-                                    </li>
-                                    <li class="media">
-                                        <div class="media-body">
-                                            <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billDue'])}}</div>
-                                            <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
-                                        </div>
-                                    </li>
-                                </ul>
+                            <div class="col-6">
+                                <div class="card-header">
+                                    <h6><b>{{__('Monthly Statistics')}}</b></h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled list-unstyled-border">
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billTotal'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billPaid'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Paid')}}</a></div>
+                                            </div>
+                                        </li>
+                                        <li class="media">
+                                            <div class="media-body">
+                                                <div class="media-right">{{\Auth::user()->priceFormat($monthlyBill['billDue'])}}</div>
+                                                <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -807,7 +878,7 @@
                                 <div class="card card-statistic-1 card-statistic-2">
                                     <div class="card-wrap">
                                         <div class="row">
-                                            <div class="col-2">
+                                            <div class="col-6 col-md-4 col-xl-2">
                                                 <div class="card-header">
                                                     <h4>{{__('Name')}}</h4>
                                                 </div>
@@ -815,7 +886,7 @@
                                                     {{$goal->name}}
                                                 </div>
                                             </div>
-                                            <div class="col-2">
+                                            <div class="col-6 col-md-4 col-xl-2">
                                                 <div class="card-header">
                                                     <h4>{{__('Type')}}</h4>
                                                 </div>
@@ -823,19 +894,19 @@
                                                     {{ __(\App\Models\Goal::$goalType[$goal->type]) }}
                                                 </div>
                                             </div>
-                                            <div class="col-3">
+                                            <div class="col-6 col-md-4 col-xl-3">
                                                 <div class="card-header">
                                                     <h4>{{__('Duration')}}</h4>
                                                 </div>
                                                 <div class="card-body">
-                                                    {{$goal->from .' To '.$goal->to}}
+                                                    {{$goal->from .__(' To ').$goal->to}}
                                                 </div>
                                             </div>
 
-                                            <div class="col-5">
+                                            <div class="col-6 col-md-12 col-xl-5">
                                                 <div class="card-header">
                                                     <div class="row">
-                                                        <div class="col-9">
+                                                        <div class="col">
                                                             {{\Auth::user()->priceFormat($total).' of '. \Auth::user()->priceFormat($goal->amount)}}
                                                         </div>
                                                         <div class="col-auto">

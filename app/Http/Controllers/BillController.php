@@ -334,14 +334,14 @@ class BillController extends Controller
 
     public function product(Request $request)
     {
-        $data['product']     = $product = ProductService::find($request->product_id);
-        $data['unit']        = $product->unit ? $product->unit->name : '';
-        $data['taxRate']     = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
-        $salePrice           = $product->sale_price;
-        $quantity            = 1;
-        $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
-        $product->sale_price = $this->FloatToReadableNumber($salePrice);
-        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + $taxPrice);
+        $data['product']        = $product = ProductService::find($request->product_id);
+        $data['unit']           = $product->unit ? $product->unit->name : '';
+        $data['taxRate']        = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
+        $purchasePrice          = $product->purchase_price;
+        $quantity               = 1;
+        $taxPrice               = ($taxRate / 100) * ($purchasePrice * $quantity);
+        $product->purchase_price= $this->FloatToReadableNumber($purchasePrice);
+        $data['totalAmount']    = $this->FloatToReadableNumber(($purchasePrice * $quantity) + $taxPrice);
 
         return json_encode($data);
     }

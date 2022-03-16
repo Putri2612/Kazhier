@@ -27,10 +27,10 @@
                 <a href="{{ route('plans.index') }}" class="nav-link nav-link-lg">
                     @if ($pricier)
                         <span><i class="fa-solid fa-circle-up"></i></span>
-                        <span class="d-sm-none d-lg-inline"> {{__('Upgrade')}}</span>
+                        <span class="d-none d-lg-inline"> {{__('Upgrade')}}</span>
                     @else
                         <span><i class="fa-solid fa-arrows-rotate"></i></span>
-                        <span class="d-sm-none d-lg-inline"> {{__('Extend')}}</span>
+                        <span class="d-none d-lg-inline"> {{__('Extend')}}</span>
                     @endif
                 </a>
             </li>
@@ -71,7 +71,7 @@
         <li class="dropdown">
             <a href="#" data-bs-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                 <img alt="image" src="{{(!empty($users->avatar)? $profile.'/'.$users->avatar : $profile.'/avatar.png')}}" class="rounded-circle me-1">
-                <div class="d-sm-none d-lg-inline-block">{{__('Hi')}}, {{\Auth::user()->name}}</div>
+                <div class="d-none d-lg-inline-block">{{__('Hi')}}, {{\Auth::user()->name}}</div>
             </a>
             <div class="dropdown-menu dropdown-menu-end">
                 <div class="dropdown-title">{{__('Welcome!')}}</div>

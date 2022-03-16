@@ -312,7 +312,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $revenue        = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
         $invoiceIDs     = Invoice:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
         $invoices       = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
-        $totalIncome    = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? array_sum($invoices) : 0);
+        $totalIncome    = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? $invoices : 0);
 
         return $totalIncome;
 
@@ -327,7 +327,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $billIDs        = Bill:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
         $bills          = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
 
-        $totalExpense   = (!empty($payment) ? $payment : 0) + (!empty($bills) ? array_sum($bills) : 0);
+        $totalExpense   = (!empty($payment) ? $payment : 0) + (!empty($bills) ? $bills : 0);
 
         return $totalExpense;
     }
