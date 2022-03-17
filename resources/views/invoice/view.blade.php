@@ -124,6 +124,9 @@
                                         <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                             {{__('Print')}}
                                         </a>
+                                        <a href="{{ route('invoice.thermal', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
+                                            {{__('Print Thermal')}}
+                                        </a>
                                     </div>
                                     <div class="form-group ">
                                         <div class="custom-control custom-checkbox shipping">
@@ -144,7 +147,9 @@
                                     <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
                                         {{__('Print')}}
                                     </a>
-
+                                    <a href="{{ route('invoice.thermal', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
+                                        {{__('Print Thermal')}}
+                                    </a>
                                 </div>
                             </div>
                         </div>
