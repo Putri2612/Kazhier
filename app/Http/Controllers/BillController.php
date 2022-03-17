@@ -129,6 +129,7 @@ class BillController extends Controller
             $bill->order_number     = $request->input('order_number');
             $bill->discount_apply   = $request->has('discount_apply') ? 1 : 0;
             $bill->created_by       = Auth::user()->creatorId();
+            $bill->served_by        = Auth::user()->id;
             $bill->save();
             CustomField::saveData($bill, $request->input('customField'));
             $products = $request->input('items');
@@ -246,7 +247,7 @@ class BillController extends Controller
                 CustomField::saveData($bill, $request->input('customField'));
                 $products = $request->input('items');
 
-                $removedProducts = BillProduct::where('bill_id', $bill->id)->whereNotIn(collect($products)->pluck('item'))->get();
+                $removedProducts = BillProduct::where('bill_id', $bill->id)->whereNotIn('product_id',collect($products)->pluck('item'))->get();
 
                 foreach ($removedProducts as $product) {
                     $item = ProductService::find($product['item']);
@@ -672,6 +673,7 @@ class BillController extends Controller
             $duplicateBill->status           = 0;
             $duplicateBill->shipping_display = $bill['shipping_display'];
             $duplicateBill->created_by       = $bill['created_by'];
+            $duplicateBill->served_by        = $bill['served_by'];
             $duplicateBill->save();
 
             if($duplicateBill)
@@ -791,6 +793,55 @@ class BillController extends Controller
             $color = '#' . $settings['bill_color'];
 
             return view('bill.templates.' . $settings['bill_template'], compact('bill', 'color', 'settings', 'vendor', 'img'));
+        }
+        else
+        {
+            return $this->RedirectDenied();
+        }
+
+    }
+
+    public function thermal($bill_id)
+    {
+        $settings = Utility::settings();
+        $billId   = Crypt::decrypt($bill_id);
+
+        $bill  = Bill::where('id', $billId)->first();
+        $data  = DB::table('settings');
+        $data  = $data->where('created_by', '=', $bill->created_by);
+        $data1 = $data->get();
+
+        foreach($data1 as $row)
+        {
+            $settings[$row->name] = $row->value;
+        }
+
+        $vendor = $bill->vender;
+
+        $items = [];
+        foreach($bill->items as $product)
+        {
+            $item           = new \stdClass();
+            $item->name     = !empty($product->product()) ? $product->product()->name : '';
+            $item->quantity = $product->quantity;
+            $item->tax      = $product->tax;
+            $item->discount = $product->discount;
+            $item->price    = $product->price;
+            $items[]        = $item;
+        }
+
+        $bill->items = $items;
+
+        //Set your logo
+        $logo         = asset(Storage::url('logo/'));
+        $company_logo = Utility::getValByName('company_logo');
+        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+
+        if($bill)
+        {
+            $color = '#' . $settings['bill_color'];
+
+            return view('bill.templates.thermal', compact('bill', 'color', 'settings', 'vendor', 'img'));
         }
         else
         {

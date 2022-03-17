@@ -11,6 +11,9 @@
 |
 */
 
+use App\Http\Controllers\api\CustomerCategoryController as ApiCustomerCategoryController;
+use App\Http\Controllers\api\CustomerController as ApiCustomerController;
+use App\Http\Controllers\api\OrderController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PostRegisterController;
@@ -19,6 +22,7 @@ use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BillController;
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\CustomerCategoryController;
@@ -207,9 +211,15 @@ Route::prefix('app')->group(
                 Route::put('productservice/import/', [ProductServiceController::class, 'storeImport'])->name('productservice.import.store');
                 Route::post('productservice/import/header', [ProductServiceController::class, 'getImportHeadings'])->name('productservice.import.headings');
                 Route::resource('productservice', ProductServiceController::class);
-        
+                
+                Route::get('customer/ajax/{name}', [ApiCustomerController::class, 'name'])->name('customer.name.ajax');
+                
                 Route::resource('customer', CustomerController::class);
+
+                Route::get('customer-category/ajax/{category_id}', [ApiCustomerCategoryController::class, 'get'])->name('customer.category.ajax');
+
                 Route::resource('customer-category', CustomerCategoryController::class);
+
         
                 Route::resource('vender', VenderController::class);
         
@@ -244,6 +254,9 @@ Route::prefix('app')->group(
                 Route::resource('payment-method', PaymentMethodController::class);
         
                 // Income
+
+                Route::get('cashier-mode', [CashierController::class, 'index'])->name('cashier-mode');
+                Route::post('order/create', [OrderController::class, 'create'])->name('order.create.ajax');
         
                 Route::prefix('invoice')->as('invoice.')->group(
                     function () {
@@ -401,7 +414,9 @@ Route::prefix('app')->group(
                     'xss'
                 ]
             ], function () {
+                Route::get('invoice/thermal/{id}', [InvoiceController::class, 'thermal'])->name('invoice.thermal');
                 Route::get('invoice/pdf/{id}', [InvoiceController::class, 'invoice'])->name('invoice.pdf');
+                Route::get('bill/thermal/{id}', [BillController::class, 'thermal'])->name('bill.thermal');
                 Route::get('bill/pdf/{id}', [BillController::class, 'bill'])->name('bill.pdf');
                 Route::get('proposal/pdf/{id}', [ProposalController::class, 'proposal'])->name('proposal.pdf');
                 

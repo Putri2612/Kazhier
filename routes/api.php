@@ -11,6 +11,7 @@ use App\Http\Controllers\api\PaymentMethodController;
 use App\Http\Controllers\api\ProductServiceCategoryController;
 use App\Http\Controllers\api\ProductServiceController;
 use App\Http\Controllers\api\ProductServiceUnitController;
+use App\Http\Controllers\api\ReportController;
 use App\Http\Controllers\api\SupplierController;
 use App\Http\Controllers\api\TaxController;
 use Illuminate\Http\Request;
@@ -51,6 +52,7 @@ Route::as('api.')->group(
             Route::delete('category/{category_id}/delete', [ProductServiceCategoryController::class, 'destroy'])->name('category.destroy');
 
             Route::get('customer', [CustomerController::class, 'get'])->name('customer.get');
+            Route::get('customer/name/{name}', [CustomerController::class, 'name'])->name('customer.name');
             Route::post('customer/create', [CustomerController::class, 'create'])->name('customer.create');
             Route::put('customer/{id}/edit', [CustomerController::class, 'edit'])->name('customer.edit');
             Route::delete('customer/{id}/delete', [CustomerController::class, 'destroy'])->name('customer.destroy');
@@ -94,6 +96,9 @@ Route::as('api.')->group(
             Route::put('payment-method/{method_id}/edit', [PaymentMethodController::class, 'edit'])->name('payment-method.edit');
             Route::delete('payment-method/{method_id}/delete', [PaymentMethodController::class, 'destroy'])->name('payment-method.destroy');
             Route::get('payment-method/{method_id}', [PaymentMethodController::class, 'get'])->name('payment-method.get');
+
+            Route::get('report/income', [ReportController::class, 'income'])->name('report.income');
+            Route::get('report/expense', [ReportController::class, 'expense'])->name('report.expense');
         });
     }
 );

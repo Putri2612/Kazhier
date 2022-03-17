@@ -118,7 +118,8 @@ class InvoiceController extends Controller
     public function product(Request $request)
     {
 
-        $taxPaidByUser = $request->has('paid_by_user') && $request->input('paid_by_user') == 'true';
+        // $taxPaidByUser = $request->has('paid_by_user') && $request->input('paid_by_user') == 'true';
+        $taxPaidByUser = true;
 
         $data['product']     = $product = ProductService::find($request->product_id);
         $data['unit']        = $product->unit ? $product->unit->name : '';
@@ -168,6 +169,7 @@ class InvoiceController extends Controller
             $invoice->customer_tax   = $request->has('customer_tax');
             $invoice->created_by     = Auth::user()->creatorId();
             $invoice->served_by      = Auth::user()->id;
+            $invoice->served_by        = Auth::user()->id;
             $invoice->save();
             CustomField::saveData($invoice, $request->input('customField'));
             $products = $request->input('items');
@@ -266,6 +268,13 @@ class InvoiceController extends Controller
 
                     return redirect()->route('bill.index')->with('error', $messages->first());
                 }
+
+                $products = $request->input('items');
+                $checkStock = ProductService::where('created_by', Auth::user()->creatorId())->whereIn('id', collect($products)->pluck('item'))->where('quantity', 0)->count();
+                if($checkStock) {
+                    return redirect()->back()->with('error', __('Empty stock'));
+                }
+
                 $invoice->customer_id    = $request->input('customer_id');
                 $invoice->issue_date     = $request->input('issue_date');
                 $invoice->due_date       = $request->input('due_date');
@@ -275,7 +284,6 @@ class InvoiceController extends Controller
                 $invoice->customer_tax   = $request->has('customer_tax');
                 $invoice->save();
                 CustomField::saveData($invoice, $request->input('customField'));
-                $products = $request->input('items');
 
                 $removedProduct = InvoiceProduct::where('invoice_id', $invoice->id)->whereNotIn('product_id', collect($products)->pluck('item'))->get();
                 foreach($removedProduct as $product) {
@@ -717,6 +725,7 @@ class InvoiceController extends Controller
             $duplicateInvoice->status           = 0;
             $duplicateInvoice->shipping_display = $invoice['shipping_display'];
             $duplicateInvoice->created_by       = $invoice['created_by'];
+            $duplicateInvoice->served_by        = $invoice['served_by'];
             $duplicateInvoice->save();
 
             if($duplicateInvoice)
@@ -815,7 +824,7 @@ class InvoiceController extends Controller
         foreach($invoice->items as $product)
         {
             $item           = new \stdClass();
-            $item->name     = !empty($product->product()) ? $product->product()->name : '';
+            $item->name     = !empty($product->product) ? $product->product->name : '';
             $item->quantity = $product->quantity;
             $item->tax      = $product->tax;
             $item->discount = $product->discount;
@@ -840,7 +849,53 @@ class InvoiceController extends Controller
         {
             return $this->RedirectDenied();
         }
+    }
 
+    public function thermal($invoice_id) {
+        $settings = Utility::settings();
+
+        $invoiceId = Crypt::decrypt($invoice_id);
+        $invoice   = Invoice::where('id', $invoiceId)->first();
+
+        $data  = DB::table('settings');
+        $data  = $data->where('created_by', '=', $invoice->created_by);
+        $data1 = $data->get();
+
+        foreach($data1 as $row)
+        {
+            $settings[$row->name] = $row->value;
+        }
+
+        $customer = $invoice->customer;
+        $items    = [];
+        foreach($invoice->items as $product)
+        {
+            $item           = new \stdClass();
+            $item->name     = !empty($product->product) ? $product->product->name : '';
+            $item->quantity = $product->quantity;
+            $item->tax      = $product->tax;
+            $item->discount = $product->discount;
+            $item->price    = $product->price;
+            $items[]        = $item;
+        }
+
+        $invoice->items = $items;
+
+        //Set your logo
+        $logo         = asset(Storage::url('logo/'));
+        $company_logo = Utility::getValByName('company_logo');
+        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+
+        if($invoice)
+        {
+            $color = '#' . $settings['invoice_color'];
+
+            return view('invoice.templates.thermal', compact('invoice', 'color', 'settings', 'customer', 'img'));
+        }
+        else
+        {
+            return $this->RedirectDenied();
+        }
     }
 
     public function saveTemplateSettings(Request $request)
