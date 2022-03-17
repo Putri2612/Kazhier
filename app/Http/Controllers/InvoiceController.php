@@ -94,7 +94,7 @@ class InvoiceController extends Controller
             $customers->prepend(__('Select Customer'), '');
             $category           = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
-            $product_services   = ProductService::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services   = ProductService::where('created_by', Auth::user()->creatorId())->where('quantity', '>', 0)->get()->pluck('name', 'id');
 
             $category           = $category->union(['new.product-category' => __('Create new category')]);
             $customers          = $customers->union(['new.customer' => __('Add new customer')]);
@@ -229,7 +229,7 @@ class InvoiceController extends Controller
             $customers      = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $category       = ProductServiceCategory::where('created_by', Auth::user()->creatorId())->where('type', 1)->get()->pluck('name', 'id');
             $category->prepend(__('Select Category'), '');
-            $product_services = ProductService::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
+            $product_services = ProductService::where('created_by', Auth::user()->creatorId())->where('quantity', '>', 0)->get()->pluck('name', 'id');
 
             $invoice->customField = CustomField::getData($invoice, 'invoice');
             $customFields         = CustomField::where('module', '=', 'invoice')->get();
@@ -266,7 +266,7 @@ class InvoiceController extends Controller
                 {
                     $messages = $validator->getMessageBag();
 
-                    return redirect()->route('bill.index')->with('error', $messages->first());
+                    return redirect()->route('invoice.edit', $invoice->id)->with('error', $messages->first());
                 }
 
                 $products = $request->input('items');

@@ -30,19 +30,6 @@
                     if (confirm('Are you sure you want to delete this element?')) {
                         var el = $(this).parent().parent().parent().parent();
                         var id = $(el.find('.id')).val();
-                        $.ajax({
-                            url: '{{route('bill.product.destroy')}}',
-                            type: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': jQuery('#token').val()
-                            },
-                            data: {
-                                'id': id
-                            },
-                            cache: false,
-                            success: function (data) {
-                            },
-                        });
 
                         $(this).slideUp(deleteElement);
                         $(this).remove();

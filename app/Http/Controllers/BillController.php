@@ -235,7 +235,7 @@ class BillController extends Controller
                 {
                     $messages = $validator->getMessageBag();
 
-                    return redirect()->route('bill.index')->with('error', $messages->first());
+                    return redirect()->route('bill.edit', $bill->id)->with('error', $messages->first());
                 }
                 $bill->vender_id      = $request->input('vender_id');
                 $bill->bill_date      = $request->input('bill_date');

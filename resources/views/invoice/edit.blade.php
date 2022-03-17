@@ -7,7 +7,10 @@
     <script>
         var selector = "body";
         const discount  = {},
-            products    = {};
+            products    = {},
+            tax         = {
+                paid_by_customer : false,
+            };
         if ($(selector + " .repeater").length) {
             var $dragAndDrop = $("body .repeater tbody").sortable({
                 handle: '.sort-handler'
@@ -33,21 +36,6 @@
                         var el = $(this).parent().parent().parent().parent();
                         var id = $(el.find('.id')).val();
 
-                        $.ajax({
-                            url: '{{route('invoice.product.destroy')}}',
-                            type: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': jQuery('#token').val()
-                            },
-                            data: {
-                                'id': id
-                            },
-                            cache: false,
-                            success: function (data) {
-
-                            },
-                        });
-
                         $(this).slideUp(deleteElement);
                         $(this).remove();
                         UpdateSubTotal();
@@ -71,6 +59,11 @@
             }
 
         }
+
+        $(document).on('change', '#customer-tax', event => {
+            tax.paid_by_customer = event.currentTarget.checked;
+            UpdateAllItemData({discount: discount, products: products, customer_tax: tax.paid_by_customer});
+        });
 
         $(document).on('change', '#customer', function () {
             $('#customer_detail').removeClass('d-none');
@@ -117,7 +110,7 @@
 
         function changeItem(element) {
             var item_id = element.val();
-            if(!item_id.includes('new') && !products[item_id]){
+            if(item_id && !item_id.includes('new') && !products[item_id]){
                 var url = element.data('url');
                 var el = element;
                 $.ajax({
@@ -189,7 +182,7 @@
             }
 
             if(doChange) {
-                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products});
+                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products, customer_tax: tax.paid_by_customer});
             }
         });
 
@@ -283,10 +276,10 @@
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="custom-control custom-checkbox mt-4">
-                                                <input class="custom-control-input" type="checkbox" name="discount_apply" id="discount_apply" {{$invoice->discount_apply==1?'checked':''}}>
-                                                <label class="custom-control-label" for="discount_apply">{{__('Discount Apply')}}</label>
+                                        <div class="col-md-6 d-flex align-items-center">
+                                            <div class="form-check">
+                                                {{ Form::checkbox('customer_tax',  null, ['class' => 'form-check-input', 'id' => 'customer-tax']) }}
+                                                {{ Form::label('customer_tax', __('Tax Paid by Customer'), ['class' => 'form-check-label']) }}
                                             </div>
                                         </div>
                                         @if(!$customFields->isEmpty())
