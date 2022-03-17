@@ -72,8 +72,6 @@ class OrderController extends Controller
         }
 
         $validator  = Validator::make($request->all(), [
-            'order_date'            => 'required',
-            'order_time'            => 'required',
             'order_category_id'     => 'required',
             'customer_name'         => 'required',
             'products'              => 'required',
@@ -97,6 +95,19 @@ class OrderController extends Controller
         $creatorID  = $user->creatorId();
         $products   = $request->input('products');
         $products   = gettype($products) == 'string' ? json_decode($products): $products;
+        if(gettype($products) == 'string') {
+            $processed_products = [];
+            foreach ($products as $product) {
+                $processed_products[] = json_decode($product);
+            }
+            $products = $processed_products;
+        }
+
+        $noStockProducts = ProductService::where('created_by', $creatorID)->whereIn('id', collect($products)->pluck('product_id'))-where('quantity', 0)->count();
+
+        if($noStockProducts) {
+            return $this->FailedResponse(__('Empty stock'));
+        }
 
         $customer   = Customer::firstOrNew([
             'name'      => $request->input('customer_name'),
@@ -116,9 +127,21 @@ class OrderController extends Controller
             $customer->save();
         }
 
-        $datetime = $request->input('order_date') . ' ' . $request->input('order_time');
-        $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
-        
+        if(!empty($request->input('order_time')) && !empty($request->input('order_date'))) {
+            $datetime = $request->input('order_date') . ' ' . $request->input('order_time');
+            $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
+        } else {
+            $timeInput  = empty($request->input('order_time')) ? now() : Carbon::createFromFormat('H:i:s',$request->input('order_time'));
+            $time       = [
+                'hour' => $timeInput->hour,
+                'minute' => $timeInput->minute,
+                'second' => $timeInput->second,
+            ];
+
+            $datetime = empty($request->input('order_date')) ? now() : Carbon::createFromFormat('Y-m-d',$request->input('order_date'));
+            $datetime = $datetime->setHour($time['hour'])->setMinute($time['minute'])->setSecond($time['second']);
+        }
+
         $invoice                    = new Invoice();
         $invoice->invoice_id        = $this->InvoiceNumber();
         $invoice->customer_id       = $customer->id;

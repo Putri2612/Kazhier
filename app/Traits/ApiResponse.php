@@ -47,4 +47,8 @@ trait ApiResponse {
     public function DeleteSuccessResponse() {
         return $this->SuccessWithoutDataResponse('Data successfully deleted');
     }
+
+    public function ViewResponse($route) {
+        return $this->SuccessResponse(['url' => route($route)]);
+    }
 }

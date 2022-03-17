@@ -33,6 +33,26 @@ class CustomerController extends Controller
         return $this->FetchSuccessResponse($data);
     }
 
+    public function name($name) {
+        $customer = Customer::where('created_by', Auth::user()->creatorId())->where('name', $name)->first();
+        if(empty($customer)) {
+            return $this->NotFoundResponse();
+        }
+
+        $email  = $customer->email ? $customer->email : 'noemail@example.com';
+        $output = [
+            'id'                => $customer->id,
+            'customer_id'       => $customer->customer_id,
+            'customer_name'     => $customer->name,
+            'customer_cell'     => $customer->contact,
+            'customer_address'  => $customer->billing_address,
+            'customer_email'    => $email,
+            'customer_category' => $customer->category_id,
+        ];
+
+        return $this->FetchSuccessResponse($output);
+    }
+
     public function create(Request $request) {
         if(!Auth::user()->can('create customer')) {
             return $this->UnauthorizedResponse();

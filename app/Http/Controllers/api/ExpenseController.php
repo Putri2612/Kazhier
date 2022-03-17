@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 class ExpenseController extends Controller
 {
     use ApiResponse, CanManageBalance;
-    public function get() {
+    public function get(Request $request) {
         $expense = Payment::select(
             'id AS expense_id',
             'description AS expense_note',
@@ -27,7 +27,12 @@ class ExpenseController extends Controller
             'account_id AS expense_account',
             'payment_method AS expense_payment_method',
         )
-        ->where('created_by', Auth::user()->creatorId())->get();
+        ->where('created_by', Auth::user()->creatorId());
+        if(!empty($request->input('search_text'))) {
+            $search = $request->input('search_text');
+            $expense->where('description', 'LIKE', "%{$search}%");
+        }
+        $expense = $expense->get();
 
         return $this->FetchSuccessResponse($expense);
     }

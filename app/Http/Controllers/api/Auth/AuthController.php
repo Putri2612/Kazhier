@@ -59,6 +59,8 @@ class AuthController extends Controller
                 'shop_address'      => empty($settings['company_address']) ? null : $settings['company_address'],
                 'currency_symbol'   => empty($settings['site_currency_symbol']) ? 'Rp' : $settings['site_currency_symbol'],
                 'shop_status'       => $user->is_active && $user->plan ? 'active' : 'inactive',
+                'roles'             => $user->getRoleNames(),
+                'permissions'       => $user->getAllPermissions()->pluck('name'),
             ];
 
             return  $this->FetchSuccessResponse($data);
