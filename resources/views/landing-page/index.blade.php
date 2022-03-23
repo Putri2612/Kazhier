@@ -214,6 +214,7 @@
                 <div class="col col-md-6">
                     <div class="footer-navigation pb-3">
                         <a href="{{ route('agreement.show', 'term-of-service') }}">Syarat & Ketentuan</a> |
+                        <a href="{{ route('agreement.show', 'policy') }}">Kebijakan Privasi</a> |
                         <a href="#">Tentang Kami</a> |
                         <a href="mailto:hello@kazhier.com">Hubungi Kami</a>
                     </div>

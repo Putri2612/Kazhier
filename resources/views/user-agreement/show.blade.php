@@ -1,6 +1,15 @@
 @extends('layouts.auth')
-@section('title')
-    {{ __('Agreement') }}
+
+@php
+    $type = ucfirst(str_replace('-', ' ', $type));
+    if($type == 'Policy') {
+        $type = 'Privacy policy';
+    } else if($type = 'Eula') {
+        $type = 'End-user license agreement';
+    }
+@endphp
+@section('page-title')
+    {{ __($type) }}
 @endsection
 @php
     $appName = (Utility::getValByName('title_text')) ? Utility::getValByName('title_text') : config('app.name', 'Kazhier');
@@ -18,7 +27,7 @@
                         <a role="button" class="back-btn return-btn"><i class="fas fa-arrow-left"></i></a>
                         <div class="card-header">
                             <div>
-                                <div class="display-6">{{ __($type)) }}</div><br/>
+                                <div class="display-6">{{ __($type) }}</div><br/>
                                 <div class="text-muted">{{ __('Last updated:') }} {{ $date ? $date : __("Never") }}</div>
                             </div>
                         </div>

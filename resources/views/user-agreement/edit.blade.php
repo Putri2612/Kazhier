@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title')
+@section('page-title')
     {{ __('Edit User Agreements') }}
 @endsection
 @push('script-page')
