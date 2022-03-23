@@ -119,6 +119,7 @@
             if(response.ok) {
                 return response.json()
             } else if(response.status != 500){
+                toastrs('Error', `${response.status}: ${response.statusText}`, 'error');
                 return response.text()
             } 
         }).then(data => {
@@ -143,7 +144,6 @@
                 };
             }
         }).catch(error => {
-            toastrs('Error', error, 'error');
             FormWizard.progress -= (100 / FormWizard.elements.length);
             FormWizard.bar.style.width = `${FormWizard.progress}%`;
             FormWizard.bar.setAttribute('aria-valuenow', FormWizard.progress);

@@ -36,24 +36,32 @@ const CreateModal   = (url, data, callbacks = {yes: () => true, no: () => false}
     fetch(`${url}?${data}`, {method: 'get'})
     .then(response => {
         if( response.ok ) return response.text();
-        else throw new Error( `${response.status}: ${response.statusText}` );
+        else {
+            toastrs('Error', `${response.status}: ${response.statusText}`, 'error');
+            response.text().then(data => {
+                console.error(data);
+            });
+            return false;
+        }
     }) .then (data => {
-        let dialog = InitModal(data);
-        document.body.append(dialog);
-        dialog.querySelector('.dialog-yes').addEventListener('click', () => {
-            callbacks.yes();
-            $(dialog).modal('hide');
-            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
-            
-        });
-        dialog.querySelector('.dialog-no').addEventListener('click', () => {
-            callbacks.no();
-            $(dialog).modal('hide');
-            setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
-        });
-        $(dialog).modal('show');
+        if(data){
+            let dialog = InitModal(data);
+            document.body.append(dialog);
+            dialog.querySelector('.dialog-yes').addEventListener('click', () => {
+                callbacks.yes();
+                $(dialog).modal('hide');
+                setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+                
+            });
+            dialog.querySelector('.dialog-no').addEventListener('click', () => {
+                callbacks.no();
+                $(dialog).modal('hide');
+                setTimeout(() => dialog.parentNode.removeChild(dialog), 2000);
+            });
+            $(dialog).modal('show');
+        }
     }) .catch ( error => {
-        toastrs('Error', error, 'error');
+        
         console.error(error);
     });
 }
@@ -180,7 +188,9 @@ const UpdateSubTotal        = () => {
 
 const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
     let element = target;
-    while(!element.getAttribute('data-is-item')) element = element.parentNode;
+    while(!element.getAttribute('data-is-item') && element.nodeName != 'BODY') element = element.parentNode;
+
+    if(element.nodeName == 'BODY') return;
 
     let quantity    = ReadableToProcessable(element.querySelector('.quantity').value),
         price       = ReadableToProcessable(element.querySelector('.price').value),
@@ -188,7 +198,10 @@ const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
         discount    = ReadableToProcessable(element.querySelector('.discount').value),
         totalPrice  = (quantity * price),
         taxPrice    = (tax / 100) * (totalPrice),
-        amount      = ProcessableToReadable((totalPrice + taxPrice) - discount);
+        customerTax = !!(additionalData.customer_tax),
+        amount      = customerTax ? (totalPrice + taxPrice) - discount : totalPrice - discount;
+
+    amount  = ProcessableToReadable(amount);
 
     if(additionalData.products) {
         const id    = element.querySelector('.item').value,
@@ -220,6 +233,16 @@ const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
     element.querySelector('.amount').innerHTML = amount;
 
     UpdateSubTotal();
+}
+
+const UpdateAllItemData = (additionalData) => {
+    const items = document.querySelectorAll('.item');
+
+    if(items) {
+        items.forEach(item => {
+            UpdateInvoiceAndBillItemData(item, additionalData);
+        });
+    }
 }
 
 const OnlyAllowNumber   = () => {
