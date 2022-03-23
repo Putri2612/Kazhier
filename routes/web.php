@@ -61,6 +61,7 @@ use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\TransferController;
+use App\Http\Controllers\UserAgreementController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VenderController;
 use Illuminate\Support\Facades\Auth;
@@ -157,6 +158,8 @@ Route::prefix('app')->group(
                     'plan'
                 ]
             ], function () {
+                Route::get('agreement/{type}/edit', [UserAgreementController::class, 'edit'])->name('agreement.edit');
+                Route::put('agreement/{type}/update', [UserAgreementController::class, 'update'])->name('agreement.update');
         
                 Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
                 Route::prefix('dashboard/charts')->as('dashboard-chart.')->group(function() {
@@ -420,10 +423,7 @@ Route::prefix('app')->group(
                 Route::get('bill/pdf/{id}', [BillController::class, 'bill'])->name('bill.pdf');
                 Route::get('proposal/pdf/{id}', [ProposalController::class, 'proposal'])->name('proposal.pdf');
                 
-                Route::get('term-of-service/edit', [EULAController::class, 'edit'])->name('tos.edit');
-                Route::put('term-of-service/update', [EULAController::class, 'update'])->name('tos.update');
-                Route::get('term-of-service', [EULAController::class, 'show'])->name('tos.show');
-                Route::get('term-of-service/ajax', [EULAController::class, 'ajax'])->name('tos.ajax');
+                Route::get('agreement/{type}', [UserAgreementController::class, 'show'])->name('agreement.show');
             }
         );
         

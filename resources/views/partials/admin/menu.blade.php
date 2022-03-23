@@ -125,7 +125,7 @@
                     </ul>
                 </li>
                 <li class="dropdown {{ Request::segment(1) == 'tos' ? 'active' : '' }}">
-                    <a href="{{ route('tos.edit') }}" class="nav-link"><i class="fas fa-signature"></i><span>{{ __('ToS') }}</span></a>
+                    <a href="{{route('agreement.edit', 'term-of-service') }}" class="nav-link"><i class="fas fa-signature"></i><span>{{ __('Agreement') }}</span></a>
                 </li>
             @else
                 @php 
