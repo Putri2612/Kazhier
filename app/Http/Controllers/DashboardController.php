@@ -49,7 +49,7 @@ class DashboardController extends Controller
             $user['total_orders']       = Order::total_orders();
             $user['total_orders_price'] = Order::total_orders_price();
             $user['total_plan']         = Plan::total_plan();
-            $user['most_purchese_plan'] = (!empty(Plan::most_purchese_plan()) ? Plan::most_purchese_plan()->total : 0);
+            $user['most_purchese_plan'] = (!empty(Plan::most_purchase_plan()) ? Plan::most_purchase_plan()->total : 0);
             $chartData                  = $this->getOrderChart(['duration' => 'week']);
 
             return view('dashboard.super_admin', compact('user', 'chartData'));
@@ -128,7 +128,7 @@ class DashboardController extends Controller
         foreach($arrDuration as $date => $label)
         {
 
-            $data               = Order::select(DB::raw('count(*) as total'))->whereDate('created_at', '=', $date)->first();
+            $data               = Order::select(DB::raw('count(*) as total'))->whereRaw('(payment_status = ? OR payment_status = ? OR payment_status = ?)', ['SUCCESS', 'success', 'succeeded'])->whereDate('created_at', '=', $date)->first();
             $arrTask['label'][] = $label;
             $arrTask['data'][]  = $data->total;
         }

@@ -1,12 +1,15 @@
 @extends('layouts.admin')
 
+@php
+    $url = config('midtrans.isProduction') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
+@endphp
+
 @push('script-page')
-    <script type="text/javascript" src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.clientKey') }}"></script>
+    <script type="text/javascript" src="{{ $url }}" data-client-key="{{ config('midtrans.clientKey') }}"></script>
     <script type="text/javascript">
         $(() => {
             snap.pay('{{$snapToken}}', {
                 onSuccess: (result) => {
-                    console.log(result);
                     window.location = './plans';
                 },
                 onPending: (result) => {

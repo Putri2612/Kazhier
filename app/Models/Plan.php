@@ -30,7 +30,7 @@ class Plan extends Model
         return Plan::count();
     }
 
-    public static function most_purchese_plan()
+    public static function most_purchase_plan()
     {
         $free_plan = Plan::where('price', '<=', 0)->first();
         $free_plan = empty($free_plan) ? 0 : $free_plan->id;

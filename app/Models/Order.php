@@ -54,12 +54,12 @@ class Order extends Model
 
     public static function total_orders()
     {
-        return Order::count();
+        return Order::whereRaw('payment_status = ? OR payment_status = ? OR payment_status = ?', ['SUCCESS', 'success', 'succeeded'])->count();
     }
 
     public static function total_orders_price()
     {
-        return Order::sum('price');
+        return Order::whereRaw('payment_status = ? OR payment_status = ? OR payment_status = ?', ['SUCCESS', 'success', 'succeeded'])->sum('price');
     }
 
     public function total_coupon_used()

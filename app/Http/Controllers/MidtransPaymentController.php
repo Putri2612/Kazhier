@@ -184,14 +184,16 @@ class MidtransPaymentController extends Controller
             // For credit card transaction, we need to check whether transaction is challenge by FDS or not
             if ($type == 'credit_card') {
                 if ($fraud == 'challenge') {
-                    $order->payment_status = 'pending';
+                    $order->payment_status = 'PENDING';
                 } else {
-                    $order->payment_status = 'success';
+                    $order->payment_status = 'SUCCESS';
                     $assignPlan            = $user->assignPlan($order->plan_id);
+                    $user->referral_redeemed = 1;
+                    
                 }
             }
         } else if ($transaction == 'settlement') {
-            $order->payment_status  = 'success';
+            $order->payment_status  = 'SUCCESS';
             $order->receipt         = "https://app.midtrans.com/snap/v1/transactions/{$transactionID}/pdf";
             $assignPlan             = $user->assignPlan($order->plan_id, $order->duration);
             if($user->referred_by){
@@ -200,11 +202,12 @@ class MidtransPaymentController extends Controller
                     $referralPoint = new ReferralPoint();
                     $referralPoint->created_by = $user->referred_by;
                 }
-                $referralPoint->Add(25000);
+                $referralPoint->Add(10000);
+                $user->referral_redeemed = 1;
 
                 $history = new ReferralPointHistory();
                 $history->description   = __(':name bought a plan', ['name' => $user->name]);
-                $history->amount        = 25000;
+                $history->amount        = 10000;
                 $history->ref_id        = $referralPoint->id;
                 $history->created_by    = $user->id;
                 $history->save();
@@ -220,5 +223,6 @@ class MidtransPaymentController extends Controller
         }
 
         $order->save();
+        $user->save();
     }
 }

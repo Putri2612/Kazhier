@@ -82,8 +82,8 @@ class ReferralController extends Controller
             $order->plan_name       = $plan->name;
             $order->plan_id         = $plan->id;
             $order->price           = $price;
-            $order->price_currency  = 'Rp';
-            $order->payment_status  = 'succeeded';
+            $order->price_currency  = 'IDR';
+            $order->payment_status  = 'SUCCESS';
             $order->receipt         = 'point exchange';
             $order->duration        = $duration;
             $order->user_id         = $user->id;
