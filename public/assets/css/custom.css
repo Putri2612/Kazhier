@@ -50,6 +50,13 @@ body.sidebar-mini .main-sidebar .sidebar-brand-sm a span {
     overflow: hidden;
 }
 
+.staff-wrap a {
+    color: var(--bs-gray-400);
+}
+.staff-wrap a:hover{
+    color: #0087f8;
+}
+
 .staff-wrap .staff-grid-view .more-action {
     position: absolute;
     right: 5px;
