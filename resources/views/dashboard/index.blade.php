@@ -168,39 +168,69 @@
             <h1>{{__('Dashboard')}}</h1>
         </div>
         @if(\Auth::user()->type=='company')
-            <div class="row">
+            <div class="row align-items-stretch">
                 @if($constant['taxes']<=0)
-                    <div class="col-3">
-                        <div class="alert alert-danger">
-                            {{__('Please add constant taxes. ')}}<a href="{{route('taxes.index')}}"><b>{{__('click here')}}</b></a>
+                    <div class="col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                        <div class="alert alert-danger flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                {{__('Please add taxes.')}}
+                            </div>
+                            <div class="text-end">
+                                <a href="{{route('taxes.index')}}"><b>{{ucfirst(__('click here'))}}</b></a>
+                            </div>
                         </div>
                     </div>
                 @endif
-                @if($constant['category']<=0)
-                    <div class="col-3">
-                        <div class="alert alert-danger">
-                            {{__('Please add constant category. ')}}<a href="{{route('product-category.index')}}"><b>{{__('click here')}}</b></a>
+                @foreach (['product-service', 'income', 'expense'] as $cat)
+                    @if($constant['category'][$cat]<=0)
+                        <div class="col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                            <div class="alert alert-danger flex-grow-1 d-flex flex-column justify-content-between">
+                                @php
+                                    $categ = str_replace('-', ' & ', $cat);
+                                @endphp
+                                <div>
+                                    {{__("Please add {$categ} category.")}}
+                                </div>
+                                <div class="text-end">
+                                    <a href="{{route('category.index', $cat)}}"><b>{{ucfirst(__('click here'))}}</b></a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                @endif
+                    @endif
+                @endforeach
                 @if($constant['units']<=0)
-                    <div class="col-3">
-                        <div class="alert alert-danger">
-                            {{__('Please add constant unit. ')}}<a href="{{route('product-unit.index')}}"><b>{{__('click here')}}</b></a>
+                    <div class="col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                        <div class="alert alert-danger flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                {{__('Please add product & service unit.')}}
+                            </div>
+                            <div class="text-end">
+                                <a href="{{route('product-unit.index')}}"><b>{{ucfirst(__('click here'))}}</b></a>
+                            </div>
                         </div>
                     </div>
                 @endif
                 @if($constant['paymentMethod']<=0)
-                    <div class="col-3">
-                        <div class="alert alert-danger">
-                            {{__('Please add constant payment method. ')}}<a href="{{route('payment-method.index')}}"><b>{{__('click here')}}</b></a>
+                    <div class="col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                        <div class="alert alert-danger flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                {{__('Please add payment method.')}}
+                            </div>
+                            <div class="text-end">
+                                <a href="{{route('payment-method.index')}}"><b>{{ucfirst(__('click here'))}}</b></a>
+                            </div>
                         </div>
                     </div>
                 @endif
                 @if($constant['bankAccount']<=0)
-                    <div class="col-3">
-                        <div class="alert alert-danger">
-                            {{__('Please create bank account. ')}}<a href="{{route('bank-account.index')}}"><b>{{__('click here')}}</b></a>
+                    <div class="col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
+                        <div class="alert alert-danger flex-grow-1 d-flex flex-column justify-content-between">
+                            <div>
+                                {{__('Please create bank account.')}}
+                            </div>
+                            <div class="text-end">
+                                <a href="{{route('bank-account.index')}}"><b>{{ucfirst(__('click here'))}}</b></a>
+                            </div>
                         </div>
                     </div>
                 @endif

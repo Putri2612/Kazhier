@@ -86,7 +86,11 @@ class DashboardController extends Controller
             }
 
             $constant['taxes']         = Tax::where('created_by', $creatorId)->count();
-            $constant['category']      = ProductServiceCategory::where('created_by', $creatorId)->count();
+            $constant['category']      = [
+                'product-service' => ProductServiceCategory::where('created_by', $creatorId)->where('type', 0)->count(),
+                'income' => ProductServiceCategory::where('created_by', $creatorId)->where('type', 1)->count(),
+                'expense' => ProductServiceCategory::where('created_by', $creatorId)->where('type', 2)->count(),
+            ];
             $constant['units']         = ProductServiceUnit::where('created_by', $creatorId)->count();
             $constant['paymentMethod'] = PaymentMethod::where('created_by', $creatorId)->count();
             $constant['bankAccount']   = BankAccount::where('created_by', $creatorId)->count();
