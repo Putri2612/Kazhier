@@ -20,22 +20,19 @@
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
                                 <a href="#" data-url="{{ route('productservice.import') }}" data-ajax-popup="true" data-title="{{__('Import Product')}}" class="btn btn-icon icon-left btn-warning">
-                                    <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
-                                    <span class="btn-inner--text"> {{__('Import')}}</span>
+                                    <i class="fas fa-upload"></i><span class="btn-inner--text d-none d-md-inline"> {{__('Import')}}</span>
                                 </a>
                             </div>
                             <div class="col-auto">
                                 <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-success">
-                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
-                                    <span class="btn-inner--text"> {{__('Export')}}</span>
+                                    <i class="fas fa-file-excel"></i><span class="btn-inner--text d-none d-md-inline"> {{__('Export')}}</span>
                                 </a>
                             </div>
                             @endif
                             @can('create product & service')
                             <div class="col-auto">
                                 <a href="#" data-url="{{ route('productservice.create') }}" data-ajax-popup="true" data-title="{{__('Create New Product')}}" class="btn btn-icon icon-left btn-primary">
-                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                    <span class="btn-inner--text"> {{__('Create')}}</span>
+                                    <i class="fas fa-plus"></i><span class="btn-inner--text d-none d-md-inline"> {{__('Create')}}</span>
                                 </a>
                             </div>
                             @endcan

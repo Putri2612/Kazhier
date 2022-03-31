@@ -5,20 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\DefaultValue;
 use App\Models\ProductServiceCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProductServiceCategoryController extends Controller
 {
-    public function index()
+    private $types = ['product-service' => 0, 'income' => 1, 'expense' => 2];
+    public function index($type)
     {
-        if(\Auth::user()->can('manage constant category'))
+        if(Auth::user()->can('manage constant category'))
         {
-            $categories = [
-                'product'   => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get(),
-                'income'    => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get(),
-                'expense'   => ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get(),
-            ];
 
-            return view('productServiceCategory.index', compact('categories'));
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                abort(404);
+            }
+            if(!empty($type)) {
+                $category   = ProductServiceCategory::where('type', $this->types[$type])->where('created_by', Auth::user()->creatorId())->get();
+                $displayType= ucwords(str_replace('-',' & ',$type));
+
+                return view("category.index", compact('category', 'type', 'displayType'));
+            }
         }
         else
         {
@@ -27,22 +33,21 @@ class ProductServiceCategoryController extends Controller
     }
 
 
-    public function create()
+    public function create($type)
     {
-        if(\Auth::user()->can('create constant category'))
+        if(Auth::user()->can('create constant category'))
         {
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 0)->get()->pluck('name');
-            $defaultCat = DefaultValue::where('type', '=', 'product service')->whereNotIn('name', $categories)->get();
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                return response()->json(['error' => __('Not found.')], 404);
+            }
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', $this->types[$type])->get()->pluck('name');
+            $defaultCat = DefaultValue::where('type', '=', str_replace('-', ' ', $type))->whereNotIn('name', $categories)->get();
 
             foreach($defaultCat as $def) {
-                $products[] = ['value' => $def->name, 'attributes' => ['color' => $def->color]];
+                $suggestions[] = ['value' => $def->name, 'attributes' => ['color' => "{$def->color}"]];
             }
 
-            foreach(ProductServiceCategory::$categoryType as $type){
-                $types[] = __($type);
-            }
-
-            return view('productServiceCategory.create', compact('types', 'products'));
+            return view('category.create', compact('type', 'suggestions'));
         }
         else
         {
@@ -50,34 +55,19 @@ class ProductServiceCategoryController extends Controller
         }
     }
 
-    public function createSuggestions(Request $request) {
-        $request->validate(['type' => 'required']);
-
-        $types      = ['product service', 'income', 'expense'];
-        $typeID     = $request->input('type');
-        $type       = $types[$typeID];
-        $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', $typeID)->get()->pluck('name');
-        $defaultCat = DefaultValue::where('type', '=', $type)->whereNotIn('name', $categories)->get();
-        
-        $defaults = [];
-        foreach($defaultCat as $def) {
-            $defaults[] = ['value' => $def->name, 'attributes' => ['color' => $def->color]];
-        }
-
-        return response()->json(['error' => false, 'message' => '', 'data' => $defaults]);
-    }
-
-    public function store(Request $request)
+    public function store(Request $request, $type)
     {
-        if(\Auth::user()->can('create constant category'))
+        if(Auth::user()->can('create constant category'))
         {
-
-            $validator = \Validator::make(
-                $request->all(), [
-                                   'name' => 'required|max:20',
-                                   'type' => 'required',
-                                   'color' => 'required',
-                               ]
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                abort(404);
+            }
+            $validator = Validator::make(
+                $request->all(), 
+                [
+                    'name' => 'required|max:20',
+                    'color' => 'required',
+                ]
             );
             if($validator->fails())
             {
@@ -89,11 +79,11 @@ class ProductServiceCategoryController extends Controller
             $category             = new ProductServiceCategory();
             $category->name       = $request->name;
             $category->color      = $request->color;
-            $category->type       = $request->type;
-            $category->created_by = \Auth::user()->creatorId();
+            $category->type       = $this->types[$type];
+            $category->created_by = Auth::user()->creatorId();
             $category->save();
 
-            return redirect()->route('product-category.index')->with('success', __('Category successfully created.'));
+            return redirect()->route('category.index', $type)->with('success', __('Category successfully created.'));
         }
         else
         {
@@ -102,15 +92,17 @@ class ProductServiceCategoryController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit($type, $id)
     {
 
-        if(\Auth::user()->can('edit constant category'))
+        if(Auth::user()->can('edit constant category'))
         {
-            $types    = ProductServiceCategory::$categoryType;
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                return response()->json(['error' => __('Not found.')], 404);
+            }
             $category = ProductServiceCategory::find($id);
 
-            return view('productServiceCategory.edit', compact('category', 'types'));
+            return view('category.edit', compact('category', 'type'));
         }
         else
         {
@@ -119,19 +111,22 @@ class ProductServiceCategoryController extends Controller
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $type, $id)
     {
-        if(\Auth::user()->can('edit constant category'))
+        if(Auth::user()->can('edit constant category'))
         {
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                abort(404);
+            }
             $category = ProductServiceCategory::find($id);
-            if($category->created_by == \Auth::user()->creatorId())
+            if($category->created_by == Auth::user()->creatorId())
             {
-                $validator = \Validator::make(
-                    $request->all(), [
-                                       'name' => 'required|max:20',
-                                       'type' => 'required',
-                                       'color' => 'required',
-                                   ]
+                $validator = Validator::make(
+                    $request->all(), 
+                    [
+                        'name' => 'required|max:20',
+                        'color' => 'required',
+                    ]
                 );
                 if($validator->fails())
                 {
@@ -142,10 +137,10 @@ class ProductServiceCategoryController extends Controller
 
                 $category->name  = $request->name;
                 $category->color = $request->color;
-                $category->type  = $request->type;
+                $category->type  = $this->types[$type];
                 $category->save();
 
-                return redirect()->route('product-category.index')->with('success', __('Category successfully updated.'));
+                return redirect()->route('category.index', $type)->with('success', __('Category successfully updated.'));
             }
             else
             {
@@ -158,16 +153,19 @@ class ProductServiceCategoryController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy($type, $id)
     {
-        if(\Auth::user()->can('delete constant category'))
+        if(Auth::user()->can('delete constant category'))
         {
+            if(empty($type) || !array_key_exists($type, $this->types)) {
+                abort(404);
+            }
             $category = ProductServiceCategory::find($id);
-            if($category->created_by == \Auth::user()->creatorId())
+            if($category->created_by == Auth::user()->creatorId())
             {
                 $category->delete();
 
-                return redirect()->route('product-category.index')->with('success', __('Category successfully deleted.'));
+                return redirect()->route('category.index', $type)->with('success', __('Category successfully deleted.'));
             }
             else
             {

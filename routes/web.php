@@ -251,7 +251,7 @@ Route::prefix('app')->group(
                 // Tax, category, unit, method
                 Route::resource('taxes', TaxController::class);
                 Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion');
-                Route::resource('product-category', ProductServiceCategoryController::class);
+                Route::resource('{type}/category', ProductServiceCategoryController::class);
         
                 Route::resource('product-unit', ProductServiceUnitController::class);
                 Route::resource('payment-method', PaymentMethodController::class);
@@ -283,6 +283,7 @@ Route::prefix('app')->group(
                         Route::post('import/headings', [InvoiceController::class, 'getImportHeadings'])->name('import.headings');
                         Route::put('import/store', [InvoiceController::class, 'storeImport'])->name('import.store');
                         Route::post('product/destroy', [InvoiceController::class, 'productDestroy'])->name('product.destroy');
+                        Route::post('product/SKU', [InvoiceController::class, 'productBySKU'])->name('product.sku');
                         Route::post('product', [InvoiceController::class, 'product'])->name('product');
         
                     }

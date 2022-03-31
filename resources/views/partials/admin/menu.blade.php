@@ -18,16 +18,16 @@
         </div>
         <ul class="sidebar-menu">
             @if(Gate::check('manage plan') || Gate::check('manage order'))
-                <li class="dropdown {{ (Request::segment(1) == 'plans' || Request::segment(1) == 'orders')?' active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'plans' || Request::segment(2) == 'orders')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-trophy"></i><span>{{__('Plan')}}</span></a>
                     <ul class="dropdown-menu">
                         @can('manage plan')
-                            <li class="{{ (Request::segment(1) == 'plans')?'active':''}}">
+                            <li class="{{ (Request::segment(2) == 'plans')?'active':''}}">
                                 <a class="nav-link" href="{{ route('plans.index') }}"><span>{{__('Plan')}}</span></a>
                             </li>
                         @endcan
                         @can('manage order')
-                            <li class="{{ (Request::segment(1) == 'orders')?'active':''}}">
+                            <li class="{{ (Request::segment(2) == 'orders')?'active':''}}">
                                 <a class="nav-link" href="{{ route('order.index') }}"><span>{{__('Past Purchase')}}</span></a>
                             </li>
                         @endcan
@@ -100,7 +100,7 @@
                 </li>
             @endcan
 
-            @if(\Auth::user()->type=='super admin')
+            @if(Auth::user()->type=='super admin')
                 @can('manage user')
                     <li class="dropdown {{ (Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit') ? ' active' : '' }}">
                         <a class="nav-link" href="{{ route('users.index') }}"> <i class="fas fa-columns"></i> <span>{{__('User') }}</span></a>
@@ -111,11 +111,11 @@
                         <a class="nav-link" href="{{ route('defaults.index') }}"> <i class="fas fa-stream"></i> <span>{{__('Default Value') }}</span></a>
                     </li>
                 @endcan
-                <li class="dropdown {{ Request::segment(1) == 'referral' ? 'active' : '' }}">
+                <li class="dropdown {{ Request::segment(2) == 'referral' ? 'active' : '' }}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
                         <i class="fas fa-retweet"></i><span>{{ __('Referral') }}</span>
                     </a>
-                    <ul class="dropdown-menu {{ Request::segment(1) == 'referral' ? 'display:block' : '' }}">
+                    <ul class="dropdown-menu {{ Request::segment(2) == 'referral' ? 'display:block' : '' }}">
                         <li class="{{ Request::route()->getName() == 'referral.withdraw' }}">
                             <a href="{{ route('referral.withdraw') }}" class="nav-link">{{ __('Withdraw Request') }}</a>
                         </li>
@@ -124,7 +124,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="dropdown {{ Request::segment(1) == 'tos' ? 'active' : '' }}">
+                <li class="dropdown {{ Request::segment(2) == 'tos' ? 'active' : '' }}">
                     <a href="{{route('agreement.edit', 'term-of-service') }}" class="nav-link"><i class="fas fa-signature"></i><span>{{ __('Agreement') }}</span></a>
                 </li>
             @else
@@ -134,9 +134,9 @@
                     $plan = App\Models\Plan::find($user->plan);
                 @endphp
                 @if( (Gate::check('manage user') || Gate::check('manage role')) && ($totalUser < $plan->max_users || $plan->max_users == -1))
-                    <li class="dropdown {{ (Request::segment(1) == 'users' || Request::segment(1) == 'roles' || Request::segment(1) == 'permissions' )?' active':''}}">
+                    <li class="dropdown {{ (Request::segment(2) == 'users' || Request::segment(2) == 'roles' || Request::segment(2) == 'permissions' )?' active':''}}">
                         <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-users"></i> <span>{{__('Staff')}}</span></a>
-                        <ul class="dropdown-menu {{ (Request::segment(1) == 'users' || Request::segment(1) == 'roles' || Request::segment(1) == 'permissions')?'display:block':''}}">
+                        <ul class="dropdown-menu {{ (Request::segment(2) == 'users' || Request::segment(2) == 'roles' || Request::segment(2) == 'permissions')?'display:block':''}}">
                             @can('manage user')
                                 <li class="{{ (Request::route()->getName() == 'users.index' || Request::route()->getName() == 'users.create' || Request::route()->getName() == 'users.edit') ? ' active' : '' }}">
                                     <a class="nav-link" href="{{ route('users.index') }}">{{  __('User') }}</a>
@@ -153,23 +153,39 @@
             @endif
 
 
-            @if(Gate::check('manage product & service'))
-                <li class="{{ (Request::segment(1) == 'productservice')?'active':''}}">
-                    <a class="nav-link" href="{{ route('productservice.index') }}">
-                        <i class="fas fa-shopping-cart"></i> <span>{{__('Product & Service')}}</span></a>
+            @if(Gate::check('manage product & service') || Gate::check('manage constant category') || Gate::check('manage constant unit'))
+                <li class="dropdown {{ (Request::segment(2) == 'productservice' || Request::segment(2) == 'product-unit' || (Request::segment(3) == 'category' && Request::segment(2) == 'product-service')) ? 'active':''}}">
+                    <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-shopping-cart"></i> <span>{{__('Product & Service')}}</span></a>
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'productservice' || Request::segment(2) == 'product-unit' || (Request::segment(3) == 'category' && Request::segment(2) == 'product-service')) ? 'active' : '' }}">
+                        @can('manage product & service')
+                            <li class="{{ (Request::segment(2) == 'productservice') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('productservice.index') }}">{{__('Product & Service')}}</a>
+                            </li>
+                        @endcan
+                        @can('manage constant category')
+                            <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'product-service') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{route('category.index', 'product-service')}}"> {{__('Category')}}</a>
+                            </li>
+                        @endcan
+                        @can('manage constant unit')
+                            <li class="{{ (Request::route()->getName() == 'product-unit.index' ) ? 'active' : '' }}">
+                                <a class="nav-link" href="{{route('product-unit.index')}}"> {{__('Unit')}}</a>
+                            </li>
+                        @endcan
+                    </ul>
                 </li>
             @endif
             @if(Gate::check('manage customer'))
-                <li class="dropdown {{ (Request::segment(1) == 'customer' || Request::segment(1) == 'customer-category')?'active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'customer' || Request::segment(2) == 'customer-category')?'active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="far fa-user"></i> <span>{{__('Customer')}}</span></a>
-                    <ul class="dropdown-menu {{ (Request::segment(1) == 'customer' || Request::segment(1) == 'customer-category')?'display:block':''}}">
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'customer' || Request::segment(2) == 'customer-category')?'display:block':''}}">
                         @can('manage user')
-                            <li class="{{ (Request::segment(1) == 'customer' ? ' active' : '') }}">
+                            <li class="{{ (Request::segment(2) == 'customer' ? ' active' : '') }}">
                                 <a class="nav-link" href="{{ route('customer.index') }}">{{__('Customer')}}</a>
                             </li>
                         @endcan
                         {{-- @can('manage user category') --}}
-                            <li class="{{ (Request::segment(1) == 'customer-category' ? ' active' : '') }}">
+                            <li class="{{ (Request::segment(2) == 'customer-category' ? ' active' : '') }}">
                                 <a class="nav-link" href="{{ route('customer-category.index') }}">{{__('Category')}}</a>
                             </li>
                         {{-- @endcan --}}
@@ -177,7 +193,7 @@
                 </li>
             @endif
             @if(Gate::check('manage vender'))
-                <li class="{{ (Request::segment(1) == 'vender')?'active':''}}">
+                <li class="{{ (Request::segment(2) == 'vender')?'active':''}}">
                     <a class="nav-link" href="{{ route('vender.index') }}">
                         <i class="fas fa-sticky-note"></i> <span>{{__('Vendor')}}</span></a>
                 </li>
@@ -185,16 +201,16 @@
 
 
             @if(Gate::check('manage proposal'))
-                <li class="{{ (Request::segment(1) == 'proposal')?'active':''}}">
+                <li class="{{ (Request::segment(2) == 'proposal')?'active':''}}">
                     <a class="nav-link" href="{{ route('proposal.index') }}">
                         <i class="fas fa-file"></i> <span>{{__('Proposal')}}</span></a>
                 </li>
             @endif
 
             @if( Gate::check('manage bank account') ||  Gate::check('manage transfer'))
-                <li class="dropdown {{ (Request::segment(1) == 'bank-account' || Request::segment(1) == 'transfer')?' active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'bank-account' || Request::segment(2) == 'transfer')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-university"></i> <span>{{__('Banking')}}</span></a>
-                    <ul class="dropdown-menu {{ (Request::segment(1) == 'bank-account' || Request::segment(1) == 'transfer')?'display:block':''}}">
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'bank-account' || Request::segment(2) == 'transfer')?'display:block':''}}">
                         @can('manage bank account')
                             <li class="{{ (Request::route()->getName() == 'bank-account.index' || Request::route()->getName() == 'bank-account.create' || Request::route()->getName() == 'bank-account.edit') ? ' active' : '' }}">
                                 <a class="nav-link" href="{{ route('bank-account.index') }}">{{  __('Account') }}</a>
@@ -210,10 +226,10 @@
                 </li>
             @endif
 
-            @if( Gate::check('manage invoice') ||  Gate::check('manage revenue') ||  Gate::check('manage credit note'))
-                <li class="dropdown {{ (Request::segment(1) == 'invoice' || Request::segment(1) == 'revenue' || Request::segment(1) == 'credit-note')?' active':''}}">
+            @if( Gate::check('manage invoice') ||  Gate::check('manage revenue') ||  Gate::check('manage credit note') || Gate::check('manage constant category'))
+                <li class="dropdown {{ (Request::segment(2) == 'invoice' || Request::segment(2) == 'revenue' || Request::segment(2) == 'credit-note' || (Request::segment(3) == 'category' && Request::segment(2) == 'income'))?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="far fa-money-bill-alt"></i> <span>{{__('Income')}}</span></a>
-                    <ul class="dropdown-menu {{ (Request::segment(1) == 'invoice' || Request::segment(1) == 'revenue' || Request::segment(1) == 'credit-note')?'display:block':''}}">
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'invoice' || Request::segment(2) == 'revenue' || Request::segment(2) == 'credit-note' || (Request::segment(3) == 'category' && Request::segment(2) == 'income'))?'display:block':''}}">
                         @can('manage invoice')
                             <li class="{{ (Request::route()->getName() == 'invoice.index' || Request::route()->getName() == 'invoice.create' || Request::route()->getName() == 'invoice.edit' || Request::route()->getName() == 'invoice.show') ? ' active' : '' }}">
                                 <a class="nav-link" href="{{ route('invoice.index') }}">{{  __('Invoice') }}</a>
@@ -229,13 +245,18 @@
                                 <a class="nav-link" href="{{ route('credit.note') }}">{{  __('Credit Note') }}</a>
                             </li>
                         @endcan
+                        @can('manage constant category')
+                            <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'income' ) ? 'active' : '' }}">
+                                <a class="nav-link" href="{{route('category.index', 'income')}}"> {{__('Category')}}</a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
             @endif
-            @if( Gate::check('manage bill')  ||  Gate::check('manage payment') ||  Gate::check('manage debit note'))
-                <li class="dropdown {{ (Request::segment(1) == 'bill' || Request::segment(1) == 'payment' || Request::segment(1) == 'debit-note'  )?' active':''}}">
+            @if( Gate::check('manage bill')  ||  Gate::check('manage payment') ||  Gate::check('manage debit note') || Gate::check('manage constant category'))
+                <li class="dropdown {{ (Request::segment(2) == 'bill' || Request::segment(2) == 'payment' || Request::segment(2) == 'debit-note' || (Request::segment(3) == 'category' && Request::segment(2) == 'expense'))?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-money-bill-wave-alt"></i> <span>{{__('Expense')}}</span></a>
-                    <ul class="dropdown-menu {{ (Request::segment(1) == 'invoice')?'display:block':''}}">
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'bill' || Request::segment(2) == 'payment' || Request::segment(2) == 'debit-note' || (Request::segment(3) == 'category' && Request::segment(2) == 'expense'))?'display:block':''}}">
                         @can('manage bill')
                             <li class="{{ (Request::route()->getName() == 'bill.index' || Request::route()->getName() == 'bill.create' || Request::route()->getName() == 'bill.edit' || Request::route()->getName() == 'bill.show') ? ' active' : '' }}">
                                 <a class="nav-link" href="{{ route('bill.index') }}">{{  __('Bill') }}</a>
@@ -251,17 +272,22 @@
                                 <a class="nav-link" href="{{ route('debit.note') }}">{{  __('Debit Note') }}</a>
                             </li>
                         @endcan
+                        @can('manage constant category')
+                            <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'expense') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{route('category.index', 'expense')}}"> {{__('Category')}}</a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
             @endif
             @if(Gate::check('manage goal'))
-                <li class="{{ (Request::segment(1) == 'goal')?'active':''}}">
+                <li class="{{ (Request::segment(2) == 'goal')?'active':''}}">
                     <a class="nav-link" href="{{ route('goal.index') }}">
                         <i class="fa fa-bullseye"></i> <span>{{__('Goal')}}</span></a>
                 </li>
             @endif
             @if(Gate::check('manage assets')  || Gate::check('manage liabilities') || Gate::check('manage equities'))
-                <li class="dropdown {{ (Request::segment(1) == 'account-assets' ||  Request::segment(1) == 'account-liabilities' || Request::segment(1) == 'account-equities') ? 'active' : ''}} ">
+                <li class="dropdown {{ (Request::segment(2) == 'account-assets' ||  Request::segment(2) == 'account-liabilities' || Request::segment(2) == 'account-equities') ? 'active' : ''}} ">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-balance-scale"></i> <span>{{__('Double Entry')}}</span></a>
                     <ul class="dropdown-menu">
                         @if (Gate::check('manage assets'))
@@ -284,33 +310,33 @@
             @endif
             @if(Auth::user()->type == 'super-admin')
                 @if(Gate::check('manage plan'))
-                    <li class="{{ (Request::segment(1) == 'plans')?'active':''}}">
+                    <li class="{{ (Request::segment(2) == 'plans')?'active':''}}">
                         <a class="nav-link" href="{{ route('plans.index') }}"><i class="fas fa-trophy"></i><span>{{__('Plan')}}</span></a>
                     </li>
                 @endif
                 @if(Gate::check('manage coupon'))
-                    <li class="{{ (Request::segment(1) == 'coupons')?'active':''}}">
+                    <li class="{{ (Request::segment(2) == 'coupons')?'active':''}}">
                         <a class="nav-link" href="{{ route('coupons.index') }}"><i class="fas fa-gift"></i><span>{{__('Coupon')}}</span></a>
                     </li>
                 @endif
 
                 @if(Gate::check('manage order'))
-                    <li class="{{ (Request::segment(1) == 'orders')?'active':''}}">
+                    <li class="{{ (Request::segment(2) == 'orders')?'active':''}}">
                         <a class="nav-link" href="{{ route('order.index') }}"><i class="fas fa-cart-plus"></i><span>{{__('Order')}}</span></a>
                     </li>
                 @endif
             @else
                 @if(Gate::check('manage plan') || Gate::check('manage order'))
-                <li class="dropdown {{ (Request::segment(1) == 'plans' || Request::segment(1) == 'orders')?' active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'plans' || Request::segment(2) == 'orders')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-trophy"></i><span>{{__('Plan')}}</span></a>
                     <ul class="dropdown-menu">
                         @can('manage plan')
-                            <li class="{{ (Request::segment(1) == 'plans')?'active':''}}">
+                            <li class="{{ (Request::segment(2) == 'plans')?'active':''}}">
                                 <a class="nav-link" href="{{ route('plans.index') }}"><span>{{__('Plan')}}</span></a>
                             </li>
                         @endcan
                         @can('manage order')
-                            <li class="{{ (Request::segment(1) == 'orders')?'active':''}}">
+                            <li class="{{ (Request::segment(2) == 'orders')?'active':''}}">
                                 <a class="nav-link" href="{{ route('order.index') }}"><span>{{__('Past Purchase')}}</span></a>
                             </li>
                         @endcan
@@ -321,7 +347,7 @@
             
 
             @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
-                <li class="dropdown {{ (Request::segment(1) == 'report' || Request::segment(1) == 'transaction' || Request::segment(1) == 'journal' || Request::segment(1) == 'ledger' || Request::segment(1) == 'balance-sheet')?' active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'report' || Request::segment(2) == 'transaction' || Request::segment(2) == 'journal' || Request::segment(2) == 'ledger' || Request::segment(2) == 'balance-sheet')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-chart-area"></i> <span>{{__('Report')}}</span></a>
                     <ul class="dropdown-menu">
                         @can('manage transaction')
@@ -388,23 +414,13 @@
                 </li>
             @endif
 
-            @if(Gate::check('manage constant tax') || Gate::check('manage constant category') ||Gate::check('manage constant unit') ||Gate::check('manage constant payment method') ||Gate::check('manage constant custom field'))
-                <li class="dropdown {{ (Request::segment(1) == 'taxes' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit' || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field')? 'active':''}}">
+            @if(Gate::check('manage constant tax') || Gate::check('manage constant payment method') ||Gate::check('manage constant custom field'))
+                <li class="dropdown {{ (Request::segment(2) == 'taxes' || Request::segment(2) == 'payment-method' || Request::segment(2) == 'custom-field')? 'active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-cog"></i> <span>{{__('Basic Setting')}}</span></a>
-                    <ul class="dropdown-menu {{ (Request::segment(1) == 'taxes' || Request::segment(1) == 'product-category' || Request::segment(1) == 'product-unit'  || Request::segment(1) == 'payment-method' || Request::segment(1) == 'custom-field')? 'display:block':''}}">
+                    <ul class="dropdown-menu {{ (Request::segment(2) == 'taxes' || Request::segment(2) == 'product-category' || Request::segment(2) == 'product-unit'  || Request::segment(2) == 'payment-method' || Request::segment(2) == 'custom-field')? 'display:block':''}}">
                         @can('manage constant tax')
                             <li class="{{ (Request::route()->getName() == 'taxes.index' ) ? 'active' : '' }}">
                                 <a class="nav-link" href="{{route('taxes.index')}}"> {{__('Taxes')}}</a>
-                            </li>
-                        @endcan
-                        @can('manage constant category')
-                            <li class="{{ (Request::route()->getName() == 'product-category.index' ) ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('product-category.index')}}"> {{__('Category')}}</a>
-                            </li>
-                        @endcan
-                        @can('manage constant unit')
-                            <li class="{{ (Request::route()->getName() == 'product-unit.index' ) ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('product-unit.index')}}"> {{__('Unit')}}</a>
                             </li>
                         @endcan
                         @can('manage constant payment method')
