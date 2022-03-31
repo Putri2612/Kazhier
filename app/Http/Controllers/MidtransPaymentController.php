@@ -186,43 +186,48 @@ class MidtransPaymentController extends Controller
                 if ($fraud == 'challenge') {
                     $order->payment_status = 'PENDING';
                 } else {
-                    $order->payment_status = 'SUCCESS';
-                    $assignPlan            = $user->assignPlan($order->plan_id);
-                    $user->referral_redeemed = 1;
-                    
+                    $this->success($order, $user, $transactionID);
                 }
             }
         } else if ($transaction == 'settlement') {
-            $order->payment_status  = 'SUCCESS';
-            $order->receipt         = "https://app.midtrans.com/snap/v1/transactions/{$transactionID}/pdf";
-            $assignPlan             = $user->assignPlan($order->plan_id, $order->duration);
-            if($user->referred_by){
-                $referralPoint  = ReferralPoint::where('created_by', '=', $user->referred_by)->first();
-                if(!$referralPoint) {
-                    $referralPoint = new ReferralPoint();
-                    $referralPoint->created_by = $user->referred_by;
-                }
-                $referralPoint->Add(10000);
-                $user->referral_redeemed = 1;
-
-                $history = new ReferralPointHistory();
-                $history->description   = __(':name bought a plan', ['name' => $user->name]);
-                $history->amount        = 10000;
-                $history->ref_id        = $referralPoint->id;
-                $history->created_by    = $user->id;
-                $history->save();
-            }
+            $this->success($order, $user, $transactionID);
         } else if ($transaction == 'deny') {
             $order->payment_status = 'DENIED';
         } else if ($transaction == 'expire') {
-            // TODO set payment status in merchant's database to 'expire'
             $order->payment_status = 'EXPIRED';
         } else if ($transaction == 'cancel') {
-            // TODO set payment status in merchant's database to 'Denied'
             $order->payment_status = 'CANCELED';
         }
 
         $order->save();
         $user->save();
+    }
+
+    private function success($order, $user, $transactionID) {
+        $order->payment_status  = 'SUCCESS';
+        $order->receipt         = "https://app.midtrans.com/snap/v1/transactions/{$transactionID}/pdf";
+        $plan                   = Plan::find($order->plan_id);
+        if(empty($plan)) {
+            return response('');
+        }
+        $assignPlan             = $user->assignPlan($order->plan_id, $order->duration);
+        if($user->referred_by){
+            $referralPoint  = ReferralPoint::where('created_by', '=', $user->referred_by)->first();
+            if(!$referralPoint) {
+                $referralPoint = new ReferralPoint();
+                $referralPoint->created_by = $user->referred_by;
+            }
+            $point = $plan->price * 10 / 100;
+            $referralPoint->Add($point);
+
+            $user->referral_redeemed = 1;
+
+            $history = new ReferralPointHistory();
+            $history->description   = __(':name bought a plan', ['name' => $user->name]);
+            $history->amount        = $point;
+            $history->ref_id        = $referralPoint->id;
+            $history->created_by    = $user->id;
+            $history->save();
+        }
     }
 }
