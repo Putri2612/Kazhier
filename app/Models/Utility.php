@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\CanProcessNumber;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class Utility extends Model
 {
+    use CanProcessNumber;
     public static function settings()
     {
         $data = DB::table('settings');
@@ -207,5 +209,9 @@ class Utility extends Model
     public static function billNumberFormat($settings, $number)
     {
         return $settings["bill_prefix"] . sprintf("%05d", $number);
+    }
+
+    public static function formatNumber($number) {
+        return (new self)->FloatToReadableNumber($number);
     }
 }

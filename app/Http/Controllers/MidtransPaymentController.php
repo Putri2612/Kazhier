@@ -217,7 +217,7 @@ class MidtransPaymentController extends Controller
                 $referralPoint = new ReferralPoint();
                 $referralPoint->created_by = $user->referred_by;
             }
-            $point = $plan->price * 10 / 100;
+            $point = $plan->price * config('referral.percentage') / 100;
             $referralPoint->Add($point);
 
             $user->referral_redeemed = 1;

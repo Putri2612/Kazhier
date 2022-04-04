@@ -38,6 +38,9 @@
                                     <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#midtrans-setting" href="#midtrans-setting" role="tab" aria-controls="" aria-selected="false">{{__('Midtrans Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#referral-setting" href="#referral-setting" role="tab" aria-controls="" aria-selected="false">{{__('Referral Setting')}}</a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" id="profile-tab3" data-bs-toggle="tab" data-bs-target="#asset-version-setting" href="#asset-version-setting" role="tab" aria-controls="" aria-selected="false">{{__('Asset Version Setting')}}</a>
                                 </li>
                             </ul>
@@ -283,6 +286,29 @@
                                         </div>
                                         {{Form::close()}}
                                     </div>
+                                </div>
+                                <div class="tab-pane fade" id="referral-setting" role="tabpanel">
+                                    @if ($message = Session::get('success'))
+                                        <p>
+                                            {{ __('It may take a while until the settings get updated.') }}
+                                            {{ __('Please refresh the page in a few seconds to check the changes.') }}
+                                        </p>
+                                    @endif
+                                    {{ Form::open(['route' => 'referral.settings', 'method' => 'put']) }}
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            {{ Form::label('ref_percentage', __('Referral Percentage per Purchase')) }}
+                                            {{ Form::number('ref_percentage', config('referral.percentage'), ['class' => 'form-control', 'min' => 0, 'max' => 100]) }}
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {{ Form::label('ref_withdraw_min', __('Minimum Withdrawal Amount')) }}
+                                            {{ Form::text('ref_withdraw_min', Utility::formatNumber(config('referral.minWithdrawal')), ['class' => 'form-control', 'data-is-number']) }}
+                                        </div>
+                                    </div>
+                                    <div class="card-footer text-end">
+                                        {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
+                                    </div>
+                                    {{ Form::close() }}
                                 </div>
                             </div>
                         </div>

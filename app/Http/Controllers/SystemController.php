@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Utility;
+use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 
 class SystemController extends Controller
 {
+    use CanProcessNumber, CanRedirect;
     public function index()
     {
         if(\Auth::user()->can('manage system settings'))
@@ -23,7 +27,7 @@ class SystemController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', 'Permission denied.');
+            return $this->RedirectDenied();
         }
     }
 
@@ -93,7 +97,7 @@ class SystemController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', 'Permission denied.');
+            return $this->RedirectDenied();
         }
     }
 
@@ -130,7 +134,7 @@ class SystemController extends Controller
         }
         else
         {
-            return redirect()->back()->with('error', 'Permission denied.');
+            return $this->RedirectDenied();
         }
 
     }
@@ -147,13 +151,37 @@ class SystemController extends Controller
                 $versions[$keyNames[0]][$keyNames[1]]   = intval($version);
             }
 
-            if($this->saveVersion($versions)) {
+            if($this->updateConfig('asset-version', $versions)) {
                 return redirect()->back()->with('success', __('Setting successfully updated.'));
             }
             return redirect()->back()->with('error', __('Something bad happened.'));
         } else {
-            return redirect()->back()->with('error', 'Permission denied.');
+            return $this->RedirectDenied();
         }
+    }
+
+    public function saveReferralSettings(Request $request) {
+        if(!Auth::user()->can('manage system settings')) {
+            return $this->RedirectDenied();
+        }
+        $validator = Validator::make($request->all(), [
+            'ref_percentage'    => 'required',
+            'ref_withdraw_min'  => 'required'
+        ]);
+
+        if($validator->fails()) {
+            return redirect()->back()->with('error', __('Incorrect input'));
+        }
+
+        $data = [
+            'percentage'    => intval($request->input('ref_percentage')),
+            'minWithdrawal' => intval($this->ReadableNumberToFloat($request->input('ref_withdraw_min')))
+        ];
+
+        if($this->updateConfig('referral', $data)) {
+            return redirect()->back()->with('success', __('Setting successfully updated.'));
+        }
+        return redirect()->back()->with('error', __('Something bad happened.'));
     }
 
     public function saveCompanySettings(Request $request)
@@ -380,9 +408,9 @@ class SystemController extends Controller
         }
     }
 
-    private function saveVersion($version) {
-        $data = var_export($version, 1);
-        return File::put(substr(app_path(), 0, -3).'config\\asset-version.php', "<?php return {$data};");
+    private function updateConfig($name, $data) {
+        $data = var_export($data, true);
+        return File::put(substr(app_path(), 0, -3)."config/{$name}.php", "<?php return {$data};");
     }
 
 }
