@@ -32,6 +32,7 @@ use App\Models\Transfer;
 use App\Models\Transaction;
 use App\Models\Vender;
 use App\Traits\CanManageBalance;
+use App\Traits\CanRedirect;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,29 +47,114 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    use CanManageBalance;
+    use CanManageBalance, CanRedirect;
 
-    public function index()
+    private $limit = 10;
+
+    public function index($page = 1)
     {
-        $user = Auth::user();
         if(Auth::user()->can('manage user'))
         {
+            $validator = Validator::make(['page' => $page], [
+                'page'  => 'numeric',
+            ]);
+
+            if($validator->fails()) {
+                return $this->RedirectNotFound();
+            }
+
+            $limit      = $this->limit;
+            $totalPage  = ceil(User::count() / $limit);
+
+            if($page <= 0 || $page > $totalPage) {
+                return $this->RedirectNotFound();
+            }
+
+            $skip       = ($page - 1) * $limit;
+            $prev       = $next = 0;
+            $hasPage    = $totalPage > 0;
+            if($hasPage){
+                if($skip) {
+                    $prev = $page - 1;
+                }
+                if($page < $totalPage) {
+                    $next = $page + 1;
+                }
+            }
+
+            $query = User::skip($skip)->take($limit)->where('created_by', '=', Auth::user()->creatorId());
             if(Auth::user()->type == 'super admin')
             {
-                $users = User::where('created_by', '=', $user->creatorId())->where('type', '=', 'company')->get();
+                $users = $query->where('type', '=', 'company')->get();
             }
             else
             {
-                $users = User::where('created_by', '=', $user->creatorId())->where('type', '!=', 'client')->get();
+                $users = $query->where('type', '!=', 'client')->get();
             }
 
-            return view('user.index')->with('users', $users);
+            return view('user.index', compact('users', 'page', 'hasPage', 'prev', 'next', 'totalPage'));
         }
         else
         {
-            return redirect()->back();
+            return $this->RedirectDenied();
         }
 
+    }
+
+    public function search($query, $page = 1) {
+        if(Auth::user()->can('manage user'))
+        {
+            $validator = Validator::make(['query' => $query, 'page' => $page], [
+                'page'  => 'numeric',
+                'query' => 'regex:/^[\w\-\s]*/i|nullable'
+            ]);
+
+            if($validator->fails()) {
+                return $this->RedirectNotFound();
+            }
+
+            $limit      = $this->limit;
+
+            $dbQuery = User::where('created_by', '=', Auth::user()->creatorId())
+                    ->where(function ($dbQuery) use ($query) {
+                        $dbQuery->where('name', 'LIKE', "%{$query}%")
+                            ->orWhere('email', 'LIKE', "%{$query}%");
+                    });
+            if(Auth::user()->type == 'super admin')
+            {
+                $dbQuery = $dbQuery->whereRaw("`type`='company'");
+            }
+            else
+            {
+                $dbQuery = $dbQuery->whereRaw("`type`!='client'");
+            }
+
+            $totalPage = ceil((clone $dbQuery)->count() / $limit);
+
+            if($page <= 0 || $page > $totalPage) {
+                return $this->RedirectNotFound();
+            }
+
+            $skip       = ($page - 1) * $limit;
+            $prev       = $next = 0;
+            $hasPage    = $totalPage > 0;
+            if($hasPage){
+                if($skip) {
+                    $prev = $page - 1;
+                }
+                if($page < $totalPage) {
+                    $next = $page + 1;
+                }
+            }
+
+            $users = $dbQuery->skip($skip)->take($limit)->get();
+
+            return view('user.index', compact('users', 'page', 'hasPage', 'prev', 'next', 'totalPage', 'query'));
+        }
+        else
+        {
+            return $this->RedirectDenied();
+        }
     }
 
 
@@ -546,19 +632,20 @@ class UserController extends Controller
             $orderID = strtoupper(str_replace('.', '', uniqid('', true)));
             Order::create(
                 [
-                    'order_id' => $orderID,
-                    'name' => null,
-                    'card_number' => null,
-                    'card_exp_month' => null,
-                    'card_exp_year' => null,
-                    'plan_name' => $plan->name,
-                    'plan_id' => $plan->id,
-                    'price' => $plan->price,
-                    'price_currency' => isset(Auth::user()->planPrice()['stripe_currency']) ? Auth::user()->planPrice()['stripe_currency'] : '',
-                    'txn_id' => '',
-                    'payment_status' => 'succeeded',
-                    'receipt' => null,
-                    'user_id' => $user->id,
+                    'order_id'          => $orderID,
+                    'duration'          => 1,
+                    'name'              => null,
+                    'card_number'       => null,
+                    'card_exp_month'    => null,
+                    'card_exp_year'     => null,
+                    'plan_name'         => $plan->name,
+                    'plan_id'           => $plan->id,
+                    'price'             => $plan->price,
+                    'price_currency'    => isset(Auth::user()->planPrice()['stripe_currency']) ? Auth::user()->planPrice()['stripe_currency'] : '',
+                    'txn_id'            => '',
+                    'payment_status'    => 'succeeded',
+                    'receipt'           => null,
+                    'user_id'           => $user->id,
                 ]
             );
 

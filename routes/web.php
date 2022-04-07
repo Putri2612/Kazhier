@@ -174,7 +174,10 @@ Route::prefix('app')->group(
         
                 Route::get('profile', [UserController::class, 'profile'])->name('profile');
                 Route::put('edit-profile', [UserController::class, 'editprofile'])->name('update.account');
-                Route::resource('users', UserController::class);
+                Route::resource('users', UserController::class, ['except' => 'show']);
+                Route::get('users/search/{query}/{page}', [UserController::class, 'search'])->name('users.page-with-search');
+                Route::get('users/search/{query}', [UserController::class, 'search'])->name('users.search');
+                Route::get('users/{page}', [UserController::class, 'index'])->name('users.page');
                 Route::match(['get', 'put'], 'users/{userID}/activity', [UserController::class, 'activity'])->name('user.activity');
         
                 Route::prefix('redeem-referral')->as('referral.')->group(

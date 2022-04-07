@@ -5,6 +5,20 @@
 @section('page-title')
     {{__('User')}}
 @endsection
+
+@push('script-page')
+    <script>
+        document.querySelector('#search-form').addEventListener('submit', event => {
+            event.preventDefault();
+            console.log(event);
+            let form = event.currentTarget,
+                url  = form.action;
+                url  = url.replace('QUERY', form.query.value);
+            window.location.href = url;
+        });
+    </script>
+@endpush
+
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -46,6 +60,17 @@
                     </div>
                 </div>
                 <div class="card">
+                    <div class="card-body">
+                        {{ Form::open(['route' => ['users.search', ['QUERY']], 'id' => 'search-form']) }}
+                            <div class="row justify-content-end">
+                                <div class="col-12 col-md-4">{{ Form::text('query', !empty($query) ? $query : null, ['class' => 'form-control', 'placeholder' => __('Search') . '...']) }}</div>
+                                <div class="col-12 col-md-auto">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                    @if(!empty($query)) <a href="{{route('users.index')}}" class="btn btn-danger"><i class="fas fa-times"></i></a> @endif
+                                </div>
+                            </div>
+                        {{ Form::close() }}
+                    </div>
                     <div class="card-body">
                         <div class="staff-wrap">
                             <div class="row">
@@ -106,6 +131,56 @@
                             </div>
                         </div>
                     </div>
+                    @if ($hasPage)
+                        <div class="card-body">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item {{ !$prev ? 'disabled' : '' }}">
+                                    @php
+                                        if(empty($prev)) {
+                                            $url = '#';
+                                        } else if(!empty($query)) {
+                                            $url = route('users.page-with-search', ['page' => $prev, 'query' => $query]);
+                                        } else {
+                                            $url = route('users.page', ['page' => $prev]);
+                                        }
+                                    @endphp
+                                    <a class="page-link" href="{{ $url }}">{{ __('Previous') }}</a>
+                                </li>
+                                @for ($index = 1; $index <= $totalPage; $index++)
+                                    @if ($index == 1 || $index == $totalPage || ($index > $page - 2 && $index < $page + 2))
+                                        <li class="page-item {{ $index == $page ? 'active' : '' }}">
+                                            @php
+                                                if($index == $page) {
+                                                    $url = '#';
+                                                } else if(!empty($query)) {
+                                                    $url = route('users.page-with-search', ['page' => $index, 'query' => $query]);
+                                                } else {
+                                                    $url = route('users.page', ['page' => $index]);
+                                                }
+                                            @endphp
+                                            <a class="page-link" href="{{ $url }}">{{ $index }}</a>
+                                        </li>
+                                    @elseif ($index == $page - 2 || $index == $page + 2)
+                                        <li class="page-item disabled">
+                                            <a class="page-link">&hellip;</a>
+                                        </li>
+                                    @endif
+                                @endfor
+                                <li class="page-item {{ !$next ? 'disabled' : '' }}">
+                                    @php
+                                        if(!$next) {
+                                            $url = '#';
+                                        } else if(!empty($query)) {
+                                            $url = route('users.page-with-search', ['page' => $next, 'query' => $query]);
+                                        } else {
+                                            $url = route('users.page', ['page' => $next]);
+                                        }
+                                    @endphp
+                                    <a class="page-link" href="{{ $url }}">{{ __('Next') }}</a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
