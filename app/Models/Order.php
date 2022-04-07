@@ -21,6 +21,7 @@ class Order extends Model
         'payment_status',
         'receipt',
         'user_id',
+        'duration'
     ];
 
     public const PAYMENT_CHANNELS = ['credit_card', 'mandiri_clickpay', 'cimb_clicks',
