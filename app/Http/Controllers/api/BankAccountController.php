@@ -50,7 +50,7 @@ class BankAccountController extends Controller
 
         $user       = Auth::user();
         $creatorId  = $user->creatorId();
-        if($user->countBankAccount() >= $user->getPlan->max_bank_accounts && $user->getPlan->max_bank_accounts != -1){
+        if($user->countBankAccount() >= $user->currentPlan->max_bank_accounts && $user->currentPlan->max_bank_accounts != -1){
             return $this->FailedResponse(__('Your bank account limit is over, Please upgrade plan.'));
         }
 

@@ -46,10 +46,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_active'       => 'datetime',
     ];
 
-    public function user(){
-        return $this->belongsTo(ProductServiceCategory::class);
-    }
-
     public function order_request(){
         return $this->hasMany(Order::class,'plan_id','id');
     }
@@ -134,11 +130,6 @@ class User extends Authenticatable implements MustVerifyEmail
         $settings = Utility::settings();
 
         return $settings["bill_prefix"] . sprintf("%05d", $number);
-    }
-
-    public function getPlan()
-    {
-        return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
     public function assignPlan($planID, $duration = 1)

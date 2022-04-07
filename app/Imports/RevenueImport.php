@@ -131,7 +131,7 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                 if($validator->fails()) {
                     $message = __('Bank account invalid');
                     $fails  .= "Error: {$message} on row {$this->row}\n";
-                } else if($this->user->getPlan->max_bank_accounts > $this->user->countBankAccount()){
+                } else if($this->user->currentPlan->max_bank_accounts > $this->user->countBankAccount()){
                     $exploded   = explode('-', $collection[$headings['account']]);
                     $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
                     $holder_name= count($exploded) > 1 ? $exploded[1] : $exploded[0];

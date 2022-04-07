@@ -3,7 +3,7 @@
     $profile        = asset(Storage::url('avatar/'));
     $currantLang    = $users->currentLanguage();
     $languages      = Utility::languages();
-    $userPlan       = $users->getPlan;
+    $userPlan       = $users->currentPlan;
     if($userPlan) {
         $pricier    = \App\Models\Plan::where('price', '>', $userPlan->price)->count();
     }
