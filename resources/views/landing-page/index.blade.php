@@ -56,8 +56,12 @@
                         <a class="nav-item active kakaflex-item" href="."><li>Beranda</li></a>
                         <a class="nav-item kakaflex-item" href="#fitur"><li>Fitur Lengkap</li></a>
                         <a class="nav-item kakaflex-item" href="#price"><li>Harga</li></a>
-                        <a class="nav-item kakaflex-item" href="./app/login"><li>Login</li></a>
-                        <a class="nav-item highlights kakaflex-item" href="./app/register"><li>Daftar</li></a>
+                        @if (Auth::check())
+                            <a class="nav-item highlights kakaflex-item" href="{{ route('dashboard') }}"><li>Dasbor</li></a>
+                        @else 
+                            <a class="nav-item kakaflex-item" href=" {{ route('user.login') }} "><li>Login</li></a>
+                            <a class="nav-item highlights kakaflex-item" href="{{ route('user.register') }}"><li>Daftar</li></a>
+                        @endif
                     </ul>
                 </nav>
             </div>
