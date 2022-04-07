@@ -15,42 +15,45 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="text-center">
+                        <div class="text-center mb-3">
                             <h3 class="display-4">{{ __('Thank You For Using :AppName!', ['AppName' => config('app.name', 'Kazhier')]) }}</h3>
                             <p>{{ __('Your plan has expired, please purchase new plan to continue using this software.') }} <br>
                                 {{ __('You can download your data if you choose to use another software.') }}</p>
                             <div class="row pb-3">
-                                <div class="col-4 d-grid p-2">
-                                    <a href="{{ route('invoice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round px-3">
+                                <div class="col-12 col-md-6 col-lg-4 d-grid p-2">
+                                    <a href="{{ route('invoice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary px-3">
                                         <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                         <span class="btn-inner--text"> {{__('Export Invoice')}}</span>
                                     </a>
                                 </div>
-                                <div class="col-4 d-grid p-2">
-                                    <a href="{{ route('revenue.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round px-3">
+                                <div class="col-12 col-md-6 col-lg-4 d-grid p-2">
+                                    <a href="{{ route('revenue.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary px-3">
                                         <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                         <span class="btn-inner--text"> {{__('Export Revenue')}}</span>
                                     </a>
                                 </div>
-                                <div class="col-4 d-grid p-2">
-                                    <a href="{{ route('bill.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round px-3">
+                                <div class="col-12 col-md-6 col-lg-4 d-grid p-2">
+                                    <a href="{{ route('bill.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary px-3">
                                         <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                         <span class="btn-inner--text"> {{__('Export Bill')}}</span>
                                     </a>
                                 </div>
-                                <div class="col-6 d-grid p-2">
-                                    <a href="{{ route('payment.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round px-3">
+                                <div class="col-12 col-md-6 d-grid p-2">
+                                    <a href="{{ route('payment.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary px-3">
                                         <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                         <span class="btn-inner--text"> {{__('Export Payment')}}</span>
                                     </a>
                                 </div>
-                                <div class="col-6 d-grid p-2">
-                                    <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round px-3">
+                                <div class="col-12 col-lg-6 d-grid p-2">
+                                    <a href="{{ route('productservice.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary px-3">
                                         <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                         <span class="btn-inner--text"> {{__('Export Product & Service')}}</span>
                                     </a>
                                 </div>
                             </div>
+                        </div>
+                        <div class="text-center">
+                            <h2 class="display-5">{{ __('Purchase New Plan') }}</h2>
                         </div>
                         <div class="row plan-div align-items-stretch justify-content-center">
                             @foreach($plans as $plan)
@@ -80,7 +83,7 @@
                                                 {{Auth::user()->planPriceFormat($discounted)}}
                                             </h3>
                                         @endif
-                                        <p class="font-style">{{$plan->duration}}</p>
+                                        <p class="font-style">{{ Auth::user()->planDurationFormat($plan->duration) }}</p>
                                         <div class="text-center">   
                                             @can('buy plan')
                                                 @if($plan->id != \Auth::user()->plan)
@@ -98,11 +101,11 @@
                                         <ul>
                                             <li>
                                                 <i class="fas fa-user-tie"></i>
-                                                <p>{{$plan->max_users}} {{__('Users')}}</p>
+                                                <p>{!!Auth::user()->planFeatureNumberFormat($plan->max_users)!!} {{__('Users')}}</p>
                                             </li>
                                             <li>
                                                 <i class="fas fa-user-plus"></i>
-                                                <p>{{$plan->max_bank_accounts}} {{__('Bank Accounts')}}</p>
+                                                <p>{!!Auth::user()->planFeatureNumberFormat($plan->max_bank_accounts)!!} {{__('Bank Accounts')}}</p>
                                             </li>
                                         </ul>
                                     </div>

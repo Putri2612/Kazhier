@@ -6,31 +6,34 @@
                     <img alt="" class="me-3 rounded-circle" width="50" src="{{asset(Storage::url('plan')).'/'.$plan->image}}">
                     <div class="media-body">
                         <div class="media-title font-style">{{$plan->name}}</div>
-                        <div class="text-job text-muted"> {{isset(\Auth::user()->planPrice()['stripe_currencys_symbol'])?\Auth::user()->planPrice()['stripe_currency_symbol'].$plan->price:''}} {{' / '. $plan->duration}}</div>
+                        <div class="text-job text-muted"> {{Auth::user()->planPriceFormat($plan->price)}} /  {{ __($plan->duration)}}</div>
                     </div>
                     <div class="media-items">
                         <div class="media-item">
-                            <div class="media-value">{{$plan->max_users}}</div>
+                            <div class="media-value">{!!Auth::user()->planFeatureNumberFormat($plan->max_users)!!}</div>
                             <div class="media-label">{{__('Users')}}</div>
                         </div>
                         <div class="media-item">
-                            <div class="media-value">{{$plan->max_customers}}</div>
-                            <div class="media-label">{{__('Customers')}}</div>
+                            <div class="media-value">{!!Auth::user()->planFeatureNumberFormat($plan->max_bank_accounts)!!}</div>
+                            <div class="media-label">{{__('Bank Accounts')}}</div>
                         </div>
                         <div class="media-item">
-                            <div class="media-value">{{$plan->max_venders}}</div>
-                            <div class="media-label">{{__('Venders')}}</div>
-                        </div>
-                        <div class="media-item">
-                            @if($user->plan==$plan->id)
-                                <div class="media-value"></div>
-                                <div class="media-label text-success"><h6>{{__('Active')}}</h6></div>
-                            @else
-                                <div class="media-value">
-                                    <a href="{{route('plan.active',[$user->id,$plan->id])}}" class="btn btn-primary" title="Click to Upgrade Plan"><i class="fas fa-cart-plus"></i></a>
-                                </div>
-                                <div class="media-label text-success"><h6></h6></div>
-                            @endif
+                            @php
+                                if($plan->id == $user->plan) {
+                                    $title  = __('Extend Plan');
+                                    $desc   = __('Extend');
+                                } else {
+                                    $title  = __('Upgrade Plan');
+                                    $desc   = __('Upgrade');
+                                }
+                            @endphp
+                            <div class="media-value">
+                                <a href="{{route('plan.active',[$user->id,$plan->id])}}" class="btn btn-primary" title="{{ $title }}">
+                                    <i class="fas fa-cart-plus"></i>
+                                    <span>{{ $desc }}</span>
+                                </a>
+                            </div>
+                            <div class="media-label text-success"><h6></h6></div>
                         </div>
                     </div>
                 </li>
