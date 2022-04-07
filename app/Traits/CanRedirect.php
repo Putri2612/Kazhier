@@ -14,4 +14,8 @@ trait CanRedirect{
     public function RedirectDenied(){
         return $this->RedirectError('Permission denied.');
     }
+
+    public function RedirectNotFound() {
+        return $this->RedirectError('Not found.');
+    }
 }
