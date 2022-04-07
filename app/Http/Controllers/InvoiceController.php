@@ -135,6 +135,26 @@ class InvoiceController extends Controller
         return json_encode($data);
     }
 
+    public function productBySKU(Request $request)
+    {
+
+        // $taxPaidByUser = $request->has('paid_by_user') && $request->input('paid_by_user') == 'true';
+        $taxPaidByUser = true;
+
+        $data['product']     = $product = ProductService::where('sku', $request->input('sku'))->where('created_by', Auth::user()->creatorId())->first();
+        $data['unit']        = $product->unit ? $product->unit->name : '';
+        $data['taxRate']     = $taxRate = ($product->taxes) ? $product->taxes->rate : 0;
+        $salePrice           = $product->sale_price;
+        $quantity            = $product->quantity > 0 ? 1 : 0;
+        $data['stock']       = $product->quantity;
+        $taxPrice            = ($taxRate / 100) * ($salePrice * $quantity);
+        $product->sale_price = $this->FloatToReadableNumber($salePrice);
+        $product->purchase_price = $this->FloatToReadableNumber($product->purchase_price);
+        $data['totalAmount'] = $this->FloatToReadableNumber(($salePrice * $quantity) + ($taxPaidByUser ? $taxPrice : 0));
+
+        return json_encode($data);
+    }
+
     public function store(Request $request)
     {
         if(Auth::user()->can('create invoice'))
