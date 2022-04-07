@@ -15,28 +15,54 @@ class ProductServiceController extends Controller
     //
     use ApiResponse;
     public function get($product_id = 'all') {
-        $user = Auth::user();
-
         $query = ProductService::select(
-            'id AS product_id',
-            'sku AS product_code',
-            'name AS product_name',
-            'sale_price AS product_sell_price',
-            'category_id AS product_category_id',
-            'unit_id AS product_unit_id',
-            'type AS product_type',
-            'quantity AS product_stock',
-            'tax_id AS product_tax_id'
-        )->where('created_by', '=', $user->creatorId());
+            'product_services.id AS product_id',
+            'product_services.sku AS product_code',
+            'product_services.name AS product_name',
+            'product_services.sale_price AS product_sell_price',
+            'product_service_categories.name AS product_category',
+            'product_service_units.name AS product_weight_unit',
+            'product_services.type AS product_type',
+            'product_services.quantity AS product_stock',
+            'taxes.rate AS product_tax_rate'
+        )->where('product_services.created_by', '=', Auth::user()->creatorId());
 
-        if($product_id == 'all'){
+        if(strtolower($product_id) != 'all'){
+            $products = $query->where('product_services.id', '=', $product_id);   
+        }
+
+        $query->join('product_service_units', 'product_services.unit_id', '=', 'product_service_units.id')
+            ->join('product_service_categories', 'product_services.category_id', '=', 'product_service_categories.id')
+            ->join('taxes', 'product_services.tax_id', '=', 'taxes.id');
+        
+        if(strtolower($product_id) == 'all') {
             $products = $query->get();
         } else {
-            $products = $query->where('id', '=', $product_id)->first();
+            $products = $query->first();
         }
 
         
         return $this->FetchSuccessResponse($products);
+    }
+
+    public function getBySKU($product_sku) {
+        $query = ProductService::select(
+            'product_services.id AS product_id',
+            'product_services.sku AS product_code',
+            'product_services.name AS product_name',
+            'product_services.sale_price AS product_sell_price',
+            'product_service_categories.name AS product_category',
+            'product_service_units.name AS product_weight_unit',
+            'product_services.type AS product_type',
+            'product_services.quantity AS product_stock',
+            'taxes.rate AS product_tax_rate'
+        )->where('product_services.created_by', '=', Auth::user()->creatorId())->where('product_services.id', '=', $product_sku);
+
+        $product = $query->join('product_service_units', 'product_services.unit_id', '=', 'product_service_units.id')
+            ->join('product_service_categories', 'product_services.category_id', '=', 'product_service_categories.id')
+            ->join('taxes', 'product_services.tax_id', '=', 'taxes.id')->first();
+        
+        return $this->FetchSuccessResponse($product);
     }
 
     public function create(Request $request) {

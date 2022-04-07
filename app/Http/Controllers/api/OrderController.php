@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
 use App\Models\InvoiceProduct;
+use App\Models\PaymentMethod;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Traits\ApiResponse;
@@ -72,11 +73,11 @@ class OrderController extends Controller
         }
 
         $validator  = Validator::make($request->all(), [
-            'order_category_id'     => 'required',
+            // 'order_category_id'     => 'required',
             'customer_name'         => 'required',
             'products'              => 'required',
             'order_price'           => 'required',
-            'order_payment_method'  => 'required',
+            // 'order_payment_method'  => 'required',
             'payment_method'        => 'required',
         ]);
 
@@ -94,16 +95,16 @@ class OrderController extends Controller
         $user       = Auth::user();
         $creatorID  = $user->creatorId();
         $products   = $request->input('products');
-        $products   = gettype($products) == 'string' ? json_decode($products): $products;
+        $products   = gettype($products) == 'string' ? json_decode($products, true): $products;
         if(gettype($products) == 'string') {
             $processed_products = [];
             foreach ($products as $product) {
-                $processed_products[] = json_decode($product);
+                $processed_products[] = json_decode($product, true);
             }
             $products = $processed_products;
         }
 
-        $noStockProducts = ProductService::where('created_by', $creatorID)->whereIn('id', collect($products)->pluck('product_id'))-where('quantity', 0)->count();
+        $noStockProducts = ProductService::where('created_by', $creatorID)->whereIn('id', collect($products)->pluck('product_id'))->where('quantity', 0)->count();
 
         if($noStockProducts) {
             return $this->FailedResponse(__('Empty stock'));
@@ -129,9 +130,9 @@ class OrderController extends Controller
 
         if(!empty($request->input('order_time')) && !empty($request->input('order_date'))) {
             $datetime = $request->input('order_date') . ' ' . $request->input('order_time');
-            $datetime = Carbon::createFromFormat('Y-m-d H:i:s', $datetime);
+            $datetime = Carbon::createFromFormat('Y-m-d H:i', $datetime);
         } else {
-            $timeInput  = empty($request->input('order_time')) ? now() : Carbon::createFromFormat('H:i:s',$request->input('order_time'));
+            $timeInput  = empty($request->input('order_time')) ? now() : Carbon::createFromFormat('H:i',$request->input('order_time'));
             $time       = [
                 'hour' => $timeInput->hour,
                 'minute' => $timeInput->minute,
@@ -142,13 +143,30 @@ class OrderController extends Controller
             $datetime = $datetime->setHour($time['hour'])->setMinute($time['minute'])->setSecond($time['second']);
         }
 
+        if(empty($request->input('order_category_id'))) {
+            $category = ProductServiceCategory::firstOrNew([
+                'name'          => 'Penjualan',
+                'created_by'    => $creatorID,
+                'type'          => 1
+            ], [
+                'color'         => '0087f8',
+            ]);
+
+            if(!$category->exists) {
+                $category->save();
+            }
+            $category_id = $category->id;
+        } else {
+            $category_id = $request->input('order_category_id');
+        }
+
         $invoice                    = new Invoice();
         $invoice->invoice_id        = $this->InvoiceNumber();
         $invoice->customer_id       = $customer->id;
         $invoice->status            = 2;
         $invoice->issue_date        = $datetime;
         $invoice->due_date          = $datetime;
-        $invoice->category_id       = $request->input('order_category_id');
+        $invoice->category_id       = $category_id;
         $invoice->ref_number        = $request->has('ref_number') ? $request->input('ref_number') : '';
         $invoice->discount_apply    = $request->has('discount_apply') ? 1 : 0;
         $invoice->created_by        = $creatorID;
@@ -157,25 +175,29 @@ class OrderController extends Controller
 
         foreach($products as $product) {
             if(gettype($product) == 'string') {
-                $product = json_decode($product);
+                $product = json_decode($product, true);
             }
-            $quantity   = $product->product_qty;
-            $tax        = $product->product_tax;
-            $discount   = isset($product->discount) ? $product->discount : 0;
-            $price      = $product->product_price;
+            $quantity   = $product['product_qty'];
+            $tax        = !empty($product['product_tax']) ? $product['product_tax'] : 0;
+            $discount   = !empty($product['discount']) ? $product['discount'] : 0;
+            $price      = $product['product_price'];
 
-            $item   = ProductService::find($product->product_id);
+            $item   = ProductService::find($product['product_id']);
             $item->quantity -= $quantity;
             $item->save();
             
             $invoiceProduct             = new InvoiceProduct();
             $invoiceProduct->invoice_id = $invoice->id;
-            $invoiceProduct->product_id = $product->product_id;
+            $invoiceProduct->product_id = $product['product_id'];
             $invoiceProduct->quantity   = $quantity;
             $invoiceProduct->tax        = $tax;
             $invoiceProduct->discount   = $discount;
             $invoiceProduct->price      = $price;
             $invoiceProduct->save();
+        }
+
+        if(!BankAccount::where('created_by', '=', $creatorID)->count()) {
+            return $this->FailedResponse(__('Please create a bank account first'));
         }
 
         $bankAccount    = BankAccount::where('id', '=', $request->input('order_payment_method'))->where('created_by', '=', $creatorID)->first();
@@ -185,12 +207,18 @@ class OrderController extends Controller
             $accountId  = BankAccount::select('id')->where('created_by', '=', $creatorID)->first()->id;
         }
 
+        $paymentMethod = PaymentMethod::firstOrNew(['name' => $request->input('payment_method'), 'created_by' => $creatorID], []);
+
+        if(!$paymentMethod->exists) {
+            $paymentMethod->save();
+        }
+
         $invoicePayment                 = new InvoicePayment();
         $invoicePayment->invoice_id     = $invoice->id;
         $invoicePayment->date           = $request->input('order_date');
         $invoicePayment->amount         = $request->input('order_price');
         $invoicePayment->account_id     = $accountId;
-        $invoicePayment->payment_method = $request->input('payment_method');
+        $invoicePayment->payment_method = $paymentMethod->id;
         $invoicePayment->reference      = '';
         $invoicePayment->description    = '';
         $invoicePayment->served_by      = $user->id;
