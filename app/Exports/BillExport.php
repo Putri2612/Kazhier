@@ -13,7 +13,8 @@ class BillExport implements FromCollection
     */
     public function collection()
     {
-        $bills      = Bill::where('created_by', '=', Auth::user()->creatorId())->orderBy('issue_date', 'asc')->get();
+        $bills      = Bill::with(['vender', 'server', 'category', 'payments', 'payments.bankAccount', 'payments.server', 'items', 'items.product'])
+                    ->where('created_by', '=', Auth::user()->creatorId())->orderBy('issue_date', 'asc')->get();
         $data       = [];
         $number     = 1;
 
@@ -23,9 +24,9 @@ class BillExport implements FromCollection
                 'bill_id'           => $bill->bill_id,
                 'issue_date'        => $bill->issue_date,
                 'due_date'          => $bill->due_date,
-                'customer_name'     => $bill->customer->name,
+                'customer_name'     => $bill->vender->name,
                 'status'            => Bill::$statuses[$bill->status],
-                'category'          => $bill->category()->first()->name,
+                'category'          => $bill->category->name,
                 'served_by'         => $bill->server ? $bill->server->name : Auth::user()->name,
                 'payments'          => '',
                 'payment_servers'   => '',

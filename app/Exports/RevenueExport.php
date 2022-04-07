@@ -13,7 +13,7 @@ class RevenueExport implements FromCollection, WithHeadings
     * @return \Illuminate\Support\Collection
     */
     public function collection(){
-        $revenues   = Revenue::where('created_by', '=', Auth::user()->creatorId())->orderBy('date', 'asc')->get();
+        $revenues   = Revenue::with(['bankAccount', 'customer', 'paymentMethod', 'category'])->where('created_by', '=', Auth::user()->creatorId())->orderBy('date', 'asc')->get();
         $data       = [];
         $number     = 1;
         foreach($revenues as $revenue) {

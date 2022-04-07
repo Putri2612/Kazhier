@@ -50,7 +50,7 @@ class PaymentController extends Controller
             $payment = PaymentMethod::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $payment->prepend(__('All'), '');
 
-            $query = Payment::where('created_by', '=', $creatorId);
+            $query = Payment::with(['vender', 'bankAccount', 'category', 'paymentMethod'])->where('created_by', '=', $creatorId);
 
             if(!empty($request->date))
             {

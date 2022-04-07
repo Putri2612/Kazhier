@@ -13,7 +13,7 @@ class ProductServiceExport implements FromCollection, WithHeadings
     * @return \Illuminate\Support\Collection
     */
     public function collection() {
-        $products   = ProductService::where('created_by', '=', Auth::user()->creatorId())->get();
+        $products   = ProductService::with(['unit', 'taxes', 'category'])->where('created_by', '=', Auth::user()->creatorId())->get();
         $data       = [];
         $number     = 1;
 

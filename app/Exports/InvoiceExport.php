@@ -15,7 +15,8 @@ class InvoiceExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        $invoices   = Invoice::where('created_by', '=', Auth::user()->creatorId())->orderBy('issue_date', 'asc')->get();
+        $invoices   = Invoice::with(['customer', 'payments', 'server', 'payments.bankAccount', 'payments.server', 'items', 'items.product'])
+                    ->where('created_by', '=', Auth::user()->creatorId())->orderBy('issue_date', 'asc')->get();
         $data       = [];
         $number     = 1;
 

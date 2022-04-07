@@ -85,7 +85,7 @@ class UserController extends Controller
             $query = User::skip($skip)->take($limit)->where('created_by', '=', Auth::user()->creatorId());
             if(Auth::user()->type == 'super admin')
             {
-                $users = $query->where('type', '=', 'company')->get();
+                $users = $query->where('type', '=', 'company')->with('currentPlan')->get();
             }
             else
             {
@@ -122,7 +122,7 @@ class UserController extends Controller
                     });
             if(Auth::user()->type == 'super admin')
             {
-                $dbQuery = $dbQuery->whereRaw("`type`='company'");
+                $dbQuery = $dbQuery->where('type', '=', 'company')->with('currentPlan');
             }
             else
             {

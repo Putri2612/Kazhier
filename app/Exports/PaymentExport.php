@@ -13,7 +13,7 @@ class PaymentExport implements FromCollection, WithHeadings
     * @return \Illuminate\Support\Collection
     */
     public function collection(){
-        $payments   = Payment::where('created_by', '=', Auth::user()->creatorId())->orderBy('date', 'asc')->get();
+        $payments   = Payment::with(['bankAccount', 'vender', 'paymentMethod', 'category'])->where('created_by', '=', Auth::user()->creatorId())->orderBy('date', 'asc')->get();
         $data       = [];
         $number     = 1;
         foreach($payments as $payment) {

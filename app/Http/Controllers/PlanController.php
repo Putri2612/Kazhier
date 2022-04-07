@@ -194,18 +194,8 @@ class PlanController extends Controller
 
     public function getPlanAsync()
     {
-        $plans = Plan::get();
-        $planArray = array();
-        foreach($plans as $plan){
-            $planArray[] = array(
-                'name' => $plan->name,
-                'price' => $plan->price,
-                'max_users' => $plan->max_users,
-                'max_account' => $plan->max_bank_accounts,
-                'duration' => $plan->duration
-            );
-        }
-        return json_encode($planArray);
+        $plans = Plan::select('name', 'price', 'max_users', 'max_account', 'duration')->get()->toArray();
+        return json_encode($plans);
     }
 
     public function expired() {

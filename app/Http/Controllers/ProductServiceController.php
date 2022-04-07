@@ -31,14 +31,15 @@ class ProductServiceController extends Controller
         {
             $creatorId = Auth::user()->creatorId();
             $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
+
+            $query  = ProductService::with(['taxes', 'unit', 'category'])->where('created_by', '=', $creatorId);
             if(!empty($request->input('category')))
             {
-
-                $productServices = ProductService::where('created_by', '=', $creatorId)->where('category_id', $request->input('category'))->get();
+                $productServices = $query->where('category_id', $request->input('category'))->get();
             }
             else
             {
-                $productServices = ProductService::where('created_by', '=', $creatorId)->get();
+                $productServices = $query->get();
             }
 
             return view('productservice.index', compact('productServices', 'category'));

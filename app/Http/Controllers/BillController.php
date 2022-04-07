@@ -46,7 +46,7 @@ class BillController extends Controller
                 $status[] = __($stat);
             }
 
-            $query = Bill::where('created_by', '=', $creatorId);
+            $query = Bill::with(['vender', 'category'])->where('created_by', '=', $creatorId);
             if(!empty($request->vender))
             {
                 $query->where('id', '=', $request->vender);

@@ -53,7 +53,7 @@ class RevenueController extends Controller
             $payment->prepend(__('All'), '');
 
 
-            $query = Revenue::where('created_by', '=', \Auth::user()->creatorId());
+            $query = Revenue::with(['bankAccount', 'customer', 'category', 'paymentMethod'])->where('created_by', '=', \Auth::user()->creatorId());
 
             if(!empty($request->date))
             {

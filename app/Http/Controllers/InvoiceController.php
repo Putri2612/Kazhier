@@ -57,7 +57,7 @@ class InvoiceController extends Controller
                 $status[] = __($stat);
             }
 
-            $query = Invoice::where('created_by', '=', Auth::user()->creatorId());
+            $query = Invoice::with(['customer', 'category'])->where('created_by', '=', Auth::user()->creatorId());
 
             if(!empty($request->customer))
             {
