@@ -51,6 +51,15 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public $settings;
 
+    public function planActive() {
+        if($this->type == 'company') {
+            return $this->plan || $this->plan_expire_date >= date('Y-m-d');
+        } else if($this->type != 'super admin') {
+            $user = User::find($this->creatorId());
+            return $user->planActive();
+        }
+    }
+
     public function authId()
     {
         return $this->id;
@@ -300,9 +309,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function incomeCurrentMonth()
     {
         $currentMonth   = date('m');
-        $revenue        = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $currentYear    = date('Y');
+        $revenue        = Revenue::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ? AND YEAR(date) = ?', [$currentMonth, $currentYear])->sum('amount');
         $invoiceIDs     = Invoice:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
-        $invoices       = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $invoices       = InvoicePayment::whereIn('invoice_id', $invoiceIDs)->whereRaw('MONTH(date) = ? AND YEAR(date) = ?', [$currentMonth, $currentYear])->sum('amount');
         $totalIncome    = (!empty($revenue) ? $revenue : 0) + (!empty($invoices) ? $invoices : 0);
 
         return $totalIncome;
@@ -311,12 +321,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function expenseCurrentMonth()
     {
-        $currentMonth = date('m');
+        $currentMonth   = date('m');
+        $currentYear    = date('Y');
 
-        $payment = Payment::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $payment        = Payment::where('created_by', '=', $this->creatorId())->whereRaw('MONTH(date) = ? AND YEAR(date) = ?', [$currentMonth, $currentYear])->sum('amount');
 
         $billIDs        = Bill:: select('id')->where('created_by', $this->creatorId())->get()->pluck('id');
-        $bills          = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('MONTH(date) = ?', [$currentMonth])->sum('amount');
+        $bills          = BillPayment::whereIn('bill_id', $billIDs)->whereRaw('MONTH(date) = ? AND YEAR(date) = ?', [$currentMonth, $currentYear])->sum('amount');
 
         $totalExpense   = (!empty($payment) ? $payment : 0) + (!empty($bills) ? $bills : 0);
 

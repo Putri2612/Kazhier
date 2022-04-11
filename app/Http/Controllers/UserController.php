@@ -64,9 +64,13 @@ class UserController extends Controller
             }
 
             $limit      = $this->limit;
-            $totalPage  = ceil(User::count() / $limit);
+            if(Auth::user()->type == 'super admin') {
+                $totalPage  = ceil(User::where('type', 'company')->count() / $limit);
+            } else {
+                $totalPage  = ceil(User::where('created_by', Auth::user()->creatorId())->where('type', '!=', 'client')->count() / $limit);
+            }
 
-            if($page <= 0 || $page > $totalPage) {
+            if(($page <= 0 || $page > $totalPage) && $page != 1) {
                 return $this->RedirectNotFound();
             }
 

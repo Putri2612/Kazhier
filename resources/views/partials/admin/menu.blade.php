@@ -5,7 +5,7 @@
 @endphp
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
-        @if (Auth::user()->type != 'super admin' && (!Auth::user()->plan || Auth::user()->plan_expire_date < date('Y-m-d')))
+        @if (Auth::user()->type != 'super admin' && !Auth::user()->planActive())
         <div class="sidebar-brand">
             <a href="#">
                 <img class="img-fluid" src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png?'.config('asset-version.img.logo'))}}" alt="">
@@ -144,7 +144,7 @@
                             @endcan
                             @can('manage role')
                                 <li class="{{ (Request::route()->getName() == 'roles.index' || Request::route()->getName() == 'roles.create' || Request::route()->getName() == 'roles.edit') ? ' active' : '' }}">
-                                    <a class="nav-link" href="{{route('roles.index')}}">{{__('Role')}}</a>
+                                    <a class="nav-link" href="{{route('roles.index')}}">{{__('Set Role')}}</a>
                                 </li>
                             @endcan
                         </ul>
@@ -164,12 +164,12 @@
                         @endcan
                         @can('manage constant category')
                             <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'product-service') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('category.index', 'product-service')}}"> {{__('Category')}}</a>
+                                <a class="nav-link" href="{{route('category.index', 'product-service')}}"> {{__('Set Category')}}</a>
                             </li>
                         @endcan
                         @can('manage constant unit')
                             <li class="{{ (Request::route()->getName() == 'product-unit.index' ) ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('product-unit.index')}}"> {{__('Unit')}}</a>
+                                <a class="nav-link" href="{{route('product-unit.index')}}"> {{__('Set Unit')}}</a>
                             </li>
                         @endcan
                     </ul>
@@ -247,7 +247,7 @@
                         @endcan
                         @can('manage constant category')
                             <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'income' ) ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('category.index', 'income')}}"> {{__('Category')}}</a>
+                                <a class="nav-link" href="{{route('category.index', 'income')}}"> {{__('Set Category')}}</a>
                             </li>
                         @endcan
                     </ul>
@@ -274,7 +274,7 @@
                         @endcan
                         @can('manage constant category')
                             <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'expense') ? 'active' : '' }}">
-                                <a class="nav-link" href="{{route('category.index', 'expense')}}"> {{__('Category')}}</a>
+                                <a class="nav-link" href="{{route('category.index', 'expense')}}"> {{__('Set Category')}}</a>
                             </li>
                         @endcan
                     </ul>
@@ -346,7 +346,7 @@
             @endif
             
 
-            @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
+            @if( Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction') || Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'))
                 <li class="dropdown {{ (Request::segment(2) == 'report' || Request::segment(2) == 'transaction' || Request::segment(2) == 'journal' || Request::segment(2) == 'ledger' || Request::segment(2) == 'balance-sheet')?' active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-chart-area"></i> <span>{{__('Report')}}</span></a>
                     <ul class="dropdown-menu">
