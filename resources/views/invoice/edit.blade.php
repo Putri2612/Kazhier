@@ -182,7 +182,7 @@
             }
 
             if(doChange) {
-                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products, customer_tax: tax.paid_by_customer});
+                UpdateInvoiceAndBillItemData(target, {discount: discount, products: products});
             }
         });
 
@@ -276,7 +276,22 @@
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}
                                             </div>
                                         </div>
-                                        <div class="col-md-6 d-flex align-items-center">
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                {{ Form::label('type', __('Type')) }}
+                                                <select name="type" id="type" class="form-control customer-sel font-style selectric">
+                                                    @foreach (\App\Models\Invoice::$types as $index => $item)
+                                                        @php
+                                                            $item = strtolower($item);
+                                                            $option = $index ? "invoice with {$item}" : $item;
+                                                            $option = ucfirst($option);
+                                                        @endphp
+                                                        <option value="{{ $index }}" {{ $index == $type ? 'selected' : '' }}>{{ __($option) }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="col-md-6 d-flex align-items-center">
                                             <div class="form-check">
                                                 {{ Form::checkbox('customer_tax',  null, ['class' => 'form-check-input', 'id' => 'customer-tax']) }}
                                                 {{ Form::label('customer_tax', __('Tax Paid by Customer'), ['class' => 'form-check-label']) }}
@@ -288,7 +303,7 @@
                                                     @include('customFields.formBuilder')
                                                 </div>
                                             </div>
-                                        @endif
+                                        @endif --}}
                                     </div>
                                 </div>
                             </div>

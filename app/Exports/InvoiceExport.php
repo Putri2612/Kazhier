@@ -27,7 +27,7 @@ class InvoiceExport implements FromCollection, WithHeadings
                 'issue_date'        => $invoice->issue_date,
                 'due_date'          => $invoice->due_date,
                 'customer_name'     => $invoice->customer->name,
-                'status'            => Invoice::$statuses[$invoice->status],
+                'status'            => $invoice->getStatus(),
                 'category'          => $invoice->category()->first()->name,
                 'served_by'         => $invoice->server ? $invoice->server->name : Auth::user()->name,
                 'payments'          => '',

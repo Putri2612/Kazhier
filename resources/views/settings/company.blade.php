@@ -64,7 +64,7 @@
                                     <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target="#proposal-template-setting" href="#proposal-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Proposal Print Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target="#template-setting" href="#template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Invoice Print Setting')}}</a>
+                                    <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target="#template-setting" href="#template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Invoice Setting')}}</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="profile-tab5" data-bs-toggle="tab" data-bs-target=""="#bill-template-setting" href="#bill-template-setting" role="tab" aria-controls="" aria-selected="false">{{__('Bill Print Setting')}}</a>
@@ -459,9 +459,21 @@
                                 <div class="tab-pane fade" id="template-setting" role="tabpanel" aria-labelledby="contact-tab4">
                                     <div class="col-md-12">
                                         <div class="row">
-                                            <div class="col-md-2">
+                                            <div class="col-md-4 col-xl-2">
                                                 <form id="setting-form" method="post" action="{{route('template.setting')}}">
                                                     @csrf
+                                                    <div class="form-group">
+                                                        <label for="invoice_type">{{ __('Default Type') }}</label>
+                                                        <select name="invoice_type" id="invoice_type" class="form-control font-style selectric">
+                                                            @foreach (\App\Models\Invoice::$types as $index => $type)
+                                                                <option {{ !empty($settings['invoice_type']) && $settings['invoice_type'] == $index ? 'selected' : '' }} value="{{ $index }}">{{ __($type) }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="invoice_automail" id="invoice_automail" {{ !isset($settings['invoice_automail']) || $settings['invoice_automail'] ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="invoice_automail">{{ __('Send invoice automatically') }}</label>
+                                                    </div>
                                                     <div class="form-group">
                                                         <label for="address">{{__('Invoice Template')}}</label>
                                                         <select class="form-control" name="invoice_template">
@@ -488,11 +500,11 @@
                                                     </button>
                                                 </form>
                                             </div>
-                                            <div class="col-md-10">
+                                            <div class="col-md-8 col-xl-10">
                                                 @if(isset($settings['invoice_template']) && isset($settings['invoice_color']))
-                                                    <iframe id="invoice_frame" class="w-100" height="100%" frameborder="0" src="{{route('invoice.preview',[$settings['invoice_template'],$settings['invoice_color']])}}"></iframe>
+                                                    <iframe id="invoice_frame" class="w-100" height="100%" style="min-height: 300px" frameborder="0" src="{{route('invoice.preview',[$settings['invoice_template'],$settings['invoice_color']])}}"></iframe>
                                                 @else
-                                                    <iframe id="invoice_frame" class="w-100" height="100%" frameborder="0" src="{{route('invoice.preview',['template1','fffff'])}}"></iframe>
+                                                    <iframe id="invoice_frame" class="w-100" height="100%" style="min-height: 300px" frameborder="0" src="{{route('invoice.preview',['template1','fffff'])}}"></iframe>
                                                 @endif
                                             </div>
                                         </div>

@@ -45,7 +45,6 @@ class InvoiceController extends Controller
 
     public function index(Request $request)
     {
-
         if(Auth::user()->can('manage invoice'))
         {
 
@@ -53,9 +52,9 @@ class InvoiceController extends Controller
             $customer->prepend(__('All'), '');
 
             $status = [];
-            foreach (Invoice::$statuses as $stat) {
-                $status[] = __($stat);
-            }
+            // foreach (Invoice::$statuses as $stat) {
+            //     $status[] = __($stat);
+            // }
 
             $query = Invoice::with(['customer', 'category'])->where('created_by', '=', Auth::user()->creatorId());
 
@@ -99,8 +98,10 @@ class InvoiceController extends Controller
             $category           = $category->union(['new.product-category' => __('Create new category')]);
             $customers          = $customers->union(['new.customer' => __('Add new customer')]);
             $product_services   = $product_services->union(['new.productservice' => __('Create new product / service')]);
+            $type        = Utility::settings();
+            $type        = isset($type['invoice_type']) ? $type['invoice_type'] : 0;
 
-            return view('invoice.create', compact('customers', 'invoice_number', 'product_services', 'category', 'customFields'));
+            return view('invoice.create', compact('customers', 'invoice_number', 'product_services', 'category', 'customFields', 'type'));
         }
         else
         {
@@ -175,12 +176,11 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            $status = Invoice::$statuses;
-
             $invoice                 = new Invoice();
             $invoice->invoice_id     = $this->invoiceNumber();
             $invoice->customer_id    = $request->input('customer_id');
             $invoice->status         = 0;
+            $invoice->type           = $request->input('type');
             $invoice->issue_date     = $request->input('issue_date');
             $invoice->due_date       = $request->input('due_date');
             $invoice->category_id    = $request->input('category_id');
@@ -189,7 +189,6 @@ class InvoiceController extends Controller
             $invoice->customer_tax   = $request->has('customer_tax');
             $invoice->created_by     = Auth::user()->creatorId();
             $invoice->served_by      = Auth::user()->id;
-            $invoice->served_by        = Auth::user()->id;
             $invoice->save();
             CustomField::saveData($invoice, $request->input('customField'));
             $products = $request->input('items');
@@ -214,26 +213,35 @@ class InvoiceController extends Controller
                 $invoiceProduct->save();
             }
 
-            $invoice->send_date = date('Y-m-d');
-            $invoice->status    = 1;
-            $invoice->save();
+            $message = __('Invoice successfully created.');
 
-            $customer         = Customer::where('id', $invoice->customer_id)->first();
-            $invoice->name    = !empty($customer) ? $customer->name : '';
-            $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-
-            $invoiceId    = Crypt::encrypt($invoice->id);
-            $invoice->url = route('invoice.pdf', $invoiceId);
-
-            if($customer->email){
-                try {
-                    Mail::to($customer->email)->send(new InvoiceSend($invoice));
-                } catch(Exception $e) {
-                    $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+            $settings = Utility::settings();
+            if((!isset($settings['invoice_automail']) || $settings['invoice_automail']) && Auth::user()->can('send invoice')) {
+                $invoice->send_date = date('Y-m-d');
+                $invoice->status    = 1;
+                $invoice->save();
+    
+                $customer         = Customer::where('id', $invoice->customer_id)->first();
+                $invoice->name    = !empty($customer) ? $customer->name : '';
+                $invoice->invoice = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
+    
+                $invoiceId    = Crypt::encrypt($invoice->id);
+                $invoice->url = route('invoice.pdf', $invoiceId);
+    
+                if($customer->email){
+                    try {
+                        Mail::to($customer->email)->send(new InvoiceSend($invoice));
+                    } catch(Exception $e) {
+                        $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
+                    }
                 }
+            } else if(isset($settings['invoice_automail']) && !$settings['invoice_automail']) {
+                $message .= ' '.__('Please manually send the invoice to customer.');
+            } else if (!Auth::user()->can('send invoice')) {
+                $message .= ' '.__('Invoice cannot be sent because user does not have the permission to do it.');
             }
 
-            return redirect()->route('invoice.index', $invoice->id)->with('success', __('Invoice successfully created.'));
+            return redirect()->route('invoice.index', $invoice->id)->with('success', $message);
         }
         else
         {
@@ -516,160 +524,6 @@ class InvoiceController extends Controller
         }
     }
 
-    public function payment($invoice_id)
-    {
-        if(Auth::user()->can('create payment invoice'))
-        {
-            $invoice = Invoice::where('id', $invoice_id)->first();
-
-            $customers  = Customer::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $categories = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $payments   = PaymentMethod::where('created_by', '=', Auth::user()->creatorId())->get()->pluck('name', 'id');
-            $accounts   = BankAccount::select('*', \DB::raw("CONCAT(bank_name,' ',holder_name) AS name"))->where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
-
-            return view('invoice.payment', compact('customers', 'categories', 'payments', 'accounts', 'invoice'));
-        }
-        else
-        {
-            return $this->RedirectDenied();
-        }
-    }
-
-    public function createPayment(Request $request, $invoice_id)
-    {
-        if(Auth::user()->can('create payment invoice'))
-        {
-            $validator = \Validator::make(
-                $request->all(), [
-                                   'date' => 'required',
-                                   'amount' => 'required',
-                                   'account_id' => 'required',
-                                   'payment_method' => 'required',
-                               ]
-            );
-            if($validator->fails())
-            {
-                $messages = $validator->getMessageBag();
-
-                return redirect()->back()->with('error', $messages->first());
-            }
-
-            $amount = $this->ReadableNumberToFloat($request->input('amount'));
-
-            $invoicePayment                 = new InvoicePayment();
-            $invoicePayment->invoice_id     = $invoice_id;
-            $invoicePayment->date           = $request->input('date');
-            $invoicePayment->amount         = $amount;
-            $invoicePayment->account_id     = $request->input('account_id');
-            $invoicePayment->payment_method = $request->input('payment_method');
-            $invoicePayment->reference      = $request->input('reference');
-            $invoicePayment->description    = $request->input('description');
-            $invoicePayment->created_by     = Auth::user()->creatorId();
-            $invoicePayment->save();
-            $this->AddBalance($request->input('account_id'), $amount, $request->input('date'));
-
-            $invoice = Invoice::where('id', $invoice_id)->first();
-            $due     = $invoice->getDue();
-            $total   = $invoice->getTotal();
-            if($invoice->status == 0)
-            {
-                $invoice->send_date = date('Y-m-d');
-                $invoice->save();
-            }
-
-            if($due <= 0) {
-                $invoice->status = 4;
-            } else if ($due == $invoice->getTotal()) {
-                $invoice->status = 2;
-            } else {
-                $invoice->status = 3;
-            }
-
-            $invoicePayment->user_id    = $invoice->customer_id;
-            $invoicePayment->user_type  = 'Customer';
-            $invoicePayment->type       = 'Partial';
-            $invoicePayment->created_by = Auth::user()->id;
-            $invoicePayment->payment_id = $invoicePayment->id;
-            $invoicePayment->category   = 'Invoice';
-
-            Transaction::addTransaction($invoicePayment);
-
-            $customer = Customer::where('id', $invoice->customer_id)->first();
-
-            $payment            = new InvoicePayment();
-            $payment->name      = $customer['name'];
-            $payment->date      = Auth::user()->dateFormat($request->input('date'));
-            $payment->amount    = Auth::user()->priceFormat($amount);
-            $payment->invoice   = 'invoice ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-            $payment->dueAmount = Auth::user()->priceFormat($invoice->getDue());
-
-            try
-            {
-                Mail::to($customer['email'])->send(new InvoicePaymentCreate($payment));
-            }
-            catch(\Exception $e)
-            {
-                $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-            }
-
-            return redirect()->back()->with('success', __('Payment successfully added.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
-        }
-
-    }
-
-    public function paymentDestroy(Request $request, $invoice_id, $payment_id)
-    {
-
-        if(Auth::user()->can('delete payment invoice'))
-        {
-            $invoicePayment = InvoicePayment::where('id', '=', $payment_id)->first();
-            $this->AddBalance($invoicePayment->account_id, -($invoicePayment->amount), $invoicePayment->date);
-            $invoicePayment->delete();
-            
-            $invoice = Invoice::where('id', $invoice_id)->first();
-            $due     = $invoice->getDue();
-            if($due <= 0) {
-                $invoice->status = 4;
-            } else if ($due == $invoice->getTotal()) {
-                $invoice->status = 2;
-            } else {
-                $invoice->status = 3;
-            }
-            $invoice->save();
-
-            $type = 'Partial';
-            $user = 'Customer';
-            Transaction::destroyTransaction($payment_id, $type, $user);
-
-            return redirect()->back()->with('success', __('Payment successfully deleted.'));
-        }
-        else
-        {
-            return $this->RedirectDenied();
-        }
-    }
-
-    public function paymentReminder($invoice_id)
-    {
-        $invoice            = Invoice::find($invoice_id);
-        $customer           = Customer::where('id', $invoice->customer_id)->first();
-        $invoice->dueAmount = Auth:: user()->priceFormat($invoice->getDue());
-        $invoice->name      = $customer['name'];
-        $invoice->date      = Auth::user()->dateFormat($invoice->send_date);
-        $invoice->invoice   = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
-
-        try
-        {
-            Mail::to($customer['email'])->send(new PaymentReminder($invoice));
-        }
-        catch(\Exception $e)
-        {
-            $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
-        }
-
-        return redirect()->back()->with('success', __('Payment reminder successfully send.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
-    }
-
     public function customerInvoiceSend($invoice_id)
     {
         return view('customer.invoice_send', compact('invoice_id'));
@@ -926,6 +780,11 @@ class InvoiceController extends Controller
         if(isset($post['invoice_template']) && (!isset($post['invoice_color']) || empty($post['invoice_color'])))
         {
             $post['invoice_color'] = "ffffff";
+        }
+        if(!isset($post['invoice_automail'])) {
+            $post['invoice_automail'] = false;
+        } else {
+            $post['invoice_automail'] = true;
         }
 
         foreach($post as $key => $data)

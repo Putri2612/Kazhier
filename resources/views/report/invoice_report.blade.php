@@ -164,16 +164,14 @@
                                                                     <td> {{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
                                                                     <td>{{ !empty($invoice->category)?$invoice->category->name:''}}</td>
                                                                     <td>
-                                                                        @if($invoice->status == 0)
-                                                                            <b><span class="text-primary">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span></b>
-                                                                        @elseif($invoice->status == 1)
-                                                                            <b> <span class="text-warning">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span></b>
-                                                                        @elseif($invoice->status == 2)
-                                                                            <b> <span class="text-danger">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span></b>
-                                                                        @elseif($invoice->status == 3)
-                                                                            <b> <span class="text-info">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span></b>
-                                                                        @elseif($invoice->status == 4)
-                                                                            <b> <span class="text-success">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span></b>
+                                                                        @php
+                                                                            $type = empty($invoice->type) ? 0 : $invoice->type;
+                                                                            $type = strtolower(\App\Models\Invoice::$types[$type]);
+                                                                        @endphp
+                                                                        @if($invoice->status <= count(\App\Models\Invoice::$statuses[$type]) - 1)
+                                                                            <span class="badge badge-white">{{ $invoice->getStatus() }}</span>
+                                                                        @else
+                                                                            <span class="badge badge-primary">{{ $invoice->getStatus() }}</span>
                                                                         @endif
                                                                     </td>
                                                                     <td> {{\Auth::user()->priceFormat($invoice->getTotal()-$invoice->getDue())}}</td>

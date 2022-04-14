@@ -39,6 +39,8 @@ use App\Http\Controllers\FrontEndErrorController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\ImportSampleController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\InvoicePaymentController;
+use App\Http\Controllers\InvoiceStatusController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\LedgerController;
@@ -274,12 +276,13 @@ Route::prefix('app')->group(
                         Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('delete.credit.note');
         
                         Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
-                        Route::get('{id}/payment', [InvoiceController::class, 'payment'])->name('payment');
-                        Route::delete('{id}/payment/{pid}/destroy', [InvoiceController::class, 'paymentDestroy'])->name('payment.destroy');
-                        Route::get('{id}/payment/reminder', [InvoiceController::class, 'paymentReminder'])->name('payment.reminder');
                         Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
                         Route::get('{id}/sent', [InvoiceController::class, 'sent'])->name('sent');
-                        Route::post('{id}/payment', [InvoiceController::class, 'createPayment'])->name('payment.create');
+                        
+                        Route::get('{id}/payment', [InvoicePaymentController::class, 'create'])->name('payment');
+                        Route::post('{id}/payment', [InvoicePaymentController::class, 'store'])->name('payment.create');
+                        Route::delete('{id}/payment/{pid}/destroy', [InvoicePaymentController::class, 'destroy'])->name('payment.destroy');
+                        Route::get('{id}/payment/reminder', [InvoicePaymentController::class, 'reminder'])->name('payment.reminder');
         
                         Route::post('customer', [InvoiceController::class, 'customer'])->name('customer');
                         Route::get('export', [InvoiceController::class, 'export'])->name('export');
@@ -290,10 +293,15 @@ Route::prefix('app')->group(
                         Route::post('product/SKU', [InvoiceController::class, 'productBySKU'])->name('product.sku');
                         Route::post('product', [InvoiceController::class, 'product'])->name('product');
         
+                        Route::put('{id}/picked-up', [InvoiceStatusController::class, 'PickedUp'])->name('picked-up');
+                        Route::put('{id}/prepared', [InvoiceStatusController::class, 'Prepared'])->name('prepared');
+                        Route::put('{id}/delivering', [InvoiceStatusController::class, 'Delivering'])->name('delivering');
+                        Route::put('{id}/delivered', [InvoiceStatusController::class, 'Delivered'])->name('delivered');
                     }
                 );
         
                 Route::resource('invoice', InvoiceController::class);
+                Route::post('invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
         
                 Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
                 Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
@@ -333,6 +341,7 @@ Route::prefix('app')->group(
                 );
         
                 Route::resource('bill', BillController::class);
+                Route::post('bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
         
                 Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
                 Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
@@ -448,10 +457,9 @@ Route::prefix('app')->group(
         Route::post('error/frontend', [FrontEndErrorController::class, 'storeError']);
         
         Route::get('/invoices/preview/{template}/{color}', [InvoiceController::class, 'previewInvoice'])->name('invoice.preview');                        
-        Route::post('/invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
         
         Route::get('/bill/preview/{template}/{color}', [BillController::class, 'previewBill'])->name('bill.preview');
-        Route::post('/bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
+
         
         Route::post('/midtrans/callback', [MidtransPaymentController::class, 'handlePaymentNotification']);
         

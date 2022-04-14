@@ -255,6 +255,21 @@
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}
                                             </div>
                                         </div>
+                                        <div class="col-md-6">
+                                            <div class="input-group">
+                                                {{ Form::label('type', __('Type')) }}
+                                                <select name="type" id="type" class="form-control customer-sel font-style selectric">
+                                                    @foreach (\App\Models\Invoice::$types as $index => $item)
+                                                        @php
+                                                            $item = strtolower($item);
+                                                            $option = $index ? "Invoice with {$item}" : $item;
+                                                            $option = ucfirst($option);
+                                                        @endphp
+                                                        <option value="{{ $index }}" {{ $index == $type ? 'selected' : '' }}>{{ __($option) }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
                                         {{-- <div class="col-md-6">
                                             <div class="custom-control custom-checkbox mt-4">
                                                 <input class="custom-control-input" type="checkbox" name="discount_apply" id="discount_apply">

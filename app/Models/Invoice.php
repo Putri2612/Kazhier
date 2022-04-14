@@ -13,27 +13,62 @@ class Invoice extends Model
         'due_date',
         'ref_number',
         'status',
+        'type',
         'category_id',
         'created_by',
     ];
 
     public static $statuses = [
-        'Draft',
-        //0
-        'Sent',
-        //1
-        'Unpaid',
-        //2
-        'Partialy Paid',
-        //3
-        'Paid',
-        //4
+        'default' => [
+            'Draft',            // 0
+            'Sent',             // 1
+            'Unpaid',           // 2
+            'Partialy Paid',    // 3
+            'Paid',             // 4
+        ],
+        'pickup' => [
+            'Draft',                // 0
+            'Awaiting For Pickup',  // 1
+            'Picked Up',            // 2
+            'Unpaid',               // 3
+            'Partialy Paid',        // 4
+            'Paid',                 // 5
+        ],
+        'delivery' => [
+            'Draft',                         // 0
+            'Preparing',                     // 1
+            'Prepared, Waiting For Courier', // 2
+            'Delivering',                    // 3
+            'Delivered',                     // 4
+            'Partialy Paid',                 // 5
+            'Paid',                          // 6
+        ]
+    ];
+
+    public static $types = [
+        'Default',
+        'Pickup',
+        'Delivery'
     ];
 
     protected $casts = [
         'issue_date'    => 'datetime',
         'due_date'      => 'datetime',
     ];
+
+    public function getStatus() {
+        return __(self::$statuses[strtolower($this->getType())][$this->status]);
+    }
+
+    public function getType() {
+        if(empty($this->type)) {
+            $type = 0;
+        } else {
+            $type = $this->type;
+        }
+
+        return self::$types[$type];
+    }
 
 
     public function tax()

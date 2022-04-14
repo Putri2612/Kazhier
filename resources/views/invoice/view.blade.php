@@ -36,69 +36,209 @@
             </div>
         </div>
         @can('send invoice')
-            @if($invoice->status!=4)
-                <div class="row">
-                    <div class="col-12">
-                        <div class="activities">
-                            <div class="activity">
-                                <div class="activity-icon bg-primary text-white shadow-primary">
-                                    <i class="fas fa-plus"></i>
-                                </div>
-                                <div class="activity-detail">
-                                    <div class="mb-2">
-                                        <span class="text-job text-primary"><h6>{{__('Create Invoice')}}</h6>
-                                        </span>
+            <div class="row">
+                <div class="col-12">
+                    <div class="activities">
+                        <div class="activity">
+                            <div class="activity-icon bg-primary text-white shadow-primary">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="mb-2">
+                                    <span class="text-job text-primary"><h6>{{__('Invoice Created')}}</h6>
+                                    </span>
+                                    @if ($invoice->status < 2)
                                         @can('edit invoice')
                                             <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
                                                 {{__('Edit')}}
                                             </a>
                                         @endcan
-                                    </div>
-                                    <p>{{__('Status')}} : <a href="#">{{__('Created on ')}} {{\Auth::user()->dateFormat($invoice->issue_date)}} </a></p>
+                                    @endif
                                 </div>
+                                <p>{{__('Created on ')}} : <a href="#"> {{\Auth::user()->dateFormat($invoice->issue_date)}} </a></p>
                             </div>
-                            <div class="activity">
-                                <div class="activity-icon bg-primary text-white shadow-primary">
-                                    <i class="fas fa-envelope"></i>
-                                </div>
-                                <div class="activity-detail">
-                                    <div class="mb-2">
-                                        <span class="text-job text-primary"><h6>{{__('Send Invoice')}}</h6></span>
-                                        @if($invoice->status!=0)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($invoice->send_date)}}  </a></p>
-                                        @else
-                                            @can('send invoice')
-                                                <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
-                                                    {{__('Mark Sent')}}
-                                                </a>
-                                            @endcan
-                                            <p>{{__('Status')}} : <a href="#">{{__('Not Sent')}} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="activity">
+                            <div class="activity-icon bg-primary text-white shadow-primary">
+                                <i class="fas fa-envelope"></i>
                             </div>
-                            <div class="activity">
-                                <div class="activity-icon bg-primary text-white shadow-primary">
-                                    <i class="far fa-money-bill-alt"></i>
-                                </div>
-                                <div class="activity-detail">
-                                    <div class="mb-2">
-                                        <span class="text-job text-primary"><h6>{{__('Get Paid')}}</h6></span>
-                                    </div>
-                                    @if($invoice->status!=0)
-                                        @can('create payment invoice')
-                                            <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
-                                                {{__('Add Payment')}}
+                            <div class="activity-detail">
+                                <div class="mb-2">
+                                    <span class="text-job text-primary"><h6>{{__('Invoice Delivery')}}</h6></span>
+                                    @if($invoice->status)
+                                        <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{ Auth::user()->dateFormat($invoice->send_date) }}  </a></p>
+                                    @else
+                                        @can('send invoice')
+                                            <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
+                                                {{__('Mark Sent')}}
                                             </a>
                                         @endcan
+                                        <p>{{__('Status')}} : <a href="#">{{__('Not Sent')}} </a></p>
                                     @endif
-                                    <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
                                 </div>
                             </div>
                         </div>
+                        @if (empty($invoice->type))
+                            @if($invoice->status)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="far fa-money-bill-alt"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 4)
+                                            @can('create payment invoice')
+                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
+                                                    {{__('Add Payment')}}
+                                                </a>
+                                            @endcan
+                                        @endif
+                                        @if($invoice->status < 4)
+                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
+                                        @else
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        @elseif($invoice->type == 1) 
+                            @if ($invoice->status >= 1)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Pickup')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 2)
+                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.picked-up', $invoice->id]]) }}
+                                                <button class="btn btn-primary btn-action me-1 float-right">
+                                                    {{ __('Picked Up') }}
+                                                </button>
+                                            {{ Form::close() }}
+                                        @endif
+                                        @if ($invoice->status < 2)
+                                            <p>{{__('Status')}} : <a href="#">{{ __($invoice->getStatus()) }} </a></p>
+                                        @else 
+                                            <p>{{__('Picked up on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->pickup_time) }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if ($invoice->status >= 2)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="far fa-money-bill-alt"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 5)
+                                            @can('create payment invoice')
+                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
+                                                    {{__('Add Payment')}}
+                                                </a>
+                                            @endcan
+                                        @endif
+                                        @if($invoice->status < 5)
+                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
+                                        @else
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        @elseif($invoice->type == 2)
+                            @if ($invoice->status >= 1)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Preparing')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 2)
+                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.prepared', $invoice->id]]) }}
+                                                <button class="btn btn-primary btn-action me-1 float-right">
+                                                    {{ __('Prepared') }}
+                                                </button>
+                                            {{ Form::close() }}
+                                        @endif
+                                        @if ($invoice->status < 3)
+                                            <p>{{__('Status')}} : <a href="#">{{ $invoice->getStatus() }} </a></p>
+                                        @else 
+                                            <p>{{__('Status')}} : <a href="#">{{ __('Prepared') }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if ($invoice->status >= 2)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="fa-solid fa-truck"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Delivery')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 3)
+                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.delivering', $invoice->id]]) }}
+                                                <button class="btn btn-primary btn-action me-1 float-right">
+                                                    {{ __('Picked Up') }}
+                                                </button>
+                                            {{ Form::close() }}
+                                        @elseif($invoice->status < 4)
+                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.delivered', $invoice->id]]) }}
+                                                <button class="btn btn-primary btn-action me-1 float-right">
+                                                    {{ __('Delivered') }}
+                                                </button>
+                                            {{ Form::close() }}
+                                        @endif
+                                        @if($invoice->status < 3)
+                                            <p>{{__('Status')}} : <a href="#">{{ __('Waiting for courier') }} </a></p>
+                                        @elseif($invoice->status < 4)
+                                            <p>{{__('Status')}} : <a href="#">{{__('Delivering')}} </a></p>
+                                            <p>{{__('Picked up at')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->pickup_time) }} </a></p>
+                                        @else
+                                            <p>{{__('Delivered at')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->delivery_time) }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                            @if ($invoice->status >= 4)
+                                <div class="activity">
+                                    <div class="activity-icon bg-primary text-white shadow-primary">
+                                        <i class="far fa-money-bill-alt"></i>
+                                    </div>
+                                    <div class="activity-detail">
+                                        <div class="mb-2">
+                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
+                                        </div>
+                                        @if($invoice->status < 6)
+                                            @can('create payment invoice')
+                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
+                                                    {{__('Add Payment')}}
+                                                </a>
+                                            @endcan
+                                        @endif
+                                        @if($invoice->status < 5)
+                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
+                                        @else
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
+                        
                     </div>
                 </div>
-            @endif
+            </div>
         @endcan
         <div class="section-body">
             <div class="invoice">
@@ -108,25 +248,51 @@
                             <div class="row mb-10">
                                 <div class="col-lg-12">
                                     <div class="text-end">
-                                        @if(!empty($invoicePayment))
-                                            <a href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}" data-bs-toggle="tooltip" data-original-title="{{__('Credit Note')}}" class="btn btn-primary btn-action me-1 float-right">
-                                                {{__('Add Credit Note')}}
-                                            </a>
-                                        @endif
-                                        @if($invoice->status!=4)
-                                            <a href="{{ route('invoice.payment.reminder',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
-                                                {{__('Payment Reminder')}}
-                                            </a>
-                                        @endif
-                                        <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
-                                            {{__('Resend Invoice')}}
-                                        </a>
-                                        <a href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
-                                            {{__('Print')}}
-                                        </a>
-                                        <a href="{{ route('invoice.thermal', Crypt::encrypt($invoice->id))}}" target="_blank" class="btn btn-primary btn-action me-1 float-right">
-                                            {{__('Print Thermal')}}
-                                        </a>
+                                        <div class="btn-group">
+                                            <button class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="fa-solid fa-print"></i>
+                                                <span>{{ __('Print') }}</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('invoice.pdf', Crypt::encrypt($invoice->id))}}" target="_blank">
+                                                        {{__('Print')}}
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('invoice.thermal', Crypt::encrypt($invoice->id))}}" target="_blank">
+                                                        {{__('Thermal')}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                                <i class="fa-solid fa-bars"></i>
+                                                {{ __('Options') }}
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                @if(!empty($invoicePayment))
+                                                    <li>
+                                                        <a class="dropdown-item" href="#" data-url="{{ route('invoice.credit.note',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Credit Note')}}">
+                                                            {{__('Add Credit Note')}}
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                                @if($invoice->status < count(\App\Models\Invoice::$statuses[strtolower($invoice->getType())]) - 1)
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ route('invoice.payment.reminder',$invoice->id) }}">
+                                                            {{__('Payment Reminder')}}
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('invoice.sent',$invoice->id) }}">
+                                                        {{__('Resend Invoice')}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                     <div class="form-group ">
                                         <div class="custom-control custom-checkbox shipping">
@@ -188,16 +354,13 @@
                                 <div class="col-md-4">
                                     <address>
                                         <strong>{{__('Status')}}:</strong><br>
-                                        @if($invoice->status == 0)
-                                            <span class="badge badge-primary">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
-                                        @elseif($invoice->status == 1)
-                                            <span class="badge badge-warning">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
-                                        @elseif($invoice->status == 2)
-                                            <span class="badge badge-danger">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
-                                        @elseif($invoice->status == 3)
-                                            <span class="badge badge-info">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
-                                        @elseif($invoice->status == 4)
-                                            <span class="badge badge-success">{{ __(\App\Models\Invoice::$statuses[$invoice->status]) }}</span>
+                                        @php
+                                            $type = strtolower($invoice->getType());
+                                        @endphp
+                                        @if($invoice->status < count(\App\Models\Invoice::$statuses[$type]) - 1)
+                                            <span class="badge badge-light">{{ $invoice->getStatus() }}</span>
+                                        @else
+                                            <span class="badge badge-primary">{{ $invoice->getStatus() }}</span>
                                         @endif
                                     </address>
                                 </div>

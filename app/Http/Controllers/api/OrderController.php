@@ -39,7 +39,7 @@ class OrderController extends Controller
                 'order_price'           => $invoice->getTotal(),
                 'order_payment_method'  => $invoice->status > 2 ? $invoice->payments()->first()->bankAccount->bank_name . ' ' . $invoice->payments()->first()->bankAccount->holder_name : 'unpaid',
                 'customer_name'         => $invoice->customer->name,
-                'status'                => Invoice::$statuses[$invoice->status],
+                'status'                => $invoice->getStatus(),
                 'served_by'             => $invoice->served_by
             ]);
         }

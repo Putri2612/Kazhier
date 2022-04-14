@@ -165,15 +165,15 @@
                                                                     <td>{{ !empty($bill->category)?$bill->category->name:''}}</td>
                                                                     <td>
                                                                         @if($bill->status == 0)
-                                                                            <b><span class="text-primary">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span></b>
+                                                                            <b><span class="text-primary">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span></b>
                                                                         @elseif($bill->status == 1)
-                                                                            <b> <span class="text-warning">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span></b>
+                                                                            <b> <span class="text-warning">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span></b>
                                                                         @elseif($bill->status == 2)
-                                                                            <b> <span class="text-danger">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span></b>
+                                                                            <b> <span class="text-danger">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span></b>
                                                                         @elseif($bill->status == 3)
-                                                                            <b> <span class="text-info">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span></b>
+                                                                            <b> <span class="text-info">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span></b>
                                                                         @elseif($bill->status == 4)
-                                                                            <b> <span class="text-success">{{ __(\App\Models\Invoice::$statuses[$bill->status]) }}</span></b>
+                                                                            <b> <span class="text-success">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span></b>
                                                                         @endif
                                                                     </td>
                                                                     <td> {{\Auth::user()->priceFormat($bill->getTotal()-$bill->getDue())}}</td>
