@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Classes\Helpers\ImportDateFormatter as DateFormatter;
 use App\Models\BankAccount;
 use App\Models\Customer;
 use App\Models\PaymentMethod;
@@ -46,7 +47,7 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
             $this->row++;
             $collection = $collection->toArray();
             $validator = Validator::make($collection, [
-                $headings['date']       => 'date',
+                $headings['date']       => 'required',
                 $headings['amount']     => 'numeric',
                 $headings['account']    => 'string|regex:/^[\w\-\s]*/i',
             ]);
@@ -148,6 +149,17 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                         $account->save();
                     }
                     $accountID = $account;
+                } else {
+                    $exploded   = explode('-', $collection[$headings['account']]);
+                    $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
+                    $holder_name= count($exploded) > 1 ? $exploded[1] : $exploded[0];
+                    $account = BankAccount::where('holder_name', $holder_name)
+                                ->where('bank_name', $bank_name)
+                                ->where('created_by', $this->user->creatorId())
+                                ->first();
+                    if(!empty($account)) {
+                        $accountID = $account;
+                    }
                 }
             }
 
@@ -159,6 +171,7 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                     'created_by'        => $this->user->creatorId(),
                     'bank_name'         => 'Bank Indonesia',
                     'account_number'    => '000',
+                    'bank_address'      => 'Indonesia',
                     'opening_balance'   => 100000,
                     'contact_number'    => '000',
                 ])->id;
@@ -190,9 +203,10 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                 }
             }
             
+            $date = DateFormatter::format($collection[$headings['date']]);
 
             $revenue                 = new Revenue();
-            $revenue->date           = $collection[$headings['date']];
+            $revenue->date           = $date;
             $revenue->amount         = $collection[$headings['amount']];
             $revenue->account_id     = $accountID;
             $revenue->customer_id    = $customerID;
@@ -202,7 +216,7 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
             $revenue->description    = $description;
             $revenue->save();
 
-            $this->AddBalance($accountID, $collection[$headings['amount']], $collection[$headings['date']]);
+            $this->AddBalance($accountID, $collection[$headings['amount']], $date);
 
             $revenue->payment_id = $revenue->id;
             $revenue->type       = 'Payment';

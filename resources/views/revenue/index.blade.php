@@ -15,31 +15,37 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6 fw-normal">{{__('Manage Revenue')}}</h4>
-                        <div class="col-6 text-end row justify-content-end">
-                            @if (Auth::user()->type == 'company')
-                            <div class="col-auto">
-                                <a href="#" data-url="{{ route('revenue.import') }}" data-ajax-popup="true" data-title="{{__('Import Revenue')}}" class="btn btn-icon icon-left btn-warning">
-                                    <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
-                                    <span class="btn-inner--text"> {{__('Import')}}</span>
-                                </a>
-                            </div>
-                            <div class="col-auto">
-                                <a href="{{ route('revenue.export') }}" class="btn btn-icon icon-left btn-success">
-                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
-                                    <span class="btn-inner--text"> {{__('Export')}}</span>
-                                </a>
-                            </div>
-                            @endif
-                            
+                        <h4 class="col-12 col-md-6 fw-normal">{{__('Manage Revenue')}}</h4>
+                        <div class="col-12 col-md-6 text-end row justify-content-end">                            
                             @can('create revenue')
                             <div class="col-auto">
                                 <a href="#" data-url="{{ route('revenue.create') }}" data-ajax-popup="true" data-title="{{__('Create New Revenue')}}" class="btn btn-icon icon-left btn-primary">
-                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                    <span class="btn-inner--text"> {{__('Create')}}</span>
+                                    <span><i class="fas fa-plus"></i></span>
+                                    <span class="d-none d-md-inline">{{__('Create')}}</span>
                                 </a>
                             </div>
                             @endcan
+                            @if (Auth::user()->type == 'company')
+                                <div class="col-auto">
+                                    <div class="btn-group">
+                                        <div class="btn btn-light" data-bs-toggle="dropdown">
+                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                        </div>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="#" data-url="{{ route('revenue.import') }}" data-ajax-popup="true" data-title="{{__('Import Revenue')}}" class="dropdown-item">
+                                                    {{__('Import')}}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('revenue.export') }}" class="dropdown-item">
+                                                    {{__('Export')}}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="card">

@@ -11,45 +11,11 @@
     {{ Form::open(['route' => 'payment.import.headings', 'class' => 'dropzone import-dropzone', 'enctype' => 'multipart/form-data']) }}
     {{ Form::close() }}
 </div>
-{{ Form::open(['method' => 'PUT', 'route' => 'payment.import.store', 'class' => 'wizard-form collapse pt-3']) }}
-    <p class="h4">{{ __('Please select the appropriate column names') }}</p>
-    {{ Form::hidden('path', '') }}
-    <div class="row">
-        <div class="col-md-12 pb-2">
-            {{ Form::label('date', __('Date')) }}
-            {{ Form::select('date', ['' => '---'], null, ['class' => 'form-control selectric second-form','required'=>'required']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('amount', __('Amount')) }}
-            {{ Form::select('amount', ['' => '---'], null, ['class' => 'form-control selectric second-form','required'=>'required']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('account', __('Account')) }}
-            {{ Form::select('account', ['' => '---'], null, ['class' => 'form-control selectric second-form', 'data-is-required']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('category', __('Category')) }}
-            {{ Form::select('category', ['' => '---'], null, ['class' => 'form-control selectric second-form', 'required'=>'required']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('payment_method', __('Payment method')) }}
-            {{ Form::select('payment_method', ['' => '---'], null, ['class' => 'form-control selectric second-form','required'=>'required']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('vender', __('Vendor')) }}
-            {{ Form::select('vender', ['' => '---'], null, ['class' => 'form-control selectric second-form']) }}
-        </div>
-        <div class="col-md-6 pb-2">
-            {{ Form::label('description', __('Description')) }}
-            {{ Form::select('description', ['' => '---'], null, ['class' => 'form-control selectric second-form']) }}
-        </div>
-        <div class="col-md-12 py-3"></div>
-        <div class="col-md-12 text-end">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{__('Cancel')}}</button>
-            {{Form::submit(__('Save'),array('class'=>'btn btn-primary'))}}
-        </div>
+<div class="wizard-form collapse mb-3">
+    <div class="text-center pt-4 pb-5">
+        <h3 class="display-4">{{ __('Extracting') }} <span id="load-extract" data-dot="3">...</span></h3>
     </div>
-{{ Form::close() }}
+</div>
 <div class="wizard-form collapse">
     <div class="text-center pt-4 pb-5">
         <i class="fas fa-circle-check fa-9x text-success"></i>
@@ -68,7 +34,11 @@
             FormWizard.active++;
             setTimeout(() => {
                 FormWizard.collapse[FormWizard.active].show();
-                FormWizard.progress += (100 / FormWizard.elements.length);
+                if(FormWizard.active == FormWizard.elements.length - 1) {
+                    FormWizard.progress = 100;
+                } else {
+                    FormWizard.progress += (100 / FormWizard.elements.length);
+                }
                 FormWizard.bar.style.width = `${FormWizard.progress}%`;
                 FormWizard.bar.setAttribute('aria-valuenow', FormWizard.progress);
             }, 500);
@@ -86,67 +56,90 @@
         dictDefaultMessage: '{{ __('Drop files here to upload') }}',
     })
     dropzones.import.on('success', (file, response) => {
-        document.querySelector('input[name="path"]').value = response.path;
-        response.headings.forEach(heading => {
-            document.querySelectorAll('.second-form').forEach(element => {
-                const option = document.createElement('option');
-                option.innerHTML = heading;
-                if(heading == element.name) {
-                    option.selected = true;
-                }
-                element.append(option);
-            });
-        });
-        $('.second-form').selectric('refresh');
         FormWizard.callback.switchForm();
+        const loading = document.querySelector('#load-extract'),
+            animation = setInterval(() => {
+                let dots = parseInt(loading.getAttribute('data-dot')),
+                    string = '';
+                if(dots == 3) dots = 1;
+                else dots++;
+                for(let dot = 0; dot < dots; dot++) {
+                    string += '.';
+                }
+                loading.setAttribute('data-dot', dots);
+                loading.innerHTML = string;
+            }, 500),
+            client  = new XMLHttpRequest(),
+            data    = new FormData(),
+            token   = document.querySelector("meta[name='csrf-token']").getAttribute('content');
+
+        data.append('headings', response.headings);
+        data.append('path', response.path);
+        data.append('_method', 'PUT');
+
+        client.onprogress = (progress) => {
+            if(progress.lengthComputable) {
+                FormWizard.progress += (100 / FormWizard.elements.length) * (progress.loaded / progress.total);
+                FormWizard.bar.style.width = `${FormWizard.progress}%`;
+                FormWizard.bar.setAttribute('aria-valuenow', FormWizard.progress);
+            }
+        }
+
+        client.onreadystatechange = () => {
+            if(client.readyState == 4) {
+                const icon  = FormWizard.elements[2].querySelector('i'),
+                    text    = FormWizard.elements[2].querySelector('p');
+                let next = false,
+                    success = false;
+                console.log(client.status, client.responseText);
+                if(client.status == 200) {
+                    const response = JSON.parse(client.responseText);
+                    success = true;
+                    if('failed' in response) {
+                        icon.classList.remove('fa-circle-check', 'text-success');
+                        icon.classList.add('fa-circle-exclamation', 'text-warning');
+
+                        text.innerHTML = response.failed;
+                        success = false;
+                    }
+                    next = true;
+                } else if(client.status == 400) {
+                    const response= JSON.parse(client.responseText);
+                    
+                    icon.classList.remove('fa-circle-check', 'text-success');
+                    icon.classList.add('fa-circle-xmark', 'text-danger');
+
+                    text.innerHTML = `${response.empty} {{ __('cannot be found') }}. {{ __('Please refer to sample we provide') }}.`;
+
+                    next = true;
+                } else {
+                    icon.classList.remove('fa-circle-check', 'text-success');
+                    icon.classList.add('fa-circle-xmark', 'text-danger');
+
+                    text.innerHTML = client.responseText;
+
+                    next = true;
+                }
+
+                if(next) {
+                    setTimeout(() => {
+                        clearInterval(animation);
+                        FormWizard.callback.switchForm();
+                        if(success){
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        }
+                    }, 1500);
+                }
+            }
+        };
+
+        client.open('POST', '{{ route('payment.import.store') }}');
+        client.setRequestHeader('X-CSRF-TOKEN', token);
+        client.send(data);
     });
     dropzones.import.on('error', (file, message) => {
         toastrs('Error', message, 'error');
-    });
-
-    FormWizard.elements[1].addEventListener('submit', event => {
-        event.preventDefault();
-        const form  = event.currentTarget,
-            data    = new FormData(form);
-
-        FormWizard.progress += (100 / FormWizard.elements.length);
-        FormWizard.bar.style.width = `${FormWizard.progress}%`;
-        FormWizard.bar.setAttribute('aria-valuenow', FormWizard.progress);
-        fetch(form.action, {
-            method: 'POST',
-            body: data
-        }).then(response => {
-            if(response.ok) {
-                return response.json()
-            } else if(response.status != 500){
-                toastrs('Error', `${response.status}: ${response.statusText}`, 'error');
-                return response.text()
-            } 
-        }).then(data => {
-            if(typeof data == 'string') {
-                throw new Error(data);
-            } else {
-                FormWizard.callback.switchForm();
-                if(data.hasOwnProperty('failed')) {
-                    const indicator = document.querySelector('.success-indicator'),
-                        message     = document.querySelector('.import-message');
-
-                    message.innerHTML = "{{__('No data imported, make sure you selected the right columns.')}}";
-                    indicator.classList.remove('fa-circle-check', 'text-success');
-                    indicator.classList.add('fa-ban', 'text-danger');
-                } else {
-                    if(data.hasOwnProperty('fails')) {
-                        FormWizard.elements[FormWizard.active].insertAdjacentHTML('beforeend', `<pre class="bg-warning px-3 py-2">${data.fails}</pre>`);
-                    }
-                    setTimeout(() => {
-                        location.reload();
-                    }, 5000);
-                };
-            }
-        }).catch(error => {
-            FormWizard.progress -= (100 / FormWizard.elements.length);
-            FormWizard.bar.style.width = `${FormWizard.progress}%`;
-            FormWizard.bar.setAttribute('aria-valuenow', FormWizard.progress);
-        });
     });
 </script>

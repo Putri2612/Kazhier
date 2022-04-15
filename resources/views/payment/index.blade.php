@@ -17,28 +17,35 @@
                     <div class="row crd mb-3">
                         <h4 class="col-6 fw-normal">{{__('Manage Payment')}}</h4>
                         <div class="col-6 row text-end justify-content-end">
-                            @if (Auth::user()->type == 'company')
-                            <div class="col-auto">
-                                <a href="#" data-url="{{ route('payment.import') }}" data-ajax-popup="true" data-title="{{__('Import Payment')}}" class="btn btn-icon icon-left btn-warning">
-                                    <span class="btn-inner--icon"><i class="fas fa-upload"></i></span>
-                                    <span class="btn-inner--text"> {{__('Import')}}</span>
-                                </a>
-                            </div>    
-                            <div class="col-auto">
-                                <a href="{{ route('payment.export') }}" class="btn btn-icon icon-left btn-success">
-                                    <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
-                                    <span class="btn-inner--text"> {{__('Export')}}</span>
-                                </a>
-                            </div>    
-                            @endif
                             @can('create payment')
-                            <div class="col-auto">
-                                <a href="#" data-url="{{ route('payment.create') }}" data-ajax-popup="true" data-title="{{__('Create New Payment')}}" class="btn btn-icon icon-left btn-primary">
-                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                    <span class="btn-inner--text"> {{__('Create')}}</span>
-                                </a>
-                            </div>
+                                <div class="col-auto">
+                                    <a href="#" data-url="{{ route('payment.create') }}" data-ajax-popup="true" data-title="{{__('Create New Payment')}}" class="btn btn-icon icon-left btn-primary">
+                                        <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                        <span class="btn-inner--text"> {{__('Create')}}</span>
+                                    </a>
+                                </div>
                             @endcan
+                            @if (Auth::user()->type == 'company')
+                                <div class="col-auto">
+                                    <div class="btn-group">
+                                        <div class="btn btn-light" data-bs-toggle="dropdown">
+                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                        </div>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="#" data-url="{{ route('payment.import') }}" data-ajax-popup="true" data-title="{{__('Import Payment')}}" class="dropdown-item">
+                                                    {{__('Import')}}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="{{ route('payment.export') }}" class="dropdown-item">
+                                                    {{__('Export')}}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="card">

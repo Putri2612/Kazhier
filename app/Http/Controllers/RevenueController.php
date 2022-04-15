@@ -327,11 +327,7 @@ class RevenueController extends Controller
     public function storeImport(Request $request) {
         if(Auth::user()->type == 'company') {
             $validator = Validator::make($request->all(), [
-                'date'          => 'required',
-                'amount'        => 'required',
-                'account'       => 'required',
-                'category'      => 'required',
-                'payment_method'=> 'required',
+                'headings'      => 'required',
                 'path'          => 'required',
             ]);
 
@@ -343,15 +339,27 @@ class RevenueController extends Controller
                 return response($message, 400);
             }
 
+            $input = explode(',', $request->input('headings'));
+
             $headings = [
-                'date'          => $request->input('date'),
-                'amount'        => $request->input('amount'),
-                'account'       => $request->input('account'),
-                'category'      => $request->input('category'),
-                'payment_method'=> $request->input('payment_method'),
-                'description'   => $request->input('description'),
-                'customer'      => $request->input('customer'),
+                'date'          => in_array('date', $input) ? 'date' : null,
+                'amount'        => in_array('amount', $input) ? 'amount' : null,
+                'account'       => in_array('bank_account', $input) ? 'bank_account' : null,
+                'category'      => in_array('category', $input) ? 'category' : null,
+                'payment_method'=> in_array('payment_method', $input) ? 'payment_method' : null,
+                'description'   => in_array('description', $input) ? 'description' : null,
+                'customer'      => in_array('customer_name', $input) ? 'customer_name' : null,
             ];
+
+            $notFound = array_keys($headings, null, true);
+
+            if(count($notFound)) {
+                $keys = ucwords(implode(', ', $notFound));
+                if(Storage::exists($request->input('path'))) {
+                    Storage::delete($request->input('path'));
+                }
+                return response()->json(['empty' => $keys, 'count' => count($notFound)], 400);
+            }
 
             if(Storage::exists($request->input('path'))) {
                 try {
@@ -364,7 +372,7 @@ class RevenueController extends Controller
                 $output['message'] = __('Import success');
                 
                 if(!empty($fails)) {
-                    $output['fails'] = $fails;
+                    $output['failed'] = $fails;
                 }
                 if(!empty($failed)) {
                     $output['failed'] = $failed;

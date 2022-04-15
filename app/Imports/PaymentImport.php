@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Classes\Helpers\ImportDateFormatter as DateFormatter;
 use App\Models\BankAccount;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
@@ -12,6 +13,7 @@ use App\Models\Vender;
 use App\Traits\CanManageBalance;
 use App\Traits\CanManageIDs;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -48,7 +50,7 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
             $this->row++;
             $collection = $collection->toArray();
             $validator = Validator::make($collection, [
-                $headings['date']       => 'date',
+                $headings['date']       => 'required',
                 $headings['amount']     => 'numeric',
                 $headings['account']    => 'string|regex:/^[\w\-\s]*/i',
             ]);
@@ -154,6 +156,17 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                         $account->save();
                     }
                     $accountID = $account;
+                } else {
+                    $exploded   = explode('-', $collection[$headings['account']]);
+                    $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
+                    $holder_name= count($exploded) > 1 ? $exploded[1] : $exploded[0];
+                    $account = BankAccount::where('holder_name', $holder_name)
+                                ->where('bank_name', $bank_name)
+                                ->where('created_by', $this->user->creatorId())
+                                ->first();
+                    if(!empty($account)) {
+                        $accountID = $account;
+                    }
                 }
             }
 
@@ -197,8 +210,10 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 }
             }
 
+            $date = DateFormatter::format($collection[$headings['date']]);
+
             $payment                = new Payment();
-            $payment->date          = $collection[$headings['date']];
+            $payment->date          = $date;
             $payment->amount        = $collection[$headings['amount']];
             $payment->account_id    = $accountID;
             $payment->vender_id     = $venderID;
@@ -220,6 +235,7 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
             Transaction::addTransaction($payment);
         }
         if($fails != ''){
+            Log::debug($fails);
             self::$failMessage .= $fails;
         }
         if(!$this->processed) {
