@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BalanceSheet;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\Goal;
@@ -13,15 +12,12 @@ use App\Models\PaymentMethod;
 use App\Models\Plan;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
-use App\Models\Projects;
 use App\Models\Revenue;
 use App\Models\Tax;
 use App\Models\User;
 use App\Traits\TimeGetter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -61,9 +57,6 @@ class DashboardController extends Controller
         }
         else
         {
-            Log::debug(json_encode([Auth::user()->name, 
-            Gate::check('income report') || Gate::check('expense report') || Gate::check('income vs expense report') || Gate::check('tax report')  || Gate::check('loss & profit report') || Gate::check('invoice report') || Gate::check('bill report') || Gate::check('invoice report') ||  Gate::check('manage transaction')||  Gate::check('statement report') || Gate::check('view journal') || Gate::check('view ledger') || Gate::check('view balance sheet'),
-                Auth::user()->getAllPermissions()]));
             $creatorId = Auth::user()->creatorId();
             
             $data['latestIncome']  = Revenue::where('created_by', '=', $creatorId)->orderBy('date', 'desc')->limit(5)->get();
