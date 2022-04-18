@@ -198,8 +198,7 @@ const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
         discount    = ReadableToProcessable(element.querySelector('.discount').value),
         totalPrice  = (quantity * price),
         taxPrice    = (tax / 100) * (totalPrice),
-        customerTax = !!(additionalData.customer_tax),
-        amount      = customerTax ? (totalPrice + taxPrice) - discount : totalPrice - discount;
+        amount      = (totalPrice + taxPrice) - discount;
 
     amount  = ProcessableToReadable(amount);
 

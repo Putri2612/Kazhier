@@ -7,13 +7,21 @@
     <div class="form-group  col-md-12">
         <div class="input-group">
             {{ Form::label('type', __('Type')) }}
-            {{ Form::select('type',$types,null, array('class' => 'form-control customer-sel font-style selectric ','required'=>'required')) }}
+            <select name="type" id="type" class="form-control customer-sel font-style selectric" required>
+                @foreach ($types as $key => $type)
+                    <option value="{{ $key }}">{{ __($type) }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
     <div class="form-group  col-md-12">
         <div class="input-group">
             {{ Form::label('module', __('Module')) }}
-            {{ Form::select('module',$modules,null, array('class' => 'form-control customer-sel font-style selectric ','required'=>'required')) }}
+            <select name="module" id="module" class="form-control customer-sel font-style selectric" required>
+                @foreach ($modules as $key => $module)
+                    <option value="{{ $key }}">{{ __($module) }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
     <div class="col-md-12 text-end">

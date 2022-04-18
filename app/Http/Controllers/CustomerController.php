@@ -43,7 +43,7 @@ class CustomerController extends Controller
     {
         if(Auth::user()->can('create customer'))
         {
-            $customFields   = CustomField::where('module', '=', 'customer')->where('created_by', Auth::user()->creatorId())->get();
+            $customFields   = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'customer')->get();
             $categories     = CustomerCategory::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $categories->prepend(__('General customer'), null);
             $categories     = $categories->union(['new.customer-category' => __('Create new customer category')]);
@@ -135,7 +135,7 @@ class CustomerController extends Controller
             $categories->prepend(__('General customer'), null);
             $categories     = $categories->union(['new.customer-category' => __('Create new customer category')]);
 
-            $customFields = CustomField::where('module', '=', 'customer')->get();
+            $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'customer')->get();
 
             return view('customer.edit', compact('customer', 'customFields', 'categories'));
         }
@@ -299,7 +299,7 @@ class CustomerController extends Controller
         {
             $userDetail              = Auth::user();
             $userDetail->customField = CustomField::getData($userDetail, 'customer');
-            $customFields            = CustomField::where('module', '=', 'customer')->get();
+            $customFields            = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'customer')->get();
 
             return view('customer.profile', compact('userDetail', 'customFields'));
         }

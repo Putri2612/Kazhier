@@ -296,14 +296,14 @@
                                                 {{ Form::checkbox('customer_tax',  null, ['class' => 'form-check-input', 'id' => 'customer-tax']) }}
                                                 {{ Form::label('customer_tax', __('Tax Paid by Customer'), ['class' => 'form-check-label']) }}
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         @if(!$customFields->isEmpty())
                                             <div class="col-md-6">
                                                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">
                                                     @include('customFields.formBuilder')
                                                 </div>
                                             </div>
-                                        @endif --}}
+                                        @endif
                                     </div>
                                 </div>
                             </div>

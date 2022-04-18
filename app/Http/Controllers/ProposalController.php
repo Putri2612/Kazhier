@@ -76,7 +76,7 @@ class ProposalController extends Controller
     {
         if(\Auth::user()->can('create proposal'))
         {
-            $customFields    = CustomField::where('module', '=', 'proposal')->get();
+            $customFields    = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'proposal')->get();
             $proposal_number = \Auth::user()->proposalNumberFormat($this->proposalNumber());
 
             $customers  = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -182,7 +182,7 @@ class ProposalController extends Controller
         if(\Auth::user()->can('edit proposal'))
         {
             $proposal_number = \Auth::user()->proposalNumberFormat($proposal->proposal_id);
-            $customFields    = CustomField::where('module', '=', 'proposal')->get();
+            $customFields    = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'proposal')->get();
 
             $customers  = Customer::where('created_by', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend(__('Select Customer'), '');

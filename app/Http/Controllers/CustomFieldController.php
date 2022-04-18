@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class CustomFieldController extends Controller
 {
@@ -14,9 +16,9 @@ class CustomFieldController extends Controller
 
     public function index()
     {
-        if(\Auth::user()->can('manage constant custom field'))
+        if(Auth::user()->can('manage constant custom field'))
         {
-            $custom_fields = CustomField::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $custom_fields = CustomField::where('created_by', '=', Auth::user()->creatorId())->get();
 
             return view('customFields.index', compact('custom_fields'));
         }
@@ -29,7 +31,7 @@ class CustomFieldController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create constant custom field'))
+        if(Auth::user()->can('create constant custom field'))
         {
             $types   = CustomField::$fieldTypes;
             $modules = CustomField::$modules;
@@ -45,15 +47,16 @@ class CustomFieldController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create constant custom field'))
+        if(Auth::user()->can('create constant custom field'))
         {
 
-            $validator = \Validator::make(
-                $request->all(), [
-                                   'name' => 'required|max:20',
-                                   'type' => 'required',
-                                   'module' => 'required',
-                               ]
+            $validator = Validator::make(
+                $request->all(), 
+                [
+                    'name' => 'required|max:20',
+                    'type' => 'required',
+                    'module' => 'required',
+                ]
             );
 
             if($validator->fails())
@@ -67,7 +70,7 @@ class CustomFieldController extends Controller
             $custom_field->name       = $request->name;
             $custom_field->type       = $request->type;
             $custom_field->module     = $request->module;
-            $custom_field->created_by = \Auth::user()->creatorId();
+            $custom_field->created_by = Auth::user()->creatorId();
             $custom_field->save();
 
             return redirect()->route('custom-field.index')->with('success', __('Custom Field successfully created!'));
@@ -86,9 +89,9 @@ class CustomFieldController extends Controller
 
     public function edit(CustomField $customField)
     {
-        if(\Auth::user()->can('edit constant custom field'))
+        if(Auth::user()->can('edit constant custom field'))
         {
-            if($customField->created_by == \Auth::user()->creatorId())
+            if($customField->created_by == Auth::user()->creatorId())
             {
                 $types   = CustomField::$fieldTypes;
                 $modules = CustomField::$modules;
@@ -109,17 +112,14 @@ class CustomFieldController extends Controller
 
     public function update(Request $request, CustomField $customField)
     {
-        if(\Auth::user()->can('edit constant custom field'))
+        if(Auth::user()->can('edit constant custom field'))
         {
 
-            if($customField->created_by == \Auth::user()->creatorId())
+            if($customField->created_by == Auth::user()->creatorId())
             {
 
-                $validator = \Validator::make(
-                    $request->all(), [
-                                       'name' => 'required|max:20',
-                                   ]
-                );
+                $validator = Validator::make(
+                    $request->all(), ['name' => 'required|max:20',]);
 
                 if($validator->fails())
                 {
@@ -147,9 +147,9 @@ class CustomFieldController extends Controller
 
     public function destroy(CustomField $customField)
     {
-        if(\Auth::user()->can('delete constant custom field'))
+        if(Auth::user()->can('delete constant custom field'))
         {
-            if($customField->created_by == \Auth::user()->creatorId())
+            if($customField->created_by == Auth::user()->creatorId())
             {
                 $customField->delete();
 

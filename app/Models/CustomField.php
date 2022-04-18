@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CustomField extends Model
@@ -35,32 +36,29 @@ class CustomField extends Model
 
     public static function saveData($obj, $data)
     {
-
         if($data)
         {
             $RecordId = $obj->id;
             foreach($data as $fieldId => $value)
             {
-                DB::insert(
-                    'insert into custom_field_values (`record_id`, `field_id`,`value`,`created_at`,`updated_at`) values (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`),`updated_at` = VALUES(`updated_at`) ', [
-                                                                                                                                                                                                                                   $RecordId,
-                                                                                                                                                                                                                                   $fieldId,
-                                                                                                                                                                                                                                   $value,
-                                                                                                                                                                                                                                   date('Y-m-d H:i:s'),
-                                                                                                                                                                                                                                   date('Y-m-d H:i:s'),
-                                                                                                                                                                                                                               ]
-                );
+                DB::table('custom_field_values')->updateOrInsert([
+                    'record_id' => $RecordId,
+                    'field_id'  => $fieldId,
+                    'value'     => $value,
+                    'created_by'=> Auth::user()->creatorId(),
+                ]);
             }
         }
     }
 
     public static function getData($obj, $module)
     {
-        return DB::table('custom_field_values')->select(
-            [
-                'custom_field_values.value',
-                'custom_fields.id',
-            ]
-        )->join('custom_fields', 'custom_field_values.field_id', '=', 'custom_fields.id')->where('custom_fields.module', '=', $module)->where('record_id', '=', $obj->id)->get()->pluck('value', 'id');
+        return DB::table('custom_field_values')
+                ->select( [ 'custom_field_values.value', 'custom_fields.id' ] )
+                ->join('custom_fields', 'custom_field_values.field_id', '=', 'custom_fields.id')
+                ->where('custom_fields.module', '=', $module)
+                ->where('record_id', '=', $obj->id)
+                ->where('created_by', Auth::user()->creatorId())
+                ->pluck('value', 'id');
     }
 }

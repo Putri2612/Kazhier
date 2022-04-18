@@ -13,7 +13,7 @@
         @elseif($customField->type == 'number')
             <div class="form-group">
                 {{ Form::label('customField-'.$customField->id, __($customField->name)) }}
-                {{ Form::number('customField['.$customField->id.']', null, array('class' => 'form-control')) }}
+                {{ Form::text('customField['.$customField->id.']', null, array('class' => 'form-control', 'data-is-number')) }}
             </div>
         @elseif($customField->type == 'date')
             <div class="form-group">

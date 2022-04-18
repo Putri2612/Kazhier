@@ -40,7 +40,7 @@ class BankAccountController extends Controller
     {
         if(Auth::user()->can('create bank account'))
         {
-            $customFields = CustomField::where('module', '=', 'account')->get();
+            $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'account')->get();
 
             return view('bankAccount.create', compact('customFields'));
         }
@@ -114,7 +114,7 @@ class BankAccountController extends Controller
             if($bankAccount->created_by == Auth::user()->creatorId())
             {
                 $bankAccount->customField       = CustomField::getData($bankAccount, 'account');
-                $customFields                   = CustomField::where('module', '=', 'account')->get();
+                $customFields                   = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'account')->get();
 
                 $bankAccount->opening_balance   = number_format($bankAccount->opening_balance, 2, ',', '.');
 
