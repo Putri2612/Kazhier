@@ -114,11 +114,9 @@
                                                         @endcan
                                                         @can('delete user')
                                                         <div class="col">
-                                                            <a href="#" class="" data-confirm="{{__('Are You Sure?')}}|{{__('This action can not be undone. Do you want to continue?')}}" data-confirm-yes="document.getElementById('delete-form-{{$user['id']}}').submit();">
+                                                            <a href="#" class="" data-is-delete data-delete-url="{{ route('users.destroy', $user['id']) }}">
                                                                 <i class="fa-solid fa-lg fa-trash"></i>
                                                             </a>
-                                                            {!! Form::open(['method' => 'DELETE', 'route' => ['users.destroy', $user['id']],'id'=>'delete-form-'.$user['id']]) !!}
-                                                            {!! Form::close() !!}
                                                         </div>
                                                         @endcan
                                                     </div>

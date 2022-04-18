@@ -58,7 +58,7 @@ class CustomField extends Model
                 ->join('custom_fields', 'custom_field_values.field_id', '=', 'custom_fields.id')
                 ->where('custom_fields.module', '=', $module)
                 ->where('record_id', '=', $obj->id)
-                ->where('created_by', Auth::user()->creatorId())
+                ->where('custom_fields.created_by', Auth::user()->creatorId())
                 ->pluck('value', 'id');
     }
 }

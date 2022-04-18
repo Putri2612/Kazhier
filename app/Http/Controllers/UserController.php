@@ -164,7 +164,7 @@ class UserController extends Controller
 
     public function create()
     {
-        $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'user')->get();
+        $customFields = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'user')->get();
 
         $user  = Auth::user();
         $roles = Role::where('created_by', '=', $user->creatorId())->get()->pluck('name', 'id');
@@ -275,7 +275,7 @@ class UserController extends Controller
         {
             $user              = User::findOrFail($id);
             $user->customField = CustomField::getData($user, 'user');
-            $customFields      = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'user')->get();
+            $customFields      = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'user')->get();
 
             return view('user.edit', compact('user', 'roles', 'customFields'));
         }
@@ -494,7 +494,7 @@ class UserController extends Controller
     {
         $userDetail              = Auth::user();
         $userDetail->customField = CustomField::getData($userDetail, 'user');
-        $customFields            = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'user')->get();
+        $customFields            = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'user')->get();
         if(Auth::user()->type == 'company'){
             $referral_token          = Auth::user()->referral_token ? Auth::user()->referral_token : $this->create_token();
             $referral_point          = ReferralPoint::where('created_by', '=', Auth::user()->id)->first();

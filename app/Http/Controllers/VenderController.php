@@ -43,7 +43,7 @@ class VenderController extends Controller
     {
         if(\Auth::user()->can('create vender'))
         {
-            $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
+            $customFields = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
 
             return view('vender.create', compact('customFields'));
         }
@@ -126,7 +126,7 @@ class VenderController extends Controller
             $vender              = Vender::find($id);
             $vender->customField = CustomField::getData($vender, 'vendor');
 
-            $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
+            $customFields = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
 
             return view('vender.edit', compact('vender', 'customFields'));
         }
@@ -289,7 +289,7 @@ class VenderController extends Controller
     {
         $userDetail              = \Auth::user();
         $userDetail->customField = CustomField::getData($userDetail, 'vendor');
-        $customFields            = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
+        $customFields            = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'vendor')->get();
 
         return view('vender.profile', compact('userDetail', 'customFields'));
     }

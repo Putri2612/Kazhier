@@ -87,7 +87,7 @@ class InvoiceController extends Controller
 
         if(Auth::user()->can('create invoice'))
         {
-            $customFields       = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+            $customFields       = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
             $invoice_number     = Auth::user()->invoiceNumberFormat($this->invoiceNumber());
             $customers          = Customer::where('created_by', Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend(__('Select Customer'), '');
@@ -260,7 +260,7 @@ class InvoiceController extends Controller
             $product_services = ProductService::where('created_by', Auth::user()->creatorId())->where('quantity', '>', 0)->get()->pluck('name', 'id');
 
             $invoice->customField = CustomField::getData($invoice, 'invoice');
-            $customFields         = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
+            $customFields         = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'invoice')->get();
 
             $category           = $category->union(['new.product-category' => __('Create new category')]);
             $customers          = $customers->union(['new.customer' => __('Add new customer')]);

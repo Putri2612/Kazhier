@@ -56,7 +56,7 @@ class ProductServiceController extends Controller
         if(Auth::user()->can('create product & service'))
         {
             $creatorId = Auth::user()->creatorId();
-            $customFields = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'product')->get();
+            $customFields = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'product')->get();
             $category     = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
             $unit         = ProductServiceUnit::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
             $tax          = Tax::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
@@ -141,7 +141,7 @@ class ProductServiceController extends Controller
                 $tax      = Tax::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
 
                 $productService->customField = CustomField::getData($productService, 'product');
-                $customFields                = CustomField::where('created_by, Auth::user()->creatorId())->where('module', '=', 'product')->get();
+                $customFields                = CustomField::where('created_by', Auth::user()->creatorId())->where('module', '=', 'product')->get();
 
                 $category   = $category->union(['new.product-category' => __('Create new category')]);
                 $unit       = $unit->union(['new.product-unit' => __('Create new unit')]);
