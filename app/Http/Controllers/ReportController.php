@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Report;
 use App\Exports\ExpenseSummaryExport;
 use App\Exports\IncomeSummaryExport;
 use App\Exports\IncomeVSExpenseSummaryExport;
@@ -20,12 +21,13 @@ use App\Models\Vender;
 use Illuminate\Http\Request;
 use App\Models\Imports\TransactionImport;
 use App\Traits\DataGetter;
+use App\Traits\TimeGetter;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
-    use DataGetter;
+    use DataGetter, TimeGetter;
     public function incomeSummary(Request $request)
     {
         if(\Auth::user()->can('income report'))
@@ -37,20 +39,20 @@ class ReportController extends Controller
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
-            $yearList   = Auth::user()->getAllRecordYear();
+            $yearList   = $this->Years();
             
             if(!empty($request->input('year')))
             {
                 $year = $request->input('year');
-            } else if($yearList->contains(date('Y'))) {
+            } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
                 $year = $yearList->first();
             }
 
-            $data = $this->GetIncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
+            $data = Report::IncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
 
-            $data['monthList']      = $month = $this->yearMonth();
+            $data['monthList']      = $this->Months();
             $data['yearList']       = $yearList;
             $data['currentYear']    = $year;
             $data['account']        = $account;
@@ -78,20 +80,20 @@ class ReportController extends Controller
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
-            $yearList   = Auth::user()->getAllRecordYear();
+            $yearList = $this->Years();
             
             if(!empty($request->input('year')))
             {
                 $year = $request->input('year');
-            } else if($yearList->contains(date('Y'))) {
+            } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
                 $year = $yearList->first();
             }
 
-            $data                   = $this->GetExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));
+            $data                   = Report::ExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));
             $data['currentYear']    = $year;
-            $data['monthList']      = $month = $this->yearMonth();
+            $data['monthList']      = $this->Months();
             $data['yearList']       = $yearList;
             $data['account']        = $account;
             $data['vender']         = $vender;
@@ -120,20 +122,21 @@ class ReportController extends Controller
             $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
-            $yearList   = Auth::user()->getAllRecordYear();
+            $yearList   = $this->Years();
             
             if(!empty($request->input('year')))
             {
                 $year = $request->input('year');
-            } else if($yearList->contains(date('Y'))) {
+            } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
                 $year = $yearList->first();
             }
+            $data = Report::IncomeXExpense($year, $request->input('account'), $request->input('category'), $request->input('customer'), $request->input('vender'));
 
-            $data = $this->GetIncomeVSExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'), $request->input('vender'));
+            
             $data['currentYear'] = $year;
-            $data['monthList'] = $month = $this->yearMonth();
+            $data['monthList'] = $month = $this->Months();
             $data['yearList']  = $yearList;
 
             
@@ -155,8 +158,8 @@ class ReportController extends Controller
 
         if(\Auth::user()->can('tax report'))
         {
-            $data['monthList'] = $month = $this->yearMonth();
-            $data['yearList']  = $this->yearList();
+            $data['monthList'] = $month = $this->Months();
+            $data['yearList']  = $this->Years();
 
             if(isset($request->year))
             {
@@ -235,12 +238,12 @@ class ReportController extends Controller
 
         if(Auth::user()->can('loss & profit report'))
         {
-            $yearList   = Auth::user()->getAllRecordYear();
+            $yearList   = $this->Years();
             
             if(!empty($request->input('year')))
             {
                 $year = $request->input('year');
-            } else if($yearList->contains(date('Y'))) {
+            } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
                 $year = $yearList->first();
@@ -257,37 +260,6 @@ class ReportController extends Controller
         }
 
 
-    }
-
-    public function yearMonth()
-    {
-        $month[] = __('January');
-        $month[] = __('February');
-        $month[] = __('March');
-        $month[] = __('April');
-        $month[] = __('May');
-        $month[] = __('June');
-        $month[] = __('July');
-        $month[] = __('August');
-        $month[] = __('September');
-        $month[] = __('October');
-        $month[] = __('November');
-        $month[] = __('December');
-
-        return $month;
-    }
-
-    public function yearList()
-    {
-        $starting_year = date('Y', strtotime('-5 year'));
-        $ending_year   = date('Y');
-
-        foreach(range($ending_year, $starting_year) as $year)
-        {
-            $years[$year] = $year;
-        }
-
-        return $years;
     }
 
     public function invoiceSummary(Request $request)
@@ -349,7 +321,7 @@ class ReportController extends Controller
                 $invoiceTotal[] = array_key_exists($i, $invoiceTotalArray) ? array_sum($invoiceTotalArray[$i]) : 0;
             }
 
-            $monthList = $month = $this->yearMonth();
+            $monthList = $month = $this->Months();
 
             return view('report.invoice_report', compact('invoices', 'customer', 'status', 'totalInvoice', 'totalDueInvoice', 'totalPaidInvoice', 'invoiceTotal', 'monthList'));
         }
@@ -413,7 +385,7 @@ class ReportController extends Controller
                 $billTotal[] = array_key_exists($i, $billTotalArray) ? array_sum($billTotalArray[$i]) : 0;
             }
 
-            $monthList = $month = $this->yearMonth();
+            $monthList = $month = $this->Months();
 
             return view('report.bill_report', compact('bills', 'vender', 'status', 'totalBill', 'totalDueBill', 'totalPaidBill', 'billTotal', 'monthList'));
         }

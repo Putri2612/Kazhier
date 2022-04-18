@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Chart;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\Goal;
@@ -152,35 +153,16 @@ class DashboardController extends Controller
 
     public function GetCategoryData($type = 'income', $year = null) {
         if(Auth::user()->type != 'super admin'){
-            return $this->GetCategoryChart(Auth::user(), $year, $type);
+            return Chart::Category(Auth::user(), $year, $type);
         }
     }
 
     private function GetCashFlowChart(User $user, $month = null, $year = null) {
-        return $user->getCashFlowChart($month, $year);
+        return Chart::Cashflow($user, $month, $year);
     }
 
     private function GetIncomeAndExpenseChart(User $user, $year = null) {
-        return $user->getIncomeAndExpenseChart($year);
-    }
-
-    private function GetCategoryChart(User $user, $year = null, $type = 'income') {
-        $types = ['income' => 1, 'expense' => 2];
-        $category = ProductServiceCategory::where('created_by', '=', $user->creatorId())->where('type', '=', $types[$type])->get();
-
-        $colors     = [];
-        $amounts    = [];
-        $categories = [];
-        foreach($category as $cat) {
-            $colors[]       = '#' . $cat->color;
-            $categories[]   = $cat->name;
-            if($type == 'income') {
-                $amounts[]      = $cat->incomeCategoryAmount($year);
-            } else if($type == 'expense') {
-                $amounts[]      = $cat->expenseCategoryAmount($year);
-            }
-        }
-        return ['colors' => $colors, 'categories' => $categories, 'amounts' => $amounts];
+        return Chart::IncomeAndExpense($user, $year);
     }
 }
 

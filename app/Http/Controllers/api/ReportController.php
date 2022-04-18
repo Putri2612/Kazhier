@@ -9,12 +9,13 @@ use App\Models\ProductServiceCategory;
 use App\Models\Vender;
 use App\Traits\ApiResponse;
 use App\Traits\DataGetter;
+use App\Traits\TimeGetter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
-    use DataGetter, ApiResponse;
+    use DataGetter, ApiResponse, TimeGetter;
 
     public function income(Request $request) {
         if(!Auth::user()->can('income report')){
@@ -27,7 +28,7 @@ class ReportController extends Controller
         $category = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
         $category->prepend(__('All'), '');
 
-        $yearList   = Auth::user()->getAllRecordYear();
+        $yearList   = $this->Years();
         
         if(!empty($request->input('year')))
         {
@@ -40,7 +41,7 @@ class ReportController extends Controller
 
         $data = $this->GetIncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
 
-        $data['monthList']      = $month = $this->yearMonth();
+        $data['monthList']      = $this->Months();
         $data['yearList']       = $yearList;
         $data['currentYear']    = $year;
         $data['account']        = $account;
@@ -62,7 +63,7 @@ class ReportController extends Controller
         $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 2)->get()->pluck('name', 'id');
         $category->prepend(__('All'), '');
 
-        $yearList   = Auth::user()->getAllRecordYear();
+        $yearList   = $this->Years();
         
         if(!empty($request->input('year')))
         {
@@ -75,43 +76,12 @@ class ReportController extends Controller
 
         $data                   = $this->GetExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));
         $data['currentYear']    = $year;
-        $data['monthList']      = $month = $this->yearMonth();
+        $data['monthList']      = $this->Months();
         $data['yearList']       = $yearList;
         $data['account']        = $account;
         $data['vender']         = $vender;
         $data['category']       = $category;
 
         return view('api.expense-report', $data);
-    }
-
-    public function yearMonth()
-    {
-        $month[] = __('January');
-        $month[] = __('February');
-        $month[] = __('March');
-        $month[] = __('April');
-        $month[] = __('May');
-        $month[] = __('June');
-        $month[] = __('July');
-        $month[] = __('August');
-        $month[] = __('September');
-        $month[] = __('October');
-        $month[] = __('November');
-        $month[] = __('December');
-
-        return $month;
-    }
-
-    public function yearList()
-    {
-        $starting_year = date('Y', strtotime('-5 year'));
-        $ending_year   = date('Y');
-
-        foreach(range($ending_year, $starting_year) as $year)
-        {
-            $years[$year] = $year;
-        }
-
-        return $years;
     }
 }
