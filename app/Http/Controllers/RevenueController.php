@@ -108,36 +108,30 @@ class RevenueController extends Controller
                 ->where('created_by', Auth::user()->creatorId())
                 ->orderBy('date', 'desc')
                 ->skip($skip)->take($limit);
-        $whereTo = '';
 
         if(!empty($request->input('date')))
         {
             $date_range = explode(' - ', $request->input('date'));
             $query->whereBetween('date', $date_range);
-            $whereTo .= 'date;';
         }
 
         if(!empty($request->input('customer')))
         {
             $query->where('customer_id', '=', $request->input('customer'));
-            $whereTo .= 'customer;';
         }
         if(!empty($request->input('account')))
         {
             $query->where('account_id', '=', $request->input('account'));
-            $whereTo .= 'account;';
         }
 
         if(!empty($request->input('category')))
         {
             $query->where('category_id', '=', $request->input('category'));
-            $whereTo .= 'category;';
         }
 
         if(!empty($request->input('payment')))
         {
             $query->where('payment_method', '=', $request->input('payment'));
-            $whereTo .= 'payment;';
         }
 
         $revenues = $query->get();
