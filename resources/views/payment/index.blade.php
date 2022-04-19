@@ -2,6 +2,78 @@
 @section('page-title')
     {{__('Payment')}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                additionalForm: '#query-form',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const date   = pagination.dateFormat(data.date),
+                    amount   = pagination.priceFormat(data.amount),
+                    account  = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '',
+                    vender   = data.vender ? data.vender.name : '',
+                    category = data.category ? data.category.name : '',
+                    paymentMethod = data.paymentMethod ? data.paymentMethod.name : '';
+                
+                @can('edit payment')
+                    let editURL = "{{ route('payment.edit', ['payment' => ':id']) }}";
+                    editURL     = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete payment')
+                    let deleteURL = "{{ route('payment.destroy', ['payment' => ':id']) }}";
+                    deleteURL     = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>${date}</td>
+                        <td>${amount}</td>
+                        <td>${account}</td>
+                        <td>${vender}</td>
+                        <td>${category}</td>
+                        <td>${paymentMethod}</td>
+                        <td>
+                            <a href="#!"
+                                class="btn btn-light"
+                                data-url="{{ route('payment.index') }}/${data.id}"
+                                data-ajax-popup="true"
+                                title="{{ __('View Reference') }}">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </a>
+                        </td>
+                        <td>${data.description}</td>
+                        @if(Gate::check('edit payment') || Gate::check('delete payment'))
+                            <td class="action text-end">
+                                @can('edit payment')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__('Edit Payment')}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete payment')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -51,7 +123,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
-                                {{ Form::open(array('route' => array('payment.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                {{ Form::open(array('route' => array('payment.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5', 'id' => 'query-form')) }}
                                 <div class="col-12 col-md-6 col-lg-auto form-group">
                                     {{ Form::label('date', __('Date')) }}
                                     {{ Form::text('date', isset($_GET['date'])?$_GET['date']:null, array('class' => 'form-control datepicker-range')) }}
@@ -79,10 +151,13 @@
                                 </div>
                                 {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('payment.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Date')}}</th>
@@ -99,43 +174,12 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-
-                                                    @foreach ($payments as $payment)
-                                                        <tr class="font-style">
-                                                            <td>{{  Helper::DateFormat($payment->date)}}</td>
-                                                            <td>{{  Auth::user()->priceFormat($payment->amount)}}</td>
-                                                            <td>{{ !empty($payment->bankAccount)?$payment->bankAccount->bank_name.' '.$payment->bankAccount->holder_name:''}}</td>
-                                                            <td>{{  !empty($payment->vender)?$payment->vender->name:''}}</td>
-                                                            <td>{{  !empty($payment->category)?$payment->category->name:''}}</td>
-                                                            <td>{{  !empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
-                                                            <td>
-                                                                <a href="#!" class="btn btn-secondary" data-url="{{route('payment.show',$payment->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-bs-toggle="tooltip" data-original-title="{{__('Reference')}}"">
-                                                                    <i class="fas fa-paperclip"></i>
-                                                                </a>
-                                                            </td>
-                                                            <td>{{  $payment->description}}</td>
-
-                                                            @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
-                                                                <td class="action text-end">
-                                                                    @can('edit payment')
-                                                                        <a href="#!" class="btn btn-primary btn-action me-1" data-url="{{ route('payment.edit',$payment->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('delete payment')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('payment.destroy', $payment->id) }}">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>

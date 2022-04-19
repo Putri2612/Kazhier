@@ -353,6 +353,7 @@ Route::prefix('app')->group(
                 Route::get('payment/import', [PaymentController::class, 'import'])->name('payment.import');
                 Route::post('payment/import/heading', [PaymentController::class, 'getImportHeadings'])->name('payment.import.headings');
                 Route::put('payment/import/store', [PaymentController::class, 'storeImport'])->name('payment.import.store');
+                Route::post('payment/get', [PaymentController::class, 'get'])->name('payment.get');
                 Route::resource('payment', PaymentController::class);
         
                 Route::resource('expenses', ExpenseController::class);
