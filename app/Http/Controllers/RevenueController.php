@@ -13,6 +13,7 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transaction;
+use App\Traits\ApiResponse;
 use App\Traits\CanImport;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
@@ -34,7 +35,8 @@ class RevenueController extends Controller
         CanProcessNumber,
         CanUploadFile,
         CanRedirect, 
-        CanImport;
+        CanImport,
+        ApiResponse;
     
     public function index(Request $request)
     {
@@ -87,6 +89,75 @@ class RevenueController extends Controller
         else
         {
             return $this->RedirectDenied();
+        }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage revenue')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+            'date'              => 'nullable|regex:/^[\d\-\s]*/i',
+            'account'           => 'nullable|numeric',
+            'category'          => 'nullable|numeric',
+            'customer'          => 'nullable|numeric',
+            'payment_method'    => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = $request->input('page');
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = $request->input('limit');
+        }
+
+        $query = Revenue::with(['bankAccount:id,bank_name,holder_name', 'customer:id,name', 'category:id,name', 'paymentMethod:id,name'])
+                ->select('id', 'amount', 'description', 'date', 'customer_id', 'account_id', 'category_id', 'payment_method')
+                ->orderBy('date', 'desc')
+                ->skip(($page - 1) * $limit)->take($limit);
+
+        if(!empty($request->input('date')))
+        {
+            $date_range = explode(' - ', $request->input('date'));
+            $query->whereBetween('date', $date_range);
+        }
+
+        if(!empty($request->input('customer')))
+        {
+            $query->where('customer_id', '=', $request->input('customer'));
+        }
+        if(!empty($request->input('account')))
+        {
+            $query->where('account_id', '=', $request->input('account'));
+        }
+
+        if(!empty($request->input('category')))
+        {
+            $query->where('category_id', '=', $request->input('category'));
+        }
+
+        if(!empty($request->input('payment')))
+        {
+            $query->where('payment_method', '=', $request->input('payment'));
+        }
+
+        $revenues = $query->get();
+
+        if($revenues->isEmpty()) {
+            return $this->NotFoundResponse();
+        } else {
+            return $this->FetchSuccessResponse($revenues);
         }
     }
 
