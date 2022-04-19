@@ -16,4 +16,9 @@ class Liability extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'date' => 'datetime',
+        'due_date' => 'datetime',
+    ];
+
 }

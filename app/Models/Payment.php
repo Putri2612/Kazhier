@@ -19,6 +19,10 @@ class Payment extends Model
         'served_by',
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function category()
     {
         return $this->hasOne(ProductServiceCategory::class, 'id', 'category_id');

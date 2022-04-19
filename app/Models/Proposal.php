@@ -28,6 +28,10 @@ class Proposal extends Model
         //4
     ];
 
+    protected $casts = [
+        'issue_date' => 'datetime'
+    ];
+
 
     public function tax()
     {

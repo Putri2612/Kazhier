@@ -17,6 +17,10 @@ class Transfer extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function fromBankAccount()
     {
         return $this->hasOne(BankAccount::class, 'id', 'from_account')->first();

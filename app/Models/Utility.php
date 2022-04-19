@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\CanProcessNumber;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use IntlDateFormatter;
 
 class Utility extends Model
 {
@@ -26,8 +27,8 @@ class Utility extends Model
             "site_currency" => "IDR",
             "site_currency_symbol" => "Rp ",
             "site_currency_symbol_position" => "pre",
-            "site_date_format" => "j M Y",
-            "site_time_format" => "g:i A",
+            "site_date_format" => "short",
+            "site_time_format" => "short",
             "company_name" => "",
             "company_address" => "",
             "company_city" => "",
@@ -214,4 +215,16 @@ class Utility extends Model
     public static function formatNumber($number) {
         return (new self)->FloatToReadableNumber($number);
     }
+
+    static $dateformats = [
+        'numeric'   => [ IntlDateFormatter::SHORT, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'short'     => [ IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'long'      => [ IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+    ];
+
+    static $timeformats = [
+        'short'     => [ IntlDateFormatter::NONE, IntlDateFormatter::SHORT, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'medium'    => [ IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'long'      => [ IntlDateFormatter::NONE, IntlDateFormatter::LONG, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+    ];
 }

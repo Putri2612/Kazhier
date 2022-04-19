@@ -17,6 +17,11 @@ class Bill extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'bill_date' => 'datetime',
+        'due_date' => 'datetime',
+    ];
+
     public static $statuses = [
         'Draft',
         'Sent',

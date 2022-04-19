@@ -16,6 +16,9 @@ class Transaction extends Model
         'customer_id',
         'payment_id',
     ];
+    protected $casts = [
+        'date' => 'datetime'
+    ];
     public function model(array $row)
     {
         return new Transaction([

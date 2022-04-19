@@ -17,6 +17,10 @@ class BillPayment extends Model
         'served_by',
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function bill(){
         return $this->hasOne(Bill::class, 'id', 'bill_id');
     }

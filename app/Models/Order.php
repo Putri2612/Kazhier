@@ -24,6 +24,10 @@ class Order extends Model
         'duration'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime'
+    ];
+
     public const PAYMENT_CHANNELS = ['credit_card', 'mandiri_clickpay', 'cimb_clicks',
 	'bca_klikbca', 'bca_klikpay', 'bri_epay', 'echannel', 'permata_va',
 	'bca_va', 'bni_va', 'other_va', 'gopay', 'indomaret',
