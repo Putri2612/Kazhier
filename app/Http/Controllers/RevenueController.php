@@ -13,6 +13,7 @@ use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Revenue;
 use App\Models\Transaction;
+use App\Models\Utility;
 use App\Traits\ApiResponse;
 use App\Traits\CanImport;
 use App\Traits\CanManageBalance;
@@ -110,54 +111,94 @@ class RevenueController extends Controller
         if($validator->fails()) {
             return $this->FailedResponse();
         }
+        $settings = Utility::settings();
 
+        $totalData = Revenue::where('created_by', Auth::user()->creatorId())->count();
         $page = 1;
         $limit = 10;
 
         if(!empty($request->input('page'))) {
-            $page = $request->input('page');
+            $page = intval($request->input('page'));
         }
 
         if(!empty($request->input('limit'))) {
-            $limit = $request->input('limit');
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->FailedResponse(json_encode([$totalPage, $page]));
+            // return $this->NotFoundResponse();
         }
 
         $query = Revenue::with(['bankAccount:id,bank_name,holder_name', 'customer:id,name', 'category:id,name', 'paymentMethod:id,name'])
                 ->select('id', 'amount', 'description', 'date', 'customer_id', 'account_id', 'category_id', 'payment_method')
+                ->where('created_by', Auth::user()->creatorId())
                 ->orderBy('date', 'desc')
-                ->skip(($page - 1) * $limit)->take($limit);
+                ->skip($skip)->take($limit);
+        $whereTo = '';
 
         if(!empty($request->input('date')))
         {
             $date_range = explode(' - ', $request->input('date'));
             $query->whereBetween('date', $date_range);
+            $whereTo .= 'date;';
         }
 
         if(!empty($request->input('customer')))
         {
             $query->where('customer_id', '=', $request->input('customer'));
+            $whereTo .= 'customer;';
         }
         if(!empty($request->input('account')))
         {
             $query->where('account_id', '=', $request->input('account'));
+            $whereTo .= 'account;';
         }
 
         if(!empty($request->input('category')))
         {
             $query->where('category_id', '=', $request->input('category'));
+            $whereTo .= 'category;';
         }
 
         if(!empty($request->input('payment')))
         {
             $query->where('payment_method', '=', $request->input('payment'));
+            $whereTo .= 'payment;';
         }
 
         $revenues = $query->get();
 
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+
         if($revenues->isEmpty()) {
+            return $this->FailedResponse(json_encode([$totalPage, $page, $skip, $limit, $whereTo, $request->all()]));
             return $this->NotFoundResponse();
         } else {
-            return $this->FetchSuccessResponse($revenues);
+            return $this->FetchSuccessResponse([
+                'data'      => $revenues,
+                'pages'     => $totalPage,
+                'currency'  => $settings['site_currency'],
+                'date'      => $dateFormat['short'],
+            ]);
         }
     }
 

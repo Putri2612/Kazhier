@@ -312,7 +312,7 @@ Route::prefix('app')->group(
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
                 Route::post('revenue/import/heading', [RevenueController::class, 'getImportHeadings'])->name('revenue.import.headings');
                 Route::put('revenue/import/store', [RevenueController::class, 'storeImport'])->name('revenue.import.store');
-                Route::get('revenue/get', [RevenueController::class, 'get'])->name('revenue.get');
+                Route::post('revenue/get', [RevenueController::class, 'get'])->name('revenue.get');
                 Route::resource('revenue', RevenueController::class);
                 // Expense
         
