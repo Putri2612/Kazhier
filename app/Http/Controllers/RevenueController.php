@@ -100,8 +100,7 @@ class RevenueController extends Controller
         $skip       = ($page - 1) * $limit;
 
         if($page > $totalPage) {
-            return $this->FailedResponse(json_encode([$totalPage, $page]));
-            // return $this->NotFoundResponse();
+            return $this->NotFoundResponse();
         }
 
         $query = Revenue::with(['bankAccount:id,bank_name,holder_name', 'customer:id,name', 'category:id,name', 'paymentMethod:id,name'])
@@ -160,16 +159,20 @@ class RevenueController extends Controller
                 'day'   => 'numeric'
             ]
         ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
 
         if($revenues->isEmpty()) {
-            return $this->FailedResponse(json_encode([$totalPage, $page, $skip, $limit, $whereTo, $request->all()]));
             return $this->NotFoundResponse();
         } else {
             return $this->FetchSuccessResponse([
                 'data'      => $revenues,
                 'pages'     => $totalPage,
                 'currency'  => $settings['site_currency'],
-                'date'      => $dateFormat['short'],
+                'date'      => $format,
             ]);
         }
     }

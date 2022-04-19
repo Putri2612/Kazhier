@@ -4,69 +4,74 @@
 @endsection
 @push('script-page')
     <script>
-        const pagination = new Pagination({
-            locale: '{{ config('app.locale') }}',
-            pageContainer: '#pagination-container',
-            limitContainer: '#pagination-limit',
-            additionalForm: '#query-form',
-            navigation: {
-                previous: `<i class="fa-solid fa-chevron-left"></i>`,
-                next: `<i class="fa-solid fa-chevron-right"></i>`,
-                limit: '{{ __('Entries each page') }}'
-            }
-        });
-        pagination.format = data => {
-            const date = pagination.dateFormat(data.date),
-                amount = pagination.priceFormat(data.amount),
-                account = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '',
-                customer = data.customer ? data.customer.name : '',
-                category = data.category ? data.category.name : '',
-                paymentMethod = data.paymentMethod ? data.paymentMethod.name : '';
-            
-            @can('edit revenue')
-                let editURL = "{{ route('revenue.edit', ['revenue' => ':id']) }}";
-                editURL     = editURL.replace(':id', data.id);
-            @endcan
-            @can('delete revenue')
-                let deleteURL = "{{ route('revenue.destroy', ['revenue' => ':id']) }}";
-                deleteURL     = deleteURL.replace(':id', data.id);
-            @endcan
-            return `
-                <tr class="font-style">
-                    <td>${date}</td>
-                    <td>${amount}</td>
-                    <td>${account}</td>
-                    <td>${customer}</td>
-                    <td>${category}</td>
-                    <td>${paymentMethod}</td>
-                    <td>
-                        <a href="#!"
-                            class="btn btn-light"
-                            data-url="{{ route('revenue.index') }}/${data.id}"
-                            data-ajax-popup="true"
-                            title="{{ __('View Reference') }}">
-                            <i class="fa-solid fa-paperclip"></i>
-                        </a>
-                    </td>
-                    <td>${data.description}</td>
-                    @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
-                        <td class="action text-end">
-                            @can('edit revenue')
-                                <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </a>
-                            @endcan
-                            @can('delete revenue')
-                                <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            @endcan
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                additionalForm: '#query-form',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const date = pagination.dateFormat(data.date),
+                    amount = pagination.priceFormat(data.amount),
+                    account = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '',
+                    customer = data.customer ? data.customer.name : '',
+                    category = data.category ? data.category.name : '',
+                    paymentMethod = data.paymentMethod ? data.paymentMethod.name : '';
+                
+                @can('edit revenue')
+                    let editURL = "{{ route('revenue.edit', ['revenue' => ':id']) }}";
+                    editURL     = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete revenue')
+                    let deleteURL = "{{ route('revenue.destroy', ['revenue' => ':id']) }}";
+                    deleteURL     = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>${date}</td>
+                        <td>${amount}</td>
+                        <td>${account}</td>
+                        <td>${customer}</td>
+                        <td>${category}</td>
+                        <td>${paymentMethod}</td>
+                        <td>
+                            <a href="#!"
+                                class="btn btn-light"
+                                data-url="{{ route('revenue.index') }}/${data.id}"
+                                data-ajax-popup="true"
+                                title="{{ __('View Reference') }}">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </a>
                         </td>
-                    @endif
-                </tr>
-            `;
+                        <td>${data.description}</td>
+                        @if(Gate::check('edit revenue') || Gate::check('delete revenue'))
+                            <td class="action text-end">
+                                @can('edit revenue')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__('Edit Revenue')}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete revenue')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
         }
-        pagination.init();
     </script>
 @endpush
 @section('content')
