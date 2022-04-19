@@ -166,6 +166,11 @@ class Pagination {
                     }
                     
                     list.appendChild(pageItem);
+                } else if ( index == this._page - 3 || index == this._page + 3) {
+                    const pageItem = document.createElement('li');
+                    pageItem.className = 'page-item disabled';
+                    pageItem.innerHTML = `<a href="#!" class="page-link">...</a>`;
+                    list.appendChild(pageItem);
                 }
             }
             if(this._page < totalPage) {
