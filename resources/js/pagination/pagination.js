@@ -75,7 +75,7 @@ class Pagination {
         data.append('limit', this._limit);
         data.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
 
-        fetch(url, { method: 'POST', body: data })
+        fetch(url, { method: 'POST', headers: {Accept: 'application/json'}, body: data })
         .then(response => {
             if(response.ok) {
                 return response.json();
@@ -83,13 +83,13 @@ class Pagination {
                 response.json().then(data => {
                     throw data.message;
                 }).catch(error => {
-                    throw error;
+                    toastrs('Error', error, 'error');
+                    console.error(error);
                 });
                 return false;
             }
         }).then(data => {
             if(data) {
-                console.log(data);
                 this.loadData(data.data);
                 this.renderPaginator(data.pages);
                 this._currency = data.currency;
@@ -120,9 +120,7 @@ class Pagination {
     }
 
     renderPaginator(totalPage) {
-        console.log('paginator masuk');
         if(totalPage > 1) {
-            console.log('paginator jalan');
             let container;
             if(this._paginator) {
                 container = this._paginator;
