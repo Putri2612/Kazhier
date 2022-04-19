@@ -236,7 +236,8 @@ Route::prefix('app')->group(
         
                 Route::resource('transfer', TransferController::class);
         
-                Route::resource('transaction', TransactionController::class);
+                Route::get('transaction', [TransactionController::class, 'index'])->name('transaction.index');
+                Route::post('transaction/get', [TransactionController::class, 'get'])->name('transaction.get');
         
                 Route::resource('defaults', DefaultValueController::class);
         
