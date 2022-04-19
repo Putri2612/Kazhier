@@ -160,7 +160,7 @@
                                                                             {{ AUth::user()->billNumberFormat($bill->bill_id) }}
                                                                         </a>
                                                                     </td>
-                                                                    <td>{{ Auth::user()->dateFormat($bill->bill_date) }}</td>
+                                                                    <td>{{ Helper::DateFormat($bill->bill_date) }}</td>
                                                                     <td> {{!empty($bill->vender)? $bill->vender->name:'' }} </td>
                                                                     <td>{{ !empty($bill->category)?$bill->category->name:''}}</td>
                                                                     <td>
@@ -178,7 +178,7 @@
                                                                     </td>
                                                                     <td> {{\Auth::user()->priceFormat($bill->getTotal()-$bill->getDue())}}</td>
                                                                     <td> {{\Auth::user()->priceFormat($bill->getDue())}}</td>
-                                                                    <td>{{!empty($bill->lastPayments)?\Auth::user()->dateFormat($bill->lastPayments->date):''}}</td>
+                                                                    <td>{{!empty($bill->lastPayments)?\Helper::DateFormat($bill->lastPayments->date):''}}</td>
                                                                     <td> {{\Auth::user()->priceFormat($bill->getTotal())}}</td>
                                                                 </tr>
                                                             @endforeach

@@ -110,8 +110,8 @@
                                                                 <td> {{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
                                                             @endif
                                                             <td>{{ !empty($invoice->category)?$invoice->category->name:''}}</td>
-                                                            <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
-                                                            <td>{{ Auth::user()->dateFormat($invoice->due_date) }}</td>
+                                                            <td>{{ Helper::DateFormat($invoice->issue_date) }}</td>
+                                                            <td>{{ Helper::DateFormat($invoice->due_date) }}</td>
                                                             <td>
                                                                 @php
                                                                     $type = strtolower($invoice->getType());

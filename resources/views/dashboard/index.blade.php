@@ -464,7 +464,7 @@
                                 <tbody class="list">
                                 @forelse($latestIncome as $income)
                                     <tr class="font-style">
-                                        <td>{{\Auth::user()->dateFormat($income->date)}}</td>
+                                        <td>{{\Helper::DateFormat($income->date)}}</td>
                                         <td>{{!empty($income->customer)?$income->customer->name:''}}</td>
                                         <td>{{\Auth::user()->priceFormat($income->amount)}}</td>
                                         <td>{{$income->description}}</td>
@@ -506,7 +506,7 @@
                                 <tbody>
                                 @forelse($latestExpense as $expense)
                                     <tr class="font-style">
-                                        <td>{{\Auth::user()->dateFormat($expense->date)}}</td>
+                                        <td>{{\Helper::DateFormat($expense->date)}}</td>
                                         <td>{{\Auth::user()->priceFormat($expense->amount)}}</td>
                                         <td>{{$expense->description}}</td>
                                     </tr>
@@ -696,8 +696,8 @@
                                             </a>
                                         </td>
                                         <td>{{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
-                                        <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
-                                        <td>{{ Auth::user()->dateFormat($invoice->due_date) }}</td>
+                                        <td>{{ Helper::DateFormat($invoice->issue_date) }}</td>
+                                        <td>{{ Helper::DateFormat($invoice->due_date) }}</td>
                                         <td>{{\Auth::user()->priceFormat($invoice->getTotal())}}</td>
                                         <td>
                                             @php
@@ -852,8 +852,8 @@
                                             </a>
                                         </td>
                                         <td>{{!empty($bill->vender)? $bill->vender->name:'' }} </td>
-                                        <td>{{ Auth::user()->dateFormat($bill->bill_date) }}</td>
-                                        <td>{{ Auth::user()->dateFormat($bill->due_date) }}</td>
+                                        <td>{{ Helper::DateFormat($bill->bill_date) }}</td>
+                                        <td>{{ Helper::DateFormat($bill->due_date) }}</td>
                                         <td>{{\Auth::user()->priceFormat($bill->getTotal())}}</td>
                                         <td>
                                             @if($bill->status == 0)

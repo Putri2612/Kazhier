@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Helper;
 use App\Exports\PaymentExport;
 use App\Imports\PaymentImport;
 use App\Models\BankAccount;
@@ -177,7 +178,7 @@ class PaymentController extends Controller
                 $payment         = new BillPayment();
                 $payment->name   = $vender['name'];
                 $payment->method = $payment_method['name'];
-                $payment->date   = Auth::user()->dateFormat($request->input('date'));
+                $payment->date   = Helper::DateFormat($request->input('date'));
                 $payment->amount = Auth::user()->priceFormat($amount);
                 $payment->bill   = '';
 

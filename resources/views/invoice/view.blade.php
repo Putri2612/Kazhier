@@ -55,7 +55,7 @@
                                         @endcan
                                     @endif
                                 </div>
-                                <p>{{__('Created on ')}} : <a href="#"> {{\Auth::user()->dateFormat($invoice->issue_date)}} </a></p>
+                                <p>{{__('Created on ')}} : <a href="#"> {{\Helper::DateFormat($invoice->issue_date)}} </a></p>
                             </div>
                         </div>
                         <div class="activity">
@@ -66,7 +66,7 @@
                                 <div class="mb-2">
                                     <span class="text-job text-primary"><h6>{{__('Invoice Delivery')}}</h6></span>
                                     @if($invoice->status)
-                                        <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{ Auth::user()->dateFormat($invoice->send_date) }}  </a></p>
+                                        <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{ Helper::DateFormat($invoice->send_date) }}  </a></p>
                                     @else
                                         @can('send invoice')
                                             <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
@@ -98,7 +98,7 @@
                                         @if($invoice->status < 4)
                                             <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
                                         @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
                                         @endif
                                     </div>
                                 </div>
@@ -123,7 +123,7 @@
                                         @if ($invoice->status < 2)
                                             <p>{{__('Status')}} : <a href="#">{{ __($invoice->getStatus()) }} </a></p>
                                         @else 
-                                            <p>{{__('Picked up on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->pickup_time) }} </a></p>
+                                            <p>{{__('Picked up on')}} : <a href="#">{{ Helper::DateFormat($invoice->pickup_time) }} </a></p>
                                         @endif
                                     </div>
                                 </div>
@@ -147,7 +147,7 @@
                                         @if($invoice->status < 5)
                                             <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
                                         @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
                                         @endif
                                     </div>
                                 </div>
@@ -203,9 +203,9 @@
                                             <p>{{__('Status')}} : <a href="#">{{ __('Waiting for courier') }} </a></p>
                                         @elseif($invoice->status < 4)
                                             <p>{{__('Status')}} : <a href="#">{{__('Delivering')}} </a></p>
-                                            <p>{{__('Picked up at')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->pickup_time) }} </a></p>
+                                            <p>{{__('Picked up at')}} : <a href="#">{{ Helper::DateFormat($invoice->pickup_time) }} </a></p>
                                         @else
-                                            <p>{{__('Delivered at')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->delivery_time) }} </a></p>
+                                            <p>{{__('Delivered at')}} : <a href="#">{{ Helper::DateFormat($invoice->delivery_time) }} </a></p>
                                         @endif
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@
                                         @if($invoice->status < 5)
                                             <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
                                         @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Auth::user()->dateFormat($invoice->payments->last()->created_at) }} </a></p>
+                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
                                         @endif
                                     </div>
                                 </div>
@@ -367,13 +367,13 @@
                                 <div class="col-md-4 text-md-center">
                                     <address>
                                         <strong>{{__('Issue Date')}} :</strong><br>
-                                        {{\Auth::user()->dateFormat($invoice->issue_date)}}<br><br>
+                                        {{\Helper::DateFormat($invoice->issue_date)}}<br><br>
                                     </address>
                                 </div>
                                 <div class="col-md-4 text-md-end">
                                     <address>
                                         <strong>{{__('Due Date')}} :</strong><br>
-                                        {{\Auth::user()->dateFormat($invoice->due_date)}}<br><br>
+                                        {{\Helper::DateFormat($invoice->due_date)}}<br><br>
                                     </address>
                                 </div>
                             </div>
@@ -479,7 +479,7 @@
                                     </tr>
                                     @foreach($invoice->payments as $key =>$payment)
                                         <tr>
-                                            <td>{{\Auth::user()->dateFormat($payment->date)}}</td>
+                                            <td>{{\Helper::DateFormat($payment->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($payment->amount)}}</td>
                                             <td class="text-center">{{!empty($payment->bankAccount)?$payment->bankAccount->bank_name.' '.$payment->bankAccount->holder_name:''}}</td>
                                             <td class="text-center">{{!empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
@@ -513,7 +513,7 @@
                                     </tr>
                                     @foreach($invoice->creditNote as $key =>$creditNote)
                                         <tr>
-                                            <td>{{\Auth::user()->dateFormat($creditNote->date)}}</td>
+                                            <td>{{\Helper::DateFormat($creditNote->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($creditNote->amount)}}</td>
                                             <td class="text-center">{{$creditNote->description}}</td>
                                             <td class="text-end">

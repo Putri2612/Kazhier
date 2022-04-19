@@ -54,7 +54,7 @@
                                                             <td>{{  (!empty($expense->category)?$expense->category->name:'')}}</td>
                                                             <td>{{ $expense->description }}</td>
                                                             <td>{{ Auth::user()->priceFormat($expense->amount) }} </td>
-                                                            <td>{{ Auth::user()->dateFormat($expense->date) }}</td>
+                                                            <td>{{ Helper::DateFormat($expense->date) }}</td>
                                                             <td>{{ $expense->projects->name }}</td>
                                                             <td>{{ (!empty($expense->user)?$expense->user->name:'') }}</td>
                                                             <td class="text-center">

@@ -55,7 +55,7 @@
                                                 $exploded = explode(' - ', $selected_date);
                                                 $formatted = [];
                                                 foreach ($exploded as $date) {
-                                                    $formatted[] = Auth::user()->dateFormat($date);
+                                                    $formatted[] = Helper::DateFormat($date);
                                                 }
                                                 $selected_date = "{$formatted[0]} - {$formatted[1]}";
                                             }
@@ -90,7 +90,7 @@
                                                     <tbody>
                                                     @foreach ($transactions as $transaction)
                                                         <tr class="font-style">
-                                                            <td>{{ \Auth::user()->dateFormat($transaction->date)}}</td>
+                                                            <td>{{ \Helper::DateFormat($transaction->date)}}</td>
                                                             <td>{{!empty($transaction->bankAccount)?$transaction->bankAccount->bank_name.' '.$transaction->bankAccount->holder_name:''}}</td>
                                                             <td class="font-style">{{  $transaction->type}}</td>
                                                             <td class="font-style">{{  $transaction->category}}</td>

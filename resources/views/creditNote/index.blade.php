@@ -78,7 +78,7 @@
                                                                         </a>
                                                                     </td>
                                                                     <td>{{ (!empty($invoice->customer)?$invoice->customer->name:'') }}</td>
-                                                                    <td>{{ Auth::user()->dateFormat($creditNote->date) }}</td>
+                                                                    <td>{{ Helper::DateFormat($creditNote->date) }}</td>
                                                                     <td>{{ Auth::user()->priceFormat($creditNote->amount) }}</td>
                                                                     <td>{{$creditNote->description}}</td>
                                                                     <td class="text-end">

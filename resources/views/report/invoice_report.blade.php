@@ -160,7 +160,7 @@
                                                                         <a class="btn btn-outline-primary" href="{{ route('invoice.show',$invoice->id) }}">{{ AUth::user()->invoiceNumberFormat($invoice->invoice_id) }}
                                                                         </a>
                                                                     </td>
-                                                                    <td>{{ \Auth::user()->dateFormat($invoice->issue_date) }}</td>
+                                                                    <td>{{ \Helper::DateFormat($invoice->issue_date) }}</td>
                                                                     <td> {{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
                                                                     <td>{{ !empty($invoice->category)?$invoice->category->name:''}}</td>
                                                                     <td>
@@ -176,7 +176,7 @@
                                                                     </td>
                                                                     <td> {{\Auth::user()->priceFormat($invoice->getTotal()-$invoice->getDue())}}</td>
                                                                     <td> {{\Auth::user()->priceFormat($invoice->getDue())}}</td>
-                                                                    <td>{{!empty($invoice->lastPayments)?\Auth::user()->dateFormat($invoice->lastPayments->date):''}}</td>
+                                                                    <td>{{!empty($invoice->lastPayments)?\Helper::DateFormat($invoice->lastPayments->date):''}}</td>
                                                                     <td> {{\Auth::user()->priceFormat($invoice->getTotal())}}</td>
                                                                 </tr>
                                                             @endforeach

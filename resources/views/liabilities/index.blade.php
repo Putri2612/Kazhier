@@ -48,8 +48,8 @@
                                                     @foreach ($liabilities as $liability)
                                                         <tr>
                                                             <td class="font-style">{{ $liability->name }}</td>
-                                                            <td class="font-style">{{ \Auth::user()->dateFormat($liability->date) }}</td>
-                                                            <td class="font-style">{{ \Auth::user()->dateFormat($liability->due_date) }}</td>
+                                                            <td class="font-style">{{ \Helper::DateFormat($liability->date) }}</td>
+                                                            <td class="font-style">{{ \Helper::DateFormat($liability->due_date) }}</td>
                                                             <td class="font-style">{{__("$liability->type") }}</td>
                                                             <td class="font-style">{{ \Auth::user()->priceFormat($liability->amount) }}</td>
                                                             <td class="font-style">{{ $liability->description }}</td>

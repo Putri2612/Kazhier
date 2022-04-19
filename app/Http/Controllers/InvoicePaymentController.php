@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Helper;
 use App\Mail\InvoicePaymentCreate;
 use App\Mail\PaymentReminder;
 use App\Models\BankAccount;
@@ -106,7 +107,7 @@ class InvoicePaymentController extends Controller
             if(!empty($customer->email) && !str_contains($customer->email ,'@example.com')) {
                 $payment            = $invoicePayment;
                 $payment->name      = $customer->name;
-                $payment->date      = Auth::user()->dateFormat($request->input('date'));
+                $payment->date      = Helper::DateFormat($request->input('date'));
                 $payment->amount    = Auth::user()->priceFormat($amount);
                 $payment->invoice   = 'invoice ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
                 $payment->dueAmount = Auth::user()->priceFormat($invoice->getDue());
@@ -165,7 +166,7 @@ class InvoicePaymentController extends Controller
         $customer           = Customer::where('id', $invoice->customer_id)->first();
         $invoice->dueAmount = Auth:: user()->priceFormat($invoice->getDue());
         $invoice->name      = $customer['name'];
-        $invoice->date      = Auth::user()->dateFormat($invoice->send_date);
+        $invoice->date      = Helper::DateFormat($invoice->send_date);
         $invoice->invoice   = Auth::user()->invoiceNumberFormat($invoice->invoice_id);
 
         try

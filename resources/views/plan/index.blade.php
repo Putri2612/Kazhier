@@ -68,7 +68,7 @@
                                                     <span class="badge bg-success" disabled>
                                                         {{__('Active')}}
                                                     </span>
-                                                    <span class="text-dark pe-3">{{__('Expire : ').Auth::user()->dateFormat(Auth::user()->plan_expire_date)}}</span>
+                                                    <span class="text-dark pe-3">{{__('Expire : ').Helper::DateFormat(Auth::user()->plan_expire_date)}}</span>
                                                 </div>
                                             </div>
                                         @endif

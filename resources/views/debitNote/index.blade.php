@@ -77,7 +77,7 @@
                                                                         </a>
                                                                     </td>
                                                                     <td>{{ (!empty($bill->vender)?$bill->vender->name:'') }}</td>
-                                                                    <td>{{ Auth::user()->dateFormat($debitNote->date) }}</td>
+                                                                    <td>{{ Helper::DateFormat($debitNote->date) }}</td>
                                                                     <td>{{ Auth::user()->priceFormat($debitNote->amount) }}</td>
                                                                     <td>{{$debitNote->description}}</td>
                                                                     <td class="text-end">

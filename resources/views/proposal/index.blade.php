@@ -104,7 +104,7 @@
                                                                 <td> {{!empty($proposal->customer)? $proposal->customer->name:'' }} </td>
                                                             @endif
                                                             <td>{{ !empty($proposal->category)?$proposal->category->name:''}}</td>
-                                                            <td>{{ Auth::user()->dateFormat($proposal->issue_date) }}</td>
+                                                            <td>{{ Helper::DateFormat($proposal->issue_date) }}</td>
                                                             <td>
                                                                 @if($proposal->status == 0)
                                                                     <span class="badge badge-primary">{{ __(\App\Models\Proposal::$statues[$proposal->status]) }}</span>
