@@ -7,6 +7,9 @@ use IntlDateFormatter;
 
 trait DateFormatter {
     public static function DateFormat($date, $type = null) {
+        if(gettype($date) == 'string') {
+            $date = strtotime($date);
+        }
 
         $types = array_keys(Utility::$dateformats);
         if(empty($type)) {
