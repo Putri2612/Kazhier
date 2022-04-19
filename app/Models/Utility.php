@@ -23,7 +23,7 @@ class Utility extends Model
         }
         $data     = $data->get();
         $settings = [
-            "site_currency" => "Rupiah",
+            "site_currency" => "IDR",
             "site_currency_symbol" => "Rp ",
             "site_currency_symbol_position" => "pre",
             "site_date_format" => "j M Y",
