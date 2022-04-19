@@ -14,13 +14,14 @@ use App\Models\Revenue;
 use App\Models\Transfer;
 use App\Traits\CanManageBalance;
 use App\Traits\DataGetter;
+use App\Traits\TimeGetter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class LedgerController extends Controller
 {
-    use CanManageBalance, DataGetter;
+    use CanManageBalance, DataGetter, TimeGetter;
     
     public function index(Request $request){
         if(Auth::user()->can('view ledger')){
@@ -38,7 +39,7 @@ class LedgerController extends Controller
             $month['12']   = __('December');
             $months        = collect($month);
 
-            $years         = Auth::user()->getAllRecordYear();
+            $years         = $this->Years();
 
             $accounts      = BankAccount::where('created_by', '=', Auth::user()->creatorId())->get();
             $defaultAccount= $accounts->first();
@@ -64,7 +65,7 @@ class LedgerController extends Controller
             // Pilih tahun berapa
             if( !empty($request->year) ){ $selected_year = $request->year; } 
             else if( $years->contains(date('Y')) ) { $selected_year = date('Y'); }
-            else { $selected_year = $years->first(); }
+            else { $selected_year = array_key_first($years); }
             
             // Pilih bulan apa
             if( !empty($request->month) ){ $selected_month = $request->month; } 

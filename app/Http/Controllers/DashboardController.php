@@ -79,9 +79,9 @@ class DashboardController extends Controller
             $data['currentYear']    = date('Y');
             $data['currentMonth']   = date('M');
             $data['months']         = $this->Months();
-            $data['years']          = Auth::user()->getAllRecordYear();
-            if(!$data['years']->contains([$data['currentYear']])) {
-                $data['years']->put($data['currentYear'], $data['currentYear']);
+            $data['years']          = $this->Years();
+            if(!in_array($data['currentYear'], $data['years'])) {
+                $data['years'][$data['currentYear']] = $data['currentYear'];
             }
 
             $constant['taxes']         = Tax::where('created_by', $creatorId)->count();

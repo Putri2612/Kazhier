@@ -36,7 +36,7 @@ class ReportController extends Controller
         } else if($yearList->contains(date('Y'))) {
             $year = date('Y');
         } else {
-            $year = $yearList->first();
+            $year = array_key_first($yearList);
         }
 
         $data = $this->GetIncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
@@ -71,7 +71,7 @@ class ReportController extends Controller
         } else if($yearList->contains(date('Y'))) {
             $year = date('Y');
         } else {
-            $year = $yearList->first();
+            $year = array_key_first($yearList);
         }
 
         $data                   = $this->GetExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));

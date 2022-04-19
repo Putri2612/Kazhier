@@ -8,12 +8,14 @@ use App\Models\InvoicePayment;
 use App\Models\Payment;
 use App\Models\Revenue;
 use App\Models\Transfer;
+use App\Traits\TimeGetter;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class JournalController extends Controller
 {
+    use TimeGetter;
     
     public function index(Request $request){
         if(\Auth::user()->can('view journal')){
@@ -32,7 +34,7 @@ class JournalController extends Controller
             $month['12']   = __('December');
             $months        = collect($month);
             
-            $years         = Auth::user()->getAllRecordYear();
+            $years         = $this->Years();
             
 
             $revenuesQuery = Revenue::where('created_by', '=', \Auth::user()->creatorId());
@@ -42,8 +44,8 @@ class JournalController extends Controller
             $transferQuery = Transfer::where('created_by', \Auth::user()->creatorId());
 
             if( !empty($request->year) ) { $selected_year = $request->year; } 
-            else if( $years->contains(date('Y')) ) { $selected_year = date('Y'); }
-            else { $selected_year = $years->first(); }
+            else if( in_array(date('Y'), $years)) { $selected_year = date('Y'); }
+            else { $selected_year = array_key_first($years); }
 
             $revenuesQuery->whereRaw('year(`date`) = ?', array($selected_year));
             $invoicesQuery->whereRaw('year(`date`) = ?', array($selected_year));
