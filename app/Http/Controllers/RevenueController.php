@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Helper;
 use App\Exports\RevenueExport;
 use App\Imports\RevenueImport;
 use App\Models\BankAccount;
@@ -56,36 +57,7 @@ class RevenueController extends Controller
             $payment->prepend(__('All'), '');
 
 
-            $query = Revenue::with(['bankAccount', 'customer', 'category', 'paymentMethod'])->where('created_by', '=', \Auth::user()->creatorId());
-
-            if(!empty($request->date))
-            {
-                $date_range = explode(' - ', $request->date);
-                $query->whereBetween('date', $date_range);
-            }
-
-            if(!empty($request->customer))
-            {
-                $query->where('id', '=', $request->customer);
-            }
-            if(!empty($request->account))
-            {
-                $query->where('account_id', '=', $request->account);
-            }
-
-            if(!empty($request->category))
-            {
-                $query->where('category_id', '=', $request->category);
-            }
-
-            if(!empty($request->payment))
-            {
-                $query->where('payment_method', '=', $request->payment);
-            }
-            $unsorted = $query->get();
-            $revenues = $unsorted->sortByDesc('date')->values()->all();
-
-            return view('revenue.index', compact('revenues', 'customer', 'account', 'category', 'payment'));
+            return view('revenue.index', compact('customer', 'account', 'category', 'payment'));
         }
         else
         {
