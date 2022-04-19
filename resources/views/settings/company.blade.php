@@ -205,19 +205,17 @@
                                                 <div class="form-group col-md-6">
                                                     <label for="site_date_format" class="form-control-label">{{__('Date Format')}}</label>
                                                     <select type="text" name="site_date_format" class="form-control selectric" id="site_date_format">
-                                                        <option value="j M Y" @if(@$settings['site_date_format'] == 'j M Y') selected="selected" @endif>1 Jan 2021</option>
-                                                        <option value="M j, Y" @if(@$settings['site_date_format'] == 'M j, Y') selected="selected" @endif>Jan 1, 2021</option>
-                                                        <option value="d-m-Y" @if(@$settings['site_date_format'] == 'd-m-Y') selected="selected" @endif>d-m-y</option>
-                                                        <option value="m-d-Y" @if(@$settings['site_date_format'] == 'm-d-Y') selected="selected" @endif>m-d-y</option>
-                                                        <option value="Y-m-d" @if(@$settings['site_date_format'] == 'Y-m-d') selected="selected" @endif>y-m-d</option>
+                                                        <option value="numeric" @if(@$settings['site_date_format'] == 'numeric') selected="selected" @endif>{{ Helper::DateFormat(now(), 'numeric') }}</option>
+                                                        <option value="short" @if(@$settings['site_date_format'] == 'short') selected="selected" @endif>{{ Helper::DateFormat(now(), 'short') }}</option>
+                                                        <option value="long" @if(@$settings['site_date_format'] == 'long') selected="selected" @endif>{{ Helper::DateFormat(now(), 'long') }}</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-md-6">
                                                     <label for="site_time_format" class="form-control-label">{{__('Time Format')}}</label>
                                                     <select type="text" name="site_time_format" class="form-control selectric" id="site_time_format">
-                                                        <option value="g:i A" @if(@$settings['site_time_format'] == 'g:i A') selected="selected" @endif>10:30 PM</option>
-                                                        <option value="g:i a" @if(@$settings['site_time_format'] == 'g:i a') selected="selected" @endif>10:30 pm</option>
-                                                        <option value="H:i" @if(@$settings['site_time_format'] == 'H:i') selected="selected" @endif>22:30</option>
+                                                        <option value="short" @if(@$settings['site_time_format'] == 'short') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'short') }}</option>
+                                                        <option value="medium" @if(@$settings['site_time_format'] == 'medium') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'medium') }}</option>
+                                                        <option value="long" @if(@$settings['site_time_format'] == 'long') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'long') }}</option>
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-md-6">

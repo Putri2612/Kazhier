@@ -105,8 +105,8 @@
                                                                 <td> {{ (!empty( $bill->vender)?$bill->vender->name:'') }} </td>
                                                             @endif
                                                             <td>{{ !empty($bill->category)?$bill->category->name:''}}</td>
-                                                            <td>{{ Auth::user()->dateFormat($bill->bill_date) }}</td>
-                                                            <td>{{ Auth::user()->dateFormat($bill->due_date) }}</td>
+                                                            <td>{{ Helper::DateFormat($bill->bill_date) }}</td>
+                                                            <td>{{ Helper::DateFormat($bill->due_date) }}</td>
                                                             <td>
                                                                 @if($bill->status == 0)
                                                                     <span class="badge badge-primary">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>

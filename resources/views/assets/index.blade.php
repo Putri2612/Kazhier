@@ -48,8 +48,8 @@
                                                     @foreach ($assets as $asset)
                                                         <tr>
                                                             <td class="font-style">{{ $asset->name }}</td>
-                                                            <td class="font-style">{{ \Auth::user()->dateFormat($asset->purchase_date) }}</td>
-                                                            <td class="font-style">{{ \Auth::user()->dateFormat($asset->supported_date) }}</td>
+                                                            <td class="font-style">{{ \Helper::DateFormat($asset->purchase_date) }}</td>
+                                                            <td class="font-style">{{ \Helper::DateFormat($asset->supported_date) }}</td>
                                                             <td class="font-style">{{ __($asset->type) }}</td>
                                                             <td class="font-style">{{ \Auth::user()->priceFormat($asset->amount) }}</td>
                                                             <td class="font-style">{{ $asset->description }}</td>

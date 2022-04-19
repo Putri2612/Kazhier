@@ -16,4 +16,9 @@ class Asset extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'purchase_date' => 'datetime',
+        'supported_date' => 'datetime',
+    ];
+
 }

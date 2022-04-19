@@ -88,7 +88,7 @@
                                                         <p class="font-style">
                                                             @if(Auth::user()->type == 'super admin')
                                                                 <b class="text-primary font-style">{{!empty($user->currentPlan)?$user->currentPlan->name:''}}</b>
-                                                                ({{__('Expire : ') }} {{!empty($user->plan_expire_date) ? \Auth::user()->dateFormat($user->plan_expire_date):'Unlimited'}})
+                                                                ({{__('Expire : ') }} {{!empty($user->plan_expire_date) ? \Helper::DateFormat($user->plan_expire_date):'Unlimited'}})
                                                             @else 
                                                                 {{$user->type}}
                                                             @endif

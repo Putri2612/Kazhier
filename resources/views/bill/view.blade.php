@@ -55,7 +55,7 @@
                                             </a>
                                         @endcan
                                     </div>
-                                    <p>{{__('Status')}} : <a href="#">{{__('Created on ')}} {{\Auth::user()->dateFormat($bill->bill_date)}} </a></p>
+                                    <p>{{__('Status')}} : <a href="#">{{__('Created on ')}} {{\Helper::DateFormat($bill->bill_date)}} </a></p>
                                 </div>
                             </div>
                             <div class="activity">
@@ -67,7 +67,7 @@
                                         <span class="text-job text-primary"><h6>{{__('Send Bill')}}</h6></span>
 
                                         @if($bill->status!=0)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($bill->send_date)}}  </a></p>
+                                            <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{\Helper::DateFormat($bill->send_date)}}  </a></p>
                                         @else
                                             @can('send bill')
                                                 <a href="{{ route('bill.sent',$bill->id) }}" class="btn btn-primary btn-action me-1 float-right">
@@ -200,13 +200,13 @@
                                 <div class="col-md-4 text-md-center">
                                     <address>
                                         <strong>{{__('Issue Date')}} :</strong><br>
-                                        {{\Auth::user()->dateFormat($bill->bill_date)}}<br><br>
+                                        {{\Helper::DateFormat($bill->bill_date)}}<br><br>
                                     </address>
                                 </div>
                                 <div class="col-md-4 text-md-end">
                                     <address>
                                         <strong>{{__('Due Date')}} :</strong><br>
-                                        {{\Auth::user()->dateFormat($bill->due_date)}}<br><br>
+                                        {{\Helper::DateFormat($bill->due_date)}}<br><br>
                                     </address>
                                 </div>
                             </div>
@@ -312,7 +312,7 @@
                                     </tr>
                                     @foreach($bill->payments as $key =>$payment)
                                         <tr>
-                                            <td>{{\Auth::user()->dateFormat($payment->date)}}</td>
+                                            <td>{{\Helper::DateFormat($payment->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($payment->amount)}}</td>
                                             <td class="text-center">{{!empty($payment->bankAccount)?$payment->bankAccount->bank_name.' '.$payment->bankAccount->holder_name:''}}</td>
                                             <td class="text-center">{{!empty($payment->paymentMethod)?$payment->paymentMethod->name:''}}</td>
@@ -346,7 +346,7 @@
                                     </tr>
                                     @foreach($bill->debitNote as $key =>$debitNote)
                                         <tr>
-                                            <td>{{\Auth::user()->dateFormat($debitNote->date)}}</td>
+                                            <td>{{\Helper::DateFormat($debitNote->date)}}</td>
                                             <td class="text-center">{{\Auth::user()->priceFormat($debitNote->amount)}}</td>
                                             <td class="text-center">{{$debitNote->description}}</td>
                                             <td class="text-end">

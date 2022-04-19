@@ -2,6 +2,42 @@
 @section('page-title')
     {{__('Bank Transaction')}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const date = pagination.dateFormat(data.date),
+                    amount = pagination.priceFormat(data.amount),
+                    account = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '';
+                
+                return `
+                    <tr class="font-style">
+                        <td>${date}</td>
+                        <td>${account}</td>
+                        <td>${data.type}</td>
+                        <td>${data.category}</td>
+                        <td>${data.description}</td>
+                        <td>${data.amount}</td>
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -55,7 +91,7 @@
                                                 $exploded = explode(' - ', $selected_date);
                                                 $formatted = [];
                                                 foreach ($exploded as $date) {
-                                                    $formatted[] = Auth::user()->dateFormat($date);
+                                                    $formatted[] = Helper::DateFormat($date);
                                                 }
                                                 $selected_date = "{$formatted[0]} - {$formatted[1]}";
                                             }
@@ -71,10 +107,13 @@
                             
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('transaction.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
 
@@ -88,22 +127,12 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    @foreach ($transactions as $transaction)
-                                                        <tr class="font-style">
-                                                            <td>{{ \Auth::user()->dateFormat($transaction->date)}}</td>
-                                                            <td>{{!empty($transaction->bankAccount)?$transaction->bankAccount->bank_name.' '.$transaction->bankAccount->holder_name:''}}</td>
-                                                            <td class="font-style">{{  $transaction->type}}</td>
-                                                            <td class="font-style">{{  $transaction->category}}</td>
-                                                            <td>{{  $transaction->description}}</td>
-                                                            <td class="text-end">{{\Auth::user()->priceFormat($transaction->amount)}}</td>
-                                                        </tr>
-                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>

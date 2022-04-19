@@ -62,7 +62,7 @@
                                                     @foreach ($payments as $payment)
 
                                                         <tr>
-                                                            <td>{{  Auth::user()->dateFormat($payment->date)}}</td>
+                                                            <td>{{  Helper::DateFormat($payment->date)}}</td>
                                                             <td>{{  Auth::user()->priceFormat($payment->amount)}}</td>
                                                             <td>{{  $payment->category}}</td>
                                                             <td>{{  !empty( $payment->payment)? (!empty($payment->payment->paymentMethod)?$payment->payment->paymentMethod->name:''):''}}</td>

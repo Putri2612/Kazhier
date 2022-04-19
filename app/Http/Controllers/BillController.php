@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Helper;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\BillPayment;
@@ -484,7 +485,7 @@ class BillController extends Controller
             $payment         = new BillPayment();
             $payment->name   = $vender['name'];
             $payment->method = $payment_method['name'];
-            $payment->date   = Auth::user()->dateFormat($request->date);
+            $payment->date   = Helper::DateFormat($request->date);
             $payment->amount = Auth::user()->priceFormat($amount);
             $payment->bill   = 'bill ' . Auth::user()->billNumberFormat($billPayment->bill_id);
 

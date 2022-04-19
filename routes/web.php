@@ -236,7 +236,8 @@ Route::prefix('app')->group(
         
                 Route::resource('transfer', TransferController::class);
         
-                Route::resource('transaction', TransactionController::class);
+                Route::get('transaction', [TransactionController::class, 'index'])->name('transaction.index');
+                Route::post('transaction/get', [TransactionController::class, 'get'])->name('transaction.get');
         
                 Route::resource('defaults', DefaultValueController::class);
         
@@ -312,6 +313,7 @@ Route::prefix('app')->group(
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
                 Route::post('revenue/import/heading', [RevenueController::class, 'getImportHeadings'])->name('revenue.import.headings');
                 Route::put('revenue/import/store', [RevenueController::class, 'storeImport'])->name('revenue.import.store');
+                Route::post('revenue/get', [RevenueController::class, 'get'])->name('revenue.get');
                 Route::resource('revenue', RevenueController::class);
                 // Expense
         
@@ -352,6 +354,7 @@ Route::prefix('app')->group(
                 Route::get('payment/import', [PaymentController::class, 'import'])->name('payment.import');
                 Route::post('payment/import/heading', [PaymentController::class, 'getImportHeadings'])->name('payment.import.headings');
                 Route::put('payment/import/store', [PaymentController::class, 'storeImport'])->name('payment.import.store');
+                Route::post('payment/get', [PaymentController::class, 'get'])->name('payment.get');
                 Route::resource('payment', PaymentController::class);
         
                 Route::resource('expenses', ExpenseController::class);

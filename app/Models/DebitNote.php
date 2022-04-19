@@ -12,6 +12,10 @@ class DebitNote extends Model
         'amount',
         'date',
     ];
+    
+    protected $casts = [
+        'date' => 'datetime'
+    ];
 
     public function vendor()
     {

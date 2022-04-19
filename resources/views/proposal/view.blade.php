@@ -53,7 +53,7 @@
                                             </a>
                                         @endcan
                                     </div>
-                                    <p><a href="#">{{__('Created on ')}} {{\Auth::user()->dateFormat($proposal->issue_date)}} </a></p>
+                                    <p><a href="#">{{__('Created on ')}} {{\Helper::DateFormat($proposal->issue_date)}} </a></p>
                                 </div>
                             </div>
                             <div class="activity">
@@ -64,7 +64,7 @@
                                     <div class="mb-2">
                                         <span class="text-job text-primary"><h6>{{__('Send Proposal')}}</h6></span>
                                         @if($proposal->status!=0)
-                                            <p><a href="#">{{__('Sent on')}} {{\Auth::user()->dateFormat($proposal->send_date)}}  </a></p>
+                                            <p><a href="#">{{__('Sent on')}} {{\Helper::DateFormat($proposal->send_date)}}  </a></p>
                                         @else
                                             @can('send proposal')
                                                 <a href="{{ route('proposal.sent',$proposal->id) }}" class="btn btn-primary btn-action me-1 float-right">
@@ -189,7 +189,7 @@
                                 <div class="col-md-8 text-md-end">
                                     <address>
                                         <strong>{{__('Issue Date')}} :</strong><br>
-                                        {{\Auth::user()->dateFormat($proposal->issue_date)}}<br><br>
+                                        {{\Helper::DateFormat($proposal->issue_date)}}<br><br>
                                     </address>
                                 </div>
                             </div>

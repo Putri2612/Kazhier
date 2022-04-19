@@ -132,7 +132,7 @@
                                                             @foreach ($ledger as $data)
                                                                 <tr class="font-style">
                                                                     <td>{{$num}}</td>
-                                                                    <td>{{Auth::user()->dateFormat($data['date'])}}</td>
+                                                                    <td>{{Helper::DateFormat($data['date'])}}</td>
                                                                     <td>{{$data['description']}}</td>
                                                                     <td>
                                                                         @if ($data['debit'] !=0)

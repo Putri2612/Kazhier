@@ -10,6 +10,10 @@ class Expense extends Model
         'category_id','description','amount','date','project_id','user_id','attachment','created_by'
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function category(){
         return $this->hasOne(ExpensesCategory::class,'id','category_id');
     }

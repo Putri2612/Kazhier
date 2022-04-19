@@ -17,6 +17,10 @@ class InvoicePayment extends Model
         'served_by'
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function invoice(){
         return $this->hasOne(Invoice::class, 'id', 'invoice_id');
     }

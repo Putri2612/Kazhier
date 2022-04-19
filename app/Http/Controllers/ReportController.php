@@ -47,7 +47,7 @@ class ReportController extends Controller
             } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
-                $year = $yearList->first();
+                $year = array_key_first($yearList);
             }
 
             $data = Report::IncomeSummary($year, $request->input('account'), $request->input('category'), $request->input('customer'));
@@ -88,7 +88,7 @@ class ReportController extends Controller
             } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
-                $year = $yearList->first();
+                $year = array_key_first($yearList);
             }
 
             $data                   = Report::ExpenseSummary($year, $request->input('account'), $request->input('category'), $request->input('vender'));
@@ -130,7 +130,7 @@ class ReportController extends Controller
             } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
-                $year = $yearList->first();
+                $year = array_key_first($yearList);
             }
             $data = Report::IncomeXExpense($year, $request->input('account'), $request->input('category'), $request->input('customer'), $request->input('vender'));
 
@@ -246,7 +246,7 @@ class ReportController extends Controller
             } else if(in_array(date('Y'), $yearList)) {
                 $year = date('Y');
             } else {
-                $year = $yearList->first();
+                $year = array_key_first($yearList);
             }
 
             $data = $this->GetProfitLoss($year);

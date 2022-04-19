@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Helper;
 use App\Exports\PaymentExport;
 use App\Imports\PaymentImport;
 use App\Models\BankAccount;
@@ -12,7 +13,9 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
+use App\Models\Utility;
 use App\Models\Vender;
+use App\Traits\ApiResponse;
 use App\Traits\CanImport;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
@@ -31,60 +34,151 @@ use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 
 class PaymentController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanUploadFile, CanRedirect, CanImport;
+    use CanManageBalance, 
+        CanProcessNumber, 
+        CanUploadFile, 
+        CanRedirect, 
+        CanImport,
+        ApiResponse;
 
     public function index(Request $request)
     {
         if(Auth::user()->can('manage payment'))
         {
             $creatorId = Auth::user()->creatorId();
-            $vender = Vender::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
+            $vender = Vender::select('name', 'id')
+                    ->where('created_by', '=', $creatorId)
+                    ->pluck('name', 'id');
             $vender->prepend(__('All'), '');
 
-            $account = BankAccount::where('created_by', '=', $creatorId)->get()->pluck('holder_name', 'id');
+            $account = BankAccount::select('holder_name', 'id')
+                    ->where('created_by', '=', $creatorId)
+                    ->pluck('holder_name', 'id');
             $account->prepend(__('All'), '');
 
-            $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 2)->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::select('name', 'id')
+                    ->where('created_by', '=', $creatorId)
+                    ->where('type', '=', 2)
+                    ->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
-            $payment = PaymentMethod::where('created_by', '=', $creatorId)->get()->pluck('name', 'id');
+            $payment = PaymentMethod::select('name', 'id')
+                    ->where('created_by', '=', $creatorId)
+                    ->pluck('name', 'id');
             $payment->prepend(__('All'), '');
 
-            $query = Payment::with(['vender', 'bankAccount', 'category', 'paymentMethod'])->where('created_by', '=', $creatorId);
 
-            if(!empty($request->date))
-            {
-                $date_range = explode(' - ', $request->date);
-                $query->whereBetween('date', $date_range);
-            }
-
-            if(!empty($request->vender))
-            {
-                $query->where('id', '=', $request->vender);
-            }
-            if(!empty($request->account))
-            {
-                $query->where('account_id', '=', $request->account);
-            }
-
-            if(!empty($request->category))
-            {
-                $query->where('category_id', '=', $request->category);
-            }
-
-            if(!empty($request->payment))
-            {
-                $query->where('payment_method', '=', $request->payment);
-            }
-            $unsorted = $query->get();
-            $payments = $unsorted->sortByDesc('date')->values()->all();
-
-
-            return view('payment.index', compact('payments', 'account', 'category', 'payment', 'vender'));
+            return view('payment.index', compact('account', 'category', 'payment', 'vender'));
         }
         else
         {
             return $this->RedirectDenied();
+        }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage payment')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+            'date'              => 'nullable|regex:/^[\d\-\s]*/i',
+            'account'           => 'nullable|numeric',
+            'category'          => 'nullable|numeric',
+            'vender'            => 'nullable|numeric',
+            'payment_method'    => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        $settings = Utility::settings();
+
+        $totalData = Payment::where('created_by', Auth::user()->creatorId())->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $query = Payment::with(['bankAccount:id,bank_name,holder_name', 'vender:id,name', 'category:id,name', 'paymentMethod:id,name'])
+                ->select('id', 'amount', 'description', 'date', 'vender_id', 'account_id', 'category_id', 'payment_method')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('date', 'desc')
+                ->skip($skip)->take($limit);
+
+        if(!empty($request->input('date')))
+        {
+            $date_range = explode(' - ', $request->input('date'));
+            $query->whereBetween('date', $date_range);
+        }
+
+        if(!empty($request->input('vender')))
+        {
+            $query->where('vender_id', '=', $request->input('vender'));
+        }
+        if(!empty($request->input('account')))
+        {
+            $query->where('account_id', '=', $request->input('account'));
+        }
+
+        if(!empty($request->input('category')))
+        {
+            $query->where('category_id', '=', $request->input('category'));
+        }
+
+        if(!empty($request->input('payment')))
+        {
+            $query->where('payment_method', '=', $request->input('payment'));
+        }
+
+        $payments = $query->get();
+
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        if($payments->isEmpty()) {
+            return $this->NotFoundResponse();
+        } else {
+            return $this->FetchSuccessResponse([
+                'data'      => $payments,
+                'pages'     => $totalPage,
+                'currency'  => $settings['site_currency'],
+                'date'      => $format,
+            ]);
         }
     }
 
@@ -177,7 +271,7 @@ class PaymentController extends Controller
                 $payment         = new BillPayment();
                 $payment->name   = $vender['name'];
                 $payment->method = $payment_method['name'];
-                $payment->date   = Auth::user()->dateFormat($request->input('date'));
+                $payment->date   = Helper::DateFormat($request->input('date'));
                 $payment->amount = Auth::user()->priceFormat($amount);
                 $payment->bill   = '';
 

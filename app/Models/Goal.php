@@ -17,6 +17,11 @@ class Goal extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'from' => 'datetime',
+        'to' => 'datetime',
+    ];
+
     public static $goalType = [
         'Invoice',
         'Bill',

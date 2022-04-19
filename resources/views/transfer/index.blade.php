@@ -72,7 +72,7 @@
                                                     <tbody>
                                                     @foreach ($transfers as $transfer)
                                                         <tr class="font-style">
-                                                            <td>{{ \Auth::user()->dateFormat( $transfer->date) }}</td>
+                                                            <td>{{ \Helper::DateFormat( $transfer->date) }}</td>
                                                             <td>{{ !empty($transfer->fromBankAccount())? $transfer->fromBankAccount()->bank_name.' '.$transfer->fromBankAccount()->holder_name:''}}</td>
                                                             <td>{{ !empty( $transfer->toBankAccount())? $transfer->toBankAccount()->bank_name.' '. $transfer->toBankAccount()->holder_name:''}}</td>
                                                             <td>{{ \Auth::user()->priceFormat( $transfer->amount)}}</td>

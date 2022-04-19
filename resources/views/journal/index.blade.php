@@ -117,7 +117,7 @@
                                                                             </a>
                                                                             @endif
                                                                         </td>
-                                                                        <td rowspan="2">{{Auth::user()->dateFormat($data->date)}}</td>
+                                                                        <td rowspan="2">{{Helper::DateFormat($data->date)}}</td>
                                                                         <td colspan="2"> 
                                                                         @if(is_a($data, 'App\Models\Revenue'))
                                                                         {{ (!empty($data->customer) ? $data->customer->name : '') }}

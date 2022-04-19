@@ -69,8 +69,8 @@
                                     </div>
                                     <div class="card-body">
                                         @php
-                                            $dateFrom   = explode(' ',Auth::user()->dateFormat($from));
-                                            $dateTo     = explode(' ',Auth::user()->dateFormat($to));
+                                            $dateFrom   = explode(' ',Helper::DateFormat($from));
+                                            $dateTo     = explode(' ',Helper::DateFormat($to));
                                         @endphp
                                         @foreach ($dateFrom as $dtFrom)
                                             {{ __($dtFrom).' ' }}
@@ -120,7 +120,7 @@
                                                     <tbody>
                                                     @foreach ($reportData['credit'] as $credit)
                                                         <tr class="font-style">
-                                                            <td>{{ Auth::user()->dateFormat($credit->date) }}</td>
+                                                            <td>{{ Helper::DateFormat($credit->date) }}</td>
                                                             <td> {{$credit->description}} </td>
                                                             <td>{{__('Credit')}}</td>
                                                             <td>{{ Auth::user()->priceFormat($credit->amount) }}</td>
@@ -128,7 +128,7 @@
                                                     @endforeach
                                                     @foreach ($reportData['debit'] as $debit)
                                                         <tr class="font-style">
-                                                            <td>{{ Auth::user()->dateFormat($debit->date) }}</td>
+                                                            <td>{{ Helper::DateFormat($debit->date) }}</td>
                                                             <td> {{$debit->description}} </td>
                                                             <td>{{__('Debit')}}</td>
                                                             <td>{{ Auth::user()->priceFormat($debit->amount) }}</td>

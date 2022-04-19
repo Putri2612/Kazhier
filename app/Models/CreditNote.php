@@ -13,6 +13,10 @@ class CreditNote extends Model
         'date',
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function customer()
     {
         return $this->hasOne(Customer::class, 'customer_id', 'customer');
