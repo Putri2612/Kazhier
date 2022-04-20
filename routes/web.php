@@ -258,6 +258,7 @@ Route::prefix('app')->group(
                 // Tax, category, unit, method
                 Route::resource('taxes', TaxController::class);
                 Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion');
+                Route::post('{type}/category/get', [ProductServiceCategoryController::class, 'get'])->name('category.get');
                 Route::resource('{type}/category', ProductServiceCategoryController::class);
         
                 Route::resource('product-unit', ProductServiceUnitController::class);
