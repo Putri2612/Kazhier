@@ -22,6 +22,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\Task;
 use App\Models\Transaction;
 use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
@@ -32,11 +33,15 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanRedirect;
+    use CanManageBalance, 
+        CanProcessNumber, 
+        CanRedirect,
+        ApiResponse;
 
     public function __construct()
     {
@@ -52,33 +57,106 @@ class InvoiceController extends Controller
             $customer->prepend(__('All'), '');
 
             $status = [];
-            // foreach (Invoice::$statuses as $stat) {
-            //     $status[] = __($stat);
-            // }
 
-            $query = Invoice::with(['customer', 'category'])->where('created_by', '=', Auth::user()->creatorId());
-
-            if(!empty($request->customer))
-            {
-                $query->where('id', '=', $request->customer);
-            }
-            if(!empty($request->issue_date))
-            {
-                $date_range = explode(' - ', $request->issue_date);
-                $query->whereBetween('issue_date', $date_range);
-            }
-
-            if(!empty($request->status))
-            {
-                $query->where('status', '=', $request->status);
-            }
-            $invoices = $query->get();
-
-            return view('invoice.index', compact('invoices', 'customer', 'status'));
+            return view('invoice.index', compact('customer', 'status'));
         }
         else
         {
             return $this->RedirectDenied();
+        }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage invoice')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+            'issue_date'        => 'nullable|regex:/^[\d\-\s]*/i',
+            'customer'          => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        $settings = Utility::settings();
+
+        $totalData = Invoice::where('created_by', Auth::user()->creatorId())->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $query = Invoice::with(['customer:id,name', 'category:id,name'])
+                ->select('id', 'invoice_id', 'issue_date', 'due_date', 'customer_id', 'status', 'category_id', 'type')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('issue_date', 'desc')
+                ->orderBy('invoice_id', 'desc')
+                ->skip($skip)->take($limit);
+
+        if(!empty($request->input('issue_datedate')))
+        {
+            $date_range = explode(' - ', $request->input('issue_datedate'));
+            $query->whereBetween('issue_datedate', $date_range);
+        }
+
+        if(!empty($request->input('customer')))
+        {
+            $query->where('customer_id', '=', $request->input('customer'));
+        }
+
+        $invoices = $query->get();
+
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        if($invoices->isEmpty()) {
+            return $this->NotFoundResponse();
+        } else {
+            foreach ($invoices as $invoice) {
+                $invoice->invoice_number = $invoice->invoiceNumber();
+                $invoice->status         = $invoice->getStatus();
+            }
+            return $this->FetchSuccessResponse([
+                'data'      => $invoices,
+                'pages'     => $totalPage,
+                'currency'  => $settings['site_currency'],
+                'date'      => $format,
+            ]);
         }
     }
 

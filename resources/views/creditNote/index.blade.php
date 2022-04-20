@@ -7,7 +7,7 @@
         $(document).on('change', '#invoice', function () {
 
             var id = $(this).val();
-            var url = "{{route('invoice.get')}}";
+            var url = "{{route('invoice.credit.note')}}";
 
             $.ajax({
                 url: url,

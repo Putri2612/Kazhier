@@ -172,4 +172,10 @@ class Invoice extends Model
         return $this->hasOne(User::class, 'id', 'served_by');
     }
 
+    public function invoiceNumber() {
+        $settings = Utility::settings();
+
+        return $settings['invoice_prefix'] . sprintf("%05d", $this->invoice_id);
+    }
+
 }

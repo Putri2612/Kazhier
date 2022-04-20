@@ -270,6 +270,8 @@ Route::prefix('app')->group(
         
                 Route::prefix('invoice')->as('invoice.')->group(
                     function () {
+                        Route::post('get', [InvoiceController::class, 'get'])->name('get');
+
                         Route::get('{id}/credit-note', [CreditNoteController::class, 'create'])->name('credit.note');
                         Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
                         Route::get('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('edit.credit.note');
@@ -307,7 +309,7 @@ Route::prefix('app')->group(
                 Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
                 Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
                 Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
-                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
+                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.credit.note');
         
                 Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');

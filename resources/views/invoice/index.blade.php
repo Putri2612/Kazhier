@@ -2,6 +2,108 @@
 @section('page-title')
     {{__('Invoice')}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                additionalForm: '#query-form',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const issue_date = pagination.dateFormat(data.issue_date),
+                    due_date    = pagination.dateFormat(data.due_date),
+                    customer    = data.customer ? data.customer.name : '',
+                    category    = data.category ? data.category.name : '',
+                    statusColor = data.status == '{{ __('Paid') }}' ? 'primary' : 'light';
+
+                let showURL = '#';
+
+                @can('show invoice')
+                    showURL = "{{ route('invoice.index') }}";
+                    showURL += data.id;
+                @endcan
+                
+                @can('edit invoice')
+                    let editURL = "{{ route('invoice.edit', ['invoice' => ':id']) }}";
+                        editURL = editURL.replace(':id', data.id);
+                @endcan
+                @can('duplicate invoice')
+                    let duplicateURL = "{{ route('invoice.duplicate', ':id') }}";
+                        duplicateURL = duplicateURL.replace(':id', data.id);
+                @endcan
+                @can('delete invoice')
+                    let deleteURL = "{{ route('invoice.destroy', ['invoice' => ':id']) }}";
+                        deleteURL = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>
+                            <a href="${showURL}" class="btn btn-outline-primary">
+                                ${data.invoice_number}
+                            </a>
+                        </td>
+                        <td>${customer}</td>
+                        <td>${category}</td>
+                        <td>${issue_date}</td>
+                        <td>${due_date}</td>
+                        <td><span class="badge badge-${statusColor}">${data.status}</span></td>
+                        @if(Gate::check('show invoice') || Gate::check('edit invoice') || Gate::check('duplicate invoice') || Gate::check('delete invoice'))
+                            <td class="action text-end">
+                                @can('show invoice')
+                                    <a href="${showURL}" class="btn btn-primary btn-action me-1">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                @endcan
+                                @if (Gate::check('edit invoice') || Gate::check('duplicate invoice') || Gate::check('delete invoice'))
+                                    <div class="btn-group">
+                                        <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @can('duplicate invoice')
+                                                <li>
+                                                    <a href="#" class="dropdown-item" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-${data.id}').submit();">
+                                                        {{ __('Duplicate') }}
+                                                        <form action="${duplicateURL}" id="duplicate-form-${data.id}"></form>
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('edit invoice')
+                                                <li>
+                                                    <a class="dropdown-item" href="${editURL}">
+                                                        {{ __('Edit') }}
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('delete invoice')
+                                                <li>
+                                                    <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
+                                                        {{ __('Delete') }}
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                @endif
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -43,7 +145,7 @@
                         <div class="card-body">
                             <div class="card-body p-0">
                                 @if(!Auth::guard('customer')->check())
-                                {{ Form::open(array('route' => array('invoice.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                {{ Form::open(array('route' => array('invoice.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5' , 'id' => 'query-form')) }}
                                 @else
                                 {{ Form::open(array('route' => array('customer.invoice'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
                                 @endif
@@ -73,13 +175,15 @@
                                 </div>
                                 {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('invoice.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
-
                                                         <th> {{__('Invoice')}}</th>
                                                         @if(!\Auth::guard('customer')->check())
                                                             <th> {{__('Customer')}}</th>
@@ -93,89 +197,12 @@
                                                         @endif
                                                     </tr>
                                                     </thead>
-
-                                                    <tbody>
-                                                    @foreach ($invoices as $invoice)
-                                                        <tr class="font-style">
-                                                            <td>
-                                                                @if(\Auth::guard('customer')->check())
-                                                                    <a class="btn btn-outline-primary" href="{{ route('customer.invoice.show',$invoice->id) }}">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}
-                                                                    </a>
-                                                                @else
-                                                                    <a class="btn btn-outline-primary" href="{{ route('invoice.show',$invoice->id) }}">{{ Auth::user()->invoiceNumberFormat($invoice->invoice_id) }}
-                                                                    </a>
-                                                                @endif
-                                                            </td>
-                                                            @if(!\Auth::guard('customer')->check())
-                                                                <td> {{!empty($invoice->customer)? $invoice->customer->name:'' }} </td>
-                                                            @endif
-                                                            <td>{{ !empty($invoice->category)?$invoice->category->name:''}}</td>
-                                                            <td>{{ Helper::DateFormat($invoice->issue_date) }}</td>
-                                                            <td>{{ Helper::DateFormat($invoice->due_date) }}</td>
-                                                            <td>
-                                                                @php
-                                                                    $type = strtolower($invoice->getType());
-                                                                @endphp
-                                                                @if($invoice->status < count(\App\Models\Invoice::$statuses[$type]) - 1)
-                                                                    <span class="badge badge-light">{{ $invoice->getStatus() }}</span>
-                                                                @else
-                                                                    <span class="badge badge-primary">{{ $invoice->getStatus() }}</span>
-                                                                @endif
-                                                            </td>
-                                                            @if(Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice') || Gate::check('duplicate invoice'))
-                                                                <td class="action text-end">
-                                                                    @can('show invoice')
-                                                                        @if(\Auth::guard('customer')->check())
-                                                                            <a href="{{ route('customer.invoice.show',$invoice->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
-                                                                                <i class="fas fa-eye"></i>
-                                                                            </a>
-                                                                        @else
-                                                                            <a href="{{ route('invoice.show',$invoice->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
-                                                                                <i class="fas fa-eye"></i>
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
-                                                                    @if (Gate::check('edit invoice') || Gate::check('duplicate invoice') || Gate::check('delete invoice'))
-                                                                        <div class="btn-group">
-                                                                            <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
-                                                                                <i class="fa-solid fa-ellipsis fa-lg"></i>
-                                                                            </button>
-                                                                            <ul class="dropdown-menu">
-                                                                                @can('duplicate invoice')
-                                                                                    <li>
-                                                                                        <a href="#" class="dropdown-item" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$invoice->id}}').submit();">
-                                                                                            {{ __('Duplicate') }}
-                                                                                            {!! Form::open(['method' => 'get', 'route' => ['invoice.duplicate', $invoice->id],'id'=>'duplicate-form-'.$invoice->id]) !!}
-                                                                                            {!! Form::close() !!}
-                                                                                        </a>
-                                                                                    </li>
-                                                                                @endcan
-                                                                                @can('edit invoice')
-                                                                                    <li>
-                                                                                        <a class="dropdown-item" href="{{ route('invoice.edit',$invoice->id) }}">
-                                                                                            {{ __('Edit') }}
-                                                                                        </a>
-                                                                                    </li>
-                                                                                @endcan
-                                                                                @can('delete invoice')
-                                                                                    <li>
-                                                                                        <a href="#!" class="dropdown-item" data-is-delete data-delete-url="{{ route('invoice.destroy', $invoice->id) }}">
-                                                                                            {{ __('Delete') }}
-                                                                                        </a>
-                                                                                    </li>
-                                                                                @endcan
-                                                                            </ul>
-                                                                        </div>
-                                                                    @endif
-                                                                </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
-                                                    </tbody>
+                                                    <tbody></tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>
