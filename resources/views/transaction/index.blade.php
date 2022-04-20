@@ -27,7 +27,7 @@
                         <td>${data.type}</td>
                         <td>${data.category}</td>
                         <td>${data.description}</td>
-                        <td>${data.amount}</td>
+                        <td>${amount}</td>
                     </tr>
                 `;
             }

@@ -29,7 +29,7 @@ class TransactionController extends Controller
     }
 
     public function get(Request $request) {
-        if(!Auth::user()->can('manage revenue')) {
+        if(!Auth::user()->can('manage transaction')) {
             return $this->UnauthorizedResponse();
         }
         
