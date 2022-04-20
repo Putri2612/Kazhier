@@ -523,7 +523,7 @@
                                                     </a>
                                                 @endcan
                                                 @can('delete credit note')
-                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('invoice.delete.credit.note',[$creditNote->invoice, $creditNote->id]) }}">
+                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('invoice.destroy.credit.note',[$creditNote->invoice, $creditNote->id]) }}">
                                                         <i class="fas fa-trash"></i>
                                                     </a>
                                                 @endcan

@@ -82,16 +82,7 @@ class InvoicePaymentController extends Controller
                 $invoice->save();
             }
 
-            $statuses = Invoice::$statuses[strtolower(Invoice::$types[$invoice->type])];
-
-            if($due <= 0) {
-                $invoice->status = array_search('Paid', $statuses);
-            } else if ($due == $invoice->getTotal()) {
-                $invoice->status = array_search('Unpaid', $statuses);
-            } else {
-                $invoice->status = array_search('Partialy Paid', $statuses);
-            }
-            $invoice->save();
+            $invoice->updateStatus();
 
             $invoicePayment->user_id    = $invoice->customer_id;
             $invoicePayment->user_type  = 'Customer';
@@ -137,17 +128,7 @@ class InvoicePaymentController extends Controller
             $invoicePayment->delete();
             
             $invoice = Invoice::where('id', $invoice_id)->first();
-            $due     = $invoice->getDue();
-            $statuses = Invoice::$statuses[strtolower(Invoice::$types[$invoice->type])];
-
-            if($due <= 0) {
-                $invoice->status = array_search('Paid', $statuses);
-            } else if ($due == $invoice->getTotal()) {
-                $invoice->status = array_search('Unpaid', $statuses);
-            } else {
-                $invoice->status = array_search('Partialy Paid', $statuses);
-            }
-            $invoice->save();
+            $invoice->updateStatus();
 
             $type = 'Partial';
             $user = 'Customer';

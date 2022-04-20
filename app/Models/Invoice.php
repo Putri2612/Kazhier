@@ -60,6 +60,24 @@ class Invoice extends Model
         return __(self::$statuses[strtolower($this->getType())][$this->status]);
     }
 
+    public function updateStatus() {
+        $due = $this->getDue();
+
+        $status = self::$statuses[$this->getType()];
+
+        if($due <= 0) {
+            $this->status = array_search('Paid', $status);
+        } else if($due == $this->getTotal()) {
+            $this->status = array_search('Unpaid', $status);
+            if($this->status === false) {
+                $this->status = array_search('Delivered', $status);
+            }
+        } else {
+            $this->status = array_search('Partialy Paid', $status);
+        }
+        $this->save();
+    }
+
     public function getType() {
         if(empty($this->type)) {
             $type = 0;

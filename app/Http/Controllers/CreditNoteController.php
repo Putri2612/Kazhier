@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class CreditNoteController extends Controller
 {
-    use CanManageBalance, CanProcessNumber;
+    use CanManageBalance, CanProcessNumber, CanRedirect, ApiResponse;
     public function __construct()
     {
         $this->middleware('auth');
@@ -30,6 +35,86 @@ class CreditNoteController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage credit note')) {
+            return $this->UnauthorizedResponse();
+        }
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        $invoices = Invoice::select('id')->where('created_by', Auth::user()->creatorId())->pluck('id');
+
+        $totalData = CreditNote::whereIn('invoice', $invoices)->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $creditNote = CreditNote::select('id', 'date', 'amount', 'description', 'invoice', 'customer')
+                    ->with(['customer:id,name', 'getinvoice:id,invoice_id'])
+                    ->whereIn('invoice', $invoices)
+                    ->orderBy('date', 'desc')
+                    ->orderBy('invoice', 'desc')
+                    ->skip($skip)->take($limit)
+                    ->get();
+
+        if($creditNote->isEmpty()) {
+            return $this->NotFoundResponse();
+        }
+        foreach ($creditNote as $note) {
+            $note->invoice_number = $note->getinvoice->invoiceNumber();
+        }
+
+        $settings = Utility::settings();
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        return $this->FetchSuccessResponse([
+            'data'      => $creditNote,
+            'pages'     => $totalPage,
+            'currency'  => $settings['site_currency'],
+            'date'      => $format,
+        ]);
     }
 
     public function create($invoice_id)
@@ -63,15 +148,14 @@ class CreditNoteController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            $invoiceDue = Invoice::where('id', $invoice_id)->first();
+            $invoice = Invoice::where('id', $invoice_id)->first();
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
-            if($amount > $invoiceDue->getDue())
+            if($amount > $invoice->getDue())
             {
                 return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
             }
 
-            $invoice             = Invoice::where('id', $invoice_id)->first();
             $credit              = new CreditNote();
             $credit->invoice     = $invoice_id;
             $credit->customer    = $invoice->customer_id;
@@ -80,7 +164,7 @@ class CreditNoteController extends Controller
             $credit->description = $request->input('description');
             $credit->save();
             
-            // $this->AddBalance()
+            $invoice->updateStatus();
 
             return redirect()->back()->with('success', __('Credit Note successfully created.'));
         }
@@ -126,15 +210,24 @@ class CreditNoteController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            $invoiceDue = Invoice::where('id', $invoice_id)->first();
+            $invoice    = Invoice::where('id', $invoice_id)->where('created_by', Auth::user()->creatorId())->first();
+            if(empty($invoice)) {
+                return $this->RedirectNotFound();
+            }
+            $credit     = $invoice->creditNote()->where('id', $creditNote_id)->first();
+            
+            if(empty($credit)) {
+                return $this->RedirectNotFound();
+            }
+            $due        = $invoice->getDue() + $credit->amount;
 
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
-            if($amount > $invoiceDue->getDue()) {
-                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($invoiceDue->getDue()) . ' credit limit of this invoice.');
+            if($amount > $due) {
+                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($due) . ' credit limit of this invoice.');
             }
 
-            $credit              = CreditNote::find($creditNote_id);
+            
             $credit->date        = $request->input('date');
             $credit->amount      = $amount;
             $credit->description = $request->input('description');
@@ -153,8 +246,16 @@ class CreditNoteController extends Controller
     {
         if(\Auth::user()->can('delete credit note'))
         {
+            $invoice    = Invoice::where('created_by', Auth::user()->creatorId())
+                        ->where('id', $invoice_id)
+                        ->first();
 
-            $creditNote = CreditNote::find($creditNote_id);
+            $creditNote = $invoice->creditNote()->where('id', $creditNote_id)->first();
+
+            if(empty($creditNote)) {
+                return $this->RedirectNotFound();
+            }
+
             $creditNote->delete();
 
             return redirect()->back()->with('success', __('Credit Note successfully deleted.'));
@@ -226,7 +327,8 @@ class CreditNoteController extends Controller
 
     public function getinvoice(Request $request)
     {
-        $invoice = Invoice::where('id', $request->invoice_id)->first();
+        Log::debug($request->all());
+        $invoice = Invoice::where('id', $request->input('invoice_id'))->first();
         echo json_encode($this->FloatToReadableNumber($invoice->getDue()));
     }
 

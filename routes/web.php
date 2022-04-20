@@ -276,7 +276,7 @@ Route::prefix('app')->group(
                         Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
                         Route::get('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('edit.credit.note');
                         Route::put('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('update.credit.note');
-                        Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('delete.credit.note');
+                        Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('destroy.credit.note');
         
                         Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
                         Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
@@ -307,9 +307,10 @@ Route::prefix('app')->group(
                 Route::post('invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
         
                 Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
+                Route::post('credit-note/get', [CreditNoteController::class, 'get'])->name('credit.note.get');
                 Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
                 Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
-                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.credit.note');
+                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('get.invoice.credit.note');
         
                 Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');

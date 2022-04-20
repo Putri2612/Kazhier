@@ -27,7 +27,7 @@
 
                 @can('show invoice')
                     showURL = "{{ route('invoice.index') }}";
-                    showURL += data.id;
+                    showURL += `/${data.id}`;
                 @endcan
                 
                 @can('edit invoice')
