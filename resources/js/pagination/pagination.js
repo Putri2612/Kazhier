@@ -226,6 +226,10 @@ class Pagination {
         container.appendChild(label);
     }
 
+    numberFormat(number) {
+        return new Intl.NumberFormat([this._locale, 'id']).format(number);
+    }
+
     priceFormat(number) {
         let formatted;
         try {
