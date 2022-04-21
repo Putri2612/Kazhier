@@ -105,8 +105,8 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row mb-3 crd">
-                        <h4 class="col-6 fw-normal">{{__('Manage Bill')}}</h4>
-                        <div class="col-6 row justify-content-end text-end">
+                        <h4 class="col-12 col-md-6 fw-normal">{{__('Manage Bill')}}</h4>
+                        <div class="col-12 col-md-6 row justify-content-end text-end">
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
                                 <a href="{{ route('bill.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary">
