@@ -2,6 +2,96 @@
 @section('page-title')
     {{__('Bill')}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                additionalForm: '#query-form',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const bill_date = pagination.dateFormat(data.bill_date),
+                    due_date    = pagination.dateFormat(data.due_date),
+                    customer    = data.customer ? data.customer.name : '',
+                    category    = data.category ? data.category.name : '',
+                    statusColor = data.status == '{{ __('Paid') }}' ? 'primary' : 'light';
+
+                let showURL = '#';
+
+                @can('show bill')
+                    showURL = "{{ route('bill.index') }}";
+                    showURL += `/${data.id}`;
+                @endcan
+                
+                @can('edit bill')
+                    let editURL = "{{ route('bill.edit', ':id') }}";
+                        editURL = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete bill')
+                    let deleteURL = "{{ route('bill.destroy', ':id') }}";
+                        deleteURL = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>
+                            <a href="${showURL}" class="btn btn-outline-primary">
+                                ${data.bill_number}
+                            </a>
+                        </td>
+                        <td>${customer}</td>
+                        <td>${category}</td>
+                        <td>${bill_date}</td>
+                        <td>${due_date}</td>
+                        <td><span class="badge badge-${statusColor}">${data.status}</span></td>
+                        @if(Gate::check('show bill') || Gate::check('edit bill') || Gate::check('delete bill'))
+                            <td class="action text-end">
+                                @can('show bill')
+                                    <a href="${showURL}" class="btn btn-primary btn-action me-1">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                @endcan
+                                @if (Gate::check('edit bill') || Gate::check('duplicate bill') || Gate::check('delete bill'))
+                                    <div class="btn-group">
+                                        <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @can('edit bill')
+                                                <li>
+                                                    <a class="dropdown-item" href="${editURL}">
+                                                        {{ __('Edit') }}
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                            @can('delete bill')
+                                                <li>
+                                                    <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
+                                                        {{ __('Delete') }}
+                                                    </a>
+                                                </li>
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                @endif
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -39,9 +129,9 @@
                         <div class="card-body">
                             <div class="card-body p-0">
                                 @if(!Auth::guard('vender')->check())
-                                    {{ Form::open(array('route' => array('bill.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                    {{ Form::open(array('route' => array('bill.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5', 'id' => 'query-form')) }}
                                 @else
-                                    {{ Form::open(array('route' => array('vender.bill'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5')) }}
+                                    {{ Form::open(array('route' => array('vender.bill'),'method' => 'GET', 'class' => 'row justify-content-end align-items-end pt-3 pb-5 mb-5', 'id' => 'query-form')) }}
                                 @endif
                                 <div class="form-group col-12 col-md-6 col-lg-auto">
                                     {{ Form::label('bill_date', __('Date')) }}
@@ -69,10 +159,13 @@
                                 </div>
                                 {{ Form::close() }}
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('bill.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Bill')}}</th>
@@ -90,75 +183,13 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    @foreach ($bills as $bill)
-                                                        <tr class="font-style">
-                                                            <td>
-                                                                @if(\Auth::guard('vender')->check())
-                                                                    <a class="btn btn-outline-primary" href="{{ route('vender.bill.show',$bill->id) }}">{{ Auth::user()->billNumberFormat($bill->bill_id) }}
-                                                                    </a>
-                                                                @else
-                                                                    <a class="btn btn-outline-primary" href="{{ route('bill.show',$bill->id) }}">{{ Auth::user()->billNumberFormat($bill->bill_id) }}
-                                                                    </a>
-                                                                @endif
-                                                            </td>
-                                                            @if(!\Auth::guard('vender')->check())
-                                                                <td> {{ (!empty( $bill->vender)?$bill->vender->name:'') }} </td>
-                                                            @endif
-                                                            <td>{{ !empty($bill->category)?$bill->category->name:''}}</td>
-                                                            <td>{{ Helper::DateFormat($bill->bill_date) }}</td>
-                                                            <td>{{ Helper::DateFormat($bill->due_date) }}</td>
-                                                            <td>
-                                                                @if($bill->status == 0)
-                                                                    <span class="badge badge-primary">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
-                                                                @elseif($bill->status == 1)
-                                                                    <span class="badge badge-warning">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
-                                                                @elseif($bill->status == 2)
-                                                                    <span class="badge badge-danger">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
-                                                                @elseif($bill->status == 3)
-                                                                    <span class="badge badge-info">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
-                                                                @elseif($bill->status == 4)
-                                                                    <span class="badge badge-success">{{ __(\App\Models\Bill::$statuses[$bill->status]) }}</span>
-                                                                @endif
-                                                            </td>
-                                                            @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
-                                                                <td class="action text-end">
-                                                                    @can('duplicate bill')
-                                                                        <a href="#" class="btn btn-success btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-{{$bill->id}}').submit();">
-                                                                            <i class="fas fa-copy"></i>
-                                                                            {!! Form::open(['method' => 'get', 'route' => ['bill.duplicate', $bill->id],'id'=>'duplicate-form-'.$bill->id]) !!}
-                                                                            {!! Form::close() !!}
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('show bill')
-                                                                        @if(\Auth::guard('vender')->check())
-                                                                            <a href="{{ route('vender.bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
-                                                                                <i class="fas fa-eye"></i>
-                                                                            </a>
-                                                                        @else
-                                                                            <a href="{{ route('bill.show',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Detail')}}">
-                                                                                <i class="fas fa-eye"></i>
-                                                                            </a>
-                                                                        @endif
-                                                                    @endcan
-                                                                    @can('edit bill')
-                                                                        <a href="{{ route('bill.edit',$bill->id) }}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('delete bill')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url='{{ route('bill.destroy', $bill->id) }}'>
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
+                                                    
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>

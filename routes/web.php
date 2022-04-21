@@ -323,6 +323,8 @@ Route::prefix('app')->group(
         
                 Route::prefix('bill')->as('bill.')->group(
                     function() {
+                        Route::post('get', [BillController::class, 'get'])->name('get');
+
                         Route::get('{id}/debit-note', [DebitNoteController::class, 'create'])->name('debit.note');
                         Route::post('{id}/debit-note', [DebitNoteController::class, 'store'])->name('debit.note.store');
                         Route::get('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'edit'])->name('edit.debit.note');
@@ -352,7 +354,7 @@ Route::prefix('app')->group(
                 Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
                 Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
                 Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note.store');
-                Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
+                Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get.debit.note');
         
                 Route::get('payment/export', [PaymentController::class, 'export'])->name('payment.export');
                 Route::get('payment/import', [PaymentController::class, 'import'])->name('payment.import');

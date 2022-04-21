@@ -18,6 +18,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
@@ -31,7 +32,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanRedirect;
+    use CanManageBalance, CanProcessNumber, CanRedirect, ApiResponse;
 
     public function index(Request $request)
     {
@@ -72,6 +73,99 @@ class BillController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage bill')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'          => 'nullable|numeric',
+            'limit'         => 'nullable|numeric',
+            'issue_date'    => 'nullable|regex:/^[\d\-\s]*/i',
+            'vender'        => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        $settings = Utility::settings();
+
+        $totalData = Bill::where('created_by', Auth::user()->creatorId())->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $query = Bill::with(['vender:id,name', 'category:id,name'])
+                ->select('id', 'bill_id', 'bill_date', 'due_date', 'vender_id', 'status', 'category_id')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('bill_date', 'desc')
+                ->orderBy('bill_id', 'desc')
+                ->skip($skip)->take($limit);
+
+        if(!empty($request->input('bill_date')))
+        {
+            $date_range = explode(' - ', $request->input('bill_date'));
+            $query->whereBetween('bill_date', $date_range);
+        }
+
+        if(!empty($request->input('vender')))
+        {
+            $query->where('vender_id', '=', $request->input('vender'));
+        }
+
+        $bills = $query->get();
+
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        if($bills->isEmpty()) {
+            return $this->NotFoundResponse();
+        } else {
+            foreach ($bills as $bill) {
+                $bill->bill_number  = $bill->billNumber();
+                $bill->status       = $bill->getStatus();
+            }
+            return $this->FetchSuccessResponse([
+                'data'      => $bills,
+                'pages'     => $totalPage,
+                'currency'  => $settings['site_currency'],
+                'date'      => $format,
+            ]);
+        }
+    }
 
     public function create()
     {
@@ -537,7 +631,7 @@ class BillController extends Controller
         if(\Auth::user()->can('manage vender bill'))
         {
 
-            $status = Invoice::$statuses;
+            $status = Bill::$statuses;
 
             $query = Bill::where('vender_id', '=', \Auth::user()->vender_id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
 
