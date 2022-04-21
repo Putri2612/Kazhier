@@ -228,6 +228,7 @@ Route::prefix('app')->group(
 
                 Route::get('customer-category/ajax/{category_id}', [ApiCustomerCategoryController::class, 'get'])->name('customer.category.ajax');
 
+                Route::post('customer-category/get', [CustomerCategoryController::class, 'get'])->name('customer-category.get');
                 Route::resource('customer-category', CustomerCategoryController::class);
 
         
@@ -264,7 +265,7 @@ Route::prefix('app')->group(
         
                 Route::post('product-unit/get', [ProductServiceUnitController::class, 'get'])->name('product-unit.get');
                 Route::resource('product-unit', ProductServiceUnitController::class);
-                
+
                 Route::post('payment-method/get', [PaymentMethodController::class, 'get'])->name('payment-method.get');
                 Route::resource('payment-method', PaymentMethodController::class);
         

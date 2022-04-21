@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerCategory;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
@@ -11,11 +13,78 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerCategoryController extends Controller
 {
-    use CanProcessNumber, CanRedirect;
+    use CanProcessNumber, CanRedirect, ApiResponse;
     public function index() {
         $categories = CustomerCategory::where('created_by', Auth::user()->creatorId())->get();
 
         return view('customer.category.index', compact('categories'));
+    }
+
+    public function get(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = CustomerCategory::where('created_by', Auth::user()->creatorId());
+        $totalData = (clone $query)->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $categories = $query->select('id', 'name', 'discount', 'discount_type AS type', 'max_discount')
+                    ->skip($skip)->take($limit)
+                    ->get();
+        if(empty($categories)) {
+            return $this->NotFoundResponse();
+        }
+        $settings = Utility::settings();
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        return $this->FetchSuccessResponse([
+            'data'      => $categories,
+            'pages'     => $totalPage,
+            'currency'  => $settings['site_currency'],
+            'date'      => $format,
+        ]);
     }
 
     public function create() {
