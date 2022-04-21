@@ -2,6 +2,55 @@
 @section('page-title')
     {{__('Product & Service Unit')}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                @can('edit constant unit')
+                    let editURL = "{{ route('product-unit.edit', [':id']) }}";
+                    editURL     = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete constant unit')
+                    let deleteURL = "{{ route('product-unit.destroy', [':id']) }}";
+                    deleteURL     = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>${data.name}</td>
+                        @if(Gate::check('edit constant unit') || Gate::check('delete constant unit'))
+                            <td class="action text-end">
+                                @can('edit constant unit')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__("Edit Product Unit")}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete constant unit')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -15,13 +64,15 @@
             <div class="row">
                 <div class="col-12">
                     <div class="row crd mb-3">
-                        <h4 class="col-6">{{__('Manage Product & Service Unit')}}</h4>
+                        <h4 class="col-12 col-md-6">{{__('Manage Product & Service Unit')}}</h4>
                         @can('create constant unit')
-                            <div class="col-6 text-end">
-                                <a href="#" data-url="{{ route('product-unit.create') }}" data-ajax-popup="true" data-title="{{__('Create New Unit')}}" class="btn btn-icon icon-left btn-primary btn-round">
-                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                    <span class="btn-inner--text"> {{__('Create')}}</span>
-                                </a>
+                            <div class="col-12 col-md-6 row justify-content-end text-end">
+                                <div class="col-auto">
+                                    <a href="#" data-url="{{ route('product-unit.create') }}" data-ajax-popup="true" data-title="{{__('Create New Unit')}}" class="btn btn-icon icon-left btn-primary">
+                                        <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                        <span class="btn-inner--text d-none d-md-inline"> {{__('Create')}}</span>
+                                    </a>
+                                </div>
                             </div>
                         @endcan
                     </div>
@@ -29,10 +80,13 @@
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable" >
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('product-unit.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Unit')}}</th>
@@ -40,29 +94,12 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    @foreach ($units as $unit)
-                                                        <tr class="font-style">
-                                                            <td>{{ $unit->name }}</td>
-                                                            <td class="action text-end">
-                                                                @can('edit constant category')
-                                                                    <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('product-unit.edit',$unit->id) }}" data-ajax-popup="true" data-title="{{__('Edit Product Unit')}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </a>
-                                                                @endcan
-                                                                @can('delete constant category')
-                                                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('product-unit.destroy', [$unit->id]) }}">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </a>
-                                                                @endcan
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>
