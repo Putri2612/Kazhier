@@ -34,8 +34,7 @@
             pagination.format = data => {
                 const date      = pagination.dateFormat(data.date),
                     customer    = data.customer ? data.customer.name : '',
-                    amount      = pagination.priceFormat(data.amount),
-                    statusColor = data.status == '{{ __('Paid') }}' ? 'primary' : 'light';
+                    amount      = pagination.priceFormat(data.amount);
 
                 let showURL = '#';
 
@@ -49,7 +48,7 @@
                         editURL = editURL.replace(':iid', data.invoice);
                         editURL = editURL.replace(':cid', data.id);
                 @endcan
-                @can('delete invoice')
+                @can('delete credit note')
                     let deleteURL = "{{ route('invoice.destroy.credit.note', [':iid', ':cid']) }}";
                         deleteURL = deleteURL.replace(':iid', data.invoice);
                         deleteURL = deleteURL.replace(':cid', data.id);
