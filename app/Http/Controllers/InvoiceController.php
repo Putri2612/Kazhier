@@ -108,10 +108,10 @@ class InvoiceController extends Controller
                 ->orderBy('invoice_id', 'desc')
                 ->skip($skip)->take($limit);
 
-        if(!empty($request->input('issue_datedate')))
+        if(!empty($request->input('issue_date')))
         {
-            $date_range = explode(' - ', $request->input('issue_datedate'));
-            $query->whereBetween('issue_datedate', $date_range);
+            $date_range = explode(' - ', $request->input('issue_date'));
+            $query->whereBetween('issue_date', $date_range);
         }
 
         if(!empty($request->input('customer')))
