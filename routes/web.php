@@ -352,6 +352,7 @@ Route::prefix('app')->group(
                 Route::post('bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
         
                 Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
+                Route::post('debit-note/get', [DebitNoteController::class, 'get'])->name('debit.note.get');
                 Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
                 Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note.store');
                 Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get.debit.note');

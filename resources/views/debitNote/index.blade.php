@@ -5,25 +5,83 @@
 @push('script-page')
     <script>
         $(document).on('change', '#bill', function () {
-
             var id = $(this).val();
-            var url = "{{route('bill.get')}}";
-
             $.ajax({
-                url: url,
+                url: "{{route('bill.get.debit.note')}}",
                 type: 'get',
                 cache: false,
-                data: {
-                    'bill_id': id,
-
-                },
-                success: function (data) {
-                    $('#amount').val(data)
-                },
-
+                data: { 'bill_id': id, },
+                success: function (data) { $('#amount').val(data) },
             });
+        });
 
-        })
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const date      = pagination.dateFormat(data.date),
+                    vender      = data.vender ? data.vender.name : '',
+                    amount      = pagination.priceFormat(data.amount);
+
+                let showURL = '#';
+
+                @can('show bill')
+                    showURL = "{{ route('bill.index') }}";
+                    showURL += `/${data.bill}`;
+                @endcan
+                
+                @can('edit debit note')
+                    let editURL = "{{ route('bill.edit.debit.note', [':bid', ':did']) }}";
+                        editURL = editURL.replace(':bid', data.bill);
+                        editURL = editURL.replace(':did', data.id);
+                @endcan
+                @can('delete debit note')
+                    let deleteURL = "{{ route('bill.delete.debit.note', [':bid', ':did']) }}";
+                        deleteURL = deleteURL.replace(':bid', data.bill);
+                        deleteURL = deleteURL.replace(':did', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>
+                            <a href="${showURL}" class="btn btn-outline-primary">
+                                ${data.bill_number}
+                            </a>
+                        </td>
+                        <td>${vender}</td>
+                        <td>${date}</td>
+                        <td>${amount}</td>
+                        <td>${data.description}</td>
+                        
+                        @if (Gate::check('edit debit note') || Gate::check('delete debit note'))
+                            <td class="action text-end">
+                                @can('edit debit note')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__('Edit Debit Note')}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete debit note')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
     </script>
 @endpush
 @section('content')
@@ -38,23 +96,32 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between w-100 crd mb-3">
-                        <h4 class="fw-normal">{{__('Manage Debit Note')}}</h4>
+                    <div class="row crd mb-3">
+                        <div class="col-12 col-md-6">
+                            <h4 class="fw-normal">{{__('Manage Debit Note')}}</h4>
+                        </div>
                         @can('create debit note')
-                            <a href="#" data-url="{{ route('bill.custom.debit.note') }}" data-ajax-popup="true" data-title="{{__('Create New Debit Note')}}" class="btn btn-icon icon-left btn-primary btn-round">
-                                <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                <span class="btn-inner--text"> {{__('Create')}}</span>
-                            </a>
+                        <div class="col-12 col-md-6 row justify-content-end">
+                            <div class="col-auto">
+                                <a href="#" data-url="{{ route('bill.custom.debit.note') }}" data-ajax-popup="true" data-title="{{__('Create New Debit Note')}}" class="btn btn-icon icon-left btn-primary">
+                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                    <span class="btn-inner--text"> {{__('Create')}}</span>
+                                </a>
+                            </div>
+                        </div>
                         @endcan
                     </div>
                     <div class="card">
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('debit.note.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Bill')}}</th>
@@ -66,41 +133,12 @@
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-
-                                                    @foreach ($bills as $bill)
-                                                        @if(!empty($bill->debitNote))
-                                                            @foreach ($bill->debitNote as $debitNote)
-
-                                                                <tr class="font-style">
-                                                                    <td>
-                                                                        <a class="btn btn-outline-primary" href="{{ route('bill.show',$debitNote->bill) }}">{{ AUth::user()->billNumberFormat($bill->bill_id) }}
-                                                                        </a>
-                                                                    </td>
-                                                                    <td>{{ (!empty($bill->vender)?$bill->vender->name:'') }}</td>
-                                                                    <td>{{ Helper::DateFormat($debitNote->date) }}</td>
-                                                                    <td>{{ Auth::user()->priceFormat($debitNote->amount) }}</td>
-                                                                    <td>{{$debitNote->description}}</td>
-                                                                    <td class="text-end">
-                                                                        @can('edit debit note')
-                                                                            <a data-url="{{ route('bill.edit.debit.note',[$debitNote->bill,$debitNote->id]) }}" data-ajax-popup="true" data-title="{{__('Add Debit Note')}}" data-bs-toggle="tooltip" data-original-title="{{__('Credit Note')}}" href="#" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                                <i class="fas fa-pencil-alt"></i>
-                                                                            </a>
-                                                                        @endcan
-                                                                        @can('edit debit note')
-                                                                            <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('bill.delete.debit.note', [$debitNote->bill, $debitNote->id]) }}">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </a>
-                                                                        @endcan
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        @endif
-                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>
