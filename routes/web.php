@@ -215,6 +215,7 @@ Route::prefix('app')->group(
                 Route::get('company-setting', [SystemController::class, 'companyIndex'])->name('company.setting');
                 Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
         
+                Route::post('productservice/get', [ProductServiceController::class, 'get'])->name('productservice.get');
                 Route::get('productservice/export', [ProductServiceController::class, 'export'])->name('productservice.export');
                 Route::get('productservice/import', [ProductServiceController::class, 'import'])->name('productservice.import');
                 Route::put('productservice/import/', [ProductServiceController::class, 'storeImport'])->name('productservice.import.store');
