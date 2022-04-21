@@ -181,7 +181,7 @@
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('invoice.get') }}">
+                                                <table class="table table-flush" data-pagination-table data-pagination-url="{{ route('invoice.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
                                                         <th> {{__('Invoice')}}</th>

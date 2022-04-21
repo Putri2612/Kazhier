@@ -109,7 +109,7 @@
                         <div class="col-6 row justify-content-end text-end">
                             @if (Auth::user()->type == 'company')
                             <div class="col-auto">
-                                <a href="{{ route('bill.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="{{ route('bill.export') }}" target="_blank" class="btn btn-icon icon-left btn-primary">
                                     <span class="btn-inner--icon"><i class="fas fa-file-excel"></i></span>
                                     <span class="btn-inner--text"> {{__('Export')}}</span>
                                 </a>
@@ -117,7 +117,7 @@
                             @endif
                             @can('create bill')
                             <div class="col-auto">
-                                <a href="{{ route('bill.create') }}" class="btn btn-icon icon-left btn-primary btn-round">
+                                <a href="{{ route('bill.create') }}" class="btn btn-icon icon-left btn-primary">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
                                 </a>
@@ -149,11 +149,11 @@
                                 </div>
                                 <div class="form-group col-12 col-md-6 col-lg-auto">
                                     <div class="text-end">
-                                        <button type="submit" class="btn btn-round btn-primary"><i class="fas fa-search"></i></button>
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
                                         @if(!\Auth::guard('vender')->check())
-                                            <a href="{{route('bill.index')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                            <a href="{{route('bill.index')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                                         @else
-                                            <a href="{{route('vender.bill')}}" class="btn btn-round btn-danger"><i class="fas fa-trash"></i></a>
+                                            <a href="{{route('vender.bill')}}" class="btn btn-danger"><i class="fas fa-trash"></i></a>
                                         @endif
                                     </div>
                                 </div>
@@ -163,31 +163,27 @@
                                         <div id="pagination-limit" class="col-auto"></div>
                                     </div>
                                     <div class="table-responsive">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('bill.get') }}">
-                                                    <thead class="thead-light">
-                                                    <tr>
-                                                        <th> {{__('Bill')}}</th>
-                                                        @if(!\Auth::guard('vender')->check())
-                                                            <th> {{__('Vendor')}}</th>
-                                                        @endif
-                                                        <th> {{__('Category')}}</th>
-                                                        <th> {{__('Bill Date')}}</th>
-                                                        <th> {{__('Due Date')}}</th>
-                                                        <th>{{__('Status')}}</th>
-                                                        @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
-                                                            <th class="text-end"> {{__('Action')}}</th>
-                                                        @endif
-                                                    </tr>
-                                                    </thead>
+                                        <table class="table table-flush" data-pagination-table data-pagination-url="{{ route('bill.get') }}">
+                                            <thead class="thead-light">
+                                            <tr>
+                                                <th> {{__('Bill')}}</th>
+                                                @if(!\Auth::guard('vender')->check())
+                                                    <th> {{__('Vendor')}}</th>
+                                                @endif
+                                                <th> {{__('Category')}}</th>
+                                                <th> {{__('Bill Date')}}</th>
+                                                <th> {{__('Due Date')}}</th>
+                                                <th>{{__('Status')}}</th>
+                                                @if(Gate::check('edit bill') || Gate::check('delete bill') || Gate::check('show bill'))
+                                                    <th class="text-end"> {{__('Action')}}</th>
+                                                @endif
+                                            </tr>
+                                            </thead>
 
-                                                    <tbody>
-                                                    
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
+                                            <tbody>
+                                            
+                                            </tbody>
+                                        </table>
                                     </div>
                                     <div id="pagination-container"></div>
                                 </div>
