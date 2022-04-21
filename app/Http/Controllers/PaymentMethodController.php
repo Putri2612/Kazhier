@@ -4,10 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\DefaultValue;
 use App\Models\PaymentMethod;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentMethodController extends Controller
 {
+    use ApiResponse;
 
     public function index()
     {
@@ -23,6 +28,77 @@ class PaymentMethodController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage constant payment method')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = PaymentMethod::where('created_by', Auth::user()->creatorId());
+        $totalData = (clone $query)->count();
+        $page = 1;
+        $limit = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $methods = $query->select('id', 'name')
+                    ->skip($skip)->take($limit)
+                    ->get();
+        if(empty($methods)) {
+            return $this->NotFoundResponse();
+        }
+
+        $settings = Utility::settings();
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        return $this->FetchSuccessResponse([
+            'data'      => $methods,
+            'pages'     => $totalPage,
+            'currency'  => $settings['site_currency'],
+            'date'      => $format,
+        ]);
+    }
 
     public function create()
     {

@@ -264,6 +264,8 @@ Route::prefix('app')->group(
         
                 Route::post('product-unit/get', [ProductServiceUnitController::class, 'get'])->name('product-unit.get');
                 Route::resource('product-unit', ProductServiceUnitController::class);
+                
+                Route::post('payment-method/get', [PaymentMethodController::class, 'get'])->name('payment-method.get');
                 Route::resource('payment-method', PaymentMethodController::class);
         
                 // Income

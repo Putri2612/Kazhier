@@ -3,6 +3,57 @@
 @section('page-title')
     {{__('Payment Method')}}
 @endsection
+
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                @can('edit constant payment method')
+                    let editURL = "{{ route('payment-method.edit', [':id']) }}";
+                    editURL     = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete constant payment method')
+                    let deleteURL = "{{ route('payment-method.destroy', [':id']) }}";
+                    deleteURL     = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>${data.name}</td>
+                        @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
+                            <td class="action text-end">
+                                @can('edit constant payment method')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__("Edit Payment Method")}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete constant payment method')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
+
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -27,13 +78,16 @@
                         <div class="card-body">
                             <div class="card-body p-0">
                                 <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                    <div class="row">
+                                        <div id="pagination-limit" class="col-auto"></div>
+                                    </div>
                                     <div class="table-responsive">
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-flush dataTable">
+                                                <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('payment-method.get') }}">
                                                     <thead class="thead-light">
                                                     <tr>
-                                                        <th>{{__('Title')}}</th>
+                                                        <th>{{__('Name')}}</th>
                                                         @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
                                                             <th class="text-end"> {{__('Action')}}</th>
                                                         @endif
@@ -41,31 +95,12 @@
                                                     </thead>
 
                                                     <tbody>
-                                                    @foreach ($paymentMethods as $paymentMethod)
-                                                        <tr class="font-style">
-                                                            <td>{{ $paymentMethod->name }}</td>
-                                                            @if(Gate::check('edit constant payment method') || Gate::check('delete constant payment method'))
-                                                                <td class="action text-end">
-                                                                    @can('edit constant payment method')
-                                                                        <a href="#!" data-url="{{ route('payment-method.edit',$paymentMethod->id) }}" data-ajax-popup="true" data-title="{{__('Edit Payment Method')}}" class="btn btn-primary btn-action me-1" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('delete constant payment method')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('payment-method.destroy', $paymentMethod->id) }}">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                </td>
-                                                            @endif
-                                                        </tr>
-                                                    @endforeach
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div id="pagination-container"></div>
                                 </div>
                             </div>
                         </div>
