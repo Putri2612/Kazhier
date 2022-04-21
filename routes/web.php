@@ -224,6 +224,7 @@ Route::prefix('app')->group(
                 
                 Route::get('customer/ajax/{name}', [ApiCustomerController::class, 'name'])->name('customer.name.ajax');
                 
+                Route::post('customer/get', [CustomerController::class, 'get'])->name('customer.get');
                 Route::resource('customer', CustomerController::class);
 
                 Route::get('customer-category/ajax/{category_id}', [ApiCustomerCategoryController::class, 'get'])->name('customer.category.ajax');

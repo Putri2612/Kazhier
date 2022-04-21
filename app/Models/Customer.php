@@ -53,6 +53,12 @@ class Customer extends Authenticatable
         return $this->belongsTo(CustomerCategory::class, 'category_id', 'id');
     }
 
+    public function customerNumber() {
+        $settings = Utility::settings();
+
+        return $settings["customer_prefix"] . sprintf("%05d", $this->customer_id);
+    }
+
     public function authId()
     {
         return $this->id;
