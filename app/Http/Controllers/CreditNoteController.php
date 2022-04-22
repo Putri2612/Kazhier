@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\InvoicePayment;
@@ -51,30 +52,17 @@ class CreditNoteController extends Controller
         }
         $invoices = Invoice::select('id')->where('created_by', Auth::user()->creatorId())->pluck('id');
 
-        $totalData = CreditNote::whereIn('invoice', $invoices)->count();
-        $page = 1;
-        $limit = 10;
-
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        $query = CreditNote::whereIn('invoice', $invoices);
+        $page   = Pagination::getTotalPage($query, $request);
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
-        $creditNote = CreditNote::select('id', 'date', 'amount', 'description', 'invoice', 'customer')
+        $creditNote = $query->select('id', 'date', 'amount', 'description', 'invoice', 'customer')
                     ->with(['customer:id,name', 'getinvoice:id,invoice_id'])
-                    ->whereIn('invoice', $invoices)
                     ->orderBy('date', 'desc')
                     ->orderBy('invoice', 'desc')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
 
         if($creditNote->isEmpty()) {
@@ -84,37 +72,7 @@ class CreditNoteController extends Controller
             $note->invoice_number = $note->getinvoice->invoiceNumber();
         }
 
-        $settings = Utility::settings();
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
-        }
-
-        return $this->FetchSuccessResponse([
-            'data'      => $creditNote,
-            'pages'     => $totalPage,
-            'currency'  => $settings['site_currency'],
-            'date'      => $format,
-        ]);
+        return $this->PaginationSuccess($creditNote, $page['totalPage']);
     }
 
     public function create($invoice_id)

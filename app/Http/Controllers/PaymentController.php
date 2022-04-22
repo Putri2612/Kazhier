@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\Helper;
+use App\Classes\Pagination;
 use App\Exports\PaymentExport;
 use App\Imports\PaymentImport;
 use App\Models\BankAccount;
@@ -94,32 +95,7 @@ class PaymentController extends Controller
         if($validator->fails()) {
             return $this->FailedResponse();
         }
-        $settings = Utility::settings();
-
-        $totalData = Payment::where('created_by', Auth::user()->creatorId())->count();
-        $page = 1;
-        $limit = 10;
-
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
-            return $this->NotFoundResponse();
-        }
-
-        $query = Payment::with(['bankAccount:id,bank_name,holder_name', 'vender:id,name', 'category:id,name', 'paymentMethod:id,name'])
-                ->select('id', 'amount', 'description', 'date', 'vender_id', 'account_id', 'category_id', 'payment_method')
-                ->where('created_by', Auth::user()->creatorId())
-                ->orderBy('date', 'desc')
-                ->skip($skip)->take($limit);
-
+        $query = Payment::where('created_by', Auth::user()->creatorId());
         if(!empty($request->input('date')))
         {
             $date_range = explode(' - ', $request->input('date'));
@@ -144,42 +120,22 @@ class PaymentController extends Controller
         {
             $query->where('payment_method', '=', $request->input('payment'));
         }
-
-        $payments = $query->get();
-
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
+        $page   = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
         }
+        
+        $payments = Payment::with(['bankAccount:id,bank_name,holder_name', 'vender:id,name', 'category:id,name', 'paymentMethod:id,name'])
+                ->select('id', 'amount', 'description', 'date', 'vender_id', 'account_id', 'category_id', 'payment_method')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('date', 'desc')
+                ->skip($page['skip'])->take($page['limit'])
+                ->get();
 
         if($payments->isEmpty()) {
             return $this->NotFoundResponse();
-        } else {
-            return $this->FetchSuccessResponse([
-                'data'      => $payments,
-                'pages'     => $totalPage,
-                'currency'  => $settings['site_currency'],
-                'date'      => $format,
-            ]);
-        }
+        } 
+        return $this->PaginationSuccess($payments, $page['totalPage']);
     }
 
 

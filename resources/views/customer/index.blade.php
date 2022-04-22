@@ -54,14 +54,6 @@
             });
             pagination.format = data => {
                 const category = data.category ? data.category.name : "{{ __('General customer') }}";
-                @can('edit constant unit')
-                    let editURL = "{{ route('customer.edit', [':id']) }}";
-                    editURL     = editURL.replace(':id', data.id);
-                @endcan
-                @can('delete constant unit')
-                    let deleteURL = "{{ route('customer.destroy', [':id']) }}";
-                    deleteURL     = deleteURL.replace(':id', data.id);
-                @endcan
                 let showURL = "{{route('customer.show',':id')}}";
                 showURL     = showURL.replace(':id', data.id);
                 return `
@@ -71,20 +63,6 @@
                         <td>${data.contact}</td>
                         <td>${data.email}</td>
                         <td>${category}</td>
-                        @if(Gate::check('edit customer') || Gate::check('delete customer'))
-                            <td class="action text-end">
-                                @can('edit customer')
-                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__("Edit Customer")}}">
-                                        <i class="fas fa-pencil-alt"></i>
-                                    </a>
-                                @endcan
-                                @can('delete customer')
-                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                @endcan
-                            </td>
-                        @endif
                     </tr>
                 `;
             }

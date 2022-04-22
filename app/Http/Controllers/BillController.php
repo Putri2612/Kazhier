@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\Helper;
+use App\Classes\Pagination;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\BillPayment;
@@ -88,33 +89,9 @@ class BillController extends Controller
         if($validator->fails()) {
             return $this->FailedResponse();
         }
-        $settings = Utility::settings();
 
-        $totalData = Bill::where('created_by', Auth::user()->creatorId())->count();
-        $page = 1;
-        $limit = 10;
-
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
-            return $this->NotFoundResponse();
-        }
-
-        $query = Bill::with(['vender:id,name', 'category:id,name'])
-                ->select('id', 'bill_id', 'bill_date', 'due_date', 'vender_id', 'status', 'category_id')
-                ->where('created_by', Auth::user()->creatorId())
-                ->orderBy('bill_date', 'desc')
-                ->orderBy('bill_id', 'desc')
-                ->skip($skip)->take($limit);
-
+        $query = Bill::where('created_by', Auth::user()->creatorId());
+        
         if(!empty($request->input('bill_date')))
         {
             $date_range = explode(' - ', $request->input('bill_date'));
@@ -125,46 +102,27 @@ class BillController extends Controller
         {
             $query->where('vender_id', '=', $request->input('vender'));
         }
-
-        $bills = $query->get();
-
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
+        $page = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
         }
+
+        $bills = $query->with(['vender:id,name', 'category:id,name'])
+            ->select('id', 'bill_id', 'bill_date', 'due_date', 'vender_id', 'status', 'category_id')
+            ->where('created_by', Auth::user()->creatorId())
+            ->orderBy('bill_date', 'desc')
+            ->orderBy('bill_id', 'desc')
+            ->skip($page['skip'])->take($page['limit'])
+            ->get();
 
         if($bills->isEmpty()) {
             return $this->NotFoundResponse();
-        } else {
-            foreach ($bills as $bill) {
-                $bill->bill_number  = $bill->billNumber();
-                $bill->status       = $bill->getStatus();
-            }
-            return $this->FetchSuccessResponse([
-                'data'      => $bills,
-                'pages'     => $totalPage,
-                'currency'  => $settings['site_currency'],
-                'date'      => $format,
-            ]);
         }
+        foreach ($bills as $bill) {
+            $bill->bill_number  = $bill->billNumber();
+            $bill->status       = $bill->getStatus();
+        }
+        return $this->PaginationSuccess($bills, $page['totalPage']);
     }
 
     public function create()

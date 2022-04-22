@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\CustomerCategory;
 use App\Models\Utility;
 use App\Traits\ApiResponse;
@@ -30,61 +31,22 @@ class CustomerCategoryController extends Controller
             return $this->FailedResponse();
         }
 
-        $query = CustomerCategory::where('created_by', Auth::user()->creatorId());
-        $totalData = (clone $query)->count();
-        $page = 1;
-        $limit = 10;
+        $query  = CustomerCategory::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
         $categories = $query->select('id', 'name', 'discount', 'discount_type AS type', 'max_discount')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
+
         if(empty($categories)) {
             return $this->NotFoundResponse();
         }
-        $settings = Utility::settings();
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
-        }
-
-        return $this->FetchSuccessResponse([
-            'data'      => $categories,
-            'pages'     => $totalPage,
-            'currency'  => $settings['site_currency'],
-            'date'      => $format,
-        ]);
+        
+        return $this->PaginationSuccess($categories, $page['totalPage']);
     }
 
     public function create() {

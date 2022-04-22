@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\CustomField;
 use App\Mail\UserCreate;
 use App\Models\Plan;
@@ -31,9 +32,7 @@ class VenderController extends Controller
     {
         if(\Auth::user()->can('manage vender'))
         {
-            $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
-
-            return view('vender.index', compact('venders'));
+            return view('vender.index');
         }
         else
         {
@@ -55,33 +54,21 @@ class VenderController extends Controller
             return $this->FailedResponse();
         }
 
-        $query = Vender::where('created_by', Auth::user()->creatorId());
-        $totalData  = (clone $query)->count();
-        $page       = 1;
-        $limit      = 10;
+        $query  = Vender::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
         $venders    = $query->select('id', 'name', 'email', 'contact', 'vender_id')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
         foreach($venders as $vender) {
             $vender->vender_number = $vender->venderNumber();
         }
 
-        return $this->PaginationSuccess($venders, $totalPage);
+        return $this->PaginationSuccess($venders, $page['totalPage']);
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\DefaultValue;
 use App\Models\PaymentMethod;
 use App\Models\Utility;
@@ -42,62 +43,22 @@ class PaymentMethodController extends Controller
             return $this->FailedResponse();
         }
 
-        $query = PaymentMethod::where('created_by', Auth::user()->creatorId());
-        $totalData = (clone $query)->count();
-        $page = 1;
-        $limit = 10;
+        $query  = PaymentMethod::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
         $methods = $query->select('id', 'name')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
+
         if(empty($methods)) {
             return $this->NotFoundResponse();
         }
 
-        $settings = Utility::settings();
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
-        }
-
-        return $this->FetchSuccessResponse([
-            'data'      => $methods,
-            'pages'     => $totalPage,
-            'currency'  => $settings['site_currency'],
-            'date'      => $format,
-        ]);
+        return $this->PaginationSuccess($methods, $page['totalPage']);
     }
 
     public function create()

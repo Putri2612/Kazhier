@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Exports\InvoiceExport;
 use App\Models\ActivityLog;
 use App\Models\BankAccount;
@@ -81,33 +82,8 @@ class InvoiceController extends Controller
         if($validator->fails()) {
             return $this->FailedResponse();
         }
-        $settings = Utility::settings();
 
-        $totalData = Invoice::where('created_by', Auth::user()->creatorId())->count();
-        $page = 1;
-        $limit = 10;
-
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
-            return $this->NotFoundResponse();
-        }
-
-        $query = Invoice::with(['customer:id,name', 'category:id,name'])
-                ->select('id', 'invoice_id', 'issue_date', 'due_date', 'customer_id', 'status', 'category_id', 'type')
-                ->where('created_by', Auth::user()->creatorId())
-                ->orderBy('issue_date', 'desc')
-                ->orderBy('invoice_id', 'desc')
-                ->skip($skip)->take($limit);
-
+        $query  = Invoice::where('created_by', Auth::user()->creatorId());
         if(!empty($request->input('issue_date')))
         {
             $date_range = explode(' - ', $request->input('issue_date'));
@@ -118,46 +94,33 @@ class InvoiceController extends Controller
         {
             $query->where('customer_id', '=', $request->input('customer'));
         }
-
-        $invoices = $query->get();
-
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
+        $page   = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
         }
 
+        
+
+        $invoices = $query->with(['customer:id,name', 'category:id,name'])
+                ->select('id', 'invoice_id', 'issue_date', 'due_date', 'customer_id', 'status', 'category_id', 'type')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('issue_date', 'desc')
+                ->orderBy('invoice_id', 'desc')
+                ->skip($page['skip'])->take($page['limit'])
+                ->get();
+
+        
+        
         if($invoices->isEmpty()) {
             return $this->NotFoundResponse();
-        } else {
-            foreach ($invoices as $invoice) {
-                $invoice->invoice_number = $invoice->invoiceNumber();
-                $invoice->status         = $invoice->getStatus();
-            }
-            return $this->FetchSuccessResponse([
-                'data'      => $invoices,
-                'pages'     => $totalPage,
-                'currency'  => $settings['site_currency'],
-                'date'      => $format,
-            ]);
+        } 
+        foreach ($invoices as $invoice) {
+            $invoice->invoice_number = $invoice->invoiceNumber();
+            $invoice->status         = $invoice->getStatus();
         }
+
+        return $this->PaginationSuccess($invoices, $page['totalPage']);
+        
     }
 
     public function create()

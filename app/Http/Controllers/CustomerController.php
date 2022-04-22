@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\Customer;
 use App\Models\CustomField;
 use App\Mail\UserCreate;
@@ -57,28 +58,16 @@ class CustomerController extends Controller
             return $this->FailedResponse();
         }
 
-        $query = Customer::where('created_by', Auth::user()->creatorId());
-        $totalData  = (clone $query)->count();
-        $page       = 1;
-        $limit      = 10;
+        $query  = Customer::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
         $customers  = $query->select('id', 'name', 'email', 'category_id', 'contact', 'customer_id')
                     ->with('category:id,name')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
         if(empty($customers)) {
             return $this->NotFoundResponse();
@@ -86,7 +75,7 @@ class CustomerController extends Controller
         foreach($customers as $customer) {
             $customer->customer_number = $customer->customerNumber();
         }
-        return $this->PaginationSuccess($customers, $totalPage);
+        return $this->PaginationSuccess($customers, $page['totalPage']);
     }
 
     public function create()

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\Bill;
 use App\Models\DebitNote;
 use App\Models\Utility;
@@ -51,34 +52,23 @@ class DebitNoteController extends Controller
         if($validator->fails()) {
             return $this->FailedResponse();
         }
+        
         $bills = Bill::select('id')
                 ->where('created_by', Auth::user()->creatorId())
                 ->pluck('id');
 
-        $totalData = DebitNote::whereIn('bill', $bills)->count();
-        $page = 1;
-        $limit = 10;
+        $query = DebitNote::whereIn('bill', $bills);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        $page = Pagination::getTotalPage($query, $request);
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
-        $debitNote = DebitNote::select('id', 'date', 'amount', 'description', 'bill', 'vender')
+        $debitNote = $query->select('id', 'date', 'amount', 'description', 'bill', 'vender')
                     ->with(['vender:id,name', 'getBill:id,bill_id'])
-                    ->whereIn('bill', $bills)
                     ->orderBy('date', 'desc')
                     ->orderBy('bill', 'desc')
-                    ->skip($skip)->take($limit)
+                    ->skip($page['skip'])->take($page['limit'])
                     ->get();
 
         if($debitNote->isEmpty()) {
@@ -88,37 +78,7 @@ class DebitNoteController extends Controller
             $note->bill_number = $note->getBill->billNumber();
         }
 
-        $settings = Utility::settings();
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
-        }
-
-        return $this->FetchSuccessResponse([
-            'data'      => $debitNote,
-            'pages'     => $totalPage,
-            'currency'  => $settings['site_currency'],
-            'date'      => $format,
-        ]);
+        return $this->PaginationSuccess($debitNote, $page['totalPage']);
         
     }
 

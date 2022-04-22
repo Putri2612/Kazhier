@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\DefaultValue;
 use App\Models\ProductServiceUnit;
 use App\Models\Utility;
@@ -27,7 +28,7 @@ class ProductServiceUnitController extends Controller
 
     public function get(Request $request) {
         if(!Auth::user()->can('manage constant unit')) {
-            return $this->NotFoundResponse();
+            return $this->UnauthorizedResponse();
         }
 
         $validator = Validator::make($request->all(), [
@@ -40,62 +41,21 @@ class ProductServiceUnitController extends Controller
         }
 
         $query = ProductServiceUnit::where('created_by', Auth::user()->creatorId());
-        $totalData  = (clone $query)->count();
-        $page       = 1;
-        $limit      = 10;
+        $page = Pagination::getTotalPage($query, $request);
 
-        if(!empty($request->input('page'))) {
-            $page = intval($request->input('page'));
-        }
-
-        if(!empty($request->input('limit'))) {
-            $limit = intval($request->input('limit'));
-        }
-        $totalPage  = ceil($totalData / $limit);
-        $skip       = ($page - 1) * $limit;
-
-        if($page > $totalPage) {
+        if($page === false) {
             return $this->NotFoundResponse();
         }
 
         $units = $query->select('name', 'id')
-                ->skip($skip)->take($limit)
+                ->skip($page['skip'])->take($page['limit'])
                 ->get();
 
         if(empty($units)) {
             return $this->NotFoundResponse();
         }
 
-        $settings = Utility::settings();
-        $dateFormat = [
-            'short' => [
-                'year'  => 'numeric',
-                'month' => 'short',
-                'day'   => 'numeric'
-            ],
-            'long' => [
-                'year'  => 'numeric',
-                'month' => 'long',
-                'day'   => 'numeric',
-            ], 
-            'numeric' => [
-                'year'  => 'numeric',
-                'month' => 'numeric',
-                'day'   => 'numeric'
-            ]
-        ];
-        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
-            $format = $dateFormat[$settings['site_date_format']];
-        } else {
-            $format = $dateFormat['short'];
-        }
-
-        return $this->FetchSuccessResponse([
-            'data'      => $units,
-            'pages'     => $totalPage,
-            'currency'  => $settings['site_currency'],
-            'date'      => $format,
-        ]);
+        return $this->PaginationSuccess($units, $page['totalPage']);
     }
 
     public function create()
