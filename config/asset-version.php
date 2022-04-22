@@ -20,5 +20,6 @@
     'custom' => 2,
     'inputsuggestion' => 1,
     'scripts' => 2,
+    'pagination' => 1,
   ),
 );
