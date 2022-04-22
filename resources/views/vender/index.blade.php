@@ -15,9 +15,11 @@
             $("[name='shipping_address']").val($("[name='billing_address']").val());
         })
         $(document).on('click', '#vend_detail', function () {
-            $('#cust_table').addClass('col-6').removeClass('col-12')
-            $('#customer_details').removeClass('d-none');
-            $('#customer_details').addClass('d-block');
+            const detail = document.querySelector('#vender-detail'),
+                content  = detail.querySelector('#detail');
+            detail.classList.remove('d-none');
+            detail.classList.add('d-block');
+
             var id = $(this).data('id');
             var url = $(this).data('url');
             $.ajax({
@@ -25,7 +27,8 @@
                 type: 'GET',
                 cache: false,
                 success: function (data) {
-                    $('#customer_details').html(data);
+                    content.innerHTML = data;
+                    detail.scrollIntoView();
                 },
 
             });
@@ -38,6 +41,35 @@
                 });
             });
         });
+
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                let showURL = "{{route('vender.show',':id')}}";
+                showURL     = showURL.replace(':id', data.id);
+                return `
+                    <tr class="font-style cust_tr" id="vend_detail" data-url="${showURL}" data-id="${data.id}">
+                        <td><a href="#" class="btn btn-outline-primary">${data.vender_number}</a></td>
+                        <td>${data.name}</td>
+                        <td>${data.contact}</td>
+                        <td>${data.email}</td>
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
     </script>
 @endpush
 @section('page-title')
@@ -55,51 +87,46 @@
         <div class="row">
             <div class="col-12">
                 <div class="row crd mb-3">
-                    <h4 class="col-6 fw-normal">{{__('Manage Vendor')}}</h4>
-                    <div class="col-6 text-end">
+                    <h4 class="col-12 col-md-6 fw-normal">{{__('Manage Vendor')}}</h4>
+                    <div class="col-12 col-md-6 row justify-content-end">
                         @can('create vender')
-                            <a href="#" data-size="2xl" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}" class="btn btn-icon icon-left btn-primary btn-round commonModal">
-                                <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
-                                <span class="btn-inner--text"> {{__('Create')}}</span>
-                            </a>
+                            <div class="col-auto">
+                                <a href="#" data-size="2xl" data-url="{{ route('vender.create') }}" data-ajax-popup="true" data-title="{{__('Create New Vendor')}}" class="btn btn-icon icon-left btn-primary commonModal">
+                                    <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
+                                    <span class="btn-inner--text"> {{__('Create')}}</span>
+                                </a>
+                            </div>
                         @endcan
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12" id="cust_table">
-                                <table class="table table-flush dataTable">
-                                    <thead class="thead-light">
-                                    <tr>
-                                        <th>#</th>
-                                        <th> {{__('Name')}}</th>
-                                        <th> {{__('Contact')}}</th>
-                                        <th> {{__('Email')}}</th>
-                                        <th></th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach ($venders as $k=>$Vender)
-                                        <tr class="cust_tr" id="vend_detail" data-url="{{route('vender.show',$Vender['id'])}}" data-id="{{$Vender['id']}}">
-                                            <td><a href="#" class="btn btn-outline-primary"> {{ AUth::user()->venderNumberFormat($Vender['vender_id']) }}</a></td>
-                                            <td>{{$Vender['name']}}</td>
-                                            <td>{{$Vender['contact']}}</td>
-                                            <td>{{$Vender['email']}}</td>
-                                            <td>
-                                                @if($Vender['is_active']==0)
-                                                    <i class="fa fa-lock" title="Inactive"></i>
-                                                @endif
-                                            </td>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div id="pagination-limit" class="col-auto"></div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('vender.get') }}">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th>#</th>
+                                            <th> {{__('Name')}}</th>
+                                            <th> {{__('Contact')}}</th>
+                                            <th> {{__('Email')}}</th>
                                         </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-6 d-none" id="customer_details">
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="pagination-container"></div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="card d-none" id="vender-detail">
+                    <div class="card-body" id="detail"></div>
                 </div>
             </div>
         </div>

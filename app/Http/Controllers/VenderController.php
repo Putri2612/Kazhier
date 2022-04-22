@@ -7,15 +7,18 @@ use App\Mail\UserCreate;
 use App\Models\Plan;
 use App\Models\Transaction;
 use App\Models\Vender;
+use App\Traits\ApiResponse;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
 class VenderController extends Controller
 {
+    use ApiResponse;
 
     public function dashboard()
     {
@@ -36,6 +39,49 @@ class VenderController extends Controller
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage vender')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = Vender::where('created_by', Auth::user()->creatorId());
+        $totalData  = (clone $query)->count();
+        $page       = 1;
+        $limit      = 10;
+
+        if(!empty($request->input('page'))) {
+            $page = intval($request->input('page'));
+        }
+
+        if(!empty($request->input('limit'))) {
+            $limit = intval($request->input('limit'));
+        }
+        $totalPage  = ceil($totalData / $limit);
+        $skip       = ($page - 1) * $limit;
+
+        if($page > $totalPage) {
+            return $this->NotFoundResponse();
+        }
+
+        $venders    = $query->select('id', 'name', 'email', 'contact', 'vender_id')
+                    ->skip($skip)->take($limit)
+                    ->get();
+        foreach($venders as $vender) {
+            $vender->vender_number = $vender->venderNumber();
+        }
+
+        return $this->PaginationSuccess($venders, $totalPage);
     }
 
 

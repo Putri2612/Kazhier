@@ -232,7 +232,7 @@ Route::prefix('app')->group(
                 Route::post('customer-category/get', [CustomerCategoryController::class, 'get'])->name('customer-category.get');
                 Route::resource('customer-category', CustomerCategoryController::class);
 
-        
+                Route::post('vender/get', [VenderController::class, 'get'])->name('vender.get');
                 Route::resource('vender', VenderController::class);
         
                 Route::resource('bank-account', BankAccountController::class);
