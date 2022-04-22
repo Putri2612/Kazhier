@@ -215,6 +215,7 @@ Route::prefix('app')->group(
                 Route::get('company-setting', [SystemController::class, 'companyIndex'])->name('company.setting');
                 Route::post('business-setting', [SystemController::class, 'saveBusinessSettings'])->name('business.setting');
         
+                Route::post('productservice/get', [ProductServiceController::class, 'get'])->name('productservice.get');
                 Route::get('productservice/export', [ProductServiceController::class, 'export'])->name('productservice.export');
                 Route::get('productservice/import', [ProductServiceController::class, 'import'])->name('productservice.import');
                 Route::put('productservice/import/', [ProductServiceController::class, 'storeImport'])->name('productservice.import.store');
@@ -223,13 +224,15 @@ Route::prefix('app')->group(
                 
                 Route::get('customer/ajax/{name}', [ApiCustomerController::class, 'name'])->name('customer.name.ajax');
                 
+                Route::post('customer/get', [CustomerController::class, 'get'])->name('customer.get');
                 Route::resource('customer', CustomerController::class);
 
                 Route::get('customer-category/ajax/{category_id}', [ApiCustomerCategoryController::class, 'get'])->name('customer.category.ajax');
 
+                Route::post('customer-category/get', [CustomerCategoryController::class, 'get'])->name('customer-category.get');
                 Route::resource('customer-category', CustomerCategoryController::class);
 
-        
+                Route::post('vender/get', [VenderController::class, 'get'])->name('vender.get');
                 Route::resource('vender', VenderController::class);
         
                 Route::resource('bank-account', BankAccountController::class);
@@ -258,9 +261,13 @@ Route::prefix('app')->group(
                 // Tax, category, unit, method
                 Route::resource('taxes', TaxController::class);
                 Route::get('product-category/suggestion', [ProductServiceCategoryController::class, 'createSuggestions'])->name('product-category.suggestion');
+                Route::post('{type}/category/get', [ProductServiceCategoryController::class, 'get'])->name('category.get');
                 Route::resource('{type}/category', ProductServiceCategoryController::class);
         
+                Route::post('product-unit/get', [ProductServiceUnitController::class, 'get'])->name('product-unit.get');
                 Route::resource('product-unit', ProductServiceUnitController::class);
+
+                Route::post('payment-method/get', [PaymentMethodController::class, 'get'])->name('payment-method.get');
                 Route::resource('payment-method', PaymentMethodController::class);
         
                 // Income
@@ -270,11 +277,13 @@ Route::prefix('app')->group(
         
                 Route::prefix('invoice')->as('invoice.')->group(
                     function () {
+                        Route::post('get', [InvoiceController::class, 'get'])->name('get');
+
                         Route::get('{id}/credit-note', [CreditNoteController::class, 'create'])->name('credit.note');
                         Route::post('{id}/credit-note', [CreditNoteController::class, 'store'])->name('credit.note.store');
                         Route::get('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'edit'])->name('edit.credit.note');
                         Route::put('{id}/credit-note/edit/{cn_id}', [CreditNoteController::class, 'update'])->name('update.credit.note');
-                        Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('delete.credit.note');
+                        Route::delete('{id}/credit-note/delete/{cn_id}', [CreditNoteController::class, 'destroy'])->name('destroy.credit.note');
         
                         Route::get('{id}/duplicate', [InvoiceController::class, 'duplicate'])->name('duplicate');
                         Route::get('{id}/shipping/print', [InvoiceController::class, 'shippingDisplay'])->name('shipping.print');
@@ -305,9 +314,10 @@ Route::prefix('app')->group(
                 Route::post('invoices/template/setting', [InvoiceController::class, 'saveTemplateSettings'])->name('template.setting');
         
                 Route::get('credit-note', [CreditNoteController::class, 'index'])->name('credit.note');
+                Route::post('credit-note/get', [CreditNoteController::class, 'get'])->name('credit.note.get');
                 Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
                 Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
-                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('invoice.get');
+                Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('get.invoice.credit.note');
         
                 Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
@@ -319,6 +329,8 @@ Route::prefix('app')->group(
         
                 Route::prefix('bill')->as('bill.')->group(
                     function() {
+                        Route::post('get', [BillController::class, 'get'])->name('get');
+
                         Route::get('{id}/debit-note', [DebitNoteController::class, 'create'])->name('debit.note');
                         Route::post('{id}/debit-note', [DebitNoteController::class, 'store'])->name('debit.note.store');
                         Route::get('{id}/debit-note/edit/{cn_id}', [DebitNoteController::class, 'edit'])->name('edit.debit.note');
@@ -346,9 +358,10 @@ Route::prefix('app')->group(
                 Route::post('bill/template/setting', [BillController::class, 'saveBillTemplateSettings'])->name('bill.template.setting');
         
                 Route::get('debit-note', [DebitNoteController::class, 'index'])->name('debit.note');
+                Route::post('debit-note/get', [DebitNoteController::class, 'get'])->name('debit.note.get');
                 Route::get('custom-debit-note', [DebitNoteController::class, 'customCreate'])->name('bill.custom.debit.note');
                 Route::post('custom-debit-note', [DebitNoteController::class, 'customStore'])->name('bill.custom.debit.note.store');
-                Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get');
+                Route::get('debit-note/bill', [DebitNoteController::class, 'getbill'])->name('bill.get.debit.note');
         
                 Route::get('payment/export', [PaymentController::class, 'export'])->name('payment.export');
                 Route::get('payment/import', [PaymentController::class, 'import'])->name('payment.import');

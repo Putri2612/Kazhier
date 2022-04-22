@@ -30,6 +30,16 @@ class Bill extends Model
         'Paid',
     ];
 
+    public function getStatus() {
+        return self::$statuses[$this->status];
+    }
+
+    public function billNumber() {
+        $settings = Utility::settings();
+
+        return $settings["bill_prefix"] . sprintf("%05d", $this->bill_id);
+    }
+
     public function vender()
     {
         return $this->hasOne(Vender::class, 'id', 'vender_id');

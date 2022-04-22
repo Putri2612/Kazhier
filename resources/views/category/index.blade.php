@@ -2,6 +2,55 @@
 @section('page-title')
     {{__($displayType . " Category")}}
 @endsection
+@push('script-page')
+    <script>
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                @can('edit constant category')
+                    let editURL = "{{ route('category.edit', ['type' => $type, 'category' => ':id']) }}";
+                    editURL     = editURL.replace(':id', data.id);
+                @endcan
+                @can('delete constant category')
+                    let deleteURL = "{{ route('category.destroy', ['type' => $type, 'category' => ':id']) }}";
+                    deleteURL     = deleteURL.replace(':id', data.id);
+                @endcan
+                return `
+                    <tr class="font-style">
+                        <td>${data.name}</td>
+                        @if(Gate::check('edit constant category') || Gate::check('delete constant category'))
+                            <td class="action text-end">
+                                @can('edit constant category')
+                                    <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__("Edit {$displayType} Category")}}">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                @endcan
+                                @can('delete constant category')
+                                    <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="${deleteURL}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                @endcan
+                            </td>
+                        @endif
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
+    </script>
+@endpush
 @section('content')
     <section class="section">
         <div class="section-header">
@@ -30,39 +79,28 @@
                             <div class="card-body p-0">
                                 <div class="tab-content">
                                     <div id="table-1_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
+                                        <div class="row">
+                                            <div id="pagination-limit" class="col-auto"></div>
+                                        </div>
                                         <div class="table-responsive">
                                             <div class="row">
                                                 <div class="col-sm-12">
-                                                    <table class="table table-flush dataTable">
+                                                    <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('category.get', $type) }}">
                                                         <thead class="thead-light">
                                                         <tr>
                                                             <th>{{__('Type')}}</th>
-                                                            <th class="text-end">{{__('Action')}}</th>
+                                                            @if(Gate::check('edit constant category') || Gate::check('delete constant category'))
+                                                                <th class="text-end">{{__('Action')}}</th>
+                                                            @endif
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        @foreach ($category as $item)
-                                                            <tr>
-                                                                <td class="font-style">{{ $item->name }}</td>
-                                                                <td class="action text-end">
-                                                                    @can('edit constant category')
-                                                                        <a href="#" class="btn btn-primary btn-action me-1" data-url="{{ route('category.edit', ['type' => $type, 'category' => $item->id]) }}" data-ajax-popup="true" data-title="{{__("Edit {$displayType} Category")}}" data-bs-toggle="tooltip" data-original-title="{{__('Edit')}}">
-                                                                            <i class="fas fa-pencil-alt"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                    @can('delete constant category')
-                                                                        <a href="#!" class="btn btn-danger btn-action" data-is-delete data-delete-url="{{ route('category.destroy', ['type' => $type, 'category' => $item->id]) }}">
-                                                                            <i class="fas fa-trash"></i>
-                                                                        </a>
-                                                                    @endcan
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div id="pagination-container"></div>
                                     </div>
                                 </div>
                             </div>

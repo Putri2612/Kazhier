@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\CustomerCategory;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
@@ -11,11 +14,39 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerCategoryController extends Controller
 {
-    use CanProcessNumber, CanRedirect;
+    use CanProcessNumber, CanRedirect, ApiResponse;
     public function index() {
         $categories = CustomerCategory::where('created_by', Auth::user()->creatorId())->get();
 
         return view('customer.category.index', compact('categories'));
+    }
+
+    public function get(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query  = CustomerCategory::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $categories = $query->select('id', 'name', 'discount', 'discount_type AS type', 'max_discount')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+
+        if(empty($categories)) {
+            return $this->NotFoundResponse();
+        }
+        
+        return $this->PaginationSuccess($categories, $page['totalPage']);
     }
 
     public function create() {

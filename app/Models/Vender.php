@@ -47,6 +47,11 @@ class Vender extends Authenticatable
 
     public $settings;
 
+    public function venderNumber() {
+        $settings = Utility::settings();
+
+        return $settings["vender_prefix"] . sprintf("%05d", $this->vender_id);
+    }
 
     public function authId()
     {

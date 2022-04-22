@@ -6,7 +6,6 @@
 
 @push('script-page')
     <script>
-
         $(document).on('click', '#billing_data', function () {
             $("[name='shipping_name']").val($("[name='billing_name']").val());
             $("[name='shipping_country']").val($("[name='billing_country']").val());
@@ -17,9 +16,10 @@
             $("[name='shipping_address']").val($("[name='billing_address']").val());
         })
         $(document).on('click', '#cust_detail', function () {
-            $('#cust_table').addClass('col-6').removeClass('col-12')
-            $('#customer_details').removeClass('d-none');
-            $('#customer_details').addClass('d-block');
+            const detail = document.querySelector('#customer_details'),
+                content = detail.querySelector('#content');
+            detail.classList.remove('d-none');
+            detail.classList.add('d-block');
             var id = $(this).data('id');
             var url = $(this).data('url');
             $.ajax({
@@ -27,7 +27,8 @@
                 type: 'GET',
                 cache: false,
                 success: function (data) {
-                    $('#customer_details').html(data);
+                    content.innerHTML = data;
+                    detail.scrollIntoView();
                 },
 
             });
@@ -39,6 +40,37 @@
                 });
             });
         });
+
+        try {
+            const pagination = new Pagination({
+                locale: '{{ config('app.locale') }}',
+                pageContainer: '#pagination-container',
+                limitContainer: '#pagination-limit',
+                navigation: {
+                    previous: `<i class="fa-solid fa-chevron-left"></i>`,
+                    next: `<i class="fa-solid fa-chevron-right"></i>`,
+                    limit: '{{ __('Entries each page') }}'
+                }
+            });
+            pagination.format = data => {
+                const category = data.category ? data.category.name : "{{ __('General customer') }}";
+                let showURL = "{{route('customer.show',':id')}}";
+                showURL     = showURL.replace(':id', data.id);
+                return `
+                    <tr class="font-style cust_tr" id="cust_detail" data-url="${showURL}" data-id="${data.id}">
+                        <td><a href="#" class="btn btn-outline-primary">${data.customer_number}</a></td>
+                        <td>${data.name}</td>
+                        <td>${data.contact}</td>
+                        <td>${data.email}</td>
+                        <td>${category}</td>
+                    </tr>
+                `;
+            }
+            pagination.init();
+        } catch (error) {
+            console.log(error);
+            toastrs('Error', error, 'error');
+        }
     </script>
 
 @endpush
@@ -61,7 +93,7 @@
                     <div class="col-6 text-end row justify-content-end">
                         <div class="col-auto">
                             @can('create customer')
-                                <a href="#" data-size="2xl" data-url="{{ route('customer.create') }}" data-ajax-popup="true" data-title="{{__('Create New Customer')}}" class="btn btn-icon icon-left btn-primary commonModal btn-round">
+                                <a href="#" data-size="2xl" data-url="{{ route('customer.create') }}" data-ajax-popup="true" data-title="{{__('Create New Customer')}}" class="btn btn-icon icon-left btn-primary commonModal">
                                     <span class="btn-inner--icon"><i class="fas fa-plus"></i></span>
                                     <span class="btn-inner--text"> {{__('Create')}}</span>
                                 </a>
@@ -73,34 +105,32 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-12" id="cust_table">
-                                <table class="table table-flush dataTable">
-                                    <thead class="thead-light">
-                                    <tr>
-                                        <th>#</th>
-                                        <th> {{__('Name')}}</th>
-                                        <th> {{__('Contact')}}</th>
-                                        <th> {{__('Email')}}</th>
-                                        <th> {{ __('Category') }} </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach ($customers as $k=>$customer)
-                                        @php
-                                            $category = $customer->category? $customer->category->name : __('General customer');
-                                        @endphp
-                                        <tr class="cust_tr" id="cust_detail" data-url="{{route('customer.show',$customer['id'])}}" data-id="{{$customer['id']}}">
-                                            <td><a href="#" class="btn btn-outline-primary">{{ AUth::user()->customerNumberFormat($customer['customer_id']) }}</a></td>
-                                            <td class="font-style">{{$customer['name']}}</td>
-                                            <td>{{$customer['contact']}}</td>
-                                            <td>{{$customer['email']}}</td>
-                                            <td>{{ $category }}</td>
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
+                                <div class="row">
+                                    <div id="pagination-limit" class="col-auto"></div>
+                                </div>
+                                <div class="table-resposive">
+                                    <table class="table table-flush dataTable no-paginate" data-pagination-table data-pagination-url="{{ route('customer.get') }}">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{__('Name')}}</th>
+                                                <th>{{__('Contact')}}</th>
+                                                <th>{{__('Email')}}</th>
+                                                <th>{{ __('Category') }} </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div id="pagination-container"></div>
                             </div>
-                            <div class="col-md-6 d-none" id="customer_details">
-                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none card" id="customer_details">
+                    <div class="card-body">
+                        <div id="content">
                         </div>
                     </div>
                 </div>

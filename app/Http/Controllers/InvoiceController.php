@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Exports\InvoiceExport;
 use App\Models\ActivityLog;
 use App\Models\BankAccount;
@@ -22,6 +23,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\Task;
 use App\Models\Transaction;
 use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
@@ -32,11 +34,15 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanRedirect;
+    use CanManageBalance, 
+        CanProcessNumber, 
+        CanRedirect,
+        ApiResponse;
 
     public function __construct()
     {
@@ -52,34 +58,69 @@ class InvoiceController extends Controller
             $customer->prepend(__('All'), '');
 
             $status = [];
-            // foreach (Invoice::$statuses as $stat) {
-            //     $status[] = __($stat);
-            // }
 
-            $query = Invoice::with(['customer', 'category'])->where('created_by', '=', Auth::user()->creatorId());
-
-            if(!empty($request->customer))
-            {
-                $query->where('id', '=', $request->customer);
-            }
-            if(!empty($request->issue_date))
-            {
-                $date_range = explode(' - ', $request->issue_date);
-                $query->whereBetween('issue_date', $date_range);
-            }
-
-            if(!empty($request->status))
-            {
-                $query->where('status', '=', $request->status);
-            }
-            $invoices = $query->get();
-
-            return view('invoice.index', compact('invoices', 'customer', 'status'));
+            return view('invoice.index', compact('customer', 'status'));
         }
         else
         {
             return $this->RedirectDenied();
         }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage invoice')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+            'issue_date'        => 'nullable|regex:/^[\d\-\s]*/i',
+            'customer'          => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query  = Invoice::where('created_by', Auth::user()->creatorId());
+        if(!empty($request->input('issue_date')))
+        {
+            $date_range = explode(' - ', $request->input('issue_date'));
+            $query->whereBetween('issue_date', $date_range);
+        }
+
+        if(!empty($request->input('customer')))
+        {
+            $query->where('customer_id', '=', $request->input('customer'));
+        }
+        $page   = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        
+
+        $invoices = $query->with(['customer:id,name', 'category:id,name'])
+                ->select('id', 'invoice_id', 'issue_date', 'due_date', 'customer_id', 'status', 'category_id', 'type')
+                ->where('created_by', Auth::user()->creatorId())
+                ->orderBy('issue_date', 'desc')
+                ->orderBy('invoice_id', 'desc')
+                ->skip($page['skip'])->take($page['limit'])
+                ->get();
+
+        
+        
+        if($invoices->isEmpty()) {
+            return $this->NotFoundResponse();
+        } 
+        foreach ($invoices as $invoice) {
+            $invoice->invoice_number = $invoice->invoiceNumber();
+            $invoice->status         = $invoice->getStatus();
+        }
+
+        return $this->PaginationSuccess($invoices, $page['totalPage']);
+        
     }
 
     public function create()

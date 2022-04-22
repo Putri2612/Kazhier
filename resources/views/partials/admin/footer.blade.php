@@ -15,7 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
 
 <script src="{{ asset('assets/js/InputSuggestion.js') }}?{{ config('asset-version.js.inputsuggestion') }}"></script>
-<script src="{{ asset('assets/js/pagination.min.js') }}?{{ config('asset-version.js.inputsuggestion') }}"></script>
+<script src="{{ asset('assets/js/pagination.min.js') }}?{{ config('asset-version.js.pagination') }}"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" type="text/javascript"></script>
 <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>

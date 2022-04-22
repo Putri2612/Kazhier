@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\DefaultValue;
 use App\Models\ProductServiceCategory;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ProductServiceCategoryController extends Controller
 {
+    use ApiResponse;
     private $types = ['product-service' => 0, 'income' => 1, 'expense' => 2];
     public function index($type)
     {
@@ -20,16 +24,54 @@ class ProductServiceCategoryController extends Controller
                 abort(404);
             }
             if(!empty($type)) {
-                $category   = ProductServiceCategory::where('type', $this->types[$type])->where('created_by', Auth::user()->creatorId())->get();
                 $displayType= ucwords(str_replace('-',' & ',$type));
 
-                return view("category.index", compact('category', 'type', 'displayType'));
+                return view("category.index", compact('type', 'displayType'));
             }
         }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function get(Request $request, $type) {
+        if(!Auth::user()->can('manage constant category')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        if(empty($type) || !array_key_exists($type, $this->types)) {
+            return $this->NotFoundResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        $type = $this->types[$type];
+
+        $query = ProductServiceCategory::where('created_by', Auth::user()->creatorId())
+                ->where('type', $type);
+
+        $page = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $categories = $query->select('name', 'id')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+
+        if($categories->isEmpty()) {
+            return $this->NotFoundResponse();
+        }
+
+        return $this->PaginationSuccess($categories, $page['totalPage']);
     }
 
 

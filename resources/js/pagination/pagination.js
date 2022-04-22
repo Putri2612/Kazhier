@@ -52,6 +52,10 @@ class Pagination {
         this.renderLimiter();
     }
 
+    set additionalData(data = new FormData) {
+        this._additionalData = data;
+    }
+
     set format(format = () => '') {
         this._format = format;
     }
@@ -69,6 +73,12 @@ class Pagination {
             data = new FormData(this._form);
         } else {
             data = new FormData;
+        }
+
+        if(this._additionalData) {
+            for(let additional of this._additionalData.entries()) {
+                data.append(additional[0], additional[1]);
+            }
         }
 
         data.append('page', this._page);
@@ -120,22 +130,22 @@ class Pagination {
     }
 
     renderPaginator(totalPage) {
+        let container;
+        if(this._paginator) {
+            container = this._paginator;
+        } else {
+            container = this._table.parentNode;
+        }
+        let nav;
+        if(container.querySelector('nav')) {
+            nav = container.querySelector('nav');
+            nav.innerHTML = '';
+        } else {
+            nav = document.createElement('nav');
+            nav.setAttribute('aria-label', 'Data page navigation');
+            container.appendChild(nav);
+        }
         if(totalPage > 1) {
-            let container;
-            if(this._paginator) {
-                container = this._paginator;
-            } else {
-                container = this._table.parentNode;
-            }
-            let nav;
-            if(container.querySelector('nav')) {
-                nav = container.querySelector('nav');
-                nav.innerHTML = '';
-            } else {
-                nav = document.createElement('nav');
-                nav.setAttribute('aria-label', 'Data page navigation');
-                container.appendChild(nav);
-            }
 
             const list    = document.createElement('ul');
             
@@ -224,6 +234,10 @@ class Pagination {
         label.innerText = this._navigation.limit;
         label.className = 'form-label';
         container.appendChild(label);
+    }
+
+    numberFormat(number) {
+        return new Intl.NumberFormat([this._locale, 'id']).format(number);
     }
 
     priceFormat(number) {

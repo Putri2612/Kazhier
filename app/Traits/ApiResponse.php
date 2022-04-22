@@ -2,6 +2,8 @@
 
 namespace App\Traits;
 
+use App\Models\Utility;
+
 trait ApiResponse {
 
     public function FailedResponse($message = 'Something went wrong :(', $status = 400) {
@@ -50,5 +52,38 @@ trait ApiResponse {
 
     public function ViewResponse($route) {
         return $this->SuccessResponse(['url' => route($route)]);
+    }
+
+    public function PaginationSuccess($data, $totalPage) {
+        $settings = Utility::settings();
+        $dateFormat = [
+            'short' => [
+                'year'  => 'numeric',
+                'month' => 'short',
+                'day'   => 'numeric'
+            ],
+            'long' => [
+                'year'  => 'numeric',
+                'month' => 'long',
+                'day'   => 'numeric',
+            ], 
+            'numeric' => [
+                'year'  => 'numeric',
+                'month' => 'numeric',
+                'day'   => 'numeric'
+            ]
+        ];
+        if(in_array($settings['site_date_format'], array_keys($dateFormat))) {
+            $format = $dateFormat[$settings['site_date_format']];
+        } else {
+            $format = $dateFormat['short'];
+        }
+
+        return $this->FetchSuccessResponse([
+            'data'      => $data,
+            'pages'     => $totalPage,
+            'currency'  => $settings['site_currency'],
+            'date'      => $format,
+        ]);
     }
 }

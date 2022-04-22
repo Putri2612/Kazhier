@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\Helper;
+use App\Classes\Pagination;
 use App\Models\BankAccount;
 use App\Models\Bill;
 use App\Models\BillPayment;
@@ -18,6 +19,7 @@ use App\Models\ProductServiceCategory;
 use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
@@ -31,7 +33,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BillController extends Controller
 {
-    use CanManageBalance, CanProcessNumber, CanRedirect;
+    use CanManageBalance, CanProcessNumber, CanRedirect, ApiResponse;
 
     public function index(Request $request)
     {
@@ -72,6 +74,56 @@ class BillController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage bill')) {
+            return $this->UnauthorizedResponse();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'page'          => 'nullable|numeric',
+            'limit'         => 'nullable|numeric',
+            'issue_date'    => 'nullable|regex:/^[\d\-\s]*/i',
+            'vender'        => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = Bill::where('created_by', Auth::user()->creatorId());
+        
+        if(!empty($request->input('bill_date')))
+        {
+            $date_range = explode(' - ', $request->input('bill_date'));
+            $query->whereBetween('bill_date', $date_range);
+        }
+
+        if(!empty($request->input('vender')))
+        {
+            $query->where('vender_id', '=', $request->input('vender'));
+        }
+        $page = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $bills = $query->with(['vender:id,name', 'category:id,name'])
+            ->select('id', 'bill_id', 'bill_date', 'due_date', 'vender_id', 'status', 'category_id')
+            ->where('created_by', Auth::user()->creatorId())
+            ->orderBy('bill_date', 'desc')
+            ->orderBy('bill_id', 'desc')
+            ->skip($page['skip'])->take($page['limit'])
+            ->get();
+
+        if($bills->isEmpty()) {
+            return $this->NotFoundResponse();
+        }
+        foreach ($bills as $bill) {
+            $bill->bill_number  = $bill->billNumber();
+            $bill->status       = $bill->getStatus();
+        }
+        return $this->PaginationSuccess($bills, $page['totalPage']);
+    }
 
     public function create()
     {
@@ -485,7 +537,7 @@ class BillController extends Controller
             $payment         = new BillPayment();
             $payment->name   = $vender['name'];
             $payment->method = $payment_method['name'];
-            $payment->date   = Helper::DateFormat($request->date);
+            $payment->date   = $request->date;
             $payment->amount = Auth::user()->priceFormat($amount);
             $payment->bill   = 'bill ' . Auth::user()->billNumberFormat($billPayment->bill_id);
 
@@ -537,7 +589,7 @@ class BillController extends Controller
         if(\Auth::user()->can('manage vender bill'))
         {
 
-            $status = Invoice::$statuses;
+            $status = Bill::$statuses;
 
             $query = Bill::where('vender_id', '=', \Auth::user()->vender_id)->where('status', '!=', '0')->where('created_by', \Auth::user()->creatorId());
 

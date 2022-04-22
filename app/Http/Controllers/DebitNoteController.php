@@ -2,16 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\Bill;
-use App\Models\CreditNote;
 use App\Models\DebitNote;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanManageBalance;
 use App\Traits\CanProcessNumber;
+use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DebitNoteController extends Controller
 {
-    use CanManageBalance, CanProcessNumber;
+    use CanManageBalance, 
+        CanProcessNumber, 
+        CanRedirect, 
+        ApiResponse;
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -31,12 +40,57 @@ class DebitNoteController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage debit note')) {
+            return $this->UnauthorizedResponse();
+        }
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+        
+        $bills = Bill::select('id')
+                ->where('created_by', Auth::user()->creatorId())
+                ->pluck('id');
+
+        $query = DebitNote::whereIn('bill', $bills);
+
+        $page = Pagination::getTotalPage($query, $request);
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $debitNote = $query->select('id', 'date', 'amount', 'description', 'bill', 'vender')
+                    ->with(['vender:id,name', 'getBill:id,bill_id'])
+                    ->orderBy('date', 'desc')
+                    ->orderBy('bill', 'desc')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+
+        if($debitNote->isEmpty()) {
+            return $this->NotFoundResponse();
+        }
+        foreach ($debitNote as $note) {
+            $note->bill_number = $note->getBill->billNumber();
+        }
+
+        return $this->PaginationSuccess($debitNote, $page['totalPage']);
+        
+    }
+
     public function create($bill_id)
     {
         if(\Auth::user()->can('create debit note'))
         {
 
             $billDue = Bill::where('id', $bill_id)->first();
+            if(empty($billDue)) {
+                return $this->NotFoundResponse();
+            }
 
             return view('debitNote.create', compact('billDue', 'bill_id'));
         }
@@ -52,9 +106,9 @@ class DebitNoteController extends Controller
         if(\Auth::user()->can('create debit note'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                ]
             );
@@ -68,7 +122,7 @@ class DebitNoteController extends Controller
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
 
             if($amount > $billDue->getDue()) {
-                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
+                return redirect()->back()->with('error', 'Maximum ' . Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
             }
             $bill                = Bill::where('id', $bill_id)->first();
             $credit              = new DebitNote();
@@ -92,8 +146,17 @@ class DebitNoteController extends Controller
     {
         if(\Auth::user()->can('edit debit note'))
         {
+            $bill       = Bill::where('id', $bill_id)->first();
 
-            $debitNote = DebitNote::find($debitNote_id);
+            if(empty($bill)) {
+                return $this->NotFoundResponse();
+            }
+
+            $debitNote  = $bill->debitNote()->where('id', $debitNote_id)->first();
+
+            if(empty($debitNote)) {
+                return $this->NotFoundResponse();
+            }
 
             return view('debitNote.edit', compact('debitNote'));
         }
@@ -110,9 +173,9 @@ class DebitNoteController extends Controller
         if(\Auth::user()->can('edit debit note'))
         {
 
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
-                                   'amount' => 'required|numeric',
+                                   'amount' => 'required',
                                    'date' => 'required',
                                ]
             );
@@ -122,14 +185,25 @@ class DebitNoteController extends Controller
 
                 return redirect()->back()->with('error', $messages->first());
             }
-            $billDue = Bill::where('id', $bill_id)->first();
+            $bill   = Bill::where('id', $bill_id)->first();
 
-            $amount = $this->ReadableNumberToFloat($request->input('amount'));
-            if($amount > $billDue->getDue()) {
-                return redirect()->back()->with('error', 'Maximum ' . \Auth::user()->priceFormat($billDue->getDue()) . ' credit limit of this bill.');
+            if(empty($bill)) {
+                return $this->RedirectNotFound();
             }
 
-            $debit              = DebitNote::find($debitNote_id);
+            $debit  = $bill->debitNote()->where('id', $debitNote_id)->first();
+
+            if(empty($debit)) {
+                return $this->RedirectNotFound();
+            }
+
+            $due = $bill->getDue() + $debit->amount;
+
+            $amount = $this->ReadableNumberToFloat($request->input('amount'));
+            if($amount > $due) {
+                return redirect()->back()->with('error', 'Maximum ' . Auth::user()->priceFormat($due) . ' credit limit of this bill.');
+            }
+
             $debit->date        = $request->input('date');
             $debit->amount      = $amount;
             $debit->description = $request->input('description');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Exports\ProductServiceExport;
 use App\Imports\ProductServiceImport;
 use App\Models\CustomField;
@@ -9,6 +10,8 @@ use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use App\Traits\CanImport;
 use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
@@ -23,26 +26,23 @@ use Symfony\Component\HttpFoundation\File\Exception\NoFileException;
 
 class ProductServiceController extends Controller
 {
-    use CanProcessNumber, CanRedirect, CanImport;
+    use CanProcessNumber, 
+        CanRedirect, 
+        CanImport, 
+        ApiResponse;
+
     public function index(Request $request)
     {
 
         if(Auth::user()->can('manage product & service'))
         {
             $creatorId = Auth::user()->creatorId();
-            $category = ProductServiceCategory::where('created_by', '=', $creatorId)->where('type', '=', 0)->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', '=', $creatorId)
+                        ->where('type', '=', 0)
+                        ->pluck('name', 'id');
+            $category->prepend(__('All'), '');
 
-            $query  = ProductService::with(['taxes', 'unit', 'category'])->where('created_by', '=', $creatorId);
-            if(!empty($request->input('category')))
-            {
-                $productServices = $query->where('category_id', $request->input('category'))->get();
-            }
-            else
-            {
-                $productServices = $query->get();
-            }
-
-            return view('productservice.index', compact('productServices', 'category'));
+            return view('productservice.index', compact('category'));
         }
         else
         {
@@ -50,6 +50,44 @@ class ProductServiceController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage product & service')) {
+            return $this->NotFoundResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+            'category'          => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = ProductService::where('created_by', Auth::user()->creatorId());
+
+        if(!empty($request->input('category'))) {
+            $query->where('category', $request->input('category'));
+        }
+
+        $page = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $products = $query->with(['taxes:id,name', 'category:id,name'])
+                    ->select('id', 'description', 'type', 'sale_price', 'purchase_price', 'tax_id', 'category_id', 'sku', 'name')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+
+        if(empty($products)) {
+            return $this->NotFoundResponse();
+        }
+
+        return $this->PaginationSuccess($products, $page['totalPage']);
+    }
 
     public function create()
     {

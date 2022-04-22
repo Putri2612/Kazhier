@@ -27,10 +27,14 @@
                         <td>${data.type}</td>
                         <td>${data.category}</td>
                         <td>${data.description}</td>
-                        <td>${data.amount}</td>
+                        <td>${amount}</td>
                     </tr>
                 `;
             }
+            @if(isset($_GET['date']) || isset($_GET['account']))
+                const form = document.querySelector('#additional');
+                pagination.additionalData = new FormData(form);
+            @endif
             pagination.init();
         } catch (error) {
             console.log(error);
@@ -50,7 +54,7 @@
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center')) }}
+                    {{ Form::open(array('route' => array('transaction.index'),'method' => 'GET', 'class' => 'row justify-content-end align-items-center', 'id' =>'additional')) }}
                         <div class="form-group col-12 col-md-6 col-lg-auto col-xxl-2">
                             {{ Form::label('date', __('Date')) }}
                             {{ Form::text('date', isset($_GET['date'])?$_GET['date']:'', array('class' => 'form-control datepicker-range')) }}

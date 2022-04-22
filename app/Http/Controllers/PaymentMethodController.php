@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\DefaultValue;
 use App\Models\PaymentMethod;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentMethodController extends Controller
 {
+    use ApiResponse;
 
     public function index()
     {
@@ -23,6 +29,37 @@ class PaymentMethodController extends Controller
         }
     }
 
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage constant payment method')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query  = PaymentMethod::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $methods = $query->select('id', 'name')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+
+        if(empty($methods)) {
+            return $this->NotFoundResponse();
+        }
+
+        return $this->PaginationSuccess($methods, $page['totalPage']);
+    }
 
     public function create()
     {

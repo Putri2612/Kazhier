@@ -2,24 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\DefaultValue;
 use App\Models\ProductServiceUnit;
+use App\Models\Utility;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class ProductServiceUnitController extends Controller
 {
+    use ApiResponse;
     public function index()
     {
         if(\Auth::user()->can('manage constant unit'))
         {
-            $units = ProductServiceUnit::where('created_by', '=', \Auth::user()->creatorId())->get();
-
-            return view('productServiceUnit.index', compact('units'));
+            return view('productServiceUnit.index');
         }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage constant unit')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query = ProductServiceUnit::where('created_by', Auth::user()->creatorId());
+        $page = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $units = $query->select('name', 'id')
+                ->skip($page['skip'])->take($page['limit'])
+                ->get();
+
+        if(empty($units)) {
+            return $this->NotFoundResponse();
+        }
+
+        return $this->PaginationSuccess($units, $page['totalPage']);
     }
 
     public function create()

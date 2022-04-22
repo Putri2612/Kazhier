@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\Pagination;
 use App\Models\CustomField;
 use App\Mail\UserCreate;
 use App\Models\Plan;
 use App\Models\Transaction;
 use App\Models\Vender;
+use App\Traits\ApiResponse;
 use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
 class VenderController extends Controller
 {
+    use ApiResponse;
 
     public function dashboard()
     {
@@ -28,14 +32,43 @@ class VenderController extends Controller
     {
         if(\Auth::user()->can('manage vender'))
         {
-            $venders = Vender::where('created_by', \Auth::user()->creatorId())->get();
-
-            return view('vender.index', compact('venders'));
+            return view('vender.index');
         }
         else
         {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+    }
+
+    public function get(Request $request) {
+        if(!Auth::user()->can('manage vender')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $validator = Validator::make($request->all(), [
+            'page'              => 'nullable|numeric',
+            'limit'             => 'nullable|numeric',
+        ]);
+
+        if($validator->fails()) {
+            return $this->FailedResponse();
+        }
+
+        $query  = Vender::where('created_by', Auth::user()->creatorId());
+        $page   = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $venders    = $query->select('id', 'name', 'email', 'contact', 'vender_id')
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+        foreach($venders as $vender) {
+            $vender->vender_number = $vender->venderNumber();
+        }
+
+        return $this->PaginationSuccess($venders, $page['totalPage']);
     }
 
 

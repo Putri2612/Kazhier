@@ -286,7 +286,7 @@
                                                             $option = $index ? "invoice with {$item}" : $item;
                                                             $option = ucfirst($option);
                                                         @endphp
-                                                        <option value="{{ $index }}" {{ $index == $type ? 'selected' : '' }}>{{ __($option) }}</option>
+                                                        <option value="{{ $index }}" {{ $index == $invoice->type ? 'selected' : '' }}>{{ __($option) }}</option>
                                                     @endforeach
                                                 </select>
                                             </div>
