@@ -212,7 +212,7 @@ class RevenueController extends Controller
             if(!empty($customer)){
                 $payment          = new InvoicePayment();
                 $payment->name    = $customer['name'];
-                $payment->date    = Helper::DateFormat($request->input('date'));
+                $payment->date    = $request->input('date');
                 $payment->amount  = \Auth::user()->priceFormat($amount);
                 $payment->invoice = '';
 

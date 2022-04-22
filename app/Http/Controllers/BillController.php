@@ -537,7 +537,7 @@ class BillController extends Controller
             $payment         = new BillPayment();
             $payment->name   = $vender['name'];
             $payment->method = $payment_method['name'];
-            $payment->date   = Helper::DateFormat($request->date);
+            $payment->date   = $request->date;
             $payment->amount = Auth::user()->priceFormat($amount);
             $payment->bill   = 'bill ' . Auth::user()->billNumberFormat($billPayment->bill_id);
 

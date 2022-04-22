@@ -98,7 +98,6 @@ class InvoicePaymentController extends Controller
             if(!empty($customer->email) && !str_contains($customer->email ,'@example.com')) {
                 $payment            = $invoicePayment;
                 $payment->name      = $customer->name;
-                $payment->date      = Helper::DateFormat($request->input('date'));
                 $payment->amount    = Auth::user()->priceFormat($amount);
                 $payment->invoice   = 'invoice ' . Auth::user()->invoiceNumberFormat($invoice->invoice_id);
                 $payment->dueAmount = Auth::user()->priceFormat($invoice->getDue());
