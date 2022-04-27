@@ -38,70 +38,52 @@
         @can('send invoice')
             <div class="row">
                 <div class="col-12">
-                    <div class="activities">
-                        <div class="activity">
-                            <div class="activity-icon bg-primary text-white shadow-primary">
-                                <i class="fas fa-plus"></i>
-                            </div>
-                            <div class="activity-detail">
-                                <div class="mb-2">
-                                    <span class="text-job text-primary"><h6>{{__('Invoice Created')}}</h6>
-                                    </span>
-                                    @if ($invoice->status < 2)
-                                        @can('edit invoice')
-                                            <a href="{{ route('invoice.edit',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
-                                                {{__('Edit')}}
-                                            </a>
-                                        @endcan
-                                    @endif
-                                </div>
-                                <p>{{__('Created on ')}} : <a href="#"> {{\Helper::DateFormat($invoice->issue_date)}} </a></p>
-                            </div>
-                        </div>
-                        <div class="activity">
-                            <div class="activity-icon bg-primary text-white shadow-primary">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <div class="activity-detail">
-                                <div class="mb-2">
-                                    <span class="text-job text-primary"><h6>{{__('Invoice Delivery')}}</h6></span>
-                                    @if($invoice->status)
-                                        <p>{{__('Status')}} : <a href="#">{{__('Sent on')}} {{ Helper::DateFormat($invoice->send_date) }}  </a></p>
-                                    @else
-                                        @can('send invoice')
-                                            <a href="{{ route('invoice.sent',$invoice->id) }}" class="btn btn-primary btn-action me-1 float-right">
-                                                {{__('Mark Sent')}}
-                                            </a>
-                                        @endcan
-                                        <p>{{__('Status')}} : <a href="#">{{__('Not Sent')}} </a></p>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
+                    <act-box>
+                        <act-item
+                            icon="plus"
+                            icon-type="solid"
+                            title="{{ __('Invoice Created') }}"
+                            details="{{ __('Created on ') }}:"
+                            details-highlight="{{Helper::DateFormat($invoice->issue_date)}}"
+                            @if ($invoice->status < 2)
+                                @can('edit invoice')
+                                    action-text="{{ __('Edit') }}"
+                                    action-url="{{ route('invoice.edit',$invoice->id) }}"
+                                @endcan
+                            @endif></act-item>
+                        <act-item
+                            icon="envelope"
+                            icon-type="solid"
+                            title="{{ __('Invoice Delivery') }}"
+                            details="{{ __('Status') }}:"
+                            @if($invoice->status)
+                                details-highlight="{{ __('Sent on') }} {{ Helper::DateFormat($invoice->send_date) }}"
+                            @else
+                                details-highlight="{{ __('Not Sent') }}"
+                                action-text="{{ __('Mark Sent') }}"
+                                action-url="{{ route('invoice.sent',$invoice->id) }}"
+                            @endif
+                        ></act-item>
                         @if (empty($invoice->type))
                             @if($invoice->status)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="far fa-money-bill-alt"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 4)
-                                            @can('create payment invoice')
-                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
-                                                    {{__('Add Payment')}}
-                                                </a>
-                                            @endcan
-                                        @endif
-                                        @if($invoice->status < 4)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
-                                        @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <act-item
+                                    icon="money-bill-alt"
+                                    icon-type="regular"
+                                    title="{{ __('Payment') }}"
+                                    @if($invoice->status < 4)
+                                        @can('create payment invoice')
+                                            action-modal="true"
+                                            action-modal-title="{{ __('Add Payment') }}"
+                                            action-url="{{ route('invoice.payment',$invoice->id) }}"
+                                            action-text="{{ __('Add Payment') }}"
+                                        @endcan
+                                        details="{{ __('Status') }}:"
+                                        details-highlight="{{ __('Awaiting payment') }}"
+                                    @else
+                                        details="{{ __('Paid on') }}:"
+                                        details-highlight="{{ Helper::DateFormat($invoice->payments->last()->created_at) }}"
+                                    @endif
+                                ></act-item>
                             @endif
                         @elseif($invoice->type == 1) 
                             @if ($invoice->status >= 1)
@@ -235,8 +217,7 @@
                                 </div>
                             @endif
                         @endif
-                        
-                    </div>
+                    </act-box>
                 </div>
             </div>
         @endcan
