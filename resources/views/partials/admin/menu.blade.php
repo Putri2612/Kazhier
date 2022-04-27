@@ -162,6 +162,11 @@
                                 <a class="nav-link" href="{{ route('productservice.index') }}">{{__('Product & Service')}}</a>
                             </li>
                         @endcan
+                        @can('manage product & service')
+                            <li class="{{ (Request::segment(2) == 'product-stock') ? 'active' : '' }}">
+                                <a class="nav-link" href="{{ route('product-stock.index') }}">{{__('Manage Stock')}}</a>
+                            </li>
+                        @endcan
                         @can('manage constant category')
                             <li class="{{ (Request::route()->getName() == 'category.index' && $type == 'product-service') ? 'active' : '' }}">
                                 <a class="nav-link" href="{{route('category.index', 'product-service')}}"> {{__('Set Category')}}</a>

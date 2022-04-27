@@ -52,6 +52,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\ProductServiceCategoryController;
 use App\Http\Controllers\ProductServiceController;
+use App\Http\Controllers\ProductServiceStockController;
 use App\Http\Controllers\ProductServiceUnitController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\ReferralController;
@@ -221,6 +222,9 @@ Route::prefix('app')->group(
                 Route::put('productservice/import/', [ProductServiceController::class, 'storeImport'])->name('productservice.import.store');
                 Route::post('productservice/import/header', [ProductServiceController::class, 'getImportHeadings'])->name('productservice.import.headings');
                 Route::resource('productservice', ProductServiceController::class);
+
+                Route::get('product-stock', [ProductServiceStockController::class, 'index'])->name('product-stock.index');
+                Route::post('product-stock/get', [ProductServiceStockController::class, 'get'])->name('product-stock.get');
                 
                 Route::get('customer/ajax/{name}', [ApiCustomerController::class, 'name'])->name('customer.name.ajax');
                 
