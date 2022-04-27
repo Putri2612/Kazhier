@@ -61,7 +61,23 @@ class ProductServiceStockController extends Controller
     }
 
     public function show($product_id) {
-        
+        if(!Auth::user()->can('manage product & service')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        $product = ProductService::where('created_by', Auth::user()->creatorId())
+                ->where('id', $product_id)->first();
+
+        if(empty($product)) {
+            return $this->NotFoundResponse();
+        }
+
+        return view('productServiceStock.show');
     }
 
+    public function history(Request $request, $product_id) {
+        if(!Auth::user()->can('manage product & service')) {
+            return $this->UnauthorizedResponse();
+        }
+    }
 }
