@@ -64,8 +64,8 @@ class DebitNoteController extends Controller
             return $this->NotFoundResponse();
         }
 
-        $debitNote = $query->select('id', 'date', 'amount', 'description', 'bill', 'vender')
-                    ->with(['vender:id,name', 'getBill:id,bill_id'])
+        $debitNote = $query->select('id', 'date', 'amount', 'description', 'bill', 'vendor')
+                    ->with(['vendor:id,name', 'getBill:id,bill_id'])
                     ->orderBy('date', 'desc')
                     ->orderBy('bill', 'desc')
                     ->skip($page['skip'])->take($page['limit'])
