@@ -1,3 +1,7 @@
+const PGSetup = {
+    EmptyText : 'No Data Found',
+}
+
 class Pagination {
     constructor({
         locale  = 'id', 
@@ -89,6 +93,12 @@ class Pagination {
         .then(response => {
             if(response.ok) {
                 return response.json();
+            } else if (response.status == 404) {
+                response.json().then(data => {
+                    toastrs('Warning', data.message, 'warning');
+                    this.loadData([]);
+                    this.renderPaginator(1);
+                })
             } else {
                 response.json().then(data => {
                     throw data.message;
@@ -110,7 +120,7 @@ class Pagination {
         });
     }
 
-    loadData(data) {
+    loadData(data = []) {
         if(typeof data === 'string') {
             data = JSON.parse(data);
         }
@@ -122,11 +132,22 @@ class Pagination {
             this._table.appendChild(tbody);
         }
 
-        data.forEach(item => {
-            let row = this._format(item);
+        if(data.length){
+            data.forEach(item => {
+                let row = this._format(item);
 
-            tbody.insertAdjacentHTML('beforeend', row);
-        });
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        } else {
+            const count = this._table.querySelectorAll('thead th').length,
+                row = document.createElement('tr'),
+                cell = document.createElement('td');
+            cell.setAttribute('colspan', count);
+            cell.className = 'text-center';
+            cell.innerHTML = PGSetup.EmptyText;
+            row.append(cell);
+            tbody.append(row);
+        }
     }
 
     renderPaginator(totalPage) {
