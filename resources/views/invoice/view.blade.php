@@ -111,28 +111,24 @@
                                 </div>
                             @endif
                             @if ($invoice->status >= 2)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="far fa-money-bill-alt"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 5)
-                                            @can('create payment invoice')
-                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
-                                                    {{__('Add Payment')}}
-                                                </a>
-                                            @endcan
-                                        @endif
-                                        @if($invoice->status < 5)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
-                                        @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <act-item
+                                    icon="money-bill-alt"
+                                    icon-type="regular"
+                                    title="{{ __('Payment') }}"
+                                    @if($invoice->status < 5)
+                                        @can('create payment invoice')
+                                            action-modal="true"
+                                            action-modal-title="{{ __('Add Payment') }}"
+                                            action-url="{{ route('invoice.payment',$invoice->id) }}"
+                                            action-text="{{ __('Add Payment') }}"
+                                        @endcan
+                                        details="{{ __('Status') }}:"
+                                        details-highlight="{{ __('Awaiting payment') }}"
+                                    @else
+                                        details="{{ __('Paid on') }}:"
+                                        details-highlight="{{ Helper::DateFormat($invoice->payments->last()->created_at) }}"
+                                    @endif
+                                ></act-item>
                             @endif
                         @elseif($invoice->type == 2)
                             @if ($invoice->status >= 1)
@@ -193,28 +189,24 @@
                                 </div>
                             @endif
                             @if ($invoice->status >= 4)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="far fa-money-bill-alt"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Payment')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 6)
-                                            @can('create payment invoice')
-                                                <a href="#!" data-url="{{ route('invoice.payment',$invoice->id) }}" data-ajax-popup="true" data-title="{{__('Add Payment')}}" class="btn btn-primary btn-action me-1 float-right">
-                                                    {{__('Add Payment')}}
-                                                </a>
-                                            @endcan
-                                        @endif
-                                        @if($invoice->status < 5)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Awaiting payment')}} </a></p>
-                                        @else
-                                            <p>{{__('Paid on')}} : <a href="#">{{ Helper::DateFormat($invoice->payments->last()->created_at) }} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <act-item
+                                    icon="money-bill-alt"
+                                    icon-type="regular"
+                                    title="{{ __('Payment') }}"
+                                    @if($invoice->status < 6)
+                                        @can('create payment invoice')
+                                            action-modal="true"
+                                            action-modal-title="{{ __('Add Payment') }}"
+                                            action-url="{{ route('invoice.payment',$invoice->id) }}"
+                                            action-text="{{ __('Add Payment') }}"
+                                        @endcan
+                                        details="{{ __('Status') }}:"
+                                        details-highlight="{{ __('Awaiting payment') }}"
+                                    @else
+                                        details="{{ __('Paid on') }}:"
+                                        details-highlight="{{ Helper::DateFormat($invoice->payments->last()->created_at) }}"
+                                    @endif
+                                ></act-item>
                             @endif
                         @endif
                     </act-box>
