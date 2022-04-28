@@ -13,6 +13,7 @@ class ActivityItem extends BaseModel {
             'action-modal-title',
             'action-text', 
             'action-url',
+            'action-method',
         ];
     }
 
@@ -39,7 +40,8 @@ class ActivityItem extends BaseModel {
             'action-modal',
             'action-modal-title',
             'action-text', 
-            'action-url'
+            'action-url',
+            'action-method',
         ];
     }
 
@@ -58,22 +60,32 @@ class ActivityItem extends BaseModel {
             highlight = '';
 
         if('action-text' in this.attr && 'action-url' in this.attr) {
-            let href = this.attr['action-url'];
-            if('action-modal' in this.attr && 'action-modal-title' in this.attr) {
-                href= '#!';
+            if('action-method' in this.attr) {
+                console.log('I have method');
+                action = `<form-btn
+                            method="${this.attr['action-method']}"
+                            text="${this.attr['action-text']}"
+                            type="button"
+                            url="${this.attr['action-url']}"
+                            ></form-btn>`;
+            } else {
+                let href = this.attr['action-url'];
+                if('action-modal' in this.attr && 'action-modal-title' in this.attr) {
+                    href= '#!';
+                    action = `
+                    data-ajax-popup="true"
+                    data-title="${this.attr['action-modal-title']}"
+                    data-url="${this.attr['action-url']}"
+                    `;
+                }
                 action = `
-                data-ajax-popup="true"
-                data-title="${this.attr['action-modal-title']}"
-                data-url="${this.attr['action-url']}"
+                <a href="${href}"
+                    class="btn btn-primary btn-action me-1 float-right"
+                    ${action}>
+                    ${this.attr['action-text']}
+                </a>
                 `;
             }
-            action = `
-            <a href="${href}"
-                class="btn btn-primary btn-action me-1 float-right"
-                ${action}>
-                ${this.attr['action-text']}
-            </a>
-            `;
         }
         
         if('details-highlight' in this.attr) {

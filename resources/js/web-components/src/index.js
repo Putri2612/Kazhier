@@ -1,3 +1,6 @@
+import FormBtn from "./Formbtn/FormBTN";
+customElements.define('form-btn', FormBtn);
+
 import ActivityItem from "./Activity/Item";
 customElements.define('act-item', ActivityItem);
 

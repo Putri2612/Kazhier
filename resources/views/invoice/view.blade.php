@@ -87,28 +87,21 @@
                             @endif
                         @elseif($invoice->type == 1) 
                             @if ($invoice->status >= 1)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="fa-solid fa-box"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Pickup')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 2)
-                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.picked-up', $invoice->id]]) }}
-                                                <button class="btn btn-primary btn-action me-1 float-right">
-                                                    {{ __('Picked Up') }}
-                                                </button>
-                                            {{ Form::close() }}
-                                        @endif
-                                        @if ($invoice->status < 2)
-                                            <p>{{__('Status')}} : <a href="#">{{ __($invoice->getStatus()) }} </a></p>
-                                        @else 
-                                            <p>{{__('Picked up on')}} : <a href="#">{{ Helper::DateFormat($invoice->pickup_time) }} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <act-item
+                                    icon-type="solid"
+                                    icon="box"
+                                    title="{{ __('Pickup') }}"
+                                    @if($invoice->status < 2)
+                                        action-method="put"
+                                        action-url="{{ route('invoice.picked-up', $invoice->id) }}"
+                                        action-text="{{ __('Picked Up') }}"
+                                        details="{{ __('Status') }}:"
+                                        details-highlight="{{ $invoice->getStatus() }}"
+                                    @else
+                                        details="{{ __('Picked up on') }}:"
+                                        details-highlight="{{ Helper::DateFormat($invoice->pickup_time) }}"
+                                    @endif
+                                ></act-item>
                             @endif
                             @if ($invoice->status >= 2)
                                 <act-item
@@ -132,61 +125,45 @@
                             @endif
                         @elseif($invoice->type == 2)
                             @if ($invoice->status >= 1)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="fa-solid fa-box"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Preparing')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 2)
-                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.prepared', $invoice->id]]) }}
-                                                <button class="btn btn-primary btn-action me-1 float-right">
-                                                    {{ __('Prepared') }}
-                                                </button>
-                                            {{ Form::close() }}
-                                        @endif
-                                        @if ($invoice->status < 3)
-                                            <p>{{__('Status')}} : <a href="#">{{ $invoice->getStatus() }} </a></p>
-                                        @else 
-                                            <p>{{__('Status')}} : <a href="#">{{ __('Prepared') }} </a></p>
-                                        @endif
-                                    </div>
-                                </div>
+                                <act-item
+                                    icon-type="solid"
+                                    icon="box"
+                                    title="{{ __('Preparing') }}"
+                                    details="{{ __('Status') }}:"
+                                    @if($invoice->status < 2)
+                                        action-method="put"
+                                        action-url="{{ route('invoice.prepared', $invoice->id) }}"
+                                        action-text="{{ __('Prepared') }}"
+                                    @endif
+                                    @if($invoice->status < 3)
+                                        details-highlight="{{ $invoice->getStatus() }}"
+                                    @else
+                                        details-highlight="{{ __('Prepared') }}"
+                                    @endif
+                                ></act-item>
                             @endif
                             @if ($invoice->status >= 2)
-                                <div class="activity">
-                                    <div class="activity-icon bg-primary text-white shadow-primary">
-                                        <i class="fa-solid fa-truck"></i>
-                                    </div>
-                                    <div class="activity-detail">
-                                        <div class="mb-2">
-                                            <span class="text-job text-primary"><h6>{{__('Delivery')}}</h6></span>
-                                        </div>
-                                        @if($invoice->status < 3)
-                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.delivering', $invoice->id]]) }}
-                                                <button class="btn btn-primary btn-action me-1 float-right">
-                                                    {{ __('Picked Up') }}
-                                                </button>
-                                            {{ Form::close() }}
-                                        @elseif($invoice->status < 4)
-                                            {{ Form::open(['method' => 'PUT', 'route' => ['invoice.delivered', $invoice->id]]) }}
-                                                <button class="btn btn-primary btn-action me-1 float-right">
-                                                    {{ __('Delivered') }}
-                                                </button>
-                                            {{ Form::close() }}
-                                        @endif
-                                        @if($invoice->status < 3)
-                                            <p>{{__('Status')}} : <a href="#">{{ __('Waiting for courier') }} </a></p>
-                                        @elseif($invoice->status < 4)
-                                            <p>{{__('Status')}} : <a href="#">{{__('Delivering')}} </a></p>
-                                            <p>{{__('Picked up at')}} : <a href="#">{{ Helper::DateFormat($invoice->pickup_time) }} </a></p>
+                                <act-item
+                                    icon-type="solid"
+                                    icon="truck"
+                                    title="{{ __('Delivery') }}"
+                                    @if($invoice->status < 4)
+                                        action-method="put"
+                                        details="{{ __('Status') }}:"
+                                        @if($invoice->status < 3) 
+                                            action-url="{{ route('invoice.delivering', $invoice->id) }}"
+                                            action-text="{{ __('Picked Up') }}"
+                                            details-highlight="{{ __('Waiting for courier') }}"
                                         @else
-                                            <p>{{__('Delivered at')}} : <a href="#">{{ Helper::DateFormat($invoice->delivery_time) }} </a></p>
+                                            action-url="{{ route('invoice.delivered', $invoice->id) }}"
+                                            action-text="{{ __('Delivered') }}"
+                                            details-highlight="{{ __('Delivering') }}"
                                         @endif
-                                    </div>
-                                </div>
+                                    @else
+                                        details="{{ __('Delivered at') }}:"
+                                        details-highlight="{{ Helper::DateFormat($invoice->delivery_time) }}"
+                                    @endif
+                                ></act-item>
                             @endif
                             @if ($invoice->status >= 4)
                                 <act-item

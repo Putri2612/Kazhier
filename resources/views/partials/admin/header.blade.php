@@ -89,19 +89,19 @@
                     </a>
                 @endif
                 <div class="dropdown-divider"></div>
-                <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('frm-logout').submit();" class="dropdown-item has-icon text-danger">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>{{__('Logout')}}</span>
-                </a>
-                @if(\Auth::guard('customer')->check())
-                    <form id="frm-logout" action="{{ route('customer.logout') }}" method="POST" class="d-none">
-                        {{ csrf_field() }}
-                    </form>
-                @else
-                    <form id="frm-logout" action="{{ route('logout') }}" method="POST" class="d-none">
-                        {{ csrf_field() }}
-                    </form>
-                @endif
+                <form-btn
+                    type="dropdown-item"
+                    method="post"
+                    text="{{ __('Logout') }}"
+                    icon-type="solid"
+                    icon="sign-out-alt"
+                    class="text-danger"
+                    @if (Auth::guard('customer')->check())
+                        url="{{ route('customer.logout') }}"
+                    @else 
+                        url="{{ route('logout') }}"
+                    @endif
+                ></form-btn>
             </div>
         </li>
     </ul>
