@@ -664,7 +664,7 @@ $(function () {
     $(".activity-wrap").niceScroll();
 });
 
-$(document).ready(function () {
+jQuery(function () {
     if($("#float-btn").length){
         $('#float-btn').on('click', () => {
             $('#float-btn').toggleClass('open');
@@ -678,12 +678,15 @@ $(document).ready(function () {
         });
     }
 
-    if ($(".datepicker-range").length) {
-        $('.datepicker-range').daterangepicker({
+    const DateRange = $('.datepicker-range');
+    if (DateRange.length) {
+
+        DateRange.daterangepicker({
             rangeDatePicker: true,
             format: 'yyyy-mm-dd',
             locale: date_picker_locale,
         });
+        
     }
 
     let dataTables = document.querySelectorAll('table.dataTable');

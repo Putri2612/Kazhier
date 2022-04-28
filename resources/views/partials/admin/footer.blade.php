@@ -27,7 +27,6 @@
 <script src="{{ asset('assets/modules/jquery-selectric/jquery.selectric.min.js') }} "></script>
 
 <script src="{{ asset('assets/modules/bootstrap-daterangepicker/daterangepicker.js') }} "></script>
-<script src="{{ asset('assets/js/jquery.easy-autocomplete.min.js') }}"></script>
 <script src="{{ asset('assets/modules/nicescroll/jquery.nicescroll.min.js')}} "></script>
 
 <script src="{{ asset('assets/js/jscolor.js') }} "></script>

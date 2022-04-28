@@ -1,0 +1,19 @@
+ul.navbar-end li a.language-dd i {
+    font-size: 23px !important;
+}
+
+ul.navbar-end li .dropdown-list {
+    width: 270px;
+    box-shadow: 0 0 30px $lighter;
+}
+
+.navbar-end .manage-language-btn {
+    color: $primary;
+    font-weight: 600;
+    border-radius: 0;
+}
+
+.navbar-end .manage-language-btn:hover {
+    color: $primary !important;
+    background-color: rgba(103, 119, 239, 0.1) !important;
+}

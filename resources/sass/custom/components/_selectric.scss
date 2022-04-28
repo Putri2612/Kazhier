@@ -1,0 +1,31 @@
+.selectric {
+    border-radius: 20px;
+    transition: 0.07s linear;
+}
+.selectric-items {
+    display: block;
+    height: auto;
+    max-height: 0;
+    transition: 0.07s linear;
+    opacity: 0;
+}
+.selectric-items .selectric-scroll{
+    max-height: 200px;
+}
+.selectric-items .selectric-scroll ul{
+    transform: scaleY(0);
+    transition: 0.07s linear;
+    top: 0;
+}
+.selectric-open .selectric {
+    border-radius: 20px 20px 0 0;
+}
+.selectric-open .selectric-items{
+    height: auto;
+    max-height: 200px;
+    overflow: hidden;
+    opacity: 1;
+}
+.selectric-open .selectric-items .selectric-scroll ul{
+    transform: scaleY(1);
+}

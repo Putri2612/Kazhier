@@ -1,0 +1,22 @@
+.progress {
+    height: 1rem;
+    font-size: 0.7rem;
+    line-height: 16px;
+}
+
+
+.progress-bar.bg-low {
+    background-color: #ffa426 !important;
+}
+
+.progress-bar.bg-full {
+    background-color: #63ed7a !important;
+}
+
+.progress-bar.bg-half {
+    background-color: #34395e;
+}
+
+.progress-bar.bg-empty {
+    background-color: #ffa426 !important;
+}
