@@ -1,4 +1,27 @@
 @import "./variables";
+@import "./basic/background";
+@import "./basic/font";
+@import "./basic/margin";
+@import "./components/activity";
+@import "./components/card";
+@import "./components/custom-control";
+@import "./components/language";
+@import "./components/profile";
+@import "./components/progress-bar";
+@import "./components/select";
+@import "./components/selectric";
+@import "./form/control";
+@import "./form/form-group";
+@import "./form/input";
+@import "./form/label";
+@import "./layout/navbar";
+@import "./layout/section";
+@import "./layout/sidebar";
+@import "./layout/staff-wrap";
+@import "./layout/tab";
+@import "./table/custom-table";
+@import "./table/datatables";
+@import "./table/table";
 
 .badges .badge {
     margin: 0 0px 3px 0;
@@ -15,25 +38,8 @@ i.far.fa-trash-alt {
     color: $red;
 }
 
-.invoice-wrap ul.pagination {
-    justify-content: flex-end;
-}
-
-.constant-table .table thead th {
-    background-color: transparent;
-    height: 0px !important;
-    padding: 0 !important;
-}
-
 .border-right {
     border-right: 1px solid #dee2e6 !important;
-}
-
-.fw-bold {
-    font-weight: 700 !important;
-}
-.fw-400{
-    font-weight: 400 !important;
 }
 
 .avatar-sm {
@@ -45,11 +51,6 @@ i.far.fa-trash-alt {
     .card .card-header .d-flex {
         flex-wrap: wrap;
     }
-
-    ul.activity-wrap {
-        height: 350px;
-    }
-
     .language-list {
         margin-bottom: 15px;
     }
@@ -81,20 +82,6 @@ i.far.fa-trash-alt {
 
     .dropzone .dz-message {
         margin: 1em;
-    }
-
-    .custom-table-view .table-row {
-        width: 580px;
-    }
-
-    .custom-table-view .table-row .tag {
-        width: 22%;
-    }
-
-    .custom-table-inner {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
     }
 
     div.dataTables_wrapper div.dataTables_filter {
@@ -147,9 +134,6 @@ i.far.fa-trash-alt {
     }
 }
 
-.font-style {
-    text-transform: capitalize !important;
-}
 
 input[type="password"] {
     display: block;
@@ -199,10 +183,6 @@ input[type="password"] {
     height: 70px !important;
 }
 
-.activities .activity .activity-detail {
-    width: 100% !important;
-}
-
 .fileinput-new {
 
     height: 100px !important;
@@ -245,12 +225,6 @@ input[type="password"] {
     margin: 17px 0 30px;
     text-decoration: none;
     font-weight: bold;
-}
-
-
-
-.font-uppercase {
-    text-transform: uppercase !important;
 }
 
 .dropdown-list .dropdown-list-content:not(.is-end):after {
