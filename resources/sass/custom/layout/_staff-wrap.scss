@@ -1,0 +1,80 @@
+.staff-wrap {
+    a{
+        color: var(--bs-gray-400);
+        &:hover{
+            color: $primary;
+        }
+    }
+
+    .btn {
+        font-weight: 400;
+        border: 1px solid transparent;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        border-radius: 0;
+        -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+    }
+
+    .staff-grid-view {
+        img {
+            height: 88px;
+            width: 88px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+        }
+
+        p {
+            font-size: 14px;
+            color: $gray;
+            margin: 0;
+        }
+
+        .btn-wrap {
+            margin: 0 -25px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #F2F4F6;
+            .btn {
+                width: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: $color-3;
+                font-size: 12px;
+                padding: 12px 12px;
+                background: $white;
+                &:first-child, &:last-child {
+                    border-right: 1px solid #F2F4F6;
+                }
+                &:first-child {
+                    border-right: 1px solid #F2F4F6;
+                }
+
+                @media (min-width: 768px) and (max-width: 1024px) {
+                    padding: 12px 6px;
+                }
+            }
+
+            i {
+                color: $color-2;
+                font-size: 16px;
+            }
+
+            svg {
+                height: 16px;
+                fill: $primary;
+            }
+        }
+    }
+
+    h2 {
+        font-size: 20px;
+        font-weight: normal;
+        color: $dark;
+        transition: all ease 0.35s;
+    }
+}

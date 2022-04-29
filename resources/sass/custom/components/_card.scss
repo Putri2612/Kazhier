@@ -1,0 +1,57 @@
+.card {
+    &-statistic-2 {
+        .card-icon{ 
+            color: $white; 
+            width: 38px;
+            height: 38px;
+            line-height: 42px;
+            font-size: 18px;
+            margin: 18px; 
+        }
+        .card-header{ 
+            padding-top: 32px;
+            h4{
+                font-size: .98rem;
+                color: $dark;
+            }
+        }
+        .card-body{
+            font-size: 0.98rem;
+            padding-bottom: 10px;
+        }
+
+        @media (min-width: 768px) and (max-width: 990px) {
+            .card-icon {
+                width: 28px;
+                height: 28px;
+                line-height: 32px;
+                font-size: 14px;
+                margin: 12px;
+            }
+            .card-header {
+                padding-top: 12px;
+            }
+        }
+    }
+    &-header {
+        .btn-sm {
+            span {
+                svg {
+                    fill: $white;
+                    width: 10px;
+                    path {
+                        fill: $white;
+                    }
+                }
+            }
+        }
+
+        h4 + .card-header-action {
+            .btn-group {
+                .btn {
+                    border-radius: 30px !important;
+                }
+            }
+        }
+    }
+}

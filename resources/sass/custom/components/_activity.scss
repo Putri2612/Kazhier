@@ -1,0 +1,27 @@
+ul.activity-wrap {
+    height: 350px;
+    overflow: auto;
+
+    li{
+        p {
+            line-height: initial;
+            padding: 5px 0;
+            font-size: 13px;
+        }
+        h6 {
+            font-size: 14px;
+        }
+        div {
+            font-size: 12px;
+        }
+    }
+
+    @media (min-width: 767px) {
+        height: 650px;
+    }
+}
+
+
+.activities .activity .activity-detail {
+    width: 100% !important;
+}

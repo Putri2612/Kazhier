@@ -1,0 +1,36 @@
+.selectric {
+    border-radius: 20px;
+    transition: 0.07s linear;
+
+    &-items {
+        display: block;
+        height: auto;
+        max-height: 0;
+        transition: 0.07s linear;
+        opacity: 0;
+    }
+
+    &-scroll {
+        max-height: 200px;
+        ul {
+            transform: scaleY(0);
+            transition: 0.07s linear;
+            top: 0;
+        }
+    }
+
+    &-open & {
+        border-radius: 20px 20px 0 0;
+
+        &-items {
+            height: auto;
+            max-height: 200px;
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        &-scroll ul {
+            transform: scaleY(1);
+        }
+    }
+}

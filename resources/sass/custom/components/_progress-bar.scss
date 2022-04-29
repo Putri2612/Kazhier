@@ -1,0 +1,13 @@
+.progress {
+    height: 1rem;
+    font-size: 0.7rem;
+    line-height: 16px;
+
+    &-bar {
+        .bg{
+            &-low, &-empty { background-color: $yellow !important; }
+            &-half { background-color: $dark !important; }
+            &-full { background-color: $green !important; }
+        }
+    }
+}

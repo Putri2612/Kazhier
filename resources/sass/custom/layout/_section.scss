@@ -1,0 +1,8 @@
+.section {
+    & &-title-custome {
+        text-align: right;
+        &::before{ display: none; }
+    }
+
+    & &-header { padding: 10px; }
+}
