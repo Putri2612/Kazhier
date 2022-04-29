@@ -1,53 +1,56 @@
-.dataTables_length label {
-    display: flex;
-    align-items: center;
-}
+.dataTable {
+    &_length {
+        label {
+            display: flex;
+            align-items: center;
+        }
 
-.dataTables_length select {
-    width: 80px;
-    margin: 0 10px;
-}
+        select {
+            width: 80px;
+            margin: 0 10px;
+        }
+    }
 
-div.dataTables_wrapper div.dataTables_filter {
-    text-align: right;
-}
+    &_wrapper &_filter {
+        text-align: right;
 
-div.dataTables_wrapper div.dataTables_filter label {
-    font-weight: normal;
-    white-space: nowrap;
-    text-align: left;
-}
+        label {
+            font-weight: normal;
+            white-space: nowrap;
+            text-align: left;
+        }
 
-div.dataTables_wrapper div.dataTables_filter input {
-    margin-left: 0.5em;
-    display: inline-block;
-    width: auto;
-}
+        input {
+            margin-left: 0.5em;
+            display: inline-block;
+            width: auto;
+        }
+    }
 
-.dataTable-sorter {
-    padding-right: 4px;
-    font-weight: bold;
-}
+    &-sorter {
+        padding-right: 4px;
+        font-weight: bold;
 
-.dataTable tbody tr {
-    background-color: unset !important;
-}
-.dataTable-sorter::before {
-    transform: translateY(25%);
-    border-top-width: 8px;
-    border-top-color: var(--kaka-blue);
-}
+        &::after {
+            transform: translateY(-25%);
+            border-bottom-width: 8px;
+            border-bottom-color: var(--kaka-blue) ;
+        }
 
-.dataTable-sorter::after {
-    transform: translateY(-25%);
-    border-bottom-width: 8px;
-    border-bottom-color: var(--kaka-blue) ;
-}
+        &::before {
+            transform: translateY(25%);
+            border-top-width: 8px;
+            border-top-color: var(--kaka-blue);
+        }
 
-.dataTable-sorter::before, .dataTable-sorter::after {
-    right: -8px;
-}
+        &::before, &::after {
+            right: -8px;
+        }
+    }
 
-.dataTable-wrapper.no-footer .dataTable-container {
-    border-bottom: unset;
+    tbody tr{ background-color: unset !important; }
+
+    &.no-footer &-container{
+        border-bottom: unset;
+    }
 }

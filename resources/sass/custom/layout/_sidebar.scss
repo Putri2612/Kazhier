@@ -1,14 +1,18 @@
-.sidebar-brand img {
-    width: 70%;
-}
+.sidebar {
+    &-brand {
+        img { width: 70%;}
+    }
 
-body.sidebar-mini .main-sidebar .sidebar-brand-sm a span {
-    color: $primary;
-}
+    &-mini .main-sidebar &-brand-sm{
+        a span {
+            color: $primary;
+        }
+    }
 
-.sidebar-container .sidebar {
-    position: absolute;
-    top: 0;
-    transition: all .3s ease-in;
-    z-index: 60;
+    &-container & {
+        position: absolute;
+        top: 0;
+        transition: all .3s ease-in;
+        z-index: 60;
+    }
 }

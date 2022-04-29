@@ -1,135 +1,80 @@
-.staff-wrap .staff-grid-view, .note {
-    background: $white;
-    border-radius: 4px;
-    padding: 18px;
-    box-shadow: 0 1px 9px 0 $light-transparent;
-    position: relative;
-    margin-bottom: 30px;
-    transition: all ease 0.35s;
-    position: relative;
-    text-align: center;
-    overflow: hidden;
-}
-
-.staff-wrap a {
-    color: var(--bs-gray-400);
-}
-.staff-wrap a:hover{
-    color: $primary;
-}
-
-.staff-wrap .staff-grid-view .more-action {
-    position: absolute;
-    right: 5px;
-    top: 3px;
-}
-
-.staff-wrap .dropdown-menu {
-    z-index: 1000;
-    min-width: 10rem;
-    padding: 0.5rem 0;
-    margin: 0.125rem 0 0;
-    font-size: 1rem;
-    color: $dark;
-    background-color: $white;
-    border: 1px solid $gray;
-    border-radius: 0.25rem;
-}
-
-.staff-wrap .btn {
-    font-weight: 400;
-    border: 1px solid transparent;
-    padding: 0.45rem 0.75rem;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    border-radius: 0;
-    -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
-}
-
-.staff-wrap .staff-grid-view img {
-    height: 88px;
-    width: 88px;
-    border-radius: 50%;
-    margin-bottom: 30px;
-}
-
-.staff-wrap .staff-grid-view h2, .note h2 {
-    font-size: 20px;
-    font-weight: normal;
-    color: $color-1;
-    transition: all ease 0.35s;
-}
-
-.staff-wrap .staff-grid-view p {
-    font-size: 14px;
-    color: $gray;
-    margin: 0;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap {
-    margin: 0 -25px;
-    display: flex;
-    justify-content: space-between;
-    border-top: 1px solid #F2F4F6;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap .btn:first-child {
-    border-right: 1px solid #F2F4F6;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap .btn:last-child {
-    border-left: 1px solid #F2F4F6;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap i {
-    color: $color-2;
-    font-size: 16px;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap .btn, .note .btn-wrap .btn {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: $color-3;
-    font-size: 12px;
-    padding: 12px 12px;
-    background: $white;
-}
-
-.staff-wrap .dropdown-toggle::after {
-    display: none;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap svg {
-    height: 16px;
-    fill: $primary;
-}
-
-.staff-wrap .staff-grid-view .btn-wrap .btn:first-child {
-    border-right: 1px solid #F2F4F6;
-}
-
-@media (max-width: 1280px) {
-    .staff-wrap .staff-grid-view p {
-        font-size: 13px;
+.staff-wrap {
+    a{
+        color: var(--bs-gray-400);
+        &:hover{
+            color: $primary;
+        }
     }
 
-    .staff-wrap .staff-grid-view, .note {
-        padding: 15px;
+    .btn {
+        font-weight: 400;
+        border: 1px solid transparent;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        border-radius: 0;
+        -webkit-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
     }
 
-    .table-responsive {
-        overflow-x: auto;
-    }
-}
+    .staff-grid-view {
+        img {
+            height: 88px;
+            width: 88px;
+            border-radius: 50%;
+            margin-bottom: 30px;
+        }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-    .staff-wrap .staff-grid-view .btn-wrap .btn {
-        padding: 12px 6px;
+        p {
+            font-size: 14px;
+            color: $gray;
+            margin: 0;
+        }
+
+        .btn-wrap {
+            margin: 0 -25px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #F2F4F6;
+            .btn {
+                width: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: $color-3;
+                font-size: 12px;
+                padding: 12px 12px;
+                background: $white;
+                &:first-child, &:last-child {
+                    border-right: 1px solid #F2F4F6;
+                }
+                &:first-child {
+                    border-right: 1px solid #F2F4F6;
+                }
+
+                @media (min-width: 768px) and (max-width: 1024px) {
+                    padding: 12px 6px;
+                }
+            }
+
+            i {
+                color: $color-2;
+                font-size: 16px;
+            }
+
+            svg {
+                height: 16px;
+                fill: $primary;
+            }
+        }
     }
 
+    h2 {
+        font-size: 20px;
+        font-weight: normal;
+        color: $dark;
+        transition: all ease 0.35s;
+    }
 }

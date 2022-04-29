@@ -1,11 +1,8 @@
-.section .section-title-custome:before {
-    display: none;
-}
+.section {
+    & &-title-custome {
+        text-align: right;
+        &::before{ display: none; }
+    }
 
-.section .section-title-custome {
-    text-align: right;
-}
-
-.section .section-header {
-    padding: 10px;
+    & &-header { padding: 10px; }
 }

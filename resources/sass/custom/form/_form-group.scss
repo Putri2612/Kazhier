@@ -1,9 +1,9 @@
-.form-group .control-label, .form-group > label {
-    margin-bottom: 3px;
-}
-
 .form-group {
     margin-bottom: 15px;
+
+    .control-label, label {
+        margin-bottom: 3px;
+    }
 }
 
 .modal-header {

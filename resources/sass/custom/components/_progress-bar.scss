@@ -2,21 +2,12 @@
     height: 1rem;
     font-size: 0.7rem;
     line-height: 16px;
-}
 
-
-.progress-bar.bg-low {
-    background-color: $yellow !important;
-}
-
-.progress-bar.bg-full {
-    background-color: $green !important;
-}
-
-.progress-bar.bg-half {
-    background-color: #34395e;
-}
-
-.progress-bar.bg-empty {
-    background-color: $yellow !important;
+    &-bar {
+        .bg{
+            &-low, &-empty { background-color: $yellow !important; }
+            &-half { background-color: $dark !important; }
+            &-full { background-color: $green !important; }
+        }
+    }
 }
