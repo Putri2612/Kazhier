@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ config('app.locale') }}">
 <meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
 @include('partials.admin.head')
 <body>

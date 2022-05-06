@@ -21,4 +21,12 @@ class ProductServiceStockChange extends Model
     protected $cast = [
         'date' => 'datetime'
     ];
+
+    public function invoice() {
+        return $this->belongsTo(Invoice::class);
+    }
+
+    public function bill() {
+        return $this->belongsTo(Bill::class);
+    }
 }

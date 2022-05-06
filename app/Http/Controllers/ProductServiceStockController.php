@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\Pagination;
 use App\Models\ProductService;
+use App\Models\ProductServiceStockChange;
 use App\Traits\ApiResponse;
 use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
@@ -53,7 +54,7 @@ class ProductServiceStockController extends Controller
                     ->skip($page['skip'])->take($page['limit'])
                     ->get();
 
-        if(empty($products)) {
+        if($products->isEmpty()) {
             return $this->NotFoundResponse();
         }
 
@@ -72,12 +73,32 @@ class ProductServiceStockController extends Controller
             return $this->NotFoundResponse();
         }
 
-        return view('productServiceStock.show');
+        return view('productServiceStock.show', compact('product'));
     }
 
     public function history(Request $request, $product_id) {
         if(!Auth::user()->can('manage product & service')) {
             return $this->UnauthorizedResponse();
         }
+
+        $query = ProductServiceStockChange::where('created_by', Auth::user()->creatorId())
+                ->where('product_id', $product_id);
+        
+        $page = Pagination::getTotalPage($query, $request);
+
+        if($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        $history = $query->select('id', 'date', 'quantity', 'invoice_id', 'bill_id')
+                    ->orderBy('date', 'desc')
+                    ->with(['invoice:id,invoice_id', 'bill:id,bill_id'])
+                    ->skip($page['skip'])->take($page['limit'])
+                    ->get();
+        if($history->isEmpty()) {
+            return $this->NotFoundResponse();
+        }
+
+        return $this->PaginationSuccess($history, $page['totalPage']);
     }
 }

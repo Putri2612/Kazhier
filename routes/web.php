@@ -225,6 +225,8 @@ Route::prefix('app')->group(
 
                 Route::get('product-stock', [ProductServiceStockController::class, 'index'])->name('product-stock.index');
                 Route::post('product-stock/get', [ProductServiceStockController::class, 'get'])->name('product-stock.get');
+                Route::get('product-stock/{id}/stock', [ProductServiceStockController::class, 'show'])->name('product-stock.show');
+                Route::post('product-stock/{id}/history', [ProductServiceStockController::class, 'history'])->name('product-stock.history');
                 
                 Route::get('customer/ajax/{name}', [ApiCustomerController::class, 'name'])->name('customer.name.ajax');
                 

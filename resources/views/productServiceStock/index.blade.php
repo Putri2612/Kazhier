@@ -17,14 +17,8 @@
                 }
             });
             pagination.format = data => {                
-                @can('edit product & service')
-                    let editURL = "{{ route('productservice.edit', ':id') }}";
-                    editURL     = editURL.replace(':id', data.id);
-                @endcan
-                @can('delete product & service')
-                    let deleteURL = "{{ route('productservice.destroy', ':id') }}";
-                    deleteURL     = deleteURL.replace(':id', data.id);
-                @endcan
+                let showURL = "{{ route('product-stock.show', ':id') }}";
+                showURL = showURL.replace(':id', data.id);
                 return `
                     <tr class="font-style">
                         <td>${data.name}</td>
@@ -32,7 +26,7 @@
                         <td>${data.type}</td>
                         <td>${data.quantity}</td>
                         <td class="action">
-                            <a href="#!" class="btn btn-primary btn-action me-1" data-url="${editURL}" data-ajax-popup="true" data-title="{{__('Stock History')}}">
+                            <a href="#!" class="btn btn-primary btn-action me-1" data-url="${showURL}" data-ajax-popup="true" data-title="{{__('Stock History')}}">
                                 <i class="fas fa-search"></i>
                             </a>
                         </td>
