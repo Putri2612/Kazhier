@@ -1,3 +1,6 @@
+import Translation from "./Translation";
+customElements.define('tl-str', Translation);
+
 import FormBtn from "./Formbtn/FormBTN";
 customElements.define('form-btn', FormBtn);
 
