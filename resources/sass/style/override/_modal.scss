@@ -1,0 +1,49 @@
+.modal-header,
+.modal-body,
+.modal-footer {
+    padding: 25px; }
+
+.modal-body {
+    padding-top: 15px; }
+
+.modal-footer {
+    padding-top: 15px;
+    padding-bottom: 15px; }
+
+.modal-header {
+    border-bottom: none;
+    padding-bottom: 5px; }
+.modal-header h5 {
+    font-size: 18px; }
+
+.modal-footer {
+    border-top: none;
+    border-radius: 0 0 3px 3px; }
+
+.modal-content {
+    max-width: 100%;
+    border: none;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05); }
+
+.modal.show .modal-content {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+
+.modal-progress .modal-content {
+    position: relative; }
+.modal-progress .modal-content:after {
+    content: ' ';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: 999;
+    background-image: url("../img/spinner.svg");
+    background-size: 80px;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 3px; }
+
+.modal-part {
+    display: none; }

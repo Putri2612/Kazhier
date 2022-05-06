@@ -45,7 +45,7 @@
     loginUser('{!! Auth::user()->cryptId() !!}');
     checkActivity();
     userActivity();
-    document.querySelector('#frm-logout').addEventListener('submit', logoutUser);
+    document.querySelector('form-btn#logout form').addEventListener('submit', logoutUser);
 
     document.addEventListener('change', event => {
         let target = event.target;

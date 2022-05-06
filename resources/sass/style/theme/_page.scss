@@ -1,0 +1,30 @@
+.page-error {
+    height: 100%;
+    width: 100%;
+    padding-top: 60px;
+    text-align: center;
+    display: table; }
+.page-error .page-inner {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle; }
+.page-error h1 {
+    font-size: 10em;
+    font-weight: 700; }
+.page-error .page-description {
+    font-size: 18px;
+    font-weight: 400;
+    color: #34395e; }
+.page-error .page-search {
+    margin: 40px auto;
+    max-width: 100%;
+    width: 350px; }
+.page-error .page-search .form-control {
+    border-radius: 30px; }
+.page-error .page-search .btn {
+    border-radius: 30px;
+    margin-left: 10px; }
+
+@media (max-width: 575.98px) {
+    .page-error .page-search {
+        width: 100%; } }
