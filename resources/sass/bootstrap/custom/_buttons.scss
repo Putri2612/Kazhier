@@ -13,8 +13,12 @@
         }
     }
 
+    &-primary {
+        color: var(--bs-white);
+    }
+
     &-action {
-        color: var(--bs-light) !important;
+        color: var(--bs-white) !important;
         line-height: 1.5rem;
         font-size: 0.75rem;
         min-width: 2rem;

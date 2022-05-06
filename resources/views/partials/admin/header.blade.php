@@ -85,6 +85,7 @@
                     @endif
                     <div class="dropdown-divider"></div>
                     <form-btn
+                        id="logout"
                         type="dropdown-item"
                         method="post"
                         text="{{ __('Logout') }}"
