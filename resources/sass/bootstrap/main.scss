@@ -1,15 +1,5 @@
 
 @import "./variables";
 
-@import "./bootstrap/bootstrap.scss";
-
-@each $name, $color in $theme-colors {
-    .btn-invert-#{$name} {
-        color: $color;
-        background: transparent;
-        &:hover{
-            color: $color;
-            background-color: var(--bs-gray-300) !important
-        }
-    }
-}
+@import "./sass/bootstrap.scss";
+@import "./custom/buttons";

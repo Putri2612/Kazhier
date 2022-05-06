@@ -1,17 +1,11 @@
-// Body
-$body-bg: #f3f6f9;
+@import "./variables/colors";
 
-// Colors
-$blue: #0087f8;
-$indigo: #6574cd;
-$purple: #9561e2;
-$pink: #f66d9b;
-$red: #e3342f;
-$orange: #f6993f;
-$yellow: #ffed4a;
-$green: #38c172;
-$teal: #4dc0b5;
-$cyan: #6cb2eb;
+@import "./variables/overrides/accordion";
+@import "./variables/overrides/alert";
+@import "./variables/overrides/badge";
+@import "./variables/overrides/breadcrumb";
+@import "./variables/overrides/card";
+@import "./variables/overrides/dropdown";
 
 
 $link-decoration: none;
