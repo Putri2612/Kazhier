@@ -1,0 +1,23 @@
+.page-item .page-link {
+    color: #0087f8;
+    border-radius: 3px;
+    margin: 0 3px; }
+.page-item.active .page-link {
+    background-color: #0087f8;
+    border-color: #0087f8; }
+.page-item.disabled .page-link {
+    border-color: transparent;
+    background-color: #f9fafe;
+    color: #0087f8;
+    opacity: .6; }
+
+.page-link {
+    border-color: transparent;
+    background-color: #f9fafe;
+    font-weight: 600; }
+.page-link:hover {
+    background-color: #0087f8;
+    color: #fff;
+    border-color: transparent; }
+.page-link:focus {
+    box-shadow: none; }

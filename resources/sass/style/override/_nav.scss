@@ -1,0 +1,35 @@
+.nav-tabs .nav-item .nav-link {
+    color: #0087f8; }
+.nav-tabs .nav-item .nav-link.active {
+    color: #000; }
+
+.tab-content > .tab-pane {
+    padding: 10px 0;
+    line-height: 24px; }
+
+.tab-bordered .tab-pane {
+    padding: 15px;
+    border: 1px solid #ededed;
+    margin-top: -1px; }
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #0087f8; }
+.nav-pills .nav-item .nav-link {
+    color: #0087f8;
+    padding-left: 15px !important;
+    padding-right: 15px !important; }
+.nav-pills .nav-item .nav-link:hover {
+    text-decoration: none;
+    background-color: #f6f7fe; }
+.nav-pills .nav-item .nav-link.active {
+    box-shadow: 0 2px 6px #acb5f6;
+    color: #fff;
+    background-color: #0087f8; }
+.nav-pills .nav-item .nav-link .badge {
+    padding: 5px 8px;
+    margin-left: 5px; }
+
+.nav .nav-item .nav-link .ion, .nav .nav-item .nav-link .fas, .nav .nav-item .nav-link .far, .nav .nav-item .nav-link .fab, .nav .nav-item .nav-link .fal {
+    margin-right: 3px;
+    font-size: 12px; }
