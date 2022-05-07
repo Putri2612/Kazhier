@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row mb-4">
     <div class="col-6 col-md-4">
         <label for="product_name" class="form-label">
             {{ __('Product Name') }}
@@ -23,8 +23,7 @@
             id="product_quantity" value="{{ $product->quantity }}"
             class="form-control-plaintext" readonly data-is-number/>
     </div>
-    <stock-change
-        class="mt-5"
-        getter="{{ route('product-stock.history', $product->id) }}"
-    ></stock-change>
 </div>
+<stock-change
+    getter="{{ route('product-stock.history', $product->id) }}"
+></stock-change>

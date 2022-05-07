@@ -6,6 +6,7 @@ use App\Classes\Pagination;
 use App\Models\ProductService;
 use App\Models\ProductServiceStockChange;
 use App\Traits\ApiResponse;
+use App\Traits\CanProcessNumber;
 use App\Traits\CanRedirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 class ProductServiceStockController extends Controller
 {
     use CanRedirect,
+        CanProcessNumber,
         ApiResponse;
 
     public function index() {
@@ -90,9 +92,10 @@ class ProductServiceStockController extends Controller
             return $this->NotFoundResponse();
         }
 
-        $history = $query->select('id', 'date', 'quantity', 'invoice_id', 'bill_id')
+        $history = $query->select('id', 'date', 'quantity', 'product_id', 'invoice_id', 'bill_id', 'description', 'created_at')
                     ->orderBy('date', 'desc')
-                    ->with(['invoice:id,invoice_id', 'bill:id,bill_id'])
+                    ->orderBy('created_at', 'desc')
+                    ->with(['invoice:id,invoice_id', 'bill:id,bill_id', 'product:id,unit_id', 'product.unit:id,name'])
                     ->skip($page['skip'])->take($page['limit'])
                     ->get();
         if($history->isEmpty()) {
@@ -100,5 +103,79 @@ class ProductServiceStockController extends Controller
         }
 
         return $this->PaginationSuccess($history, $page['totalPage']);
+    }
+
+    private $operations = [ 'add', 'reduce' ];
+
+    public function modify($product_id, $operation) {
+        if(!Auth::user()->can('manage product & service')) {
+            return $this->UnauthorizedResponse();
+        }
+
+        if(!in_array($operation, $this->operations)) {
+            return $this->NotFoundResponse();
+        }
+
+        $product = ProductService::where('created_by', Auth::user()->creatorId())
+                ->where('id', $product_id)->first();
+
+        if(empty($product)) {
+            return $this->NotFoundResponse();
+        }
+
+        return view('productServiceStock.modify', compact('product', 'operation'));
+    }
+
+    public function update(Request $request, $operation) {
+        if(!Auth::user()->can('manage product & service')) {
+            return $this->RedirectDenied();
+        }
+
+        if(!in_array($operation, $this->operations)) {
+            return $this->RedirectNotFound();
+        }
+        
+        $validator = Validator::make($request->all(), [
+            'id'    => 'required|numeric',
+            'date'  => 'required|date',
+            'amount'=> 'required',
+        ]);
+
+        if($validator->fails()) {
+            $message = $validator->getMessageBag();
+            return redirect()->back()->with('error', $message);
+        }
+
+        $product = ProductService::where('created_by', Auth::user()->creatorId())
+        ->where('id', $request->input('id'))->first();
+
+        if(empty($product)) {
+            return $this->RedirectNotFound();
+        }
+
+        $amount = $this->ReadableNumberToFloat($request->input('amount'));
+
+        if($operation == 'reduce') {
+            $amount = -$amount;
+        }
+        $product->quantity += $amount;
+
+        if($product->quantity < 0) {
+            return redirect()->back()->with('error', __('Not enough stock'));
+        }
+
+        $product->save();
+
+        $history = new ProductServiceStockChange;
+        $history->date          = $request->input('date');
+        $history->quantity      = $amount;
+        $history->description   = $request->input('description');
+        $history->product_id    = $request->input('id');
+        $history->created_by    = Auth::user()->creatorId();
+        $history->save();
+
+        $operation = ucfirst($operation);
+
+        return redirect()->route('product-stock.index')->with('success', __("Stock {$operation}ed"));
     }
 }

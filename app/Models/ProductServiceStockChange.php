@@ -29,4 +29,8 @@ class ProductServiceStockChange extends Model
     public function bill() {
         return $this->belongsTo(Bill::class);
     }
+
+    public function product() {
+        return $this->belongsTo(ProductService::class, 'product_id');
+    }
 }

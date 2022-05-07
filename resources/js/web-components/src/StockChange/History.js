@@ -35,12 +35,17 @@ class History extends BaseModel {
             return;
         }
 
+        this.style.maxHeight = '70vh';
+
         const activity  = this.act = document.createElement('act-box'),
             getBtn      = this.getBTN = document.createElement('button');
 
         getBtn.className = "btn btn-outline-primary btn-icon";
-        getBtn.innerHTML = `<i class="fa-solid fa-arrow-down"></i>`;
-        getBtn.addEventListener('click', event => this._getData());
+        getBtn.style.borderRadius = '50%';
+        getBtn.innerHTML = `<i class="fa-solid fa-arrow-down fa-2x"></i>`;
+        getBtn.addEventListener('click', event => {
+            this._getData()
+        });
 
         this.append(activity);
         this.append(getBtn);
@@ -50,10 +55,32 @@ class History extends BaseModel {
 
     _appendAct(data = []) {
         data.forEach(item => {
+            const icon  = item.quantity > 0 ? 'plus' : 'minus',
+                date    = this.dateFormat(item.date);
+            let detail  = '',
+                focus   = `(${this.numberFormat(item.quantity)}`;
+
+            if('description' in item) {
+                detail = item.description;
+            } else if('invoice_number' in item) {
+                detail = item.invoice_number;
+            } else if('bill_number' in item) {
+                detail = item.bill_number;
+            }
+
+            if('product' in item) {
+                const product = item.product;
+                if('unit' in product) {
+                    focus += ` ${product.unit.name}`;
+                }
+            }
+            focus += ')';
+            
             this.act.add({
-                icon    : {type: 'solid', icon: 'ellipsis'},
-                title   : 'Title',
-                detail  : 'Small details',
+                icon    : {type: 'solid', icon: icon},
+                title   : date,
+                detail  : detail,
+                focus   : focus,
                 action  : false
             })
         })
@@ -93,10 +120,14 @@ class History extends BaseModel {
                 getIcon.classList.remove('fa-ellipsis');
                 getIcon.classList.add('fa-arrow-down');
 
+                if(data && this.page == data.pages) {
+                    this.removeChild(this.getBTN);
+                }
+                
                 if(data) {
+                    this._dateStyle = data.date;
                     this._appendAct(data.data);
                 } else if(this.page == 1 || this.page == data.pages) {
-                    this.removeChild(this.getBTN);
                     const noItem = document.createElement('div');
                     noItem.className = 'text-center';
                     noItem.innerHTML = `
@@ -105,8 +136,22 @@ class History extends BaseModel {
                     `
                     this.append(noItem);
                 }
+                setTimeout(() => {
+                    this.gettingData = false;
+                }, 500);
             });
         }
+    }
+
+    dateFormat(date) {
+        const time = new Date(date),
+            locale = document.documentElement.lang;
+        return new Intl.DateTimeFormat([locale, 'id'], this._dateStyle ).format(time);
+    }
+
+    numberFormat(number) {
+        const locale = document.documentElement.lang;
+        return new Intl.NumberFormat([locale, 'id']).format(number);
     }
 }
 

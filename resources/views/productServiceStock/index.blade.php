@@ -19,6 +19,13 @@
             pagination.format = data => {                
                 let showURL = "{{ route('product-stock.show', ':id') }}";
                 showURL = showURL.replace(':id', data.id);
+
+                let addURL = "{{ route('product-stock.modify', [':id', 'add']) }}";
+                addURL  = addURL.replace(':id', data.id);
+
+                let reduceURL = "{{ route('product-stock.modify', [':id', 'reduce']) }}";
+                reduceURL  = reduceURL.replace(':id', data.id);
+
                 return `
                     <tr class="font-style">
                         <td>${data.name}</td>
@@ -26,8 +33,20 @@
                         <td>${data.type}</td>
                         <td>${data.quantity}</td>
                         <td class="action">
-                            <a href="#!" class="btn btn-primary btn-action me-1" data-url="${showURL}" data-ajax-popup="true" data-title="{{__('Stock History')}}">
-                                <i class="fas fa-search"></i>
+                            <a href="#!" class="btn btn-invert-primary me-1" 
+                                data-url="${showURL}" data-ajax-popup="true" 
+                                data-title="{{__('Stock History')}}">
+                                <i class="fa-solid fa-search"></i>
+                            </a>
+                            <a href="#!" class="btn btn-invert-primary me-1" 
+                                data-url="${addURL}" data-ajax-popup="true" 
+                                data-title="{{__('Add Stock')}}">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            <a href="#!" class="btn btn-invert-primary me-1" 
+                                data-url="${reduceURL}" data-ajax-popup="true" 
+                                data-title="{{__('Reduce Stock')}}">
+                                <i class="fa-solid fa-minus"></i>
                             </a>
                         </td>
                     </tr>

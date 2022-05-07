@@ -61,7 +61,6 @@ class ActivityItem extends BaseModel {
 
         if('action-text' in this.attr && 'action-url' in this.attr) {
             if('action-method' in this.attr) {
-                console.log('I have method');
                 action = `<form-btn
                             method="${this.attr['action-method']}"
                             text="${this.attr['action-text']}"
@@ -89,7 +88,6 @@ class ActivityItem extends BaseModel {
         }
         
         if('details-highlight' in this.attr) {
-            console.log('ada highlight');
             highlight = `<a href="#!">${this.attr['details-highlight']}</a>`;
         }
 

@@ -13,6 +13,7 @@ class ActivityContainer extends BaseModel {
         icon    = {type: 'solid', icon: 'ellipsis'},
         title   = 'Title',
         detail  = 'Small details',
+        focus   = false,
         action  = false
     }) {
         const item = document.createElement('act-item');
@@ -21,6 +22,11 @@ class ActivityContainer extends BaseModel {
         item.setAttribute('icon', icon.icon);
         item.setAttribute('title', title);
         item.setAttribute('details', detail);
+
+        if(focus) {
+            item.setAttribute('details-highlight', focus);
+        }
+
         if(action && typeof action == 'object') {
             item.setAttribute('action-text', action.text);
             item.setAttribute('action-url', action.url);
