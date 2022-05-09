@@ -60,12 +60,12 @@ class History extends BaseModel {
             let detail  = '',
                 focus   = `(${this.numberFormat(item.quantity)}`;
 
-            if('description' in item) {
-                detail = item.description;
-            } else if('invoice_number' in item) {
+            if('invoice_number' in item) {
                 detail = item.invoice_number;
             } else if('bill_number' in item) {
                 detail = item.bill_number;
+            } else {
+                detail = item.description;
             }
 
             if('product' in item) {
@@ -91,6 +91,7 @@ class History extends BaseModel {
             this.gettingData = true;
 
             const getIcon = this.getBTN.querySelector('i');
+            const prevPage = this.page;
 
             this.getBTN.disabled = true;
             getIcon.classList.remove('fa-arrow-down');
@@ -119,22 +120,28 @@ class History extends BaseModel {
                 this.getBTN.disabled = false;
                 getIcon.classList.remove('fa-ellipsis');
                 getIcon.classList.add('fa-arrow-down');
-
-                if(data && this.page == data.pages) {
-                    this.removeChild(this.getBTN);
-                }
                 
                 if(data) {
                     this._dateStyle = data.date;
+                    this._maxPage   = data.pages;
                     this._appendAct(data.data);
-                } else if(this.page == 1 || this.page == data.pages) {
-                    const noItem = document.createElement('div');
-                    noItem.className = 'text-center';
-                    noItem.innerHTML = `
-                        <i class="fa-solid fa-5x fa-box-open text-secondary"></i><br/>
-                        <span><tl-str class="text-secondary">No older history</tl-str></span>
-                    `
-                    this.append(noItem);
+                    if(this.page == data.pages) {
+                        this.removeChild(this.getBTN);
+                    }
+                } else {
+                    if(prevPage){
+                        this.page = prevPage;
+                    }
+                    if(this.page == 1 || this.page == this._maxPage){
+                        this.removeChild(this.getBTN);
+                        const noItem = document.createElement('div');
+                        noItem.className = 'text-center';
+                        noItem.innerHTML = `
+                            <i class="fa-solid fa-5x fa-box-open text-secondary"></i><br/>
+                            <span><tl-str class="text-secondary">No older history</tl-str></span>
+                        `
+                        this.append(noItem);
+                    }
                 }
                 setTimeout(() => {
                     this.gettingData = false;

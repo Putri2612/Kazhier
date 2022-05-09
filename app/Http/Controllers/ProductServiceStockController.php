@@ -52,7 +52,8 @@ class ProductServiceStockController extends Controller
             return $this->NotFoundResponse();
         }
 
-        $products   = $query->select('id', 'sku', 'name', 'type', 'quantity')
+        $products   = $query->select('id', 'sku', 'name', 'type', 'quantity', 'unit_id')
+                    ->with('unit:id,name')
                     ->skip($page['skip'])->take($page['limit'])
                     ->get();
 
@@ -69,6 +70,7 @@ class ProductServiceStockController extends Controller
         }
 
         $product = ProductService::where('created_by', Auth::user()->creatorId())
+                ->select('id', 'name', 'sku', 'quantity')
                 ->where('id', $product_id)->first();
 
         if(empty($product)) {
@@ -100,6 +102,14 @@ class ProductServiceStockController extends Controller
                     ->get();
         if($history->isEmpty()) {
             return $this->NotFoundResponse();
+        }
+
+        foreach($history as $item) {
+            if($item->bill) {
+                $item->bill_number = $item->bill->billNumber();
+            } else if ($item->invoice) {
+                $item->invoice_number = $item->invoice->invoiceNumber();
+            }
         }
 
         return $this->PaginationSuccess($history, $page['totalPage']);

@@ -8,6 +8,7 @@ use App\Imports\ProductServiceImport;
 use App\Models\CustomField;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
+use App\Models\ProductServiceStockChange;
 use App\Models\ProductServiceUnit;
 use App\Models\Tax;
 use App\Models\Utility;
@@ -141,6 +142,7 @@ class ProductServiceController extends Controller
 
             $sale_price     = $this->ReadableNumberToFloat($request->input('sale_price'));
             $purchase_price = $this->ReadableNumberToFloat($request->input('purchase_price'));
+            $quantity       = $this->ReadableNumberToFloat($request->input('quantity'));
 
             $productService                 = new ProductService();
             $productService->name           = $request->input('name');
@@ -152,10 +154,18 @@ class ProductServiceController extends Controller
             $productService->unit_id        = $request->input('unit_id');
             $productService->type           = $request->input('type');
             $productService->category_id    = $request->input('category_id');
-            $productService->quantity       = $request->input('quantity');
+            $productService->quantity       = $quantity;
             $productService->created_by     = Auth::user()->creatorId();
             $productService->save();
             CustomField::saveData($productService, $request->input('customField'));
+
+            $history = new ProductServiceStockChange;
+            $history->product_id    = $productService->id;
+            $history->quantity      = $quantity;
+            $history->date          = now();
+            $history->description   = 'Initial stock';
+            $history->created_by    = Auth::user()->creatorId();
+            $history->save();
 
             return redirect()->route('productservice.index')->with('success', __('Product successfully created.'));
         }
@@ -212,7 +222,6 @@ class ProductServiceController extends Controller
                 $rules = [
                     'name'              => 'required',
                     'sku'               => 'required',
-                    'quantity'          => 'required',
                     'sale_price'        => 'required',
                     'purchase_price'    => 'required',
                     'tax_id'            => 'required',
@@ -242,7 +251,6 @@ class ProductServiceController extends Controller
                 $productService->unit_id        = $request->input('unit_id');
                 $productService->type           = $request->input('type');
                 $productService->category_id    = $request->input('category_id');
-                $productService->quantity       = $request->input('quantity');
                 $productService->created_by     = $creatorId;
                 $productService->save();
                 CustomField::saveData($productService, $request->input('customField'));

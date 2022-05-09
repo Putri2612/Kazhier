@@ -9,13 +9,13 @@ use App\Models\Bill;
 use App\Models\BillPayment;
 use App\Models\BillProduct;
 use App\Models\CustomField;
-use App\Models\Invoice;
 use App\Mail\BillPaymentCreate;
 use App\Mail\BillSend;
 use App\Mail\VenderBillSend;
 use App\Models\PaymentMethod;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
+use App\Models\ProductServiceStockChange;
 use App\Models\Transaction;
 use App\Models\Utility;
 use App\Models\Vender;
@@ -205,6 +205,14 @@ class BillController extends Controller
                 $billProduct->discount   = $discount;
                 $billProduct->price      = $price;
                 $billProduct->save();
+
+                $history = new ProductServiceStockChange;
+                $history->bill_id       = $bill->id;
+                $history->product_id    = $item->id;
+                $history->quantity      = $quantity;
+                $history->date          = $bill->bill_date;
+                $history->created_by    = Auth::user()->creatorId();
+                $history->save();
             }
 
             return redirect()->route('bill.index', $bill->id)->with('success', __('Bill successfully created.'));
@@ -301,6 +309,7 @@ class BillController extends Controller
                 $products = $request->input('items');
 
                 $removedProducts = BillProduct::where('bill_id', $bill->id)->whereNotIn('product_id',collect($products)->pluck('item'))->get();
+                ProductServiceStockChange::where('bill_id', $bill->id)->whereIn('product_id', $removedProducts)->delete();
 
                 foreach ($removedProducts as $product) {
                     $item = ProductService::find($product['item']);
@@ -336,6 +345,13 @@ class BillController extends Controller
                     $billProduct->discount   = $discount;
                     $billProduct->price      = $price;
                     $billProduct->save();
+
+                    $history = ProductServiceStockChange::where('bill_id', $bill->id)
+                                ->where('product_id', $item->id)
+                                ->first();
+                    $history->quantity  = $quantity;
+                    $history->date      = $bill->bill_date;
+                    $history->save();
                 }
 
 
@@ -359,6 +375,14 @@ class BillController extends Controller
             if($bill->created_by == \Auth::user()->creatorId())
             {
                 $bill->delete();
+                $items = BillProduct::where('bill_id', $bill->id)->select('product_id', 'quantity')
+                            ->with(['product'])->get();
+                foreach($items as $item) {
+                    $product = $item->product;
+                    $product->quantity -= $item->quantity;
+                    $product->save();
+                }
+                ProductServiceStockChange::where('bill_id', $bill->id)->delete();
                 BillProduct::where('bill_id', '=', $bill->id)->delete();
 
                 return redirect()->route('bill.index')->with('success', __('Bill successfully deleted.'));

@@ -20,6 +20,7 @@ use App\Models\PaymentMethod;
 use App\Models\Products;
 use App\Models\ProductService;
 use App\Models\ProductServiceCategory;
+use App\Models\ProductServiceStockChange;
 use App\Models\Task;
 use App\Models\Transaction;
 use App\Models\Utility;
@@ -252,6 +253,14 @@ class InvoiceController extends Controller
                 $invoiceProduct->discount   = $discount;
                 $invoiceProduct->price      = $price;
                 $invoiceProduct->save();
+
+                $history                = new ProductServiceStockChange;
+                $history->date          = $invoice->issue_date;
+                $history->quantity      = -$quantity;
+                $history->product_id    = $item->id;
+                $history->invoice_id    = $invoice->id;
+                $history->created_by    = Auth::user()->creatorId();
+                $history->save();
             }
 
             $message = __('Invoice successfully created.');
@@ -339,9 +348,23 @@ class InvoiceController extends Controller
                 }
 
                 $products = $request->input('items');
-                $checkStock = ProductService::where('created_by', Auth::user()->creatorId())->whereIn('id', collect($products)->pluck('item'))->where('quantity', 0)->count();
+                $checkStock = ProductService::where('created_by', Auth::user()->creatorId())
+                            ->whereIn('id', collect($products)->pluck('item'))
+                            ->where('quantity', 0)->count();
                 if($checkStock) {
                     return redirect()->back()->with('error', __('Empty stock'));
+                }
+
+                $removedProduct = InvoiceProduct::where('invoice_id', $invoice->id)
+                                ->whereNotIn('product_id', collect($products)->pluck('item'))->get();
+                ProductServiceStockChange::where('invoice_id', $invoice->id)->whereIn('product_id', $removedProduct)->delete();
+                foreach($removedProduct as $product) {
+                    $item = ProductService::find($product->product_id);
+                    if(!empty($item)) {
+                        $item->quantity += $product->quantity;
+                        $item->save();
+                    }
+                    $product->delete();
                 }
 
                 $invoice->customer_id    = $request->input('customer_id');
@@ -353,16 +376,6 @@ class InvoiceController extends Controller
                 $invoice->customer_tax   = $request->has('customer_tax');
                 $invoice->save();
                 CustomField::saveData($invoice, $request->input('customField'));
-
-                $removedProduct = InvoiceProduct::where('invoice_id', $invoice->id)->whereNotIn('product_id', collect($products)->pluck('item'))->get();
-                foreach($removedProduct as $product) {
-                    $item = ProductService::find($product->product_id);
-                    if(!empty($item)) {
-                        $item->quantity += $product->quantity;
-                        $item->save();
-                    }
-                    $product->delete();
-                }
 
                 foreach($products as $product) {
                     $quantity   = $this->ReadableNumberToFloat($product['quantity']);
@@ -384,6 +397,12 @@ class InvoiceController extends Controller
                     $item = ProductService::find($product['item']);
                     $item->quantity -= $stockChange;
                     $item->save();
+
+                    $history = ProductServiceStockChange::where('invoice_id', $invoice->id)
+                                ->where('product_id', $item->id)->first();
+                    $history->date      = $invoice->issue_date;
+                    $history->quantity  = -$quantity;
+                    $history->save();
 
                     $invoiceProduct->product_id = $product['item'];
                     $invoiceProduct->quantity   = $quantity;
@@ -448,7 +467,15 @@ class InvoiceController extends Controller
             if($invoice->created_by == Auth::user()->creatorId())
             {
                 $invoice->delete();
+                $items  = InvoiceProduct::where('invoice_id', $invoice->id)
+                        ->select('product_id', 'quantity')
+                        ->with(['product'])->get();
+                foreach ($items as $item) {
+                    $item->product->quantity += $item->quantity;
+                    $item->product->save();
+                }
                 InvoiceProduct::where('invoice_id', '=', $invoice->id)->delete();
+                ProductServiceStockChange::where('invoice_id', $invoice->id)->delete();
 
                 return redirect()->route('invoice.index')->with('success', __('Invoice successfully deleted.'));
             }

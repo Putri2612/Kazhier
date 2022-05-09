@@ -154,7 +154,10 @@
 
 
             @if(Gate::check('manage product & service') || Gate::check('manage constant category') || Gate::check('manage constant unit'))
-                <li class="dropdown {{ (Request::segment(2) == 'productservice' || Request::segment(2) == 'product-unit' || (Request::segment(3) == 'category' && Request::segment(2) == 'product-service')) ? 'active':''}}">
+                <li class="dropdown {{ (Request::segment(2) == 'productservice' ||
+                    Request::segment(2) == 'product-unit' || 
+                    (Request::segment(3) == 'category' && Request::segment(2) == 'product-service') ||
+                    Request::segment(2) == 'product-stock') ? 'active':''}}">
                     <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-shopping-cart"></i> <span>{{__('Product & Service')}}</span></a>
                     <ul class="dropdown-menu {{ (Request::segment(2) == 'productservice' || Request::segment(2) == 'product-unit' || (Request::segment(3) == 'category' && Request::segment(2) == 'product-service')) ? 'active' : '' }}">
                         @can('manage product & service')

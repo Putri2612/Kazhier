@@ -186,7 +186,7 @@ const UpdateSubTotal        = () => {
     document.querySelector('.totalAmount').innerHTML = subTotal;
 }
 
-const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
+const UpdateInvoiceAndBillItemData  = (target, additionalData = {}) => {
     let element = target;
     while(!element.getAttribute('data-is-item') && element.nodeName != 'BODY') element = element.parentNode;
 
@@ -202,7 +202,7 @@ const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
 
     amount  = ProcessableToReadable(amount);
 
-    if(additionalData.products) {
+    if('products' in additionalData) {
         const id    = element.querySelector('.item').value,
             product = additionalData.products[id];
 
@@ -212,7 +212,7 @@ const UpdateInvoiceAndBillItemData  = (target, additionalData = null) => {
         }
     }
 
-    if(additionalData.discount.amount) {
+    if('discount' in additionalData && 'amount' in additionalData.discount) {
         const CustomerDiscount = additionalData.discount;
         if(CustomerDiscount.amount > 1 && CustomerDiscount.amount > discount) {
             discount = CustomerDiscount.amount;
