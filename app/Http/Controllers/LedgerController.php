@@ -64,7 +64,7 @@ class LedgerController extends Controller
 
             // Pilih tahun berapa
             if( !empty($request->year) ){ $selected_year = $request->year; } 
-            else if( $years->contains(date('Y')) ) { $selected_year = date('Y'); }
+            else if( in_array(date('Y'), $years) ) { $selected_year = date('Y'); }
             else { $selected_year = array_key_first($years); }
             
             // Pilih bulan apa
