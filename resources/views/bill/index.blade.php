@@ -58,27 +58,25 @@
                                     </a>
                                 @endcan
                                 @if (Gate::check('edit bill') || Gate::check('duplicate bill') || Gate::check('delete bill'))
-                                    <div class="btn-group">
-                                        <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
-                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            @can('edit bill')
-                                                <li>
-                                                    <a class="dropdown-item" href="${editURL}">
-                                                        {{ __('Edit') }}
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                            @can('delete bill')
-                                                <li>
-                                                    <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
-                                                        {{ __('Delete') }}
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                        </ul>
-                                    </div>
+                                    <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                        <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @can('edit bill')
+                                            <li>
+                                                <a class="dropdown-item" href="${editURL}">
+                                                    {{ __('Edit') }}
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('delete bill')
+                                            <li>
+                                                <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
+                                                    {{ __('Delete') }}
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
                                 @endif
                             </td>
                         @endif

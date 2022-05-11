@@ -62,35 +62,33 @@
                                     </a>
                                 @endcan
                                 @if (Gate::check('edit invoice') || Gate::check('duplicate invoice') || Gate::check('delete invoice'))
-                                    <div class="btn-group">
-                                        <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
-                                            <i class="fa-solid fa-ellipsis fa-lg"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            @can('duplicate invoice')
-                                                <li>
-                                                    <a href="#" class="dropdown-item" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-${data.id}').submit();">
-                                                        {{ __('Duplicate') }}
-                                                        <form action="${duplicateURL}" id="duplicate-form-${data.id}"></form>
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                            @can('edit invoice')
-                                                <li>
-                                                    <a class="dropdown-item" href="${editURL}">
-                                                        {{ __('Edit') }}
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                            @can('delete invoice')
-                                                <li>
-                                                    <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
-                                                        {{ __('Delete') }}
-                                                    </a>
-                                                </li>
-                                            @endcan
-                                        </ul>
-                                    </div>
+                                    <button class="btn btn-light" data-bs-toggle="dropdown" data-bs-auto-close="true">
+                                        <i class="fa-solid fa-ellipsis fa-lg"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        @can('duplicate invoice')
+                                            <li>
+                                                <a href="#" class="dropdown-item" data-bs-toggle="tooltip" data-original-title="{{__('Duplicate')}}" data-bs-toggle="tooltip" data-original-title="{{__('Delete')}}" data-confirm="You want to confirm this action. Press Yes to continue or Cancel to go back" data-confirm-yes="document.getElementById('duplicate-form-${data.id}').submit();">
+                                                    {{ __('Duplicate') }}
+                                                    <form action="${duplicateURL}" id="duplicate-form-${data.id}"></form>
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('edit invoice')
+                                            <li>
+                                                <a class="dropdown-item" href="${editURL}">
+                                                    {{ __('Edit') }}
+                                                </a>
+                                            </li>
+                                        @endcan
+                                        @can('delete invoice')
+                                            <li>
+                                                <a href="#!" class="dropdown-item" data-is-delete data-delete-url="${deleteURL}">
+                                                    {{ __('Delete') }}
+                                                </a>
+                                            </li>
+                                        @endcan
+                                    </ul>
                                 @endif
                             </td>
                         @endif
@@ -179,28 +177,24 @@
                                         <div id="pagination-limit" class="col-auto"></div>
                                     </div>
                                     <div class="table-responsive">
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <table class="table table-flush" data-pagination-table data-pagination-url="{{ route('invoice.get') }}">
-                                                    <thead class="thead-light">
-                                                    <tr>
-                                                        <th> {{__('Invoice')}}</th>
-                                                        @if(!\Auth::guard('customer')->check())
-                                                            <th> {{__('Customer')}}</th>
-                                                        @endif
-                                                        <th> {{__('Category')}}</th>
-                                                        <th> {{__('Issue Date')}}</th>
-                                                        <th> {{__('Due Date')}}</th>
-                                                        <th> {{__('Status')}}</th>
-                                                        @if(Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
-                                                            <th class="text-end"> {{__('Action')}}</th>
-                                                        @endif
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div>
+                                        <table class="table table-flush" data-pagination-table data-pagination-url="{{ route('invoice.get') }}">
+                                            <thead class="thead-light">
+                                            <tr>
+                                                <th> {{__('Invoice')}}</th>
+                                                @if(!\Auth::guard('customer')->check())
+                                                    <th> {{__('Customer')}}</th>
+                                                @endif
+                                                <th> {{__('Category')}}</th>
+                                                <th> {{__('Issue Date')}}</th>
+                                                <th> {{__('Due Date')}}</th>
+                                                <th> {{__('Status')}}</th>
+                                                @if(Gate::check('edit invoice') || Gate::check('delete invoice') || Gate::check('show invoice'))
+                                                    <th class="text-end"> {{__('Action')}}</th>
+                                                @endif
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
                                     </div>
                                     <div id="pagination-container"></div>
                                 </div>
