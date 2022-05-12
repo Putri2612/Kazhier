@@ -13,7 +13,9 @@ trait CanManageBalance{
         $account    = BankAccount::where('id', '=', $account_id)->where('created_by', '=', $creatorID)->first();
 
         if($account){
-            $date       = Carbon::createFromFormat('Y-m-d', $date)->firstOfMonth();
+            if(gettype($date) == 'string') {
+                $date       = Carbon::createFromFormat('Y-m-d', $date)->firstOfMonth();
+            }
             $balance    = DB::table('balance')
                             ->where('created_by', '=', $creatorID)
                             ->where('date', '=', $date)

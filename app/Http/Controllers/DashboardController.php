@@ -94,13 +94,23 @@ class DashboardController extends Controller
             $constant['paymentMethod'] = PaymentMethod::where('created_by', $creatorId)->count();
             $constant['bankAccount']   = BankAccount::where('created_by', $creatorId)->count();
             $data['constant']          = $constant;
-            $data['bankAccountDetail'] = BankAccount::where('created_by', '=', $creatorId)->get();
-            $data['recentInvoice']     = Invoice::where('created_by', '=', $creatorId)->orderBy('issue_date', 'desc')->limit(5)->get();
-            $data['weeklyInvoice']     = Auth::user()->weeklyInvoice();
-            $data['monthlyInvoice']    = Auth::user()->monthlyInvoice();
-            $data['recentBill']        = Bill::where('created_by', '=', $creatorId)->orderBy('bill_date', 'desc')->limit(5)->get();
-            $data['weeklyBill']        = Auth::user()->weeklyBill();
-            $data['monthlyBill']       = Auth::user()->monthlyBill();
+            $data['bankAccountDetail'] = BankAccount::where('created_by', '=', $creatorId)
+                                        ->get();
+
+            $data['recentInvoice']     = Invoice::select('id', 'customer_id', 'issue_date', 'due_date', 'status', 'type')
+                                        ->where('created_by', '=', $creatorId)
+                                        ->orderBy('issue_date', 'desc')
+                                        ->limit(5)->get();
+            $data['weeklyInvoice']     = Invoice::weekly();
+            $data['monthlyInvoice']    = Invoice::monthly();
+
+            $data['recentBill']        = Bill::select('id', 'vender_id', 'bill_date', 'due_date', 'status')
+                                        ->where('created_by', '=', $creatorId)
+                                        ->orderBy('bill_date', 'desc')
+                                        ->limit(5)->get();
+            $data['weeklyBill']        = Bill::weekly();
+            $data['monthlyBill']       = Bill::monthly();
+
             $data['goals']             = Goal::where('created_by', '=', $creatorId)->where('is_display', 1)->get();
 
             return view('dashboard.index', $data);

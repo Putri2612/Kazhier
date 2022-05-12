@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Bill extends Model
 {
@@ -131,5 +132,43 @@ class Bill extends Model
 
     public function server(){
         return $this->hasOne(User::class, 'id', 'served_by');
+    }
+
+    public static function weekly() {
+        $start  = now()->startOfWeek();
+        $end    = (clone $start)->endOfWeek();
+        $bills  = Bill::select('id')
+                    ->where('created_by', Auth::user()->creatorId())
+                    ->where('bill_date', '>=', $start)
+                    ->where('bill_date', '<=', $end)
+                    ->get();
+        return self::processStatistic($bills);
+    }
+
+    public static function monthly() {
+        $start  = now()->startOfMonth();
+        $end    = (clone $start)->endOfMonth();
+        $bills  = Bill::select('id')
+                    ->where('created_by', Auth::user()->creatorId())
+                    ->where('bill_date', '>=', $start)
+                    ->where('bill_date', '<=', $end)
+                    ->get();
+        return self::processStatistic($bills);
+    }
+
+    private static function processStatistic($bills) {
+        $detail = [
+            'billTotal'  => 0,
+            'billPaid'   => 0,
+            'billDue'    => 0
+        ];
+
+        foreach($bills as $bill) {
+            $detail['billTotal'] += $bill->getTotal();
+            $detail['billPaid']  += ($bill->getTotal() - $bill->getDue());
+            $detail['billDue']   += $bill->getDue();
+        }
+
+        return $detail;
     }
 }

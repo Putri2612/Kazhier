@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Invoice extends Model
 {
@@ -63,7 +64,7 @@ class Invoice extends Model
     public function updateStatus() {
         $due = $this->getDue();
 
-        $status = self::$statuses[$this->getType()];
+        $status = self::$statuses[strtolower($this->getType())];
 
         if($due <= 0) {
             $this->status = array_search('Paid', $status);
@@ -133,11 +134,7 @@ class Invoice extends Model
 
     public function getTotalDiscount()
     {
-        $totalDiscount = 0;
-        foreach($this->items as $product)
-        {
-            $totalDiscount += $product->discount;
-        }
+        $totalDiscount = $this->items()->sum('discount');
 
         return $totalDiscount;
     }
@@ -149,11 +146,7 @@ class Invoice extends Model
 
     public function getDue()
     {
-        $due = 0;
-        foreach($this->payments as $payment)
-        {
-            $due += $payment->amount;
-        }
+        $due = $this->payments()->sum('amount');
 
         return ($this->getTotal() - $due) - $this->invoiceTotalCreditNote();
     }
@@ -196,4 +189,41 @@ class Invoice extends Model
         return $settings['invoice_prefix'] . sprintf("%05d", $this->invoice_id);
     }
 
+    public static function weekly() {
+        $start  = now()->startOfWeek();
+        $end    = (clone $start)->endOfWeek();
+        $invoices = Invoice::select('id')
+                    ->where('created_by', Auth::user()->creatorId())
+                    ->where('issue_date', '>=', $start)
+                    ->where('issue_date', '<=', $end)
+                    ->get();
+        return self::processStatistic($invoices);
+    }
+
+    public static function monthly() {
+        $start  = now()->startOfMonth();
+        $end    = (clone $start)->endOfMonth();
+        $invoices = Invoice::select('id')
+                    ->where('created_by', Auth::user()->creatorId())
+                    ->where('issue_date', '>=', $start)
+                    ->where('issue_date', '<=', $end)
+                    ->get();
+        return self::processStatistic($invoices);
+    }
+
+    private static function processStatistic($invoices) {
+        $detail = [
+            'invoiceTotal'  => 0,
+            'invoicePaid'   => 0,
+            'invoiceDue'    => 0
+        ];
+
+        foreach($invoices as $invoice) {
+            $detail['invoiceTotal'] += $invoice->getTotal();
+            $detail['invoicePaid']  += ($invoice->getTotal() - $invoice->getDue());
+            $detail['invoiceDue']   += $invoice->getDue();
+        }
+
+        return $detail;
+    }
 }

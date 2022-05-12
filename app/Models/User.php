@@ -378,16 +378,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return User::where('created_by', '=', $id)->count();
     }
 
-    public function totalCompanyCustomer($id)
-    {
-        return Customer::where('created_by', '=', $id)->count();
-    }
-
-    public function totalCompanyVender($id)
-    {
-        return Vender::where('created_by', '=', $id)->count();
-    }
-
     public function planPrice()
     {
         $user = $this;
@@ -431,50 +421,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function currentPlan()
     {
         return $this->hasOne(Plan::class, 'id', 'plan');
-    }
-
-    public function weeklyInvoice()
-    {
-        $staticstart  = date('Y-m-d', strtotime('last Week'));
-        $currentDate  = date('Y-m-d');
-        $invoices     = Invoice:: select('*')->where('created_by', $this->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
-        $invoiceTotal = 0;
-        $invoicePaid  = 0;
-        $invoiceDue   = 0;
-        foreach($invoices as $invoice)
-        {
-            $invoiceTotal += $invoice->getTotal();
-            $invoicePaid  += ($invoice->getTotal() - $invoice->getDue());
-            $invoiceDue   += $invoice->getDue();
-        }
-
-        $invoiceDetail['invoiceTotal'] = $invoiceTotal;
-        $invoiceDetail['invoicePaid']  = $invoicePaid;
-        $invoiceDetail['invoiceDue']   = $invoiceDue;
-
-        return $invoiceDetail;
-    }
-
-    public function monthlyInvoice()
-    {
-        $staticstart  = date('Y-m-d', strtotime('last Month'));
-        $currentDate  = date('Y-m-d');
-        $invoices     = Invoice:: select('*')->where('created_by', $this->creatorId())->where('issue_date', '>=', $staticstart)->where('issue_date', '<=', $currentDate)->get();
-        $invoiceTotal = 0;
-        $invoicePaid  = 0;
-        $invoiceDue   = 0;
-        foreach($invoices as $invoice)
-        {
-            $invoiceTotal += $invoice->getTotal();
-            $invoicePaid  += ($invoice->getTotal() - $invoice->getDue());
-            $invoiceDue   += $invoice->getDue();
-        }
-
-        $invoiceDetail['invoiceTotal'] = $invoiceTotal;
-        $invoiceDetail['invoicePaid']  = $invoicePaid;
-        $invoiceDetail['invoiceDue']   = $invoiceDue;
-
-        return $invoiceDetail;
     }
 
     public function weeklyBill()
