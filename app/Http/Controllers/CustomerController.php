@@ -128,6 +128,10 @@ class CustomerController extends Controller
             $customerData['biling_country']     = 'Indonesia';
             $customerData['shipping_country']   = 'Indonesia';
 
+            if(empty($customerData['category_id'])) {
+                $customerData['category_id'] = 0;
+            }
+
             $customer   = Customer::create($customerData);
             $customer->refresh();
 
