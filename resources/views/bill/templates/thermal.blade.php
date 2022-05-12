@@ -35,12 +35,12 @@
             <tr>
                 <td colspan="2">{{ __('NO.') }}</td>
                 <td>:</td>
-                <td colspan="3">{{ Utility::billNumberFormat($settings,$bill->bill_id) }}</td>
+                <td colspan="3">{{ $bill->billNumber() }}</td>
             </tr>
             <tr>
                 <td colspan="2">{{ __('Date') }}</td>
                 <td>:</td>
-                <td colspan="3">{{ Utility::dateFormat($settings,$bill->bill_date) }}</td>    
+                <td colspan="3">{{ Helper::dateFormat($bill->bill_date) }}</td>    
             </tr>
             <tr>
                 <td colspan="2">{{ __('Server') }}</td>

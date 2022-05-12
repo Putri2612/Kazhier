@@ -724,8 +724,8 @@ class InvoiceController extends Controller
             $item->name     = 'Item ' . $i;
             $item->quantity = 1;
             $item->tax      = 5;
-            $item->discount = 50;
-            $item->price    = 100;
+            $item->discount = 0;
+            $item->price    = 1000;
             $items[]        = $item;
         }
 

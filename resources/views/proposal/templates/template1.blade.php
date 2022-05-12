@@ -533,11 +533,11 @@
                                             </tr>
                                             <tr>
                                                 <td>{{__('Issue Date')}}:</td>
-                                                <td>{{\App\Models\Utility::dateFormat($settings,$proposal->issue_date)}}</td>
+                                                <td>{{Helper::dateFormat($proposal->issue_date)}}</td>
                                             </tr>
                                             <tr>
                                                 <td>{{__('Due Date')}}:</td>
-                                                <td>{{\App\Models\Utility::dateFormat($settings,$proposal->due_date)}}</td>
+                                                <td>{{Helper::dateFormat($proposal->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>

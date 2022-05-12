@@ -505,8 +505,8 @@
                             <div data-v-7d9d14b5="" class="d-inner" style="border-right: 50px solid {{$color}};">
                                 <div data-v-7d9d14b5="" class="row">
                                     <div data-v-7d9d14b5="" class="col-2"><h1 data-v-7d9d14b5="" class="fancy-title tu mb5" style="color: {{$color}};">{{__('BILL')}}</h1>
-                                        <h3 data-v-7d9d14b5="">{{\App\Models\Utility::billNumberFormat($settings,$bill->bill_id)}}</h3>
-                                        <p data-v-7d9d14b5="">{{\App\Models\Utility::dateFormat($settings,$bill->issue_date)}}</p>
+                                        <h3 data-v-7d9d14b5="">{{$bill->billNumber()}}</h3>
+                                        <p data-v-7d9d14b5="">{{Helper::dateFormat($bill->issue_date)}}</p>
                                     </div>
                                     <div data-v-7d9d14b5="" class="col-2 text-end"><img data-v-7d9d14b5="" class="d-logo" src="{{$img}}" style="max-width: 250px;"></div>
                                 </div>
@@ -526,7 +526,7 @@
                                             <tbody data-v-7d9d14b5="">
                                             <tr data-v-7d9d14b5="">
                                                 <td data-v-7d9d14b5="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-7d9d14b5="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
+                                                <td data-v-7d9d14b5="" class="text-end">{{Helper::dateFormat($bill->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>

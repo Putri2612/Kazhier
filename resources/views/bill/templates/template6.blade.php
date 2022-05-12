@@ -554,15 +554,15 @@
                                             <tbody data-v-4b3dcb8a="">
                                             <tr data-v-4b3dcb8a="">
                                                 <td data-v-4b3dcb8a="" class="fwb">{{__('Number')}}:</td>
-                                                <td data-v-4b3dcb8a="" class="text-end">{{\App\Models\Utility::billNumberFormat($settings,$bill->bill_id)}}</td>
+                                                <td data-v-4b3dcb8a="" class="text-end">{{$bill->billNumber()}}</td>
                                             </tr>
                                             <tr data-v-4b3dcb8a="">
                                                 <td data-v-4b3dcb8a="" class="fwb">{{__('Issue Date')}}:</td>
-                                                <td data-v-4b3dcb8a="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->issue_date)}}</td>
+                                                <td data-v-4b3dcb8a="" class="text-end">{{Helper::dateFormat($bill->issue_date)}}</td>
                                             </tr>
                                             <tr data-v-4b3dcb8a="">
                                                 <td data-v-4b3dcb8a="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-4b3dcb8a="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$bill->due_date)}}</td>
+                                                <td data-v-4b3dcb8a="" class="text-end">{{Helper::dateFormat($bill->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>

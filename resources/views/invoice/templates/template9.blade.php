@@ -504,8 +504,8 @@
                             <div data-v-7d9d14b5="" class="d-inner" style="border-right: 50px solid {{$color}};">
                                 <div data-v-7d9d14b5="" class="row">
                                     <div data-v-7d9d14b5="" class="col-2"><h1 data-v-7d9d14b5="" class="fancy-title tu mb5" style="color: {{$color}};">{{__('INVOICE')}}</h1>
-                                        <h3 data-v-7d9d14b5="">{{\App\Models\Utility::invoiceNumberFormat($settings,$invoice->invoice_id)}}</h3>
-                                        <p data-v-7d9d14b5="">{{\App\Models\Utility::dateFormat($settings,$invoice->issue_date)}}</p>
+                                        <h3 data-v-7d9d14b5="">{{$invoice->invoiceNumber()}}</h3>
+                                        <p data-v-7d9d14b5="">{{Helper::dateFormat($invoice->issue_date)}}</p>
                                     </div>
                                     <div data-v-7d9d14b5="" class="col-2 text-end"><img data-v-7d9d14b5="" class="d-logo" src="{{$img}}" style="max-width: 250px;"></div>
                                 </div>
@@ -525,7 +525,7 @@
                                             <tbody data-v-7d9d14b5="">
                                             <tr data-v-7d9d14b5="">
                                                 <td data-v-7d9d14b5="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-7d9d14b5="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$invoice->due_date)}}</td>
+                                                <td data-v-7d9d14b5="" class="text-end">{{Helper::dateFormat($invoice->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -561,11 +561,7 @@
                                             <div class="d-table-th w-8">{{__('Item')}}</div>
                                             <div class="d-table-th w-3">{{__('Quantity')}}</div>
                                             <div class="d-table-th w-3">{{__('Tax')}} (%)</div>
-                                            @if($invoice->discount_apply==1)
-                                                <div class="d-table-th w-3">{{__('Discount')}}</div>
-                                            @else
-                                                <div class="d-table-th w-3"></div>
-                                            @endif
+                                            <div class="d-table-th w-3">{{__('Discount')}}</div>
                                             <div class="d-table-th w-3">{{__('Price')}}</div>
                                             <div class="d-table-th w-4 text-end">{{__('Totals')}}
                                             </div>
@@ -583,15 +579,9 @@
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{$item->tax}}</pre>
                                                         </div>
-                                                        @if($invoice->discount_apply==1)
-                                                            <div class="d-table-td w-3">
-                                                                <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
-                                                            </div>
-                                                        @else
-                                                            <div class="d-table-td w-3">
-                                                                <pre data-v-f2a183a6=""></pre>
-                                                            </div>
-                                                        @endif
+                                                        <div class="d-table-td w-3">
+                                                            <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
+                                                        </div>
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                         </div>

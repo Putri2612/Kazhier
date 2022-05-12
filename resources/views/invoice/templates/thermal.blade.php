@@ -35,12 +35,12 @@
             <tr>
                 <td colspan="2">{{ __('NO.') }}</td>
                 <td>:</td>
-                <td colspan="3">{{ Utility::invoiceNumberFormat($settings,$invoice->invoice_id) }}</td>
+                <td colspan="3">{{ $invoice->invoiceNumber() }}</td>
             </tr>
             <tr>
                 <td colspan="2">{{ __('Date') }}</td>
                 <td>:</td>
-                <td colspan="3">{{ Utility::dateFormat($settings,$invoice->issue_date) }}</td>    
+                <td colspan="3">{{ Helper::dateFormat($invoice->issue_date) }}</td>    
             </tr>
             <tr>
                 <td colspan="2">{{ __('Server') }}</td>
