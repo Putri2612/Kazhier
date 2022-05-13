@@ -99,6 +99,7 @@
                         icon.classList.remove('fa-circle-check', 'text-success');
                         icon.classList.add('fa-circle-exclamation', 'text-warning');
 
+                        text.classList.add('text-start');
                         text.innerHTML = response.failed;
                         success = false;
                     }
@@ -108,6 +109,7 @@
                     
                     icon.classList.remove('fa-circle-check', 'text-success');
                     icon.classList.add('fa-circle-xmark', 'text-danger');
+                    text.classList.add('text-start');
 
                     text.innerHTML = `${response.empty} {{ __('cannot be found') }}. {{ __('Please refer to sample we provide') }}.`;
 
@@ -116,6 +118,7 @@
                     icon.classList.remove('fa-circle-check', 'text-success');
                     icon.classList.add('fa-circle-xmark', 'text-danger');
 
+                    text.classList.add('text-start');
                     text.innerHTML = client.responseText;
 
                     next = true;

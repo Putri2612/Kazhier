@@ -53,7 +53,8 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
             ]);
             if($validator->fails()) {
                 foreach($validator->errors()->all() as $message) {
-                    $fails .= "Error: {$message} on row {$this->row}\n";
+                    $fails .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails .= '\n';
                 }
                 continue;
             }
@@ -68,7 +69,8 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Category name invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $category = ProductServiceCategory::firstOrNew(['name' => $collection[$headings['category']], 'type' => 1, 'created_by' => $this->user->creatorId()]);
                     if(!$category->exists) {
@@ -112,13 +114,14 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
             $description = ' ';
             if(!empty($headings['description']) && $headings['description'] != '---') {
                 $validator = Validator::make($collection, [
-                    $headings['description'] => 'string|regex:/^[\w\-\s\n\r\(\)]*/i'
+                    $headings['description'] => 'string|nullable|regex:/^[\w\-\s\n\r\(\)]*/i'
                 ]);
 
                 if($validator->fails()) {
-                    $message = __('Description invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
-                } else {
+                    $message = __("Description invalid, please only use these characters: A-Z, a-z, 0-9, \"(\", \")\", and \"-\"");
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
+                } else if($collection[$headings['description']]){
                     $description = $collection[$headings['description']];
                 }
             }
@@ -131,7 +134,8 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Bank account invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else if($this->user->currentPlan->max_bank_accounts > $this->user->countBankAccount()){
                     $exploded   = explode('-', $collection[$headings['account']]);
                     $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
@@ -185,7 +189,8 @@ class RevenueImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Customer name invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $customer = Customer::firstOrNew([
                         'name'          => $collection[$headings['customer']],

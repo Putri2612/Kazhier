@@ -22,7 +22,7 @@
                     account = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '',
                     customer = data.customer ? data.customer.name : '',
                     category = data.category ? data.category.name : '',
-                    paymentMethod = data.paymentMethod ? data.paymentMethod.name : '';
+                    paymentMethod = data.payment_method ? data.payment_method.name : '';
                 
                 @can('edit revenue')
                     let editURL = "{{ route('revenue.edit', ['revenue' => ':id']) }}";

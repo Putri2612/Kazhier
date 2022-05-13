@@ -56,7 +56,8 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
             ]);
             if($validator->fails()) {
                 foreach($validator->errors()->all() as $message) {
-                    $fails .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 }
                 continue;
             }
@@ -71,7 +72,8 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Category name invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $category = ProductServiceCategory::firstOrNew(['name' => $collection[$headings['category']], 'type' => 2, 'created_by' => $this->user->creatorId()]);
                     if(!$category->exists) {
@@ -96,7 +98,8 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Payment method invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $payment_method = PaymentMethod::firstOrNew(['name' => $collection[$headings['payment_method']], 'created_by' => $this->user->creatorId()]);
                     if(!$payment_method->exists) {
@@ -122,8 +125,9 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
 
                 if($validator->fails()) {
-                    $message = __('Description invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $message = __("Description invalid, please only use these characters: A-Z, a-z, 0-9, \"(\", \")\", and \"-\"");
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $description = $collection[$headings['description']];
                 }
@@ -138,7 +142,8 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Bank account invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else if($this->user->currentPlan->max_bank_accounts > $this->user->countBankAccount()){
                     $exploded   = explode('-', $collection[$headings['account']]);
                     $bank_name  = count($exploded) > 1 ? $exploded[0] : 'Bank Indonesia';
@@ -191,7 +196,8 @@ class PaymentImport implements ToCollection, WithHeadingRow, WithEvents
                 ]);
                 if($validator->fails()) {
                     $message = __('Vendor name invalid');
-                    $fails  .= "Error: {$message} on row {$this->row}\n";
+                    $fails  .= __("Error: :message on row :row", ['message' => $message, 'row' => $this->row]);
+                    $fails  .= '<br/>';
                 } else {
                     $vender = Vender::firstOrNew([
                         'name'      => $collection[$headings['vender']],
