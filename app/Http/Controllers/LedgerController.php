@@ -96,6 +96,7 @@ class LedgerController extends Controller
             
             $ledger_data   = $unsorted_data->sortBy('date')->values()->all();
             $ledger        = array();
+            dd($ledger_data);
 
             foreach($ledger_data as $data){
                 $description = '';
@@ -105,9 +106,9 @@ class LedgerController extends Controller
                     if(is_a($data, 'App\Models\Revenue') || is_a($data, 'App\Models\Payment')){
                         $description = $data->description;
                     } else if(is_a($data, 'App\Models\InvoicePayment')){
-                        $description = \Auth::user()->invoiceNumberFormat($data->invoice_id).' Payment';
+                        $description = $data->invoice->invoiceNumber().' Payment';
                     } else if(is_a($data, 'App\Models\BillPayment')){
-                        $description = \Auth::user()->billNumberFormat($data->invoice_id).' Payment';
+                        $description = $data->bill->billNumber().' Payment';
                     }
                     $ledger[] = array(
                         'date' => $data->date,
@@ -124,14 +125,14 @@ class LedgerController extends Controller
                         $debit = $data->amount;
                         $credit = 0;
                         $description = $data->description;
-                    } else if(is_a($data, 'App\InvoicePayment')){
+                    } else if(is_a($data, 'App\Models\InvoicePayment')){
                         $credit = $data->amount;
                         $debit = 0;
-                        $description = \Auth::user()->invoiceNumberFormat($data->invoice_id).' Payment';
-                    } else if(is_a($data, 'App\BillPayment')){
+                        $description = $data->invoice->invoiceNumber().' Payment';
+                    } else if(is_a($data, 'App\Models\BillPayment')){
                         $debit = $data->amount;
                         $credit = 0;
-                        $description = \Auth::user()->billNumberFormat($data->invoice_id).' Payment';
+                        $description = $data->bill->billNumber().' Payment';
                     }
                     $ledger[] = array(
                         'date' => $data->date,
@@ -143,7 +144,6 @@ class LedgerController extends Controller
             }
 
             $count  = count($ledger);
-            $ledger = collect($ledger);
             
 
             return view('ledger.index', compact('ledger', 'count', 'months', 'years', 'accountList', 'prevBalance', 'selected_year'));

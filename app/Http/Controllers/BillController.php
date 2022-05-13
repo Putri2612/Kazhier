@@ -385,6 +385,15 @@ class BillController extends Controller
                 ProductServiceStockChange::where('bill_id', $bill->id)->delete();
                 BillProduct::where('bill_id', '=', $bill->id)->delete();
 
+                $payments = BillPayment::select('account_id', 'date', DB::raw('SUM(amount) AS amount'))
+                            ->where('bill_id', $bill->id)
+                            ->groupBy('date', 'account_id')
+                            ->get();
+                foreach($payments as $payment) {
+                    $this->AddBalance($payment->account_id, $payment->amount, $payment->date);
+                }
+                BillPayment::where('bill_id', $bill->id)->delete();
+
                 return redirect()->route('bill.index')->with('success', __('Bill successfully deleted.'));
             }
             else

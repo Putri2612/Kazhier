@@ -668,28 +668,48 @@ class UserController extends Controller
 
             foreach ($users as $user){
                 DB::delete('DELETE FROM balance WHERE created_by = ?', array($user->id));
+                $bills = Bill::where('created_by', $user->id)->pluck('id');
+                BillPayment::where('created_by', $user->id)->whereNotIn('bill_id', $bills)->delete();
 
-                $revenues = Revenue::where('created_by', '=', $user->id)->get();
+                $invoices = Invoice::where('created_by', $user->id)->pluck('id');
+                InvoicePayment::where('created_by', $user->id)->whereNotIn('invoice_id', $invoices)->delete();
+
+                $revenues   = Revenue::select('account_id', 'date', DB::raw('SUM(amount) as amount'))
+                            ->where('created_by', '=', $user->id)
+                            ->groupBy('date', 'account_id')
+                            ->get();
                 foreach($revenues as $revenue){
                     $this->AddBalance($revenue->account_id, $revenue->amount, $revenue->date, $user);
                 }
 
-                $payments = Payment::where('created_by', '=', $user->id)->get();
+                $payments   = Payment::select('account_id', 'date', DB::raw('SUM(amount) as amount'))
+                            ->where('created_by', '=', $user->id)
+                            ->groupBy('date', 'account_id')
+                            ->get();
                 foreach($payments as $payment){
                     $this->AddBalance($payment->account_id, -$payment->amount, $payment->date, $user);
                 }
 
-                $invoicePayments = InvoicePayment::where('created_by', '=', $user->id)->get();
+                $invoicePayments    = InvoicePayment::select('account_id', 'date', DB::raw('SUM(amount) as amount'))
+                                    ->where('created_by', '=', $user->id)
+                                    ->groupBy('date', 'account_id')
+                                    ->get();
                 foreach($invoicePayments as $invoicePayment){
                     $this->AddBalance($invoicePayment->account_id, $invoicePayment->amount, $invoicePayment->date, $user);
                 }
 
-                $billPayments = BillPayment::where('created_by', '=', $user->id)->get();
+                $billPayments   = BillPayment::select('account_id', 'date', DB::raw('SUM(amount) as amount'))
+                                ->where('created_by', '=', $user->id)
+                                ->groupBy('date', 'account_id')
+                                ->get();
                 foreach($billPayments as $billPayment){
                     $this->AddBalance($billPayment->account_id, -$billPayment->amount, $billPayment->date, $user);
                 }
 
-                $transfers = Transfer::where('created_by', '=', $user->id)->get();
+                $transfers = Transfer::select('from_account', 'to_account', 'date', DB::raw('SUM(amount) as amount'))
+                            ->where('created_by', '=', $user->id)
+                            ->groupBy('date', 'from_account', 'to_account')
+                            ->get();
                 foreach($transfers as $transfer){
                     $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date, $user);
                 }
