@@ -51,6 +51,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public $settings;
 
+    public function activePlan() {
+        if($this->type == 'company') {
+            return $this->belongsTo(Plan::class, 'plan')->first();
+        } else if($this->type != 'super admin') {
+            $user = User::find($this->creatorId());
+            return $user->activePlan();
+        }
+    }
     public function planActive() {
         if($this->type == 'company') {
             return $this->plan || $this->plan_expire_date >= date('Y-m-d');
