@@ -21,4 +21,13 @@ class Asset extends Model
         'supported_date' => 'datetime',
     ];
 
+    public static $types = [
+        'current asset',
+        'fixed asset',
+        'inventory',
+        'non-current asset',
+        'prepayment',
+        'bank & cash',
+        'depreciation'
+    ];
 }
