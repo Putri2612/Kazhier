@@ -128,12 +128,16 @@
                     <a href="{{route('agreement.edit', 'term-of-service') }}" class="nav-link"><i class="fas fa-signature"></i><span>{{ __('Agreement') }}</span></a>
                 </li>
             @else
-                @php 
-                    $user = \Auth::user();
-                    $totalUser = $user->countUsers();
-                    $plan = App\Models\Plan::find($user->plan);
+                @php
+                    $plan       = Auth::user()->activePlan();
+                    $maxUser    = 0;
+                    if(empty($plan)) {
+                        Log::debug(json_encode(['id' => Auth::user()->id, 'creatorId' => Auth::user()->creatorId()]));
+                    } else {
+                        $maxUser = $plan->max_users;
+                    }
                 @endphp
-                @if( (Gate::check('manage user') || Gate::check('manage role')) && ($totalUser < $plan->max_users || $plan->max_users == -1))
+                @if((Gate::check('manage user') || Gate::check('manage role')) && $maxUser != 0)
                     <li class="dropdown {{ (Request::segment(2) == 'users' || Request::segment(2) == 'roles' || Request::segment(2) == 'permissions' )?' active':''}}">
                         <a href="#" class="nav-link has-dropdown" data-toggle="dropdown"><i class="fas fa-users"></i> <span>{{__('Staff')}}</span></a>
                         <ul class="dropdown-menu {{ (Request::segment(2) == 'users' || Request::segment(2) == 'roles' || Request::segment(2) == 'permissions')?'display:block':''}}">

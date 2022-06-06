@@ -51,6 +51,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public $settings;
 
+    public function activePlan() {
+        if($this->type == 'company') {
+            return $this->belongsTo(Plan::class, 'plan')->first();
+        } else if($this->type != 'super admin') {
+            $user = User::find($this->creatorId());
+            return $user->activePlan();
+        }
+    }
     public function planActive() {
         if($this->type == 'company') {
             return $this->plan || $this->plan_expire_date >= date('Y-m-d');
@@ -421,50 +429,6 @@ class User extends Authenticatable implements MustVerifyEmail
     public function currentPlan()
     {
         return $this->hasOne(Plan::class, 'id', 'plan');
-    }
-
-    public function weeklyBill()
-    {
-        $staticstart = date('Y-m-d', strtotime('last Week'));
-        $currentDate = date('Y-m-d');
-        $bills       = Bill:: select('*')->where('created_by', $this->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
-        $billTotal   = 0;
-        $billPaid    = 0;
-        $billDue     = 0;
-        foreach($bills as $bill)
-        {
-            $billTotal += $bill->getTotal();
-            $billPaid  += ($bill->getTotal() - $bill->getDue());
-            $billDue   += $bill->getDue();
-        }
-
-        $billDetail['billTotal'] = $billTotal;
-        $billDetail['billPaid']  = $billPaid;
-        $billDetail['billDue']   = $billDue;
-
-        return $billDetail;
-    }
-
-    public function monthlyBill()
-    {
-        $staticstart = date('Y-m-d', strtotime('last Month'));
-        $currentDate = date('Y-m-d');
-        $bills       = Bill:: select('*')->where('created_by', $this->creatorId())->where('bill_date', '>=', $staticstart)->where('bill_date', '<=', $currentDate)->get();
-        $billTotal   = 0;
-        $billPaid    = 0;
-        $billDue     = 0;
-        foreach($bills as $bill)
-        {
-            $billTotal += $bill->getTotal();
-            $billPaid  += ($bill->getTotal() - $bill->getDue());
-            $billDue   += $bill->getDue();
-        }
-
-        $billDetail['billTotal'] = $billTotal;
-        $billDetail['billPaid']  = $billPaid;
-        $billDetail['billDue']   = $billDue;
-
-        return $billDetail;
     }
 
     public function getAllRecordYear(){

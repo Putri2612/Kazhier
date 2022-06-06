@@ -505,7 +505,7 @@
                                 <div data-v-7d9d14b5="" class="row">
                                     <div data-v-7d9d14b5="" class="col-2"><h1 data-v-7d9d14b5="" class="fancy-title tu mb5" style="color: {{$color}};">{{__('PROPOSAL')}}</h1>
                                         <h3 data-v-7d9d14b5="">{{\App\Models\Utility::proposalNumberFormat($settings,$proposal->proposal_id)}}</h3>
-                                        <p data-v-7d9d14b5="">{{\App\Models\Utility::dateFormat($settings,$proposal->issue_date)}}</p>
+                                        <p data-v-7d9d14b5="">{{Helper::dateFormat($proposal->issue_date)}}</p>
                                     </div>
                                     <div data-v-7d9d14b5="" class="col-2 text-end"><img data-v-7d9d14b5="" class="d-logo" src="{{$img}}" style="max-width: 250px;"></div>
                                 </div>
@@ -525,7 +525,7 @@
                                             <tbody data-v-7d9d14b5="">
                                             <tr data-v-7d9d14b5="">
                                                 <td data-v-7d9d14b5="" class="fwb">{{__('Due Date')}}:</td>
-                                                <td data-v-7d9d14b5="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$proposal->due_date)}}</td>
+                                                <td data-v-7d9d14b5="" class="text-end">{{Helper::dateFormat($proposal->due_date)}}</td>
                                             </tr>
                                             </tbody>
                                         </table>

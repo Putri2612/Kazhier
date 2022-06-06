@@ -525,15 +525,15 @@
                                         <tbody data-v-37eeda86="">
                                         <tr>
                                             <td>{{__('Number')}}:</td>
-                                            <td>{{\App\Models\Utility::invoiceNumberFormat($settings,$invoice->invoice_id)}}</td>
+                                            <td>{{$invoice->invoiceNumber()}}</td>
                                         </tr>
                                         <tr>
                                             <td>{{__('Issue Date')}}:</td>
-                                            <td>{{\App\Models\Utility::dateFormat($settings,$invoice->issue_date)}}</td>
+                                            <td>{{Helper::dateFormat($invoice->issue_date)}}</td>
                                         </tr>
                                         <tr>
                                             <td>{{__('Due Date')}}:</td>
-                                            <td>{{\App\Models\Utility::dateFormat($settings,$invoice->due_date)}}</td>
+                                            <td>{{Helper::dateFormat($invoice->due_date)}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -572,11 +572,7 @@
                                             <div class="d-table-th w-8">{{__('Item')}}</div>
                                             <div class="d-table-th w-3">{{__('Quantity')}}</div>
                                             <div class="d-table-th w-3">{{__('Tax')}} (%)</div>
-                                            @if($invoice->discount_apply==1)
-                                                <div class="d-table-th w-3">{{__('Discount')}}</div>
-                                            @else
-                                                <div class="d-table-th w-3"></div>
-                                            @endif
+                                            <div class="d-table-th w-3">{{__('Discount')}}</div>
                                             <div class="d-table-th w-3">{{__('Price')}}</div>
                                             <div class="d-table-th w-4 text-end">{{__('Totals')}} </div>
                                         </div>
@@ -593,15 +589,9 @@
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{$item->tax}}</pre>
                                                         </div>
-                                                        @if($invoice->discount_apply==1)
-                                                            <div class="d-table-td w-3">
-                                                                <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
-                                                            </div>
-                                                        @else
-                                                            <div class="d-table-td w-3">
-                                                                <pre data-v-f2a183a6=""></pre>
-                                                            </div>
-                                                        @endif
+                                                        <div class="d-table-td w-3">
+                                                            <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
+                                                        </div>
                                                         <div class="d-table-td w-3">
                                                             <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                         </div>

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Imagick;
 
 trait CanUploadFile{
     public function UploadFile($file, $location){
@@ -11,6 +12,23 @@ trait CanUploadFile{
         $newName        = md5(Auth::user()->creatorId().uniqid().$originalName);
         $extension      = $file->getClientOriginalExtension();
         $file->storeAs('public/'.$location, $newName.'.'.$extension);
+
+        $path   = storage_path("app/public/{$location}/{$newName}.{$extension}");
+        $image  = new Imagick($path);
+        $height = $image->getImageHeight();
+        $width  = $image->getImageWidth();
+        if($height > $width) {
+            $row    = 800;
+            $col    = 600;
+        } else {
+            $col    = 800;
+            $row    = 600;
+        }
+
+        if($height > $row || $width > $col) {
+            $image->scaleImage($col, $row, true);
+            $image->writeImage($path);
+        }
 
         return $newName.'.'.$extension;
     }

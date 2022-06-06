@@ -14,19 +14,28 @@
         $(document).on("change", "select[name='invoice_template'], input[name='invoice_color']", function () {
             var template = $("select[name='invoice_template']").val();
             var color = $("input[name='invoice_color']:checked").val();
-            $('#invoice_frame').attr('src', '{{url('/invoices/preview')}}/' + template + '/' + color);
+            let url = `{{ route('invoice.preview', [':template', ':color']) }}`;
+                url = url.replace(':template', template);
+                url = url.replace(':color', color);
+            $('#invoice_frame').attr('src', url);
         });
 
         $(document).on("change", "select[name='proposal_template'], input[name='proposal_color']", function () {
             var template = $("select[name='proposal_template']").val();
             var color = $("input[name='proposal_color']:checked").val();
-            $('#proposal_frame').attr('src', '{{url('/proposal/preview')}}/' + template + '/' + color);
+            let url = `{{ route('proposal.preview', [':template', ':color']) }}`;
+                url = url.replace(':template', template);
+                url = url.replace(':color', color);
+            $('#proposal_frame').attr('src', url);
         });
 
         $(document).on("change", "select[name='bill_template'], input[name='bill_color']", function () {
             var template = $("select[name='bill_template']").val();
             var color = $("input[name='bill_color']:checked").val();
-            $('#bill_frame').attr('src', '{{url('/bill/preview')}}/' + template + '/' + color);
+            let url = `{{ route('bill.preview', [':template', ':color']) }}`;
+                url = url.replace(':template', template);
+                url = url.replace(':color', color);
+            $('#bill_frame').attr('src', url);
         });
     </script>
     
@@ -74,331 +83,217 @@
                                 <div class="tab-pane fade fade show active" id="business-setting" role="tabpanel" aria-labelledby="profile-tab3">
                                     <div class="company-setting-wrap">
                                         {{Form::model($settings,array('route'=>'business.setting','method'=>'POST','enctype' => "multipart/form-data"))}}
-                                        <div class="card-body">
                                             <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-4">
-                                                        <h5>{{__('Logo')}}</h5>
-                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
-                                                            <div class="fileinput-new thumbnail h-150">
-                                                                <img src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-4">
+                                                            <h5>{{__('Logo')}}</h5>
+                                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                <div class="fileinput-new thumbnail h-150">
+                                                                    <img src="{{$logo.'/'.(isset($company_logo) && !empty($company_logo)?$company_logo:'logo.png').'?'.rand()}}" alt="">
+                                                                </div>
+                                                                <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
+                                                                <div>
+                                                                <span class="btn btn-primary btn-file">
+                                                                    <span class="fileinput-new"> {{__('Select image')}} </span>
+                                                                    <span class="fileinput-exists"> {{__('Change')}} </span>
+                                                                    <input type="hidden">
+                                                                    <input type="file" name="company_logo" id="logo">
+                                                                </span>
+                                                                    <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
+                                                                </div>
                                                             </div>
-                                                            <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
-                                                            <div>
-                                                            <span class="btn btn-primary btn-file">
-                                                                <span class="fileinput-new"> {{__('Select image')}} </span>
-                                                                <span class="fileinput-exists"> {{__('Change')}} </span>
-                                                                <input type="hidden">
-                                                                <input type="file" name="company_logo" id="logo">
-                                                            </span>
-                                                                <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
+                                                            <p class="mt-3 text-primary"> {{__('These Logo will appear on Bill and Invoice as well.')}}</p>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <h5>{{__('Small Logo')}}</h5>
+                                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                <div class="fileinput-new thumbnail h-150">
+                                                                    <img src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png').'?'.rand()}}" alt="">
+                                                                </div>
+                                                                <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
+                                                                <div>
+                                                                <span class="btn btn-primary btn-file">
+                                                                    <span class="fileinput-new"> {{__('Select image')}} </span>
+                                                                    <span class="fileinput-exists"> {{__('Change')}} </span>
+                                                                    <input type="hidden">
+                                                                    <input type="file" name="company_small_logo" id="company_small_logo">
+                                                                </span>
+                                                                    <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <p class="mt-3 text-primary"> {{__('These Logo will appear on Bill and Invoice as well.')}}</p>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <h5>{{__('Small Logo')}}</h5>
-                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
-                                                            <div class="fileinput-new thumbnail h-150">
-                                                                <img src="{{$logo.'/'.(isset($company_small_logo) && !empty($company_small_logo)?$company_small_logo:'small_logo.png').'?'.rand()}}" alt="">
-                                                            </div>
-                                                            <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
-                                                            <div>
-                                                            <span class="btn btn-primary btn-file">
-                                                                <span class="fileinput-new"> {{__('Select image')}} </span>
-                                                                <span class="fileinput-exists"> {{__('Change')}} </span>
-                                                                <input type="hidden">
-                                                                <input type="file" name="company_small_logo" id="company_small_logo">
-                                                            </span>
-                                                                <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-lg-4">
-                                                        <h5>{{__('Favicon')}}</h5>
-                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
-                                                            <div class="fileinput-new thumbnail h-150">
-                                                                <img src="{{$logo.'/'.(isset($company_favicon) && !empty($company_favicon)?$company_favicon:'favicon.png').'?'.rand()}}" alt="">
-                                                            </div>
-                                                            <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
-                                                            <div>
-                                                            <span class="btn btn-primary btn-file">
-                                                                <span class="fileinput-new"> {{__('Select image')}} </span>
-                                                                <span class="fileinput-exists"> {{__('Change')}} </span>
-                                                                <input type="hidden">
-                                                                <input type="file" name="company_favicon" id="company_favicon">
-                                                            </span>
-                                                                <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
+                                                        <div class="col-lg-4">
+                                                            <h5>{{__('Favicon')}}</h5>
+                                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                <div class="fileinput-new thumbnail h-150">
+                                                                    <img src="{{$logo.'/'.(isset($company_favicon) && !empty($company_favicon)?$company_favicon:'favicon.png').'?'.rand()}}" alt="">
+                                                                </div>
+                                                                <div class="fileinput-preview fileinput-exists thumbnail thumbnail-h3"></div>
+                                                                <div>
+                                                                <span class="btn btn-primary btn-file">
+                                                                    <span class="fileinput-new"> {{__('Select image')}} </span>
+                                                                    <span class="fileinput-exists"> {{__('Change')}} </span>
+                                                                    <input type="hidden">
+                                                                    <input type="file" name="company_favicon" id="company_favicon">
+                                                                </span>
+                                                                    <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> {{__('Remove')}} </a>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="row">
-                                                    @error('logo')
-                                                    <span class="invalid-logo" role="alert">
-                                                        <strong class="text-danger">{{ $message }}</strong>
-                                                     </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="row mt-20">
-                                                    <div class="form-group col-md-6">
-                                                        {{Form::label('title_text',__('Title Text')) }}
-                                                        {{Form::text('title_text',null,array('class'=>'form-control','placeholder'=>__('Title Text')))}}
-                                                        @error('title_text')
-                                                        <span class="invalid-title_text" role="alert">
-                                                             <strong class="text-danger">{{ $message }}</strong>
-                                                             </span>
+                                                    <div class="row">
+                                                        @error('logo')
+                                                        <span class="invalid-logo" role="alert">
+                                                            <strong class="text-danger">{{ $message }}</strong>
+                                                        </span>
                                                         @enderror
+                                                    </div>
+                                                    <div class="row mt-20">
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('title_text',__('Title Text')) }}
+                                                            {{Form::text('title_text',null,array('class'=>'form-control','placeholder'=>__('Title Text')))}}
+                                                            @error('title_text')
+                                                            <span class="invalid-title_text" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                                </span>
+                                                            @enderror
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="card-footer text-end">
-                                            {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
-                                        </div>
+                                            <div class="card-footer text-end">
+                                                {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
+                                            </div>
                                         {{Form::close()}}
                                     </div>
                                 </div>
                                 <div class="tab-pane fade fade" id="system-setting" role="tabpanel" aria-labelledby="profile-tab3">
                                     <div class="company-setting-wrap">
                                         {{Form::model($settings,array('route'=>'system.settings','method'=>'post'))}}
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('site_currency',__('Currency *')) }}
-                                                    {{Form::text('site_currency',null,array('class'=>'form-control font-style'))}}
-                                                    @error('site_currency')
-                                                    <span class="invalid-site_currency" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('site_currency_symbol',__('Currency Symbol *')) }}
-                                                    {{Form::text('site_currency_symbol',null,array('class'=>'form-control'))}}
-                                                    @error('site_currency_symbol')
-                                                    <span class="invalid-site_currency_symbol" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="form-control-label" for="example3cols3Input">{{__('Currency Symbol Position')}}</label>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <div class="custom-control custom-radio mb-3">
-
-                                                                    <input type="radio" id="customRadio5" name="site_currency_symbol_position" value="pre" class="custom-control-input" @if(@$settings['site_currency_symbol_position'] == 'pre') checked @endif>
-                                                                    <label class="custom-control-label" for="customRadio5">{{__('Pre')}}</label>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        {{Form::label('site_currency',__('Currency *')) }}
+                                                        {{Form::text('site_currency',null,array('class'=>'form-control font-style'))}}
+                                                        @error('site_currency')
+                                                        <span class="invalid-site_currency" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        {{Form::label('site_currency_symbol',__('Currency Symbol *')) }}
+                                                        {{Form::text('site_currency_symbol',null,array('class'=>'form-control'))}}
+                                                        @error('site_currency_symbol')
+                                                        <span class="invalid-site_currency_symbol" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="form-control-label" for="example3cols3Input">{{__('Currency Symbol Position')}}</label>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="custom-control custom-radio mb-3">
+                                                                        <input type="radio" id="customRadio5" name="site_currency_symbol_position" value="pre" class="custom-control-input" @if(@$settings['site_currency_symbol_position'] == 'pre') checked @endif>
+                                                                        <label class="custom-control-label" for="customRadio5">{{__('Pre')}}</label>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <div class="custom-control custom-radio mb-3">
-                                                                    <input type="radio" id="customRadio6" name="site_currency_symbol_position" value="post" class="custom-control-input" @if(@$settings['site_currency_symbol_position'] == 'post') checked @endif>
-                                                                    <label class="custom-control-label" for="customRadio6">{{__('Post')}}</label>
+                                                                <div class="col-md-6">
+                                                                    <div class="custom-control custom-radio mb-3">
+                                                                        <input type="radio" id="customRadio6" name="site_currency_symbol_position" value="post" class="custom-control-input" @if(@$settings['site_currency_symbol_position'] == 'post') checked @endif>
+                                                                        <label class="custom-control-label" for="customRadio6">{{__('Post')}}</label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label for="site_date_format" class="form-control-label">{{__('Date Format')}}</label>
-                                                    <select type="text" name="site_date_format" class="form-control selectric" id="site_date_format">
-                                                        <option value="numeric" @if(@$settings['site_date_format'] == 'numeric') selected="selected" @endif>{{ Helper::DateFormat(now(), 'numeric') }}</option>
-                                                        <option value="short" @if(@$settings['site_date_format'] == 'short') selected="selected" @endif>{{ Helper::DateFormat(now(), 'short') }}</option>
-                                                        <option value="long" @if(@$settings['site_date_format'] == 'long') selected="selected" @endif>{{ Helper::DateFormat(now(), 'long') }}</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label for="site_time_format" class="form-control-label">{{__('Time Format')}}</label>
-                                                    <select type="text" name="site_time_format" class="form-control selectric" id="site_time_format">
-                                                        <option value="short" @if(@$settings['site_time_format'] == 'short') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'short') }}</option>
-                                                        <option value="medium" @if(@$settings['site_time_format'] == 'medium') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'medium') }}</option>
-                                                        <option value="long" @if(@$settings['site_time_format'] == 'long') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'long') }}</option>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('invoice_prefix',__('Invoice Prefix')) }}
-                                                    {{Form::text('invoice_prefix',null,array('class'=>'form-control'))}}
-                                                    @error('invoice_prefix')
-                                                    <span class="invalid-invoice_prefix" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('proposal_prefix',__('Proposal Prefix')) }}
-                                                    {{Form::text('proposal_prefix',null,array('class'=>'form-control'))}}
-                                                    @error('proposal_prefix')
-                                                    <span class="invalid-proposal_prefix" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('bill_prefix',__('Bill Prefix')) }}
-                                                    {{Form::text('bill_prefix',null,array('class'=>'form-control'))}}
-                                                    @error('bill_prefix')
-                                                    <span class="invalid-bill_prefix" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('customer_prefix',__('Customer Prefix')) }}
-                                                    {{Form::text('customer_prefix',null,array('class'=>'form-control'))}}
-                                                    @error('customer_prefix')
-                                                    <span class="invalid-customer_prefix" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('vender_prefix',__('Vender Prefix')) }}
-                                                    {{Form::text('vender_prefix',null,array('class'=>'form-control'))}}
-                                                    @error('vender_prefix')
-                                                    <span class="invalid-vender_prefix" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('invoice_color',__('Invoice/Bill Color Theme')) }}
-                                                    {{Form::text('invoice_color',null,array('class'=>'form-control jscolor'))}}
-                                                    @error('invoice_color')
-                                                    <span class="invalid-invoice_color" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('footer_title',__('Invoice/Bill Footer Title')) }}
-                                                    {{Form::text('footer_title',null,array('class'=>'form-control'))}}
-                                                    @error('footer_title')
-                                                    <span class="invalid-footer_title" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    {{Form::label('footer_notes',__('Invoice/Bill Footer Notes')) }}
-                                                    {{Form::text('footer_notes',null,array('class'=>'form-control'))}}
-                                                    @error('footer_notes')
-                                                    <span class="invalid-footer_notes" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer text-end">
-                                            {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
-                                        </div>
-                                        {{Form::close()}}
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="company-setting" role="tabpanel" aria-labelledby="contact-tab4">
-                                    <div class="email-setting-wrap">
-                                        <div class="row">
-                                            {{Form::model($settings,array('route'=>'company.settings','method'=>'post'))}}
-                                            <div class="card-body">
-                                                <div class="row">
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_name *',__('Company Name *')) }}
-                                                        {{Form::text('company_name',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_name')
-                                                        <span class="invalid-company_name" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        <label for="site_date_format" class="form-control-label">{{__('Date Format')}}</label>
+                                                        <select type="text" name="site_date_format" class="form-control selectric" id="site_date_format">
+                                                            <option value="numeric" @if(@$settings['site_date_format'] == 'numeric') selected="selected" @endif>{{ Helper::DateFormat(now(), 'numeric') }}</option>
+                                                            <option value="short" @if(@$settings['site_date_format'] == 'short') selected="selected" @endif>{{ Helper::DateFormat(now(), 'short') }}</option>
+                                                            <option value="long" @if(@$settings['site_date_format'] == 'long') selected="selected" @endif>{{ Helper::DateFormat(now(), 'long') }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="site_time_format" class="form-control-label">{{__('Time Format')}}</label>
+                                                        <select type="text" name="site_time_format" class="form-control selectric" id="site_time_format">
+                                                            <option value="short" @if(@$settings['site_time_format'] == 'short') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'short') }}</option>
+                                                            <option value="medium" @if(@$settings['site_time_format'] == 'medium') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'medium') }}</option>
+                                                            <option value="long" @if(@$settings['site_time_format'] == 'long') selected="selected" @endif>{{ Helper::TimeFormat(now(), 'long') }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        {{Form::label('invoice_prefix',__('Invoice Prefix')) }}
+                                                        {{Form::text('invoice_prefix',null,array('class'=>'form-control'))}}
+                                                        @error('invoice_prefix')
+                                                        <span class="invalid-invoice_prefix" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_address',__('Address')) }}
-                                                        {{Form::text('company_address',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_address')
-                                                        <span class="invalid-company_address" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        {{Form::label('proposal_prefix',__('Proposal Prefix')) }}
+                                                        {{Form::text('proposal_prefix',null,array('class'=>'form-control'))}}
+                                                        @error('proposal_prefix')
+                                                        <span class="invalid-proposal_prefix" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_city',__('City')) }}
-                                                        {{Form::text('company_city',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_city')
-                                                        <span class="invalid-company_city" role="alert">
-                                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                                </span>
+                                                        {{Form::label('bill_prefix',__('Bill Prefix')) }}
+                                                        {{Form::text('bill_prefix',null,array('class'=>'form-control'))}}
+                                                        @error('bill_prefix')
+                                                        <span class="invalid-bill_prefix" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_state',__('State')) }}
-                                                        {{Form::text('company_state',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_state')
-                                                        <span class="invalid-company_state" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        {{Form::label('customer_prefix',__('Customer Prefix')) }}
+                                                        {{Form::text('customer_prefix',null,array('class'=>'form-control'))}}
+                                                        @error('customer_prefix')
+                                                        <span class="invalid-customer_prefix" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_zipcode',__('Zip/Post Code')) }}
-                                                        {{Form::text('company_zipcode',null,array('class'=>'form-control'))}}
-                                                        @error('company_zipcode')
-                                                        <span class="invalid-company_zipcode" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="form-group  col-md-6">
-                                                        {{Form::label('company_country',__('Country')) }}
-                                                        {{Form::text('company_country',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_country')
-                                                        <span class="invalid-company_country" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        {{Form::label('vender_prefix',__('Vender Prefix')) }}
+                                                        {{Form::text('vender_prefix',null,array('class'=>'form-control'))}}
+                                                        @error('vender_prefix')
+                                                        <span class="invalid-vender_prefix" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_telephone',__('Telephone')) }}
-                                                        {{Form::text('company_telephone',null,array('class'=>'form-control'))}}
-                                                        @error('company_telephone')
-                                                        <span class="invalid-company_telephone" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        {{Form::label('invoice_color',__('Invoice/Bill Color Theme')) }}
+                                                        {{Form::text('invoice_color',null,array('class'=>'form-control jscolor'))}}
+                                                        @error('invoice_color')
+                                                        <span class="invalid-invoice_color" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_email',__('System Email *')) }}
-                                                        {{Form::text('company_email',null,array('class'=>'form-control'))}}
-                                                        @error('company_email')
-                                                        <span class="invalid-company_email" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
+                                                        {{Form::label('footer_title',__('Invoice/Bill Footer Title')) }}
+                                                        {{Form::text('footer_title',null,array('class'=>'form-control'))}}
+                                                        @error('footer_title')
+                                                        <span class="invalid-footer_title" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
                                                         @enderror
                                                     </div>
                                                     <div class="form-group col-md-6">
-                                                        {{Form::label('company_email_from_name',__('Email (From Name) *')) }}
-                                                        {{Form::text('company_email_from_name',null,array('class'=>'form-control font-style'))}}
-                                                        @error('company_email_from_name')
-                                                        <span class="invalid-company_email_from_name" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        {{Form::label('registration_number',__('Company Registration Number *')) }}
-                                                        {{Form::text('registration_number',null,array('class'=>'form-control'))}}
-                                                        @error('registration_number')
-                                                        <span class="invalid-registration_number" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                        @enderror
-                                                    </div>
-                                                    <div class="form-group col-md-6">
-                                                        {{Form::label('vat_number',__('VAT Number *')) }}
-                                                        {{Form::text('vat_number',null,array('class'=>'form-control'))}}
-                                                        @error('vat_number')
-                                                            <span class="invalid-vat_number" role="alert">
+                                                        {{Form::label('footer_notes',__('Invoice/Bill Footer Notes')) }}
+                                                        {{Form::text('footer_notes',null,array('class'=>'form-control'))}}
+                                                        @error('footer_notes')
+                                                        <span class="invalid-footer_notes" role="alert">
                                                                 <strong class="text-danger">{{ $message }}</strong>
                                                             </span>
                                                         @enderror
@@ -408,6 +303,119 @@
                                             <div class="card-footer text-end">
                                                 {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
                                             </div>
+                                        {{Form::close()}}
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="company-setting" role="tabpanel" aria-labelledby="contact-tab4">
+                                    <div class="email-setting-wrap">
+                                        <div class="row">
+                                            {{Form::model($settings,array('route'=>'company.settings','method'=>'post'))}}
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_name *',__('Company Name *')) }}
+                                                            {{Form::text('company_name',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_name')
+                                                            <span class="invalid-company_name" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_address',__('Address')) }}
+                                                            {{Form::text('company_address',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_address')
+                                                            <span class="invalid-company_address" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_city',__('City')) }}
+                                                            {{Form::text('company_city',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_city')
+                                                            <span class="invalid-company_city" role="alert">
+                                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                                    </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_state',__('State')) }}
+                                                            {{Form::text('company_state',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_state')
+                                                            <span class="invalid-company_state" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_zipcode',__('Zip/Post Code')) }}
+                                                            {{Form::text('company_zipcode',null,array('class'=>'form-control'))}}
+                                                            @error('company_zipcode')
+                                                            <span class="invalid-company_zipcode" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group  col-md-6">
+                                                            {{Form::label('company_country',__('Country')) }}
+                                                            {{Form::text('company_country',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_country')
+                                                            <span class="invalid-company_country" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_telephone',__('Telephone')) }}
+                                                            {{Form::text('company_telephone',null,array('class'=>'form-control'))}}
+                                                            @error('company_telephone')
+                                                            <span class="invalid-company_telephone" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_email',__('System Email *')) }}
+                                                            {{Form::text('company_email',null,array('class'=>'form-control'))}}
+                                                            @error('company_email')
+                                                            <span class="invalid-company_email" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('company_email_from_name',__('Email (From Name) *')) }}
+                                                            {{Form::text('company_email_from_name',null,array('class'=>'form-control font-style'))}}
+                                                            @error('company_email_from_name')
+                                                            <span class="invalid-company_email_from_name" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('registration_number',__('Company Registration Number *')) }}
+                                                            {{Form::text('registration_number',null,array('class'=>'form-control'))}}
+                                                            @error('registration_number')
+                                                            <span class="invalid-registration_number" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            {{Form::label('vat_number',__('VAT Number *')) }}
+                                                            {{Form::text('vat_number',null,array('class'=>'form-control'))}}
+                                                            @error('vat_number')
+                                                                <span class="invalid-vat_number" role="alert">
+                                                                    <strong class="text-danger">{{ $message }}</strong>
+                                                                </span>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-end">
+                                                    {{Form::submit(__('Save Change'),array('class'=>'btn btn-primary'))}}
+                                                </div>
                                             {{Form::close()}}
                                         </div>
                                     </div>

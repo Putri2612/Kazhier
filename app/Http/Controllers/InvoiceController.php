@@ -475,7 +475,15 @@ class InvoiceController extends Controller
                     $item->product->save();
                 }
                 InvoiceProduct::where('invoice_id', '=', $invoice->id)->delete();
-                ProductServiceStockChange::where('invoice_id', $invoice->id)->delete();
+
+                $paymentAmount = InvoicePayment::select('account_id', 'date', DB::raw('SUM(amount) as amount'))
+                                ->where('invoice_id', $invoice->id)
+                                ->groupBy('date', 'account_id')
+                                ->get();
+                foreach($paymentAmount as $payment) {
+                    $this->AddBalance($payment->account_id, -($payment->amount), $payment->date);
+                }
+                InvoicePayment::where('invoice_id', $invoice->id)->delete();
 
                 return redirect()->route('invoice.index')->with('success', __('Invoice successfully deleted.'));
             }
@@ -724,8 +732,8 @@ class InvoiceController extends Controller
             $item->name     = 'Item ' . $i;
             $item->quantity = 1;
             $item->tax      = 5;
-            $item->discount = 50;
-            $item->price    = 100;
+            $item->discount = 0;
+            $item->price    = 1000;
             $items[]        = $item;
         }
 

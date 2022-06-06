@@ -528,18 +528,18 @@
                                         <div data-v-f2a183a6="" class="d-title">{{__('INVOICE')}}</div>
                                         <table data-v-f2a183a6="" class="summary-table">
                                             <tbody data-v-f2a183a6="">
-                                            <tr>
-                                                <td>{{__('Number')}}:</td>
-                                                <td>{{\App\Models\Utility::invoiceNumberFormat($settings,$invoice->invoice_id)}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>{{__('Issue Date')}}:</td>
-                                                <td>{{\App\Models\Utility::dateFormat($settings,$invoice->issue_date)}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>{{__('Due Date')}}:</td>
-                                                <td>{{\App\Models\Utility::dateFormat($settings,$invoice->due_date)}}</td>
-                                            </tr>
+                                                <tr>
+                                                    <td>{{__('Number')}}:</td>
+                                                    <td>{{$invoice->invoiceNumber()}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{__('Issue Date')}}:</td>
+                                                    <td>{{Helper::dateFormat($invoice->issue_date)}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>{{__('Due Date')}}:</td>
+                                                    <td>{{Helper::dateFormat($invoice->due_date)}}</td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -573,16 +573,12 @@
                                     <div data-v-f2a183a6="" class="d-table">
                                         <div data-v-f2a183a6="" class="d-table">
                                             <div data-v-f2a183a6="" class="d-table-tr" style="background: {{$color}};">
-                                                <div class="d-table-th w-8">{{__('Item')}}</div>
+                                                <div class="d-table-th w-5">{{__('Item')}}</div>
                                                 <div class="d-table-th w-3">{{__('Quantity')}}</div>
                                                 <div class="d-table-th w-3">{{__('Tax')}} (%)</div>
-                                                @if($invoice->discount_apply==1)
-                                                    <div class="d-table-th w-3">{{__('Discount')}}</div>
-                                                @else
-                                                    <div class="d-table-th w-3"></div>
-                                                @endif
-                                                <div class="d-table-th w-3">{{__('Price')}}</div>
-                                                <div class="d-table-th w-4 text-end">{{__('Totals')}}
+                                                <div class="d-table-th w-3">{{__('Discount')}}</div>
+                                                <div class="d-table-th w-5">{{__('Price')}}</div>
+                                                <div class="d-table-th w-5 text-end">{{__('Totals')}}
                                                 </div>
                                             </div>
 
@@ -599,19 +595,13 @@
                                                             <div class="d-table-td w-3">
                                                                 <pre data-v-f2a183a6="">{{$item->tax}}</pre>
                                                             </div>
-                                                            @if($invoice->discount_apply==1)
-                                                                <div class="d-table-td w-3">
-                                                                    <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
-                                                                </div>
-                                                            @else
-                                                                <div class="d-table-td w-3">
-                                                                    <pre data-v-f2a183a6=""></pre>
-                                                                </div>
-                                                            @endif
+                                                            <div class="d-table-td w-3">
+                                                                <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->discount)}}</pre>
+                                                            </div>
                                                             <div class="d-table-td w-3">
                                                                 <pre data-v-f2a183a6="">{{\App\Models\Utility::priceFormat($settings,$item->price)}}</pre>
                                                             </div>
-                                                            <div class="d-table-td w-4 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
+                                                            <div class="d-table-td w-5 text-end"><span>{{\App\Models\Utility::priceFormat($settings,$item->price * $item->quantity)}}</span></div>
                                                         </div>
                                                     @endforeach
                                                 @else

@@ -530,11 +530,11 @@
                                         </tr>
                                         <tr data-v-363339a0="">
                                             <td data-v-363339a0="" class="tu fwb" style="color: {{$color}};">{{__('Issue Date')}}:</td>
-                                            <td data-v-363339a0="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$proposal->issue_date)}}</td>
+                                            <td data-v-363339a0="" class="text-end">{{Helper::dateFormat($proposal->issue_date)}}</td>
                                         </tr>
                                         <tr data-v-363339a0="">
                                             <td data-v-363339a0="" class="tu fwb" style="color: {{$color}};">{{__('Due Date')}}:</td>
-                                            <td data-v-363339a0="" class="text-end">{{\App\Models\Utility::dateFormat($settings,$proposal->due_date)}}</td>
+                                            <td data-v-363339a0="" class="text-end">{{Helper::dateFormat($proposal->due_date)}}</td>
                                         </tr>
                                         </tbody>
                                     </table>
