@@ -14,7 +14,9 @@ trait CanManageBalance{
 
         if($account){
             if(gettype($date) == 'string') {
-                $date       = Carbon::createFromFormat('Y-m-d', $date)->firstOfMonth();
+                $date   = Carbon::createFromFormat('Y-m-d', $date)->firstOfMonth();
+            } else {
+                $date   = $date->firstOfMonth();
             }
             $balance    = DB::table('balance')
                             ->where('created_by', '=', $creatorID)
@@ -46,26 +48,30 @@ trait CanManageBalance{
     public function GetCurrentBalance(BankAccount $account, $user = null){
         $creatorID  = Auth::user()->type == 'super admin' ? $user->creatorId() : Auth::user()->creatorId();
         $now        = Carbon::now()->toDateString();
-        $balances   = DB::table('balance')->where('created_by', '=', $creatorID)
+        $balances   = DB::table('balance')
+                        ->selectRaw('SUM(amount) as amount')
+                        ->where('created_by', '=', $creatorID)
                         ->where('account_id', '=', $account->id)
                         ->where('date', '<=', $now)
-                        ->get();
+                        ->first();
         $total      = $account->opening_balance;
-        foreach($balances as $balance){
-            $total += $balance->amount;
+        if(!empty($balances)) {
+            $total += $balances->amount;
         }
 
         return $total;
     }
 
     public function GetBalanceBefore($date, BankAccount $account){
-        $balances   = DB::table('balance')->where('created_by', '=', Auth::user()->creatorId())
+        $balances   = DB::table('balance')
+                        ->selectRaw('SUM(amount) as amount')
+                        ->where('created_by', '=', Auth::user()->creatorId())
                         ->where('account_id', '=', $account->id)
                         ->where('date', '<', $date)
-                        ->get();
+                        ->first();
         $total      = $account->opening_balance;
-        foreach($balances as $balance){
-            $total += $balance->amount;
+        if(!empty($balances)) {
+            $total += $balances->amount;
         }
 
         return $total;

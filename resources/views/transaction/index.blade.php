@@ -18,7 +18,7 @@
             pagination.format = data => {
                 const date = pagination.dateFormat(data.date),
                     amount = pagination.priceFormat(data.amount),
-                    account = data.bankAccount ? `${data.bankAccount.bank_name} ${data.bankAccount.holder_name}` : '';
+                    account = data.bank_account ? `${data.bank_account.bank_name} ${data.bank_account.holder_name}` : '';
                 
                 return `
                     <tr class="font-style">

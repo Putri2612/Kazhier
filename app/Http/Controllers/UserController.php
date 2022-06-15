@@ -34,12 +34,14 @@ use App\Models\Vender;
 use App\Traits\CanManageBalance;
 use App\Traits\CanRedirect;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Session;
 use Spatie\Permission\Models\Role;
@@ -664,10 +666,14 @@ class UserController extends Controller
 
     public function syncData(){
         if(Auth::user()->type == 'super admin'){
-            $users     = User::where('type', '=', 'company')->get();
+            $users  = User::where('type', '=', 'company')->get();
+            $ids    = clone($users)->pluck('id');
+
+            DB::table('balance')->whereIn('created_by', $ids)->delete();
+            DB::statement('ALTER table balance AUTO_INCREMENT = 1');
+            BankAccount::whereIn('created_by', $ids)->update(['current_balance' => DB::raw('opening_balance')]);
 
             foreach ($users as $user){
-                DB::delete('DELETE FROM balance WHERE created_by = ?', array($user->id));
                 $bills = Bill::where('created_by', $user->id)->pluck('id');
                 BillPayment::where('created_by', $user->id)->whereNotIn('bill_id', $bills)->delete();
 
@@ -714,6 +720,8 @@ class UserController extends Controller
                     $this->TransferBalance($transfer->from_account, $transfer->to_account, $transfer->amount, $transfer->date, $user);
                 }
             }
+
+            
             return redirect()->back()->with('success', __('Data synchronized.'));
         } else {
             return redirect()->back()->with('error', __('Permission denied.'));
