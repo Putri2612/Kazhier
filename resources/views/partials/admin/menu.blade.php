@@ -129,7 +129,7 @@
                 </li>
             @else
                 @php
-                    $plan       = Auth::user()->activePlan();
+                    $plan       = Auth::user()->activePlan;
                     $maxUser    = 0;
                     if(empty($plan)) {
                         Log::debug(json_encode(['id' => Auth::user()->id, 'creatorId' => Auth::user()->creatorId()]));
