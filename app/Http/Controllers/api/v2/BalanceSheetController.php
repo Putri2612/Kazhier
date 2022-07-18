@@ -10,6 +10,7 @@ use App\Models\Liability;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BalanceSheetController extends Controller
 {
@@ -23,20 +24,30 @@ class BalanceSheetController extends Controller
         $creatorId = Auth::user()->creatorId();
 
         $assets = Asset::where('created_by', $creatorId)
-                ->select('name', 'type', 'purchase_date','supported_date', 'amount', 'description')
-                ->get()->groupBy('type');
+                ->select('name', 'type', 'amount', 'description')
+                ->get()
+                ->groupBy('type');
 
-        $bankAccounts = BankAccount::where('created_by', $creatorId)->get();
+        $bankAccounts = BankAccount::select(
+                            DB::raw('CONCAT(bank_name, " ", holder_name) AS name'), 
+                            'id'
+                        )->where('created_by', $creatorId)
+                        ->get();
+
         if(isset($assets['current assets']) && !$assets['current assets']->isEmpty()) {
             foreach($bankAccounts as $account) {
+                $account->amount = $account->CurrentBalance();
                 $assets['current assets']->prepend($account);
             }
         } else {
+            foreach($bankAccounts as $account) {
+                $account->amount = $account->CurrentBalance();
+            }
             $asset['current assets'] = $bankAccounts;
         }
 
         $liabilities    = Liability::where('created_by', $creatorId)
-                        ->select('name', 'date', 'due_date', 'type', 'amount', 'description')
+                        ->select('name', 'type', 'amount', 'description')
                         ->get()->groupBy('type');
         $equities       = Equity::where('created_by', $creatorId)
                         ->select('name', 'amount', 'description')
