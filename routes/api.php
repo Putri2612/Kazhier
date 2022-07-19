@@ -31,7 +31,9 @@ Route::as('api.')->group(
     function () {
         require __DIR__."/api/v1.php";
 
-        Route::prefix('v2')->as('v2.')->group(
+        Route::prefix('v2')->as('v2.')->middleware([
+            'xss'
+        ])->group(
             function () {
                 require __DIR__.'/api/v2.php';
             }
