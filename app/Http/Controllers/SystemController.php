@@ -332,14 +332,15 @@ class SystemController extends Controller
 
                 $request->validate(
                     [
-                        'company_logo' => 'image|mimes:png',
+                        'company_logo' => 'image|mimes:png,jpg,jpeg',
                     ]
                 );
                 
 
-                $logoName     = $user->id . '_logo.png';
-                $path         = $request->file('company_logo')->storeAs('public/logo/', $logoName);
-                $company_logo = !empty($request->company_logo) ? "{$logoName}?{$now}" : 'logo.png';
+                $extension      = $request->file('company_logo')->getClientOriginalExtension();
+                $logoName       = "{$user->id}_logo.{$extension}";
+                $path           = $request->file('company_logo')->storeAs('public/logo/', $logoName);
+                $company_logo   = !empty($request->company_logo) ? "{$logoName}?{$now}" : 'logo.png';
 
                 DB::insert('insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ', [$company_logo,'company_logo', $creatorID ]);
             }
@@ -349,11 +350,13 @@ class SystemController extends Controller
             {
                 $request->validate(
                     [
-                        'company_small_logo' => 'image|mimes:png',
+                        'company_small_logo' => 'image|mimes:png,jpg,jpeg',
                     ]
                 );
-                $smallLogoName = $user->id . '_small_logo.png';
-                $path          = $request->file('company_small_logo')->storeAs('public/logo/', $smallLogoName);
+
+                $extension      = $request->file('company_small_logo')->getClientOriginalExtension();
+                $smallLogoName  = "{$user->id}_small_logo.{$extension}";
+                $path           = $request->file('company_small_logo')->storeAs('public/logo/', $smallLogoName);
 
                 $company_small_logo = !empty($request->company_small_logo) ? "{$smallLogoName}?{$now}" : 'small_logo.png';
 
@@ -364,11 +367,13 @@ class SystemController extends Controller
             {
                 $request->validate(
                     [
-                        'company_favicon' => 'image|mimes:png',
+                        'company_favicon' => 'image|mimes:png,jpg,jpeg',
                     ]
                 );
-                $favicon = $user->id . '_favicon.png';
-                $path    = $request->file('company_favicon')->storeAs('public/logo/', $favicon);
+
+                $extension  = $request->file('company_favicon')->getClientOriginalExtension();
+                $favicon    = "{$user->id}_favicon.{$extension}";
+                $path       = $request->file('company_favicon')->storeAs('public/logo/', $favicon);
 
                 $company_favicon = !empty($request->favicon) ? "{$favicon}?{$now}" : 'favicon.png';
 

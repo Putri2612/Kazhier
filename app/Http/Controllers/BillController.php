@@ -831,9 +831,10 @@ class BillController extends Controller
         $preview = 1;
         $color   = '#' . $color;
 
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo           = asset(Storage::url('logo/'));
+        $company_logo   = Utility::getValByName('company_logo');
+        $img            = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $img            .= '?'.config('asset-version.img.logo');
 
         return view('bill.templates.' . $template, compact('bill', 'preview', 'color', 'img', 'settings', 'vendor'));
     }
@@ -919,9 +920,10 @@ class BillController extends Controller
         $bill->items = $items;
 
         //Set your logo
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo           = asset(Storage::url('logo/'));
+        $company_logo   = Utility::getValByName('company_logo');
+        $img            = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $img            .= '?'.config('asset-version.img.logo');
 
         if($bill)
         {

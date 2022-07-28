@@ -746,9 +746,11 @@ class InvoiceController extends Controller
         $preview = 1;
         $color   = '#' . $color;
 
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo           = asset(Storage::url('logo/'));
+        $company_logo   = Utility::getValByName('company_logo');
+        $logo_version   = config('asset-version.img.logo');
+        $img            = asset($logo . '/' . (!empty($company_logo) ? $company_logo : 'logo.png'));
+        $img            .= "?{$logo_version}";
 
         return view('invoice.templates.' . $template, compact('invoice', 'preview', 'color', 'img', 'settings', 'customer'));
     }
@@ -832,9 +834,10 @@ class InvoiceController extends Controller
         $invoice->items = $items;
 
         //Set your logo
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo           = asset(Storage::url('logo/'));
+        $company_logo   = Utility::getValByName('company_logo');
+        $img            = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $img            .= '?'.config('asset-version.img.logo');
 
         if($invoice)
         {
