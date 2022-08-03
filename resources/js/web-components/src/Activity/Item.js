@@ -1,49 +1,33 @@
 import BaseModel from "../BaseModel";
+import view from "../HelperFunctions/View";
+
+import WithMethod from "./Html/ActionWithMethod.html";
+import WithoutMethod from "./Html/ActionWithoutMethod.html";
+import ItemHtml from "./Html/ActivityItem.html";
 
 class ActivityItem extends BaseModel {
 
-    static get observedAttributes() {
-        return [
-            'icon', 
-            'icon-type', 
-            'title', 
-            'details',
-            'details-highlight',
-            'action-modal', 
-            'action-modal-title',
-            'action-text', 
-            'action-url',
-            'action-method',
-        ];
-    }
+    static observedAttributes = [
+        'icon', 
+        'icon-type', 
+        'title', 
+        'details',
+        'details-highlight',
+        'action-modal', 
+        'action-modal-title',
+        'action-text', 
+        'action-url',
+        'action-method',
+    ];
 
-    get requiredAttributes () {
-        return [
-            'icon', 
-            'icon-type', 
-            'title', 
-            'details'
-        ];
-    }
+    requiredAttributes =  [
+        'icon', 
+        'icon-type', 
+        'title', 
+        'details'
+    ];
 
-    get castAttributes () {
-        return [];
-    }
-
-    get availableAttributes () {
-        return [
-            'icon', 
-            'icon-type', 
-            'title', 
-            'details',
-            'details-highlight',
-            'action-modal',
-            'action-modal-title',
-            'action-text', 
-            'action-url',
-            'action-method',
-        ];
-    }
+    castAttributes =  [];
 
     constructor () {
         super();
@@ -61,12 +45,14 @@ class ActivityItem extends BaseModel {
 
         if('action-text' in this.attr && 'action-url' in this.attr) {
             if('action-method' in this.attr) {
-                action = `<form-btn
-                            method="${this.attr['action-method']}"
-                            text="${this.attr['action-text']}"
-                            type="button"
-                            url="${this.attr['action-url']}"
-                            ></form-btn>`;
+                action = view(
+                    WithMethod, 
+                    {
+                        method  : this.attr['action-method'],
+                        text    : this.attr['action-text'],
+                        url     : this.attr['action-url']
+                    }
+                );
             } else {
                 let href = this.attr['action-url'];
                 if('action-modal' in this.attr && 'action-modal-title' in this.attr) {
@@ -77,13 +63,14 @@ class ActivityItem extends BaseModel {
                     data-url="${this.attr['action-url']}"
                     `;
                 }
-                action = `
-                <a href="${href}"
-                    class="btn btn-primary btn-action me-1 float-right"
-                    ${action}>
-                    ${this.attr['action-text']}
-                </a>
-                `;
+                action = view(
+                    WithoutMethod,
+                    {
+                        href    : href,
+                        text    : this.attr['action-text'],
+                        modal   : action
+                    }
+                );
             }
         }
         
@@ -92,17 +79,17 @@ class ActivityItem extends BaseModel {
         }
 
         this.className = 'activity';
-        this.innerHTML = `
-        <div class="activity-icon bg-primary text-white shadow-primary">
-            <i class="fa-${this.attr['icon-type']} fa-${this.attr.icon}"></i>
-        </div>
-        <div class="activity-detail">
-            <div class="mb-2">
-                <span class="text-job text-primary"><h6>${this.attr['title']}</h6></span>
-            </div>
-            ${action}
-            <p>${this.attr['details']} ${highlight}</p>
-        </div>`;
+        this.innerHTML = view(
+            ItemHtml,
+            {
+                'icon-type' : this.attr['icon-type'],
+                icon        : this.attr.icon,
+                title       : this.attr.title,
+                action      : action,
+                details     : this.attr.details,
+                highlight   : highlight
+            }
+        );
     }
 }
 

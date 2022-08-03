@@ -2,17 +2,9 @@ import BaseModel from "../BaseModel";
 
 class FormBtn extends BaseModel {
 
-    static get observedAttributes() {
-        return ['method', 'text', 'url', 'type', 'icon', 'icon-type'];
-    }
+    static observedAttributes = ['method', 'text', 'url', 'type', 'icon', 'icon-type'];
 
-    get requiredAttributes () {
-        return ['method', 'text', 'url', 'type'];
-    }
-
-    get availableAttributes () {
-        return ['method', 'text', 'url', 'type', 'icon', 'icon-type'];
-    }
+    requiredAttributes = ['method', 'text', 'url', 'type'];
 
     constructor() {
         super();

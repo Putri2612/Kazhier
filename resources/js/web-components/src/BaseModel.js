@@ -1,16 +1,10 @@
 class BaseModel extends HTMLElement {
 
-    get requiredAttributes () {
-        return [];
-    }
+    static observedAttributes = [];
 
-    get castAttributes () {
-        return [];
-    }
-
-    get availableAttributes () {
-        return [];
-    }
+    requiredAttributes  = [];
+    castAttributes      = [];
+    availableAttributes = [];
 
     constructor() {
         super();
@@ -19,7 +13,7 @@ class BaseModel extends HTMLElement {
         this.rendered = false;
 
         for(let name of this.getAttributeNames()) {
-            if(name in this.availableAttributes) {
+            if(name in this.constructor.observedAttributes) {
                 this.storeAttribute(name, this.getAttribute(name));
             }
         }
@@ -40,10 +34,16 @@ class BaseModel extends HTMLElement {
 
     _storeAttribute(name, value) {
         if(name in this.castAttributes) {
-            if(this.castAttributes[name]  == 'object') {
+            if (Array.isArray(this.castAttributes[name])) {
+                if(this.castAttributes[name].includes(value)) {
+                    this.attr[name] = value;
+                }
+            } else if(this.castAttributes[name]  == 'object') {
                 this.attr[name] = JSON.parse(value);
             } else if (this.castAttributes[name] == 'integer') {
                 this.attr[name] = parseInt(value);
+            } else if (this.castAttributes[name] == 'boolean') {
+                this.attr[name] = Boolean(value);
             }
         } else {
             this.attr[name] = value;

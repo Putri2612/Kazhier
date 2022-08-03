@@ -1,22 +1,16 @@
 import BaseModel from "../BaseModel";
+import { dateFormat, numberFormat } from "../HelperFunctions/Formatter";
+import view from "../HelperFunctions/View";
+
+import NoMore from "./Html/NoOlderHistory.html";
 
 class History extends BaseModel {
     
-    static get observedAttributes() {
-        return ['getter', 'limit'];
-    }
+    static observedAttributes = ['getter', 'limit'];
 
-    get requiredAttributes () {
-        return ['getter'];
-    }
+    requiredAttributes = ['getter'];
 
-    get castAttributes () {
-        return {limit: 'integer'};
-    }
-
-    get availableAttributes () {
-        return ['getter', 'limit'];
-    }
+    castAttributes = {limit: 'integer'};
 
     constructor() {
         super();
@@ -56,9 +50,9 @@ class History extends BaseModel {
     _appendAct(data = []) {
         data.forEach(item => {
             const icon  = item.quantity > 0 ? 'plus' : 'minus',
-                date    = this.dateFormat(item.date);
+                date    = dateFormat(item.date, this._dateStyle);
             let detail  = '',
-                focus   = `(${this.numberFormat(item.quantity)}`;
+                focus   = `(${numberFormat(item.quantity)}`;
 
             if('invoice_number' in item) {
                 detail = item.invoice_number;
@@ -134,13 +128,9 @@ class History extends BaseModel {
                     }
                     if(this.page == 1 || this.page == this._maxPage){
                         this.removeChild(this.getBTN);
-                        const noItem = document.createElement('div');
-                        noItem.className = 'text-center';
-                        noItem.innerHTML = `
-                            <i class="fa-solid fa-5x fa-box-open text-secondary"></i><br/>
-                            <span><tl-str class="text-secondary">No older history</tl-str></span>
-                        `
-                        this.append(noItem);
+                        const noItem = view(NoMore);
+
+                        this.insertAdjacentHTML('beforeend', noItem);
                     }
                 }
                 setTimeout(() => {
@@ -148,17 +138,6 @@ class History extends BaseModel {
                 }, 500);
             });
         }
-    }
-
-    dateFormat(date) {
-        const time = new Date(date),
-            locale = document.documentElement.lang;
-        return new Intl.DateTimeFormat([locale, 'id'], this._dateStyle ).format(time);
-    }
-
-    numberFormat(number) {
-        const locale = document.documentElement.lang;
-        return new Intl.NumberFormat([locale, 'id']).format(number);
     }
 }
 
