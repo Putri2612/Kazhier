@@ -11,9 +11,12 @@ module.exports = {
         rules: [
             {
                 test: /\.(js)$/,
-                exclude: /node_modules/,
-                use: "babel-loader",
+                exclude: /node_modules/
             },
+            {
+                test: /\.html$/i,
+                loader: "html-loader"
+            }
         ],
     },
     mode: "production",
