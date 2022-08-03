@@ -754,7 +754,7 @@
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billTotal'])}}</div>
                                     <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billPaid'])}}</div>
-                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($weeklyBill['billDue'])}}</div>
                                 </div>
                                 <div class="tab-pane fade media" id="monthly-bill" role="tabpanel">
@@ -762,7 +762,7 @@
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billTotal'])}}</div>
                                     <div class="media-title"><a href="#">{{__('Total Bill Generated')}}</a></div>
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billPaid'])}}</div>
-                                    <div class="media-title"><a href="#">{{__('Total Duep')}}</a></div>
+                                    <div class="media-title"><a href="#">{{__('Total Due')}}</a></div>
                                     <div class="text-end text-primary fw-bolder">{{\Auth::user()->priceFormat($monthlyBill['billDue'])}}</div>
                                 </div>
                             </div>
