@@ -233,7 +233,7 @@
                                     @foreach($iteams as $key =>$iteam)
                                         <tr>
                                             <td>{{$key+1}}</td>
-                                            <td>{{!empty($iteam->product())?$iteam->product()->name:''}}</td>
+                                            <td>{{!empty($iteam->product)?$iteam->product->name:''}}</td>
                                             <td class="text-center">{{$iteam->quantity}}</td>
                                             <td class="text-center">{{$iteam->tax}}</td>
                                             @if($bill->discount_apply==1)

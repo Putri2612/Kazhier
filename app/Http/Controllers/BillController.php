@@ -860,7 +860,7 @@ class BillController extends Controller
         foreach($bill->items as $product)
         {
             $item           = new \stdClass();
-            $item->name     = !empty($product->product()) ? $product->product()->name : '';
+            $item->name     = !empty($product->product) ? $product->product->name : '';
             $item->quantity = $product->quantity;
             $item->tax      = $product->tax;
             $item->discount = $product->discount;
@@ -909,7 +909,7 @@ class BillController extends Controller
         foreach($bill->items as $product)
         {
             $item           = new \stdClass();
-            $item->name     = !empty($product->product()) ? $product->product()->name : '';
+            $item->name     = !empty($product->product) ? $product->product->name : '';
             $item->quantity = $product->quantity;
             $item->tax      = $product->tax;
             $item->discount = $product->discount;

@@ -17,6 +17,6 @@ class BillProduct extends Model
 
     public function product()
     {
-        return $this->hasOne(ProductService::class, 'id', 'product_id')->first();
+        return $this->hasOne(ProductService::class, 'id', 'product_id');
     }
 }
