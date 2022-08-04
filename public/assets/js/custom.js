@@ -584,17 +584,17 @@ const ChartsConstant = {
     }, 
     locale : 'id',
     Callbacks : {
-        ticks : (label, index, labels) => new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(label),
+        ticks : (label, index, labels) => new Intl.NumberFormat(ChartsConstant.locale, { maximumFractionDigits: 0 }).format(label),
         tooltipsLabel : (context) => {
             let label = context.dataset.label || '';
             if(label) { label += ' : '; }
-            if(context.parsed.y !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(context.parsed.y)}
+            if(context.parsed.y !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumFractionDigits: 0 }).format(context.parsed.y)}
             return label;
         },
         tooltipsDoughnut: (context) => {
             let label = context.label || '';
             if(label) { label += ' : ' }
-            if(context.parsed !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumSignificantDigits: 2 }).format(context.parsed)}
+            if(context.parsed !== null) { label += new Intl.NumberFormat(ChartsConstant.locale, { maximumFractionDigits: 0 }).format(context.parsed)}
             return label;
         }
     }
