@@ -73,10 +73,10 @@
                                                     @foreach ($transfers as $transfer)
                                                         <tr class="font-style">
                                                             <td>{{ \Helper::DateFormat( $transfer->date) }}</td>
-                                                            <td>{{ !empty($transfer->fromBankAccount())? $transfer->fromBankAccount()->bank_name.' '.$transfer->fromBankAccount()->holder_name:''}}</td>
-                                                            <td>{{ !empty( $transfer->toBankAccount())? $transfer->toBankAccount()->bank_name.' '. $transfer->toBankAccount()->holder_name:''}}</td>
+                                                            <td>{{ !empty($transfer->fromBankAccount)? $transfer->fromBankAccount->bank_name.' '.$transfer->fromBankAccount->holder_name:''}}</td>
+                                                            <td>{{ !empty( $transfer->toBankAccount)? $transfer->toBankAccount->bank_name.' '. $transfer->toBankAccount->holder_name:''}}</td>
                                                             <td>{{ \Auth::user()->priceFormat( $transfer->amount)}}</td>
-                                                            <td>{{ !empty($transfer->paymentMethod())?$transfer->paymentMethod()->name:''}}</td>
+                                                            <td>{{ !empty($transfer->paymentMethod)?$transfer->paymentMethod->name:''}}</td>
                                                             <td>
                                                                 <a href="#!" class="btn btn-secondary" data-url="{{route('transfer.show',$transfer->id) }}" data-ajax-popup="true" data-title="{{__('View Reference')}}" data-bs-toggle="tooltip" data-original-title="{{__('Reference')}}"">
                                                                     <i class="fas fa-paperclip"></i>

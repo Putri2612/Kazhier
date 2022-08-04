@@ -99,84 +99,87 @@
                                                                 $num = 1; $total = 0;
                                                             @endphp
                                                             @foreach ($journal_data as $data)
-                                                                    <tr class="font-style">
-                                                                        <td rowspan="2">
-                                                                            @if(is_a($data, 'App\Models\Revenue') || is_a($data, 'App\Models\Payment') || is_a($data, 'App\Models\Transfer'))
-                                                                            <a href="#!" 
-                                                                                data-url="{{route((is_a($data, 'App\Models\Revenue') ? 'revenue.show' : (is_a($data, 'App\Models\Payment') ? 'payment.show' : 'transfer.show')),$data->id) }}" 
-                                                                                data-ajax-popup="true" 
-                                                                                data-title="{{__('View Reference')}}" 
-                                                                                data-bs-toggle="tooltip" 
-                                                                                data-original-title="{{__('Reference')}}"">
+                                                                <tr class="font-style">
+                                                                    <td rowspan="2">
+                                                                        @if(is_a($data, 'App\Models\Revenue') || is_a($data, 'App\Models\Payment') || is_a($data, 'App\Models\Transfer'))
+                                                                        <a href="#!" 
+                                                                            data-url="{{route((is_a($data, 'App\Models\Revenue') ? 'revenue.show' : (is_a($data, 'App\Models\Payment') ? 'payment.show' : 'transfer.show')),$data->id) }}" 
+                                                                            data-ajax-popup="true" 
+                                                                            data-title="{{__('View Reference')}}" 
+                                                                            data-bs-toggle="tooltip" 
+                                                                            data-original-title="{{__('Reference')}}"">
+                                                                            {{$num++}}
+                                                                        </a>
+                                                                        @elseif (is_a($data, 'App\Models\InvoicePayment'))
+                                                                            <a href="{{ route('invoice.show', $data->invoice_id) }}">
                                                                                 {{$num++}}
                                                                             </a>
-                                                                            @endif
-                                                                            @if (is_a($data, 'App\Models\InvoicePayment') || is_a($data, 'App\Models\BillPayment'))
-                                                                            <a href="{{ route((is_a($data, 'App\Models\InvoicePayment') ? 'invoice.show' : 'bill.show'), $data->invoice_id) }}">
+                                                                        @elseif (is_a($data, 'App\Models\BillPayment'))
+                                                                            <a href="{{ route('bill.show', $data->bill_id) }}">
                                                                                 {{$num++}}
                                                                             </a>
-                                                                            @endif
-                                                                        </td>
-                                                                        <td rowspan="2">{{Helper::DateFormat($data->date)}}</td>
-                                                                        <td colspan="2"> 
-                                                                        @if(is_a($data, 'App\Models\Revenue'))
-                                                                        {{ (!empty($data->customer) ? $data->customer->name : '') }}
-                                                                        {{ (!empty($data->customer) && !empty($data->category) ? ' - ' : '') }}
-                                                                        {{ (!empty($data->category) ? $data->category->name : '') }}
                                                                         @endif
-        
-                                                                        @if(is_a($data, 'App\Models\Payment'))
-                                                                        {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name.' '.$data->bankAccount->holder_name : '') }}
-                                                                        @endif
-        
-                                                                        @if(is_a($data, 'App\Models\InvoicePayment'))
-                                                                        {{ (!empty($data->invoice->customer) ? $data->invoice->customer->name : '') }}
-                                                                        {{ (!empty($data->invoice->customer) && !empty($data->invoice->category) ? ' - ' : '') }}
-                                                                        {{ (!empty($data->invoice->category) ? $data->invoice->category->name : '') }}
-                                                                        @endif
-        
-                                                                        @if(is_a($data, 'App\Models\BillPayment'))
-                                                                        {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name . ' ' . $data->bankAccount->holder_name : '') }}
-                                                                        @endif
+                                                                    </td>
+                                                                    <td rowspan="2">{{Helper::DateFormat($data->date)}}</td>
+                                                                    <td colspan="2"> 
+                                                                    @if(is_a($data, 'App\Models\Revenue'))
+                                                                    {{ (!empty($data->customer) ? $data->customer->name : '') }}
+                                                                    {{ (!empty($data->customer) && !empty($data->category) ? ' - ' : '') }}
+                                                                    {{ (!empty($data->category) ? $data->category->name : '') }}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\Payment'))
+                                                                    {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name.' '.$data->bankAccount->holder_name : '') }}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\InvoicePayment'))
+                                                                    {{ (!empty($data->invoice->customer) ? $data->invoice->customer->name : '') }}
+                                                                    {{ (!empty($data->invoice->customer) && !empty($data->invoice->category) ? ' - ' : '') }}
+                                                                    {{ (!empty($data->invoice->category) ? $data->invoice->category->name : '') }}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\BillPayment'))
+                                                                    {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name . ' ' . $data->bankAccount->holder_name : '') }}
+                                                                    @endif
 
-                                                                        @if(is_a($data, 'App\Models\Transfer'))
-                                                                        {{ (!empty($data->fromBankAccount())? $data->fromBankAccount()->bank_name.' '.$data->fromBankAccount()->holder_name:'') }}
-                                                                        {{ '( '.__('transfer').' )'}}
-                                                                        @endif
-                                                                        </td>
-                                                                        <td class="text-end">{{Auth::user()->priceFormat($data->amount)}}</td>
-                                                                        <td></td>
-                                                                    </tr>
-                                                                    <tr class="font-style">
-                                                                        <td></td>
-                                                                        <td>
-                                                                        @if(is_a($data, 'App\Models\Revenue'))
-                                                                        {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name . ' ' . $data->bankAccount->holder_name : '') }}
-                                                                        @endif
-        
-                                                                        @if(is_a($data, 'App\Models\Payment'))
-                                                                        {{ (!empty($data->vender) ? $data->vender->name : '') }}
-                                                                        {{ (!empty($data->vender) && !empty($data->category) ? ' - ' : '') }}
-                                                                        {{ (!empty($data->category) ? $data->category->name : '')}}
-                                                                        @endif
-        
-                                                                        @if(is_a($data, 'App\Models\InvoicePayment'))
-                                                                        {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name.' '.$data->bankAccount->holder_name : '') }}
-                                                                        @endif
-        
-                                                                        @if(is_a($data, 'App\Models\BillPayment'))
-                                                                        {{ (!empty($data->bill->vender) ? $data->bill->vender->name : '') }}
-                                                                        {{ (!empty($data->bill->vender) && !empty($data->bill->category) ? ' - ' : '') }}
-                                                                        {{ (!empty($data->bill->category) ? $data->bill->category->name : '') }}
-                                                                        @endif
+                                                                    @if(is_a($data, 'App\Models\Transfer'))
+                                                                    {{ (!empty($data->fromBankAccount)? $data->fromBankAccount->bank_name.' '.$data->fromBankAccount->holder_name:'') }}
+                                                                    {{ '( '.__('transfer').' )'}}
+                                                                    @endif
+                                                                    </td>
+                                                                    <td class="text-end">{{Auth::user()->priceFormat($data->amount)}}</td>
+                                                                    <td></td>
+                                                                </tr>
+                                                                <tr class="font-style">
+                                                                    <td></td>
+                                                                    <td>
+                                                                    @if(is_a($data, 'App\Models\Revenue'))
+                                                                    {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name . ' ' . $data->bankAccount->holder_name : '') }}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\Payment'))
+                                                                    {{ (!empty($data->vender) ? $data->vender->name : '') }}
+                                                                    {{ (!empty($data->vender) && !empty($data->category) ? ' - ' : '') }}
+                                                                    {{ (!empty($data->category) ? $data->category->name : '')}}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\InvoicePayment'))
+                                                                    {{ (!empty($data->bankAccount) ? $data->bankAccount->bank_name.' '.$data->bankAccount->holder_name : '') }}
+                                                                    @endif
+    
+                                                                    @if(is_a($data, 'App\Models\BillPayment'))
+                                                                    {{ (!empty($data->bill->vender) ? $data->bill->vender->name : '') }}
+                                                                    {{ (!empty($data->bill->vender) && !empty($data->bill->category) ? ' - ' : '') }}
+                                                                    {{ (!empty($data->bill->category) ? $data->bill->category->name : '') }}
+                                                                    @endif
 
-                                                                        @if(is_a($data, 'App\Models\Transfer'))
-                                                                        {{ (!empty( $data->toBankAccount())? $data->toBankAccount()->bank_name.' '. $data->toBankAccount()->holder_name:'') }}
-                                                                        @endif
-                                                                        </td>
-                                                                        <td></td>
-                                                                        <td class="text-end">{{Auth::user()->priceFormat($data->amount)}} </td>
-                                                                    </tr>
+                                                                    @if(is_a($data, 'App\Models\Transfer'))
+                                                                    {{ (!empty( $data->toBankAccount)? $data->toBankAccount->bank_name.' '. $data->toBankAccount->holder_name:'') }}
+                                                                    @endif
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td class="text-end">{{Auth::user()->priceFormat($data->amount)}} </td>
+                                                                </tr>
                                                                 @php
                                                                     $total = $total + $data->amount;
                                                                 @endphp

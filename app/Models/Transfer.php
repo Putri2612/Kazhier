@@ -23,16 +23,16 @@ class Transfer extends Model
 
     public function fromBankAccount()
     {
-        return $this->hasOne(BankAccount::class, 'id', 'from_account')->first();
+        return $this->hasOne(BankAccount::class, 'id', 'from_account');
     }
 
     public function toBankAccount()
     {
-        return $this->hasOne(BankAccount::class, 'id', 'to_account')->first();
+        return $this->hasOne(BankAccount::class, 'id', 'to_account');
     }
 
     public function paymentMethod()
     {
-        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method')->first();
+        return $this->hasOne(PaymentMethod::class, 'id', 'payment_method');
     }
 }

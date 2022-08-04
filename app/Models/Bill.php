@@ -35,6 +35,11 @@ class Bill extends Model
         return self::$statuses[$this->status];
     }
 
+    public static function number($id) {
+        $settings = Utility::settings();
+        return $settings["bill_prefix"] . sprintf("%05d", $id);
+    }
+
     public function billNumber() {
         $settings = Utility::settings();
 

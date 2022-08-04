@@ -41,6 +41,7 @@ class LedgerController extends Controller
 
             $years         = $this->Years();
 
+            // opsi akun & kategori
             $accounts      = BankAccount::where('created_by', '=', Auth::user()->creatorId())->get();
             $defaultAccount= $accounts->first();
             $categories    = ProductServiceCategory::where('created_by', '=', Auth::user()->creatorId())->where('type', '!=', 0)->get();
@@ -71,80 +72,102 @@ class LedgerController extends Controller
             if( !empty($request->month) ){ $selected_month = $request->month; } 
             else { $selected_month = date('m'); }
 
+            // Credit
+            $revenueQuery = Revenue::toBase()
+                        ->select('amount AS credit', 'date', 'description')
+                        ->whereMonth('date', $selected_month)
+                        ->whereYear('date', $selected_year);
+            $invoiceQuery = InvoicePayment::with(['invoice:id,invoice_id'])
+                        ->select('invoice_id', 'amount AS credit', 'date')
+                        ->whereMonth('date', $selected_month)
+                        ->whereYear('date', $selected_year);
+            // Debit
+            $paymentQuery = Payment::toBase()
+                        ->select('amount AS debit', 'date', 'description')
+                        ->whereMonth('date', $selected_month)
+                        ->whereYear('date', $selected_year);
+            $billQuery  = BillPayment::with(['bill:id,bill_id'])
+                        ->select('bill_id', 'amount AS debit', 'date')
+                        ->whereMonth('date', $selected_month)
+                        ->whereYear('date', $selected_year);
+
             // masukkan querynya
             if($isCategory){
-                $revenues  = $this->GetRevenuesWithCategory($account_id, $selected_month, $selected_year);
-                $invoices  = $this->GetInvoicePaymentsWithCategory($account_id, $selected_month, $selected_year);
-                $payments  = $this->GetPaymentsWithCategory($account_id, $selected_month, $selected_year);
-                $bills     = $this->GetBillPaymentsWithCategory($account_id, $selected_month, $selected_year);
+                $revenues   = $revenueQuery->where('category_id', $account_id)->get();
                 
-                $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills);
+                $invoiceIds = Invoice::select('id')->where('category_id', $account_id)->pluck('id');
+                $invoices   = $invoiceQuery->whereIn('invoice_id', $invoiceIds)->get();
+                $invoices   = collect(json_decode(json_encode($invoices)));
+
+                $payments   = $paymentQuery->where('category_id', $account_id)->get();
+
+                $billIds    = Bill::select('id')->where('category_id', $account_id)->pluck('id');
+                $bills      = $billQuery->whereIn('bill_id', $billIds)->get();
+                $bills      = collect(json_decode(json_encode($bills)));
+                
+                $unsorted_data  = $revenues->merge($payments);
+                $unprocessed    = $invoices->merge($bills);
                 $prevBalance = $this->getCategoryBalance($account_id, $selected_month, $selected_year);
             } else {
-                $date = Carbon::createFromFormat('Y m', "{$selected_year} {$selected_month}")->firstOfMonth();
-                $prevBalance    =  $this->GetBalanceBefore($date, $defaultAccount);
+                $date           = Carbon::createFromFormat('Y m', "{$selected_year} {$selected_month}")->firstOfMonth();
+                $prevBalance    = $this->GetBalanceBefore($date, BankAccount::find($account_id));
 
-                $revenues  = $this->GetRevenues($selected_month, $selected_year, $account_id);
-                $invoices  = $this->GetInvoicePayments($selected_month, $selected_year, $account_id);
-                $payments  = $this->GetPayments($selected_month, $selected_year, $account_id);
-                $bills     = $this->GetBillPayments($selected_month, $selected_year, $account_id);
-                $transfers = $this->GetTransfers($selected_month, $selected_year, $account_id);
-                
+                $revenues   = $revenueQuery->where('account_id', $account_id)->get();
+                $invoices   = $invoiceQuery->where('account_id', $account_id)->get();
+                $invoices   = collect(json_decode(json_encode($invoices)));
+                $payments   = $paymentQuery->where('account_id', $account_id)->get();
+                $bills      = $billQuery->where('account_id', $account_id)->get();
+                $bills      = collect(json_decode(json_encode($bills)));
+
+                $debitTransfer  = Transfer::select('amount AS debit', 'date', 'to_account')
+                                ->with(['toBankAccount:id,holder_name,bank_name'])
+                                ->whereMonth('date', $selected_month)
+                                ->whereYear('date', $selected_year)
+                                ->where('from_account', $account_id)
+                                ->get();
+                $debitTransfer  = collect(json_decode(json_encode($debitTransfer)));
+
+                $creditTransfer = Transfer::select('amount AS credit', 'date', 'from_account')
+                                ->with(['fromBankAccount:id,holder_name,bank_name'])
+                                ->whereMonth('date', $selected_month)
+                                ->whereYear('date', $selected_year)
+                                ->where('to_account', $account_id)
+                                ->get();
+                $creditTransfer  = collect(json_decode(json_encode($creditTransfer)));
+
                 // sort data
-                $unsorted_data = $revenues->merge($invoices)->merge($payments)->merge($bills)->merge($transfers);
+                $unsorted_data  = $revenues->merge($payments);
+                $unprocessed    = $bills->merge($invoices)
+                                ->merge($debitTransfer)
+                                ->merge($creditTransfer);
             }
-            
-            $ledger_data   = $unsorted_data->sortBy('date')->values()->all();
-            $ledger        = array();
-            dd($ledger_data);
 
-            foreach($ledger_data as $data){
-                $description = '';
-                $debit = 0;
-                $credit = 0;
-                if($isCategory){
-                    if(is_a($data, 'App\Models\Revenue') || is_a($data, 'App\Models\Payment')){
-                        $description = $data->description;
-                    } else if(is_a($data, 'App\Models\InvoicePayment')){
-                        $description = $data->invoice->invoiceNumber().' Payment';
-                    } else if(is_a($data, 'App\Models\BillPayment')){
-                        $description = $data->bill->billNumber().' Payment';
-                    }
-                    $ledger[] = array(
-                        'date' => $data->date,
-                        'description' => $description,
-                        'debit' => 0,
-                        'credit' => $data->amount
-                    );
-                } else {
-                    if(is_a($data, 'App\Models\Revenue')){
-                        $credit = $data->amount;
-                        $debit = 0;
-                        $description = $data->description;
-                    } else if(is_a($data, 'App\Models\Payment')){
-                        $debit = $data->amount;
-                        $credit = 0;
-                        $description = $data->description;
-                    } else if(is_a($data, 'App\Models\InvoicePayment')){
-                        $credit = $data->amount;
-                        $debit = 0;
-                        $description = $data->invoice->invoiceNumber().' Payment';
-                    } else if(is_a($data, 'App\Models\BillPayment')){
-                        $debit = $data->amount;
-                        $credit = 0;
-                        $description = $data->bill->billNumber().' Payment';
-                    }
-                    $ledger[] = array(
-                        'date' => $data->date,
-                        'description' => $description,
-                        'debit' => $debit,
-                        'credit' => $credit
-                    );
+            foreach($unprocessed as $data) {
+                if(!empty($data->invoice)) {
+                    $invoiceNum = Invoice::number($data->invoice->invoice_id);
+                    $data->description = __(':number Payment', ['number' => $invoiceNum]);
+                }
+                if(!empty($data->bill)) {
+                    $billNum = Bill::number($data->bill->bill_id);
+                    $data->description = __(':number Payment', ['number' => $billNum]);
+                }
+                if(!empty($data->from_bank_account)) {
+                    $from       = $data->from_bank_account;
+                    $account    = "{$from->bank_name} {$from->holder_name}";
+                    $data->description = __('Transfer from :account', ['account' => $account]);
+                }
+                if(!empty($data->to_bank_account)) {
+                    $to         = $data->to_bank_account;
+                    $account    = "{$to->bank_name} {$to->holder_name}";
+                    $data->description = __('Transfer to :account', ['account' => $account]);
                 }
             }
 
-            $count  = count($ledger);
+            $unsorted_data = $unsorted_data->merge($unprocessed);
             
+            $ledger = $unsorted_data->sortBy('date')->values()->all();
+
+            $count  = count($ledger);
 
             return view('ledger.index', compact('ledger', 'count', 'months', 'years', 'accountList', 'prevBalance', 'selected_year'));
         } else {

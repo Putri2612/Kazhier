@@ -132,27 +132,29 @@
                                                             @foreach ($ledger as $data)
                                                                 <tr class="font-style">
                                                                     <td>{{$num}}</td>
-                                                                    <td>{{Helper::DateFormat($data['date'])}}</td>
-                                                                    <td>{{$data['description']}}</td>
+                                                                    <td>{{Helper::DateFormat($data->date)}}</td>
+                                                                    <td>{{$data->description}}</td>
                                                                     <td>
-                                                                        @if ($data['debit'] !=0)
+                                                                        @if (!empty($data->debit))
                                                                             @php
-                                                                                $debitTotal += $data['debit'];
+                                                                                $debitTotal += $data->debit;
                                                                             @endphp
-                                                                            {{Auth::user()->priceFormat($data['debit'])}}
+                                                                            {{Auth::user()->priceFormat($data->debit)}}
                                                                         @endif
                                                                     </td>
                                                                     <td>
-                                                                        @if ($data['credit'] !=0)
+                                                                        @if (!empty($data->credit))
                                                                             @php
-                                                                                $creditTotal +=$data['credit'];
+                                                                                $creditTotal += $data->credit;
                                                                             @endphp
-                                                                            {{Auth::user()->priceFormat($data['credit'])}}
+                                                                            {{Auth::user()->priceFormat($data->credit)}}
                                                                         @endif
                                                                     </td>
                                                                     <td>
                                                                         @php
-                                                                            $balance += ($data['credit'] - $data['debit']);
+                                                                            $credit = !empty($data->credit) ? $data->credit : 0;
+                                                                            $debit  = !empty($data->debit) ? $data->debit : 0;
+                                                                            $balance += ($credit - $debit);
                                                                         @endphp
                                                                         {{Auth::user()->priceFormat($balance)}}
                                                                     </td>

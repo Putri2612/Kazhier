@@ -189,6 +189,11 @@ class Invoice extends Model
         return $settings['invoice_prefix'] . sprintf("%05d", $this->invoice_id);
     }
 
+    public static function number($id) {
+        $settings = Utility::settings();
+        return $settings["invoice_prefix"] . sprintf("%05d", $id);
+    }
+
     public static function weekly() {
         $start  = now()->startOfWeek();
         $end    = (clone $start)->endOfWeek();
