@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Liability;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
 
 class LiabilityController extends Controller
 {
+    use CanProcessNumber;
+
     public function index()
     {
         if(\Auth::user()->can('manage liabilities'))
@@ -65,7 +68,7 @@ class LiabilityController extends Controller
             $liabilities->type           = $request->type;
             $liabilities->date           = $request->date;
             $liabilities->due_date       = $request->due_date;
-            $liabilities->amount         = $request->amount;
+            $liabilities->amount         = $this->ReadableNumberToFloat($request->amount);
             $liabilities->description    = $request->description;
             $liabilities->created_by     = \Auth::user()->creatorId();
             $liabilities->save();
@@ -132,7 +135,7 @@ class LiabilityController extends Controller
                 $liability->type           = $request->type;
                 $liability->date           = $request->date;
                 $liability->due_date       = $request->due_date;
-                $liability->amount         = $request->amount;
+                $liability->amount         = $this->ReadableNumberToFloat($request->amount);
                 $liability->description    = $request->description;
                 $liability->save();
 

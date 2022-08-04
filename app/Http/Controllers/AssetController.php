@@ -3,15 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class AssetController extends Controller
 {
+    use CanProcessNumber;
+
     public function index()
     {
-        if(\Auth::user()->can('manage assets'))
+        if(Auth::user()->can('manage assets'))
         {
-            $assets = Asset::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $assets = Asset::where('created_by', '=', Auth::user()->creatorId())->get();
 
             return view('assets.index', compact('assets'));
         }
@@ -46,9 +51,9 @@ class AssetController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create assets'))
+        if(Auth::user()->can('create assets'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'name' => 'required',
                                    'type' => 'required',
@@ -69,9 +74,9 @@ class AssetController extends Controller
             $assets->type           = $request->type;
             $assets->purchase_date  = $request->purchase_date;
             $assets->supported_date = $request->supported_date;
-            $assets->amount         = $request->amount;
+            $assets->amount         = $this->ReadableNumberToFloat($request->amount);
             $assets->description    = $request->description;
-            $assets->created_by     = \Auth::user()->creatorId();
+            $assets->created_by     = Auth::user()->creatorId();
             $assets->save();
 
             return redirect()->route('account-assets.index')->with('success', __('Assets successfully created.'));
@@ -91,7 +96,7 @@ class AssetController extends Controller
     public function edit($id)
     {
 
-        if(\Auth::user()->can('edit assets'))
+        if(Auth::user()->can('edit assets'))
         {
             $asset = Asset::find($id);
             $types['current asset']     = __('Current Asset');
@@ -115,12 +120,12 @@ class AssetController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit assets'))
+        if(Auth::user()->can('edit assets'))
         {
             $asset = Asset::find($id);
-            if($asset->created_by == \Auth::user()->creatorId())
+            if($asset->created_by == Auth::user()->creatorId())
             {
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'name' => 'required',
                                        'purchase_date' => 'required',
@@ -140,7 +145,7 @@ class AssetController extends Controller
                 $asset->type           = $request->type;
                 $asset->purchase_date  = $request->purchase_date;
                 $asset->supported_date = $request->supported_date;
-                $asset->amount         = $request->amount;
+                $asset->amount         = $this->ReadableNumberToFloat($request->amount);
                 $asset->description    = $request->description;
                 $asset->save();
 
@@ -160,10 +165,10 @@ class AssetController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete assets'))
+        if(Auth::user()->can('delete assets'))
         {
             $asset = Asset::find($id);
-            if($asset->created_by == \Auth::user()->creatorId())
+            if($asset->created_by == Auth::user()->creatorId())
             {
                 $asset->delete();
 

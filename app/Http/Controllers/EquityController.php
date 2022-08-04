@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Equity;
+use App\Traits\CanProcessNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class EquityController extends Controller
 {
+    use CanProcessNumber;
     public function index()
     {
-        if(\Auth::user()->can('manage equities'))
+        if(Auth::user()->can('manage equities'))
         {
-            $equities = Equity::where('created_by', '=', \Auth::user()->creatorId())->get();
+            $equities = Equity::where('created_by', '=', Auth::user()->creatorId())->get();
 
             return view('equities.index', compact('equities'));
         }
@@ -24,7 +28,7 @@ class EquityController extends Controller
 
     public function create()
     {
-        if(\Auth::user()->can('create equities'))
+        if(Auth::user()->can('create equities'))
         {
             return view('equities.create');
         }
@@ -37,9 +41,9 @@ class EquityController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create equities'))
+        if(Auth::user()->can('create equities'))
         {
-            $validator = \Validator::make(
+            $validator = Validator::make(
                 $request->all(), [
                                    'name' => 'required',
                                    'amount' => 'required',
@@ -54,7 +58,7 @@ class EquityController extends Controller
 
             $equities                 = new Equity();
             $equities->name           = $request->name;
-            $equities->amount         = $request->amount;
+            $equities->amount         = $this->ReadableNumberToFloat($request->amount);
             $equities->description    = $request->description;
             $equities->created_by     = \Auth::user()->creatorId();
             $equities->save();
@@ -76,7 +80,7 @@ class EquityController extends Controller
     public function edit($id)
     {
 
-        if(\Auth::user()->can('edit equities'))
+        if(Auth::user()->can('edit equities'))
         {
             $equity = Equity::find($id);
             
@@ -91,12 +95,12 @@ class EquityController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(\Auth::user()->can('edit equities'))
+        if(Auth::user()->can('edit equities'))
         {
             $equity = Equity::find($id);
-            if($equity->created_by == \Auth::user()->creatorId())
+            if($equity->created_by == Auth::user()->creatorId())
             {
-                $validator = \Validator::make(
+                $validator = Validator::make(
                     $request->all(), [
                                        'name' => 'required',
                                        'amount' => 'required',
@@ -110,7 +114,7 @@ class EquityController extends Controller
                 }
 
                 $equity->name           = $request->name;
-                $equity->amount         = $request->amount;
+                $equity->amount         = $this->ReadableNumberToFloat($request->amount);
                 $equity->description    = $request->description;
                 $equity->save();
 
@@ -130,10 +134,10 @@ class EquityController extends Controller
 
     public function destroy($id)
     {
-        if(\Auth::user()->can('delete equities'))
+        if(Auth::user()->can('delete equities'))
         {
             $equity = Equity::find($id);
-            if($equity->created_by == \Auth::user()->creatorId())
+            if($equity->created_by == Auth::user()->creatorId())
             {
                 $equity->delete();
 
