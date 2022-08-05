@@ -32,7 +32,7 @@ class BaseModel extends HTMLElement {
         this.rendered = true;
     }
 
-    _storeAttribute(name, value) {
+    _storeAttribute(name, value = "") {
         if(name in this.castAttributes) {
             if (Array.isArray(this.castAttributes[name])) {
                 if(this.castAttributes[name].includes(value)) {
@@ -43,7 +43,8 @@ class BaseModel extends HTMLElement {
             } else if (this.castAttributes[name] == 'integer') {
                 this.attr[name] = parseInt(value);
             } else if (this.castAttributes[name] == 'boolean') {
-                this.attr[name] = Boolean(value);
+                value = value.toLowerCase();
+                this.attr[name] = (value === 'true' || value === '1') && value !== '';
             }
         } else {
             this.attr[name] = value;
