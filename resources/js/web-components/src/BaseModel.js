@@ -45,6 +45,8 @@ class BaseModel extends HTMLElement {
             } else if (this.castAttributes[name] == 'boolean') {
                 value = value.toLowerCase();
                 this.attr[name] = (value === 'true' || value === '1') && value !== '';
+            } else if (this.castAttributes[name] == 'url') {
+                this.attr[name] = new URL(value);
             }
         } else {
             this.attr[name] = value;

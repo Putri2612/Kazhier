@@ -1,4 +1,5 @@
 import BaseModel from "../BaseModel";
+import getLang from "../HelperFunctions/DocumentLang";
 
 class Translation extends BaseModel {
 
@@ -7,12 +8,18 @@ class Translation extends BaseModel {
 
     constructor() {
         super();
+        const storage = localStorage.getItem('translations');
+        if(storage) {
+            Translation.data = JSON.parse(storage);
+            return;
+        }
+
         if(!Object.keys(Translation.data).length && !Translation.fetching) {
             Translation.fetching = true;
 
             let url     = window.location.href,
                 pos     = url.indexOf('/app/'),
-                lang    = document.documentElement.lang.toLowerCase();
+                lang    = getLang();
 
                 if(pos <= 0) {
                     pos = url.length;
@@ -29,6 +36,7 @@ class Translation extends BaseModel {
                     return false;
                 }
             }).then(data => {
+                localStorage.setItem('translations', JSON.stringify(data));
                 Translation.data = data;
                 Translation.fetching = false;
                 document.querySelectorAll('tl-str').forEach(element => {
