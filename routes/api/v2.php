@@ -7,7 +7,12 @@ use App\Http\Controllers\API\v2\Auth\RegisterController;
 use App\Http\Controllers\api\v2\BalanceSheetController;
 use App\Http\Controllers\api\v2\BankAccountController;
 use App\Http\Controllers\api\v2\CategoryController;
+use App\Http\Controllers\api\v2\Format\Controller as FormatController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('format')->as('format.')->group(function () {
+    Route::get('{type}', [FormatController::class, 'get'])->name('get');
+});
 
 Route::prefix('auth')->as('auth.')->group(function() {
     Route::post('login', [LoginController::class, 'index'])->name('login');

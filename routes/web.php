@@ -74,6 +74,7 @@ Route::get('/', function () { return view('landing-page.index');} );
 
 Route::prefix('app')->group(
     function() {
+        Route::get('/test', function() { return view('test.index'); });
         Route::prefix('customer')->as('customer.')->group(
             function (){
                 Route::group(
@@ -331,7 +332,7 @@ Route::prefix('app')->group(
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
                 Route::post('revenue/import/heading', [RevenueController::class, 'getImportHeadings'])->name('revenue.import.headings');
                 Route::put('revenue/import/store', [RevenueController::class, 'storeImport'])->name('revenue.import.store');
-                Route::post('revenue/get', [RevenueController::class, 'get'])->name('revenue.get');
+                Route::match(['get', 'post'] ,'revenue/get', [RevenueController::class, 'get'])->name('revenue.get');
                 Route::resource('revenue', RevenueController::class);
                 // Expense
         

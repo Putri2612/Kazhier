@@ -8,18 +8,25 @@ class Translation extends BaseModel {
 
     constructor() {
         super();
+        const lang  = getLang(),
+            oldLang = localStorage.getItem('trans-lang'),
+            nofetch = lang == oldLang;
+
+        if(Object.keys(Translation.data).length && nofetch) {
+            return;
+        }
+
         const storage = localStorage.getItem('translations');
-        if(storage) {
+        if(storage && nofetch) {
             Translation.data = JSON.parse(storage);
             return;
         }
 
-        if(!Object.keys(Translation.data).length && !Translation.fetching) {
+        if(!Translation.fetching) {
             Translation.fetching = true;
 
             let url     = window.location.href,
-                pos     = url.indexOf('/app/'),
-                lang    = getLang();
+                pos     = url.indexOf('/app/');
 
                 if(pos <= 0) {
                     pos = url.length;
@@ -37,6 +44,7 @@ class Translation extends BaseModel {
                 }
             }).then(data => {
                 localStorage.setItem('translations', JSON.stringify(data));
+                localStorage.setItem('trans-lang', lang);
                 Translation.data = data;
                 Translation.fetching = false;
                 document.querySelectorAll('tl-str').forEach(element => {

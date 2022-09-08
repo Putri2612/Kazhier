@@ -1,6 +1,12 @@
 import Translation from "./Translation/Translation";
 customElements.define('tl-str', Translation);
 
+import DateFormatter from "./Formatter/Date/DateFormatter";
+customElements.define('date-str', DateFormatter);
+
+import CurrencyFormatter from "./Formatter/Currency/CurrencyFormatter";
+customElements.define('price-str', CurrencyFormatter);
+
 import FormBtn from "./Formbtn/FormBTN";
 customElements.define('form-btn', FormBtn);
 

@@ -32,7 +32,7 @@ class Bill extends Model
     ];
 
     public function getStatus() {
-        return self::$statuses[$this->status];
+        return static::$statuses[$this->status];
     }
 
     public static function number($id) {
@@ -41,9 +41,7 @@ class Bill extends Model
     }
 
     public function billNumber() {
-        $settings = Utility::settings();
-
-        return $settings["bill_prefix"] . sprintf("%05d", $this->bill_id);
+        return static::number($this->id);
     }
 
     public function vender()
