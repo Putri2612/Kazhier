@@ -194,7 +194,7 @@ class PlanController extends Controller
 
     public function getPlanAsync()
     {
-        $plans = Plan::select('name', 'price', 'max_users', 'max_account', 'duration')->get()->toArray();
+        $plans = Plan::select('name', 'price', 'max_users', 'max_bank_accounts as max_account', 'duration')->get()->toArray();
         return json_encode($plans);
     }
 

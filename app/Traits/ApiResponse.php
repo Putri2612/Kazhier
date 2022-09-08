@@ -7,7 +7,7 @@ use App\Models\Utility;
 trait ApiResponse {
 
     protected function FailedResponse($message = 'Something went wrong :(', $status = 400) {
-        return response()->json(['message' => $message], $status);
+        return response()->json(['message' => __($message)], $status);
     }
 
     protected function CreateFailedResponse() {
@@ -27,7 +27,7 @@ trait ApiResponse {
     }
 
     protected function SuccessResponse($data, $message = 'Success') {
-        return response()->json(['data' => $data, 'message' => $message]);
+        return response()->json(['data' => $data, 'message' => __($message)]);
     }
 
     protected function SuccessWithoutDataResponse($message = 'Success') {
