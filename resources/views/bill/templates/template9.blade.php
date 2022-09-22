@@ -649,8 +649,18 @@
                                     </div>
                                 </div>
                                 <div data-v-7d9d14b5="" class="break-25"></div>
-                                <div data-v-7d9d14b5="" class="break-25"></div>
-                                <div data-v-7d9d14b5=""><h1 data-v-7d9d14b5="" style="color: {{$color}};">{{__('Thank you!')}}</h1></div>
+                            </div>
+                            <div style="text-align:end">
+                                <p>
+                                    Sidoarjo, 20 September 2022
+                                </p>
+                                <br><br><br><br><br>
+                                <p>
+                                    Pak Yudi
+                                </p>
+                                <p>
+                                    Direktur
+                                </p>
                             </div>
                         </div>
                     </div>

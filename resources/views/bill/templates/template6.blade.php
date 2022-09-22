@@ -655,7 +655,21 @@
                                                 <div data-v-f2a183a6="" class="d-table-summary-item" style="border-top: 1px solid {{$color}}; border-bottom: 1px solid {{$color}};">
                                                     <div data-v-f2a183a6="" class="d-table-label">{{__('Due Amount')}}:</div>
                                                     <div data-v-f2a183a6="" class="d-table-value">{{\App\Models\Utility::priceFormat($settings,$bill->getDue())}}</div>
-                                                </div>
+                                            </div>
+                                                    <div style="text-align:right">
+                                                        <p>
+                                                            Sidoarjo, 20 September 2022
+                                                        </p>
+                                                        <br><br><br><br><br>
+                                                        <p>
+                                                    <div style="text-align: center">
+                                                            Pak Yudi
+                                                        </p>
+                                                        <p>
+                                                            Direktur
+                                                        </p>
+                                                    </div>
+                                                    </div>
                                             </div>
                                         </div>
                                     </div>

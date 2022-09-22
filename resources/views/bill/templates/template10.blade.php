@@ -654,6 +654,18 @@
                                 </div>
                                 <div data-v-b8f60a0c="" class="break-25"></div>
                             </div>
+                            <div style="text-align:end">
+                                <p>
+                                    Sidoarjo, 20 September 2022
+                                </p>
+                                <br><br><br><br><br>
+                                <p>
+                                    Pak Yudi
+                                </p>
+                                <p>
+                                    Direktur
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
