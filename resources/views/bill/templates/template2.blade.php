@@ -657,6 +657,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @if($bill->withSignature())
+                                        <div style="text-align:right">
+                                            <p>
+                                                {{ $settings['company_city'] }}, {{ Helper::dateFormat($bill->issue_date) }}
+                                            </p>
+                                            <br><br><br>
+                                            <p>
+                                                {{ $bill->signed_by }}
+                                            </p>
+                                            <p>
+                                                {{ $bill->signee_position }}
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

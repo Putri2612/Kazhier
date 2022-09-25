@@ -231,6 +231,32 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
+                                            <div class="form-group">
+                                                {{ Form::label('signed_by', __('Signed By')) }}
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text">
+                                                            <i class="fas fa-signature"></i>
+                                                        </div>
+                                                    </div>
+                                                    {{ Form::text('signed_by', '', array('class' => 'form-control')) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                {{ Form::label('signee_position', __('Signee Position')) }}
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    </div>
+                                                    {{ Form::text('signee_position', '', array('class' => 'form-control')) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="input-group">
                                                 {{ Form::label('category_id', __('Category')) }}
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}

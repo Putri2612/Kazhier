@@ -643,23 +643,23 @@
                                                         <div data-v-f2a183a6="" class="d-table-label">{{__('Due Amount')}}:</div>
                                                         <div data-v-f2a183a6="" class="d-table-value">{{\App\Models\Utility::priceFormat($settings,$bill->getDue())}}</div>
                                                     </div>
-                                                    <div style="text-align: right">
-                                                        <p>
-                                                            Sidoarjo, 20 September 2022
-                                                        </p>
-                                                        <br><br><br><br><br>
-                                                        <p>
-                                                    <div style="text-align: center">
-                                                            Pak Yudi
-                                                        </p>
-                                                        <p>
-                                                            Direktur
-                                                        </p>
-                                                    </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        @if($bill->withSignature())
+                                            <div style="text-align:right">
+                                                <p>
+                                                    {{ $settings['company_city'] }}, {{ Helper::dateFormat($bill->issue_date) }}
+                                                </p>
+                                                <br><br><br>
+                                                <p>
+                                                    {{ $bill->signed_by }}
+                                                </p>
+                                                <p>
+                                                    {{ $bill->signee_position }}
+                                                </p>
+                                            </div>
+                                        @endif
                                     </div>
                                     <div data-v-1ad6e3b9="" class="break-25"></div>
                                 </div>

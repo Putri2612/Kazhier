@@ -653,18 +653,20 @@
                                     </div>
                                 </div>
                                 <div data-v-b8f60a0c="" class="break-25"></div>
-                            </div>
-                            <div style="text-align:end">
-                                <p>
-                                    Sidoarjo, 20 September 2022
-                                </p>
-                                <br><br><br><br><br>
-                                <p>
-                                    Pak Yudi
-                                </p>
-                                <p>
-                                    Direktur
-                                </p>
+                                @if($bill->withSignature())
+                                    <div style="text-align:right">
+                                        <p>
+                                            {{ $settings['company_city'] }}, {{ Helper::dateFormat($bill->issue_date) }}
+                                        </p>
+                                        <br><br><br>
+                                        <p>
+                                            {{ $bill->signed_by }}
+                                        </p>
+                                        <p>
+                                            {{ $bill->signee_position }}
+                                        </p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
