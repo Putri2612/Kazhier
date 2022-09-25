@@ -180,6 +180,8 @@ class BillController extends Controller
             $bill->due_date         = $request->input('due_date');
             $bill->category_id      = $request->input('category_id');
             $bill->order_number     = $request->input('order_number');
+            $bill->signed_by        = $request->input('signed_by');
+            $bill->signee_position  = $request->input('signee_position');
             $bill->discount_apply   = $request->has('discount_apply') ? 1 : 0;
             $bill->created_by       = Auth::user()->creatorId();
             $bill->served_by        = Auth::user()->id;
@@ -303,6 +305,8 @@ class BillController extends Controller
                 $bill->due_date       = $request->input('due_date');
                 $bill->order_number   = $request->input('order_number');
                 $bill->discount_apply = $request->has('discount_apply') ? 1 : 0;
+                $bill->signed_by        = $request->input('signed_by');
+                $bill->signee_position  = $request->input('signee_position');
                 $bill->category_id    = $request->input('category_id');
                 $bill->save();
                 CustomField::saveData($bill, $request->input('customField'));
@@ -823,18 +827,22 @@ class BillController extends Controller
             $items[]        = $item;
         }
 
-        $bill->bill_id    = 1;
-        $bill->issue_date = date('Y-m-d H:i:s');
-        $bill->due_date   = date('Y-m-d H:i:s');
-        $bill->items      = $items;
+        $bill->bill_id          = 1;
+        $bill->issue_date       = date('Y-m-d H:i:s');
+        $bill->due_date         = date('Y-m-d H:i:s');
+        $bill->signed_by        = '<Signee Name>';
+        $bill->signee_position  = '<Signee Position>';
+        $bill->items            = $items;
 
         $preview = 1;
         $color   = '#' . $color;
 
-        $logo           = asset(Storage::url('logo/'));
-        $company_logo   = Utility::getValByName('company_logo');
-        $img            = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
-        $img            .= '?'.config('asset-version.img.logo');
+        $logo                       = asset(Storage::url('logo/'));
+        $settings                   = Utility::settings();
+        $company_logo               = $settings['company_logo'];
+        $settings['company_city']   = $settings['company_city'] ?: '<Company City>';
+        $img                        = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $img                        .= '?'.config('asset-version.img.logo');
 
         return view('bill.templates.' . $template, compact('bill', 'preview', 'color', 'img', 'settings', 'vendor'));
     }
@@ -871,9 +879,11 @@ class BillController extends Controller
         $bill->items = $items;
 
         //Set your logo
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo                       = asset(Storage::url('logo/'));
+        $settings                   = Utility::settings();
+        $company_logo               = $settings['company_logo'];
+        $settings['company_city']   = $settings['company_city'];
+        $img                        = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
 
         if($bill)
         {

@@ -137,6 +137,10 @@ class Bill extends Model
         return $this->hasOne(User::class, 'id', 'served_by');
     }
 
+    public function withSignature() {
+        return isset($this->signed_by) && isset($this->signee_position);
+    }
+
     public static function weekly() {
         $start  = now()->startOfWeek();
         $end    = (clone $start)->endOfWeek();

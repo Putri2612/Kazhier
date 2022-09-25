@@ -656,6 +656,20 @@
                                     </div>
                                 </div>
                                 <div data-v-363339a0="" class="break-50"></div>
+                                @if($bill->withSignature())
+                                    <div style="text-align:right">
+                                        <p>
+                                            {{ $settings['company_city'] }}, {{ Helper::dateFormat($bill->issue_date) }}
+                                        </p>
+                                        <br><br><br>
+                                        <p>
+                                            {{ $bill->signed_by }}
+                                        </p>
+                                        <p>
+                                            {{ $bill->signee_position }}
+                                        </p>
+                                    </div>
+                                @endif
                                 <div data-v-363339a0="" class="row">
                                     <div data-v-363339a0="" class="col-66"><p data-v-363339a0="" class="thank" style="color: {{$color}};">{{__('Thank you')}}!</p></div>
                                     <div data-v-363339a0="" class="col-33"></div>
