@@ -218,19 +218,21 @@ class InvoiceController extends Controller
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            $invoice                 = new Invoice();
-            $invoice->invoice_id     = $this->invoiceNumber();
-            $invoice->customer_id    = $request->input('customer_id');
-            $invoice->status         = 0;
-            $invoice->type           = $request->input('type');
-            $invoice->issue_date     = $request->input('issue_date');
-            $invoice->due_date       = $request->input('due_date');
-            $invoice->category_id    = $request->input('category_id');
-            $invoice->ref_number     = $request->input('ref_number');
-            $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
-            $invoice->customer_tax   = $request->has('customer_tax');
-            $invoice->created_by     = Auth::user()->creatorId();
-            $invoice->served_by      = Auth::user()->id;
+            $invoice                    = new Invoice();
+            $invoice->invoice_id        = $this->invoiceNumber();
+            $invoice->customer_id       = $request->input('customer_id');
+            $invoice->status            = 0;
+            $invoice->type              = $request->input('type');
+            $invoice->issue_date        = $request->input('issue_date');
+            $invoice->due_date          = $request->input('due_date');
+            $invoice->category_id       = $request->input('category_id');
+            $invoice->ref_number        = $request->input('ref_number');
+            $invoice->discount_apply    = $request->input('discount_apply') !== null ? 1 : 0;
+            $invoice->customer_tax      = $request->has('customer_tax');
+            $invoice->created_by        = Auth::user()->creatorId();
+            $invoice->served_by         = Auth::user()->id;
+            $invoice->signed_by         = $request->input('signed_by');
+            $invoice->signee_position   = $request->input('signee_position');
             $invoice->save();
             CustomField::saveData($invoice, $request->input('customField'));
             $products = $request->input('items');
@@ -367,13 +369,15 @@ class InvoiceController extends Controller
                     $product->delete();
                 }
 
-                $invoice->customer_id    = $request->input('customer_id');
-                $invoice->issue_date     = $request->input('issue_date');
-                $invoice->due_date       = $request->input('due_date');
-                $invoice->ref_number     = $request->input('ref_number');
-                $invoice->discount_apply = $request->input('discount_apply') !== null ? 1 : 0;
-                $invoice->category_id    = $request->input('category_id');
-                $invoice->customer_tax   = $request->has('customer_tax');
+                $invoice->customer_id       = $request->input('customer_id');
+                $invoice->issue_date        = $request->input('issue_date');
+                $invoice->due_date          = $request->input('due_date');
+                $invoice->ref_number        = $request->input('ref_number');
+                $invoice->discount_apply    = $request->input('discount_apply') !== null ? 1 : 0;
+                $invoice->category_id       = $request->input('category_id');
+                $invoice->customer_tax      = $request->has('customer_tax');
+                $invoice->signed_by         = $request->input('signed_by');
+                $invoice->signee_position   = $request->input('signee_position');
                 $invoice->save();
                 CustomField::saveData($invoice, $request->input('customField'));
 
@@ -737,17 +741,22 @@ class InvoiceController extends Controller
             $items[]        = $item;
         }
 
-        $invoice->invoice_id = 1;
-        $invoice->issue_date = date('Y-m-d H:i:s');
-        $invoice->due_date   = date('Y-m-d H:i:s');
-        $invoice->items      = $items;
+        $invoice->invoice_id        = 1;
+        $invoice->issue_date        = date('Y-m-d H:i:s');
+        $invoice->due_date          = date('Y-m-d H:i:s');
+        $invoice->items             = $items;
+        $invoice->signed_by         = '<Signee Name>';
+        $invoice->signee_position   = '<Signee Position>';
 
 
         $preview = 1;
         $color   = '#' . $color;
 
-        $logo           = asset(Storage::url('logo/'));
-        $company_logo   = Utility::getValByName('company_logo');
+        $logo                       = asset(Storage::url('logo/'));
+        $settings                   = Utility::settings();
+        $company_logo               = $settings['company_logo'];
+        $settings['company_city']   = $settings['company_city'] ?: '<Company City>';
+        
         $logo_version   = config('asset-version.img.logo');
         $img            = asset($logo . '/' . (!empty($company_logo) ? $company_logo : 'logo.png'));
         $img            .= "?{$logo_version}";
@@ -787,9 +796,11 @@ class InvoiceController extends Controller
         $invoice->items = $items;
 
         //Set your logo
-        $logo         = asset(Storage::url('logo/'));
-        $company_logo = Utility::getValByName('company_logo');
-        $img          = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
+        $logo                       = asset(Storage::url('logo/'));
+        $settings                   = Utility::settings();
+        $company_logo               = $settings['company_logo'];
+        $settings['company_city']   = $settings['company_city'];
+        $img                        = asset($logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo.png'));
 
         if($invoice)
         {

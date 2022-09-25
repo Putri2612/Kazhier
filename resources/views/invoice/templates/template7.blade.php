@@ -661,18 +661,20 @@
                                             </div>
                                         </div>
                                         <div data-v-1ad6e3b9="" class="break-25"></div>
+                                        @if($invoice->withSignature())
                                         <div style="text-align:end">
                                             <p>
-                                                Sidoarjo, 19 September 2022
+                                                {{ $settings['company_city'] }}, {{ Helper::DateFormat($invoice->issue_date, 'long') }}
                                             </p>
-                                            <br><br><br><br><br>
+                                            <br><br><br>
                                             <p>
-                                                Pak Yudi
+                                                {{ $invoice->signed_by }}
                                             </p>
                                             <p>
-                                                Direktur
+                                                {{ $invoice->signee_position }}
                                             </p>
                                         </div>
+                                    @endif
                                     </div>
                                 </div>
                             </div>

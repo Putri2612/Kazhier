@@ -667,18 +667,20 @@
                                         </div>
                                     </div>
                                     <div data-v-b8f60a0c="" class="break-25"></div>
-                                    <div style="text-align:end">
-                                        <p>
-                                            Sidoarjo, 19 September 2022
-                                        </p>
-                                        <br><br><br><br><br>
-                                        <p>
-                                            Pak Yudi
-                                        </p>
-                                        <p>
-                                            Direktur
-                                        </p>
-                                    </div>
+                                    @if($invoice->withSignature())
+                                        <div style="text-align:end">
+                                            <p>
+                                                {{ $settings['company_city'] }}, {{ Helper::DateFormat($invoice->issue_date, 'long') }}
+                                            </p>
+                                            <br><br><br>
+                                            <p>
+                                                {{ $invoice->signed_by }}
+                                            </p>
+                                            <p>
+                                                {{ $invoice->signee_position }}
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

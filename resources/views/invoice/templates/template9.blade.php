@@ -666,18 +666,20 @@
                                     <div data-v-7d9d14b5="">
                                         <h1 data-v-7d9d14b5="" style="color: {{$color}};">{{__('Thank you!')}}</h1>
                                     </div>
-                                    <div style="text-align:end">
-                                        <p>
-                                            Sidoarjo, 19 September 2022
-                                        </p>
-                                        <br><br><br><br><br>
-                                        <p>
-                                            Pak Yudi
-                                        </p>
-                                        <p>
-                                            Direktur
-                                        </p>
-                                    </div>
+                                    @if($invoice->withSignature())
+                                        <div style="text-align:end">
+                                            <p>
+                                                {{ $settings['company_city'] }}, {{ Helper::DateFormat($invoice->issue_date, 'long') }}
+                                            </p>
+                                            <br><br><br>
+                                            <p>
+                                                {{ $invoice->signed_by }}
+                                            </p>
+                                            <p>
+                                                {{ $invoice->signee_position }}
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

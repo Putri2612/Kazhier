@@ -250,6 +250,32 @@
                                             </div>
                                         </div>
                                         <div class="col-md-6">
+                                            <div class="form-group">
+                                                {{ Form::label('signed_by', __('Signed By')) }}
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text">
+                                                            <i class="fas fa-signature"></i>
+                                                        </div>
+                                                    </div>
+                                                    {{ Form::text('signed_by', '', array('class' => 'form-control')) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                {{ Form::label('signee_position', __('Signee Position')) }}
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <div class="input-group-text">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    </div>
+                                                    {{ Form::text('signee_position', '', array('class' => 'form-control')) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="input-group">
                                                 {{ Form::label('category_id', __('Category')) }}
                                                 {{ Form::select('category_id', $category,null, array('class' => 'form-control customer-sel font-style selectric','required'=>'required')) }}
@@ -270,12 +296,6 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        {{-- <div class="col-md-6">
-                                            <div class="custom-control custom-checkbox mt-4">
-                                                <input class="custom-control-input" type="checkbox" name="discount_apply" id="discount_apply">
-                                                <label class="custom-control-label" for="discount_apply">{{__('Discount Apply')}}</label>
-                                            </div>
-                                        </div> --}}
                                         @if(!$customFields->isEmpty())
                                             <div class="col-md-6">
                                                 <div class="tab-pane fade show" id="tab-2" role="tabpanel">

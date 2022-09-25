@@ -189,6 +189,10 @@ class Invoice extends Model
         return $settings['invoice_prefix'] . sprintf("%05d", $this->invoice_id);
     }
 
+    public function withSignature() {
+        return isset($this->signed_by) && isset($this->signee_position);
+    }
+
     public static function number($id) {
         $settings = Utility::settings();
         return $settings["invoice_prefix"] . sprintf("%05d", $id);
