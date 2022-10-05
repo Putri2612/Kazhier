@@ -40,8 +40,7 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->type == 'super admin')
-        {
+        if (Auth::user()->type == 'super admin') {
             $user                       = Auth::user();
             $user['total_user']         = $user->countCompany();
             $user['total_paid_user']    = $user->countPaidCompany();
@@ -52,26 +51,23 @@ class DashboardController extends Controller
             $chartData                  = $this->getOrderChart(['duration' => 'week']);
 
             return view('dashboard.super_admin', compact('user', 'chartData'));
-        }
-        else if(Auth::user()->type == 'company' && !Auth::user()->initialized){
+        } else if (Auth::user()->type == 'company' && !Auth::user()->initialized) {
             return redirect()->route('initial-setup.index');
-        }
-        else
-        {
+        } else {
             $creatorId = Auth::user()->creatorId();
-            
+
             $data['latestIncome']  = Revenue::where('created_by', '=', $creatorId)->orderBy('date', 'desc')->limit(5)->get();
             $data['latestExpense'] = Payment::where('created_by', '=', $creatorId)->orderBy('date', 'desc')->limit(5)->get();
 
             $incomeCategoryData = $this->GetCategoryData();
             $data['incomeCategoryColor'] = $incomeCategoryData['colors'];
             $data['incomeCategory']      = $incomeCategoryData['categories'];
-            $data['incomeCategoryAmount']= $incomeCategoryData['amounts'];
+            $data['incomeCategoryAmount'] = $incomeCategoryData['amounts'];
 
             $expenseCategoryData = $this->GetCategoryData('expense');
             $data['expenseCategoryColor'] = $expenseCategoryData['colors'];
             $data['expenseCategory']      = $expenseCategoryData['categories'];
-            $data['expenseCategoryAmount']= $expenseCategoryData['amounts'];
+            $data['expenseCategoryAmount'] = $expenseCategoryData['amounts'];
 
             $data['IncomeExpenseChart'] = $this->GetIncomeAndExpenseChart(Auth::user());
             $data['CashFlowChart']      = $this->GetCashFlowChart(Auth::user());
@@ -80,7 +76,7 @@ class DashboardController extends Controller
             $data['currentMonth']   = date('M');
             $data['months']         = $this->Months();
             $data['years']          = $this->Years();
-            if(!in_array($data['currentYear'], $data['years'])) {
+            if (!in_array($data['currentYear'], $data['years'])) {
                 $data['years'][$data['currentYear']] = $data['currentYear'];
             }
 
@@ -95,19 +91,19 @@ class DashboardController extends Controller
             $constant['bankAccount']   = BankAccount::where('created_by', $creatorId)->count();
             $data['constant']          = $constant;
             $data['bankAccountDetail'] = BankAccount::where('created_by', '=', $creatorId)
-                                        ->get();
+                ->get();
 
             $data['recentInvoice']     = Invoice::select('id', 'customer_id', 'issue_date', 'due_date', 'status', 'type')
-                                        ->where('created_by', '=', $creatorId)
-                                        ->orderBy('issue_date', 'desc')
-                                        ->limit(5)->get();
+                ->where('created_by', '=', $creatorId)
+                ->orderBy('issue_date', 'desc')
+                ->limit(5)->get();
             $data['weeklyInvoice']     = Invoice::weekly();
             $data['monthlyInvoice']    = Invoice::monthly();
 
             $data['recentBill']        = Bill::select('id', 'vender_id', 'bill_date', 'due_date', 'status')
-                                        ->where('created_by', '=', $creatorId)
-                                        ->orderBy('bill_date', 'desc')
-                                        ->limit(5)->get();
+                ->where('created_by', '=', $creatorId)
+                ->orderBy('bill_date', 'desc')
+                ->limit(5)->get();
             $data['weeklyBill']        = Bill::weekly();
             $data['monthlyBill']       = Bill::monthly();
 
@@ -115,20 +111,15 @@ class DashboardController extends Controller
 
             return view('dashboard.index', $data);
         }
-
-
     }
 
     public function getOrderChart($arrParam)
     {
         $arrDuration = [];
-        if($arrParam['duration'])
-        {
-            if($arrParam['duration'] == 'week')
-            {
+        if ($arrParam['duration']) {
+            if ($arrParam['duration'] == 'week') {
                 $previous_week = strtotime("-2 week +1 day");
-                for($i = 0; $i < 14; $i++)
-                {
+                for ($i = 0; $i < 14; $i++) {
                     $arrDuration[date('Y-m-d', $previous_week)] = date('d-M', $previous_week);
                     $previous_week                              = strtotime(date('Y-m-d', $previous_week) . " +1 day");
                 }
@@ -138,8 +129,7 @@ class DashboardController extends Controller
         $arrTask          = [];
         $arrTask['label'] = [];
         $arrTask['data']  = [];
-        foreach($arrDuration as $date => $label)
-        {
+        foreach ($arrDuration as $date => $label) {
 
             $data               = Order::select(DB::raw('count(*) as total'))->whereRaw('(payment_status = ? OR payment_status = ? OR payment_status = ?)', ['SUCCESS', 'success', 'succeeded'])->whereDate('created_at', '=', $date)->first();
             $arrTask['label'][] = $label;
@@ -149,30 +139,34 @@ class DashboardController extends Controller
         return $arrTask;
     }
 
-    public function GetCashFlow($month = null, $year = null) {
-        if(Auth::user()->type != 'super admin') {
+    public function GetCashFlow($month = null, $year = null)
+    {
+        if (Auth::user()->type != 'super admin') {
             return response()->json($this->GetCashFlowChart(Auth::user(), $month, $year));
         }
     }
 
-    public function GetIncomeExpense($year = null) {
-        if(Auth::user()->type != 'super admin') {
+    public function GetIncomeExpense($year = null)
+    {
+        if (Auth::user()->type != 'super admin') {
             return response()->json($this->GetIncomeAndExpenseChart(Auth::user(), $year));
         }
     }
 
-    public function GetCategoryData($type = 'income', $year = null) {
-        if(Auth::user()->type != 'super admin'){
-            return Chart::Category(Auth::user(), $year, $type);
+    public function GetCategoryData($type = 'income', $month = null, $year = null)
+    {
+        if (Auth::user()->type != 'super admin') {
+            return Chart::Category(Auth::user(), $month, $year, $type);
         }
     }
 
-    private function GetCashFlowChart(User $user, $month = null, $year = null) {
+    private function GetCashFlowChart(User $user, $month = null, $year = null)
+    {
         return Chart::Cashflow($user, $month, $year);
     }
 
-    private function GetIncomeAndExpenseChart(User $user, $year = null) {
+    private function GetIncomeAndExpenseChart(User $user, $year = null)
+    {
         return Chart::IncomeAndExpense($user, $year);
     }
 }
-
