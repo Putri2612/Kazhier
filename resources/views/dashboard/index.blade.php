@@ -10,9 +10,7 @@
             DoughnutIncome  : document.querySelector('#chart-doughnut-income').getContext('2d'),
             DoughnutExpense : document.querySelector('#chart-doughnut-expense').getContext('2d'),
         }
-
         ChartsConstant.locale = '{{ Config::get('app.locale') }}';
-
         const ChartOptions = {
             line: {
                 scales: {
@@ -35,13 +33,10 @@
                 }
             },
             doughnut: {
-                cutout: "75%",
+                cutout: "60%",
                 interaction:{
                     intersect: true,
                 },
-                legend: {
-                    position: 'top',
-                }, 
                 animation: {
                     animateScale: true,
                     animateRotate: true
@@ -51,16 +46,30 @@
                         callbacks: {
                             label: ChartsConstant.Callbacks.tooltipsDoughnut
                         }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 16
+                            },
+                            generateLabels: (chart) => {
+                                const datasets = chart.data.datasets;
+                                return datasets[0].data.map((amount, i) => ({
+                                    text: `${chart.data.labels[i]} ${amount}`,
+                                    fillStyle: datasets[0].backgroundColor[i],
+                                }))
+                            }
+                        }
                     }
                 }
             }
         }
-
         const CreateCharts = {
             Line: ({context, labels, datasets}) => new Chart(context, { type: 'line', data: { labels: labels, datasets: datasets }, options: ChartOptions.line }),
             Doughnut: ({context, labels, datasets}) => new Chart(context, { type: 'doughnut', data: { datasets: datasets, labels: labels }, options: ChartOptions.doughnut }),
         }
-
         const DisplayCharts = {
             Cashflow: CreateCharts.Line({
                 context: Canvas.Cashflow, 
@@ -72,7 +81,6 @@
                 labels: @json($IncomeExpenseChart['months']), 
                 datasets: @json($IncomeExpenseChart['data'])
             }),
-
             DoughnutIncome: CreateCharts.Doughnut({
                 context: Canvas.DoughnutIncome,
                 labels: @json($incomeCategory), 
@@ -90,18 +98,17 @@
                 }]
             }),
         }
-
         document.querySelectorAll('.underline-dropdown select').forEach(element => {
             element.addEventListener('change', event => {
                 const target = event.currentTarget;
                 // parse url
-                let url = target.getAttribute('data-source');
+                let url = target.getAttribute('data-source'),
+                    type = target.getAttribute('data-type');
                 if(target.hasAttribute('data-name')) {
                     const values = {
-                        month   : parseInt(document.querySelector('select[data-name="cashflow-month"]').value) + 1,
-                        year    : document.querySelector('select[data-name="cashflow-year"]').value
+                        month   : parseInt(document.querySelector(`select[data-name="${type}-month"]`).value) + 1,
+                        year    : document.querySelector(`select[data-name="${type}-year"]`).value
                     };
-
                     url = url.replace(':year', values.year);
                     url = url.replace(':month', values.month);
                 } else {
@@ -125,27 +132,26 @@
                         targetChart.data.datasets = dataset;
                         targetChart.data.labels = data.categories;
                         
-                        const type      = targetName.replace('Doughnut', '').toLowerCase(),
-                            list        = document.querySelector(`.${type}-category-list`);
-                        let priceFormat = "{{ Auth::user()->priceFormat(0) }}".replace('.', '').replace(',', '');
+                        // const type      = targetName.replace('Doughnut', '').toLowerCase(),
+                        //     list        = document.querySelector(`.${type}-category-list`);
+                        // let priceFormat = "{{ Auth::user()->priceFormat(0) }}".replace('.', '').replace(',', '');
                         
-                        let zeros = '';
-                        for(let i = 0; i < priceFormat.match(/0/gi).length; i++) {
-                            zeros += '0';
-                        }
-
-                        priceFormat = priceFormat.replace(zeros, '0');
+                        // let zeros = '';
+                        // for(let i = 0; i < priceFormat.match(/0/gi).length; i++) {
+                        //     zeros += '0';
+                        // }
+                        // priceFormat = priceFormat.replace(zeros, '0');
                         
-                        list.innerHTML = '';
-                        data.categories.forEach((category, index) => {
-                            const amount = new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.amounts[index]),
-                                formattedAmount = priceFormat.replace('0', amount),
-                                content = `<div class="text-end mt-10">
-                                    <span class="graph-label" style="background-color: ${data.colors[index]}">${category}</span>
-                                    <span>${formattedAmount}</span>
-                                </div>`;
-                            list.insertAdjacentHTML('beforeend', content);
-                        });
+                        // list.innerHTML = '';
+                        // data.categories.forEach((category, index) => {
+                        //     const amount = new Intl.NumberFormat('{{ Config::get('app.locale') }}', { maximumSignificantDigits: 2 }).format(data.amounts[index]),
+                        //         formattedAmount = priceFormat.replace('0', amount),
+                        //         content = `<div class="text-end mt-10">
+                        //             <span class="graph-label" style="background-color: ${data.colors[index]}">${category}</span>
+                        //             <span>${formattedAmount}</span>
+                        //         </div>`;
+                        //     list.insertAdjacentHTML('beforeend', content);
+                        // });
                     } else {
                         targetChart.data.datasets   = data.data;
                         if(targetName.includes('Cashflow')) {
@@ -339,10 +345,29 @@
                     <h4 class="col-md-6 fw-normal">{{__('Cashflow')}}</h4>
                     <div class="col-md-6 fw-400 row justify-content-md-end align-items-end">
                         <div class="col-auto underline-dropdown">
-                            {{ Form::select('cashflow_month',$months, date('n') - 1, array('class' => 'h5', 'data-source' => route('dashboard-chart.cashflow', ['month' => ':month', 'year' => ':year']), 'data-name' => 'cashflow-month', 'data-target' => 'Cashflow')) }}
+                            {{ 
+                                Form::select(
+                                    'cashflow_month',
+                                    $months, 
+                                    date('n') - 1,
+                                    array(
+                                        'class' => 'h5', 
+                                        'data-source' => route(
+                                            'dashboard-chart.cashflow', 
+                                            [
+                                                'month' => ':month', 
+                                                'year' => ':year'
+                                            ]
+                                        ), 
+                                        'data-name' => 'cashflow-month', 
+                                        'data-target' => 'Cashflow',
+                                        'data-type' => 'cashflow'
+                                    )
+                                ) 
+                            }}
                         </div>
                         <div class="col-auto underline-dropdown">
-                            {{ Form::select('cashflow_year',$years, $currentYear, array('class' => 'h5', 'data-source' => route('dashboard-chart.cashflow', ['month' => ':month', 'year' => ':year']), 'data-name' => 'cashflow-year', 'data-target' => 'Cashflow')) }}
+                            {{ Form::select('cashflow_year',$years, $currentYear, array('class' => 'h5', 'data-source' => route('dashboard-chart.cashflow', ['month' => ':month', 'year' => ':year']), 'data-name' => 'cashflow-year', 'data-target' => 'Cashflow', 'data-type' => 'cashflow')) }}
                         </div>
                     </div>
                 </div>
@@ -379,27 +404,18 @@
                             <h4 class="col-md-8 fw-normal">{{__('Income By Category')}}</h4>
                             <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
                                 <div class="col-auto underline-dropdown">
-                                    {{ Form::select('income_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'income', 'year' => ':year']), 'data-target' => 'DoughnutIncome')) }}
+                                    {{ Form::select('income_category_month',$months, date('n') - 1, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'income', 'month' => ':month', 'year' => ':year']), 'data-type' => 'income_category', 'data-name' => 'income_category-month', 'data-target' => 'DoughnutIncome')) }}
+                                </div>
+                                <div class="col-auto underline-dropdown">
+                                    {{ Form::select('income_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'income', 'month' => ':month', 'year' => ':year']), 'data-type' => 'income_category', 'data-name' => 'income_category-year', 'data-target' => 'DoughnutIncome')) }}
                                 </div>
                             </div>
                         </div>
                         <div class="card">
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-12 col-md-4 income-category-list">
-                                        @forelse($incomeCategory as $key=>$category)
-                                            <div class="text-end mt-10">
-                                                <span class="graph-label" style="background-color: {{$incomeCategoryColor[$key]}}">{{$category}}</span>
-                                                <span>{{\Auth::user()->priceFormat($incomeCategoryAmount[$key])}}</span>
-                                            </div>
-                                        @empty
-                                            <div class="text-center">
-                                                <h6>{{__('there is no income by category')}}</h6>
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <canvas id="chart-doughnut-income" height="182"></canvas>
+                                    <div class="col-md-12 col-md-4">
+                                        <canvas id="chart-doughnut-income" height="330"></canvas>
                                     </div>
                                     <div class="col-md-4"></div>
                                 </div>
@@ -411,27 +427,18 @@
                             <h4 class="col-md-8 fw-normal">{{__('Expense By Category')}}</h4>
                             <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
                                 <div class="col-auto underline-dropdown">
-                                    {{ Form::select('expense_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'expense', 'year' => ':year']), 'data-target' => 'DoughnutExpense')) }}
+                                    {{ Form::select('expense_category_month',$months, date('n') - 1, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'expense', 'month' => ':month', 'year' => ':year']), 'data-type' => 'expense_category', 'data-name' => 'expense_category-month', 'data-target' => 'DoughnutExpense')) }}
+                                </div>
+                                <div class="col-auto underline-dropdown">
+                                    {{ Form::select('expense_category_year',$years, $currentYear, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'expense', 'month' => ':month', 'year' => ':year']), 'data-type' => 'expense_category', 'data-name' => 'expense_category-year', 'data-target' => 'DoughnutExpense')) }}
                                 </div>
                             </div>
                         </div>
                         <div class="card">                            
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-12 col-md-4 expense-category-list">
-                                        @forelse($expenseCategory as $key=>$category)
-                                            <div class="text-end mt-10">
-                                                <span class="graph-label" style="background-color: {{$expenseCategoryColor[$key]}}">{{$category}}</span>
-                                                <span>{{\Auth::user()->priceFormat($expenseCategoryAmount[$key])}}</span>
-                                            </div>
-                                        @empty
-                                            <div class="text-center">
-                                                <h6>{{__('there is no expense by category')}}</h6>
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                    <div class="col-12 col-md-4">
-                                        <canvas id="chart-doughnut-expense" height="182"></canvas>
+                                    <div class="col-md-12 col-md-4">
+                                        <canvas id="chart-doughnut-expense" height="450"></canvas>
                                     </div>
                                     <div class="col-md-4"></div>
                                 </div>
@@ -995,5 +1002,3 @@
         @endif
     </section>
 @endsection
-
-
