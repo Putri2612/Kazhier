@@ -56,10 +56,13 @@
                             },
                             generateLabels: (chart) => {
                                 const datasets = chart.data.datasets;
-                                return datasets[0].data.map((amount, i) => ({
-                                    text: `${chart.data.labels[i]} ${amount}`,
-                                    fillStyle: datasets[0].backgroundColor[i],
-                                }))
+                                return datasets[0].data.map((amount, i) => {
+                                    const number = ProcessableToReadable(amount);
+                                    return {
+                                        text: `${chart.data.labels[i]}: ${number}`,
+                                        fillStyle: datasets[0].backgroundColor[i],
+                                    }
+                                })
                             }
                         }
                     }
@@ -401,8 +404,8 @@
                 <div class="row">
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-8 fw-normal">{{__('Income By Category')}}</h4>
-                            <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
+                            <h4 class="col-md-6 fw-normal">{{__('Income By Category')}}</h4>
+                            <div class="col-md-6 fw-400 row justify-content-md-end align-items-end">
                                 <div class="col-auto underline-dropdown">
                                     {{ Form::select('income_category_month',$months, date('n') - 1, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'income', 'month' => ':month', 'year' => ':year']), 'data-type' => 'income_category', 'data-name' => 'income_category-month', 'data-target' => 'DoughnutIncome')) }}
                                 </div>
@@ -414,18 +417,17 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-md-12 col-md-4">
-                                        <canvas id="chart-doughnut-income" height="330"></canvas>
+                                    <div class="col-12">
+                                        <canvas id="chart-doughnut-income" height="320"></canvas>
                                     </div>
-                                    <div class="col-md-4"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6 col-md-12 col-12 col-sm-12">
                         <div class="row">
-                            <h4 class="col-md-8 fw-normal">{{__('Expense By Category')}}</h4>
-                            <div class="col-md-4 fw-400 row justify-content-md-end align-items-end">
+                            <h4 class="col-md-6 fw-normal">{{__('Expense By Category')}}</h4>
+                            <div class="col-md-6 fw-400 row justify-content-md-end align-items-end">
                                 <div class="col-auto underline-dropdown">
                                     {{ Form::select('expense_category_month',$months, date('n') - 1, array('class' => 'h4', 'data-source' => route('dashboard-chart.category', ['type' => 'expense', 'month' => ':month', 'year' => ':year']), 'data-type' => 'expense_category', 'data-name' => 'expense_category-month', 'data-target' => 'DoughnutExpense')) }}
                                 </div>
@@ -437,10 +439,9 @@
                         <div class="card">                            
                             <div class="card-body">
                                 <div class="row flex-md-row-reverse align-items-md-center">
-                                    <div class="col-md-12 col-md-4">
-                                        <canvas id="chart-doughnut-expense" height="450"></canvas>
+                                    <div class="col-12">
+                                        <canvas id="chart-doughnut-expense" height="320"></canvas>
                                     </div>
-                                    <div class="col-md-4"></div>
                                 </div>
                             </div>
                         </div>

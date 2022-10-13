@@ -28,7 +28,7 @@ class ProductServiceCategory extends Model
     public function incomeCategoryAmount($month = null, $year = null)
     {
         if(empty($year)) { $year    = date('Y'); }
-        if(empty($month)) { $month    = date('Y'); }
+        if(empty($month)) { $month    = date('m'); }
         $creatorID = Auth::user()->creatorId();
 
         $revenue    = $this->hasMany(Revenue::class, 'category_id', 'id')->where('created_by', $creatorID)->whereMonth('date',$month)->whereYear('date',$year)->sum('amount');
@@ -44,7 +44,7 @@ class ProductServiceCategory extends Model
     public function expenseCategoryAmount($month = null, $year = null)
     {
         if(empty($year)) { $year    = date('Y'); }
-        if(empty($month)) { $month    = date('Y'); }
+        if(empty($month)) { $month    = date('m'); }
         $creatorID = Auth::user()->creatorId();
 
         $payment = $this->hasMany(Payment::class, 'category_id', 'id')->where('created_by', $creatorID)->whereMonth('date',$month)->whereYear('date',$year)->sum('amount');
