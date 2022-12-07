@@ -36,6 +36,7 @@ use App\Http\Controllers\EquityController;
 use App\Http\Controllers\EULAController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\FrontEndErrorController;
+use App\Http\Controllers\Github\WebhookController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\ImportSampleController;
 use App\Http\Controllers\InvoiceController;
@@ -73,6 +74,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('landing-page.index');
 });
+
+Route::post('github/webhook', [WebhookController::class, 'handle']);
 
 Route::prefix('app')->group(
     function () {
