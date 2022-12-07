@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\api\v2\AssetController;
-use App\Http\Controllers\API\v2\Auth\LoginController;
+use App\Http\Controllers\api\v2\Auth\LoginController;
 use App\Http\Controllers\api\v2\Auth\LogoutController;
-use App\Http\Controllers\API\v2\Auth\RegisterController;
+use App\Http\Controllers\api\v2\Auth\RegisterController;
 use App\Http\Controllers\api\v2\BalanceSheetController;
 use App\Http\Controllers\api\v2\BankAccountController;
 use App\Http\Controllers\api\v2\CategoryController;
