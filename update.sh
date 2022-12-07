@@ -5,3 +5,6 @@ git pull;
 
 # migrate
 php artisan migrate;
+
+# reload cache route
+php artisan route:cache;
