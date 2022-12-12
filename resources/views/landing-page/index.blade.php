@@ -223,7 +223,7 @@
                         <a href="mailto:hello@kazhier.com">Hubungi Kami</a>
                     </div>
                     <div class="copyright">
-                        Copyright &copy; Kazhier 2022
+                        Copyright &copy; PT. Teknologi Inspirasi Nusantara {{ date('Y') }}
                     </div>
                 </div>
             </div>
