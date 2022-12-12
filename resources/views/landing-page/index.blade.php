@@ -77,7 +77,7 @@
                     <a href="./app/register" id="trial" class="btn-primary txt-center"><span>Daftar Sekarang!</span></a>
                 </div>
                 <div class="kakapanel-2-per-3-lg kakaflex-item kakaflex kakaflex-align-right-lg kakaflex-align-center">
-                    <img class="headline-card" id="headline-card" src="{{ asset('assets/img/props/headline.png') }}" alt="Kazhier" height="auto">
+                    <img class="headline-card" id="headline-card" src="{{ asset('assets/img/props/headline.png') }}?1" alt="Kazhier" height="auto">
                 </div>
             </div>
         </section>
