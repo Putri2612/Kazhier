@@ -44,7 +44,7 @@
 <body>
     <header id="page-header" class="stick-top">
         <div class="header-container">
-            <div class="logo-container"><img src="{{ asset('assets/img/props/logo.svg') }}" alt="Logo Kazhier" height="36"></div>
+            <div class="logo-container"><img src="{{ asset('assets/img/props/logo.png') }}" alt="Logo Kazhier" height="36"></div>
             <div class="nav-container">
                 <nav>
                     <div id="nav-btn" class="nav-btn">
@@ -212,7 +212,7 @@
             <div class="row align-items-stretch">
                 <div class="col col-md-6">
                     <div class="logo-container d-flex align-items-center">
-                        <img src="{{ asset('assets/img/props/logo.svg') }}" alt="Logo Kazhier" height="36">
+                        <img src="{{ asset('assets/img/props/logo.png') }}" alt="Logo Kazhier" height="36">
                     </div>
                 </div>
                 <div class="col col-md-6">

@@ -8,3 +8,5 @@ routes.scanned.php
 down
 views
 sessions
+cache
+testing
