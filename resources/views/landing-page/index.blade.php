@@ -212,7 +212,7 @@
             <div class="row align-items-stretch">
                 <div class="col col-md-6">
                     <div class="logo-container d-flex align-items-center">
-                        <img src="{{ asset('assets/img/props/logo.png') }}" alt="Logo Kazhier" height="36">
+                        <img src="{{ asset('assets/img/props/logo.png') }}?1" alt="Logo Kazhier" height="36">
                     </div>
                 </div>
                 <div class="col col-md-6">
