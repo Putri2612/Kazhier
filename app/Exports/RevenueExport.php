@@ -9,11 +9,22 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class RevenueExport implements FromCollection, WithHeadings
 {
+
+    protected $revenueFilter;
+
+    public function setRevenue(Revenue $revenue)
+    {
+        $this->revenueFilter = $revenue;
+    }
+
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection(){
         $revenues   = Revenue::with(['bankAccount', 'customer', 'paymentMethod', 'category'])->where('created_by', '=', Auth::user()->creatorId())->orderBy('date', 'asc')->get();
+        if($this->revenueFilter !== null){
+            $revenues = $this->revenueFilter;
+        }
         $data       = [];
         $number     = 1;
         foreach($revenues as $revenue) {

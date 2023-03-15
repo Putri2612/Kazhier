@@ -82,7 +82,7 @@
                         </div>
                     </div>
                     <div class="mt-5 text-muted text-center">
-                        {{__('Dont have an account?')}} <a href="{{ route('register.show') }}">{{ __('Register') }}</a>
+                        {{__('Dont have an account?')}} <a href="{{ route('register.show',$lang) }}">{{ __('Register') }}</a>
                     </div>
                     <div class="simple-footer">
                         {{(Utility::getValByName('footer_text')) ? Utility::getValByName('footer_text') :  __('Copyright AccountGo') }} {{ date('Y') }}

@@ -110,7 +110,7 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="{{ route('revenue.export') }}" class="dropdown-item">
+                                                <a href="{{ route('revenue.export',) }}" class="dropdown-item">
                                                     {{__('Export')}}
                                                 </a>
                                             </li>
@@ -191,3 +191,6 @@
         </div>
     </section>
 @endsection
+
+// Setiap Search Filter, Data yang dipilih disimpan di cookies, dalam bentuk json lalu di decrypt md5
+// Kirim data md5 melalui parameter

@@ -49,7 +49,7 @@
                     },
                     legend: {
                         display: true,
-                        position: 'bottom',
+                        position: 'right',
                         labels: {
                             font: {
                                 size: 16

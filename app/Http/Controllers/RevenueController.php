@@ -86,17 +86,17 @@ class RevenueController extends Controller
         }
 
         $query = Revenue::where('created_by', Auth::user()->creatorId());
-        if(!empty($request->input('date')))
+        if(!empty($request->filled('date')))
         {
             $date_range = explode(' - ', $request->input('date'));
             $query->whereBetween('date', $date_range);
         }
 
-        if(!empty($request->input('customer')))
+        if(!empty($request->filled('customer')))
         {
             $query->where('customer_id', '=', $request->input('customer'));
         }
-        if(!empty($request->input('account')))
+        if(!empty($request->filled('account')))
         {
             $query->where('account_id', '=', $request->input('account'));
         }
@@ -349,6 +349,18 @@ class RevenueController extends Controller
 
     public function export() {
         if(Auth::user()->type == 'company'){
+            $revenue = new RevenueExport;
+            // Decrypt MD5
+            // decode json e
+            // Data hasil decode di check ada nilainya atau tidak
+            // Jika ada maka search bedasarkan key
+            // jika tidak ada maka tidak perlu di search
+            $revenues = $query->with(['bankAccount:id,bank_name,holder_name', 'customer:id,name', 'category:id,name', 'paymentMethod:id,name'])
+                ->select('id', 'amount', 'description', 'date', 'customer_id', 'account_id', 'category_id', 'payment_method')
+                ->orderBy('date', 'desc')
+                ->skip($page['skip'])->take($page['limit'])
+                ->get();
+                $revenue->setRevenue($revenues);
             return Excel::download(new RevenueExport, 'revenues.xlsx');
         } else {
             return $this->RedirectDenied();

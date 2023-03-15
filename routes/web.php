@@ -339,7 +339,7 @@ Route::prefix('app')->group(
                 Route::get('custom-credit-note', [CreditNoteController::class, 'customCreate'])->name('invoice.custom.credit.note');
                 Route::post('custom-credit-note', [CreditNoteController::class, 'customStore'])->name('invoice.custom.credit.note.store');
                 Route::get('credit-note/invoice', [CreditNoteController::class, 'getinvoice'])->name('get.invoice.credit.note');
-
+//TODO DIkasih parameter di export bisa nilainya kosong {?data}
                 Route::get('revenue/export', [RevenueController::class, 'export'])->name('revenue.export');
                 Route::get('revenue/import', [RevenueController::class, 'import'])->name('revenue.import');
                 Route::post('revenue/import/heading', [RevenueController::class, 'getImportHeadings'])->name('revenue.import.headings');
