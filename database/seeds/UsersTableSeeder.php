@@ -1,9 +1,12 @@
 <?php
 
-use App\User;
+namespace Database\Seeders;
+
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 
 class UsersTableSeeder extends Seeder
 {
@@ -160,8 +163,7 @@ class UsersTableSeeder extends Seeder
             'delete constant custom field',
         ];
 
-        foreach($arrPermissions as $ap)
-        {
+        foreach ($arrPermissions as $ap) {
             Permission::create(['name' => $ap]);
         }
 
@@ -204,8 +206,7 @@ class UsersTableSeeder extends Seeder
             'delete coupon',
 
         ];
-        foreach($superAdminPermissions as $ap)
-        {
+        foreach ($superAdminPermissions as $ap) {
             $permission = Permission::findByName($ap);
             $superAdminRole->givePermissionTo($permission);
         }
@@ -242,8 +243,7 @@ class UsersTableSeeder extends Seeder
             'manage customer proposal',
         ];
 
-        foreach($customerPermission as $ap)
-        {
+        foreach ($customerPermission as $ap) {
             $permission = Permission::findByName($ap);
             $customerRole->givePermissionTo($permission);
         }
@@ -267,8 +267,7 @@ class UsersTableSeeder extends Seeder
             'show bill',
         ];
 
-        foreach($venderPermission as $ap)
-        {
+        foreach ($venderPermission as $ap) {
             $permission = Permission::findByName($ap);
             $venderRole->givePermissionTo($permission);
         }
@@ -412,8 +411,7 @@ class UsersTableSeeder extends Seeder
 
         ];
 
-        foreach($companyPermissions as $ap)
-        {
+        foreach ($companyPermissions as $ap) {
             $permission = Permission::findByName($ap);
             $companyRole->givePermissionTo($permission);
         }
@@ -547,8 +545,7 @@ class UsersTableSeeder extends Seeder
             'delete constant custom field',
         ];
 
-        foreach($accountantPermission as $ap)
-        {
+        foreach ($accountantPermission as $ap) {
             $permission = Permission::findByName($ap);
             $accountantRole->givePermissionTo($permission);
         }

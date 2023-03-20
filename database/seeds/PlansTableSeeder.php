@@ -1,6 +1,8 @@
 <?php
 
-use App\Plan;
+namespace Database\Seeders;
+
+use App\Models\Plan;
 use Illuminate\Database\Seeder;
 
 class PlansTableSeeder extends Seeder
@@ -20,7 +22,7 @@ class PlansTableSeeder extends Seeder
                 'max_users' => 5,
                 'max_customers' => 5,
                 'max_venders' => 5,
-                'image'=>'free_plan.png',
+                'image' => 'free_plan.png',
             ]
         );
     }

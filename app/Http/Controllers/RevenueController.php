@@ -37,21 +37,20 @@ class RevenueController extends Controller
     use CanManageBalance,
         CanProcessNumber,
         CanUploadFile,
-        CanRedirect, 
+        CanRedirect,
         CanImport,
         ApiResponse;
-    
+
     public function index(Request $request)
     {
-        if(\Auth::user()->can('manage revenue'))
-        {
+        if (\Auth::user()->can('manage revenue')) {
             $customer = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customer->prepend(__('All'), '');
 
             $account = BankAccount::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('holder_name', 'id');
             $account->prepend(__('All'), '');
 
-            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type','=',1)->get()->pluck('name', 'id');
+            $category = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
             $category->prepend(__('All'), '');
 
             $payment = PaymentMethod::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
@@ -59,18 +58,17 @@ class RevenueController extends Controller
 
 
             return view('revenue.index', compact('customer', 'account', 'category', 'payment'));
-        }
-        else
-        {
+        } else {
             return $this->RedirectDenied();
         }
     }
 
-    public function get(Request $request) {
-        if(!Auth::user()->can('manage revenue')) {
+    public function get(Request $request)
+    {
+        if (!Auth::user()->can('manage revenue')) {
             return $this->UnauthorizedResponse();
         }
-        
+
         $validator = Validator::make($request->all(), [
             'page'              => 'nullable|numeric',
             'limit'             => 'nullable|numeric',
@@ -81,50 +79,45 @@ class RevenueController extends Controller
             'payment_method'    => 'nullable|numeric',
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             return $this->FailedResponse();
         }
 
         $query = Revenue::where('created_by', Auth::user()->creatorId());
-        if(!empty($request->filled('date')))
-        {
+        if (!empty($request->filled('date'))) {
             $date_range = explode(' - ', $request->input('date'));
             $query->whereBetween('date', $date_range);
         }
 
-        if(!empty($request->filled('customer')))
-        {
+        if (!empty($request->filled('customer'))) {
             $query->where('customer_id', '=', $request->input('customer'));
         }
-        if(!empty($request->filled('account')))
-        {
+        if (!empty($request->filled('account'))) {
             $query->where('account_id', '=', $request->input('account'));
         }
 
-        if(!empty($request->input('category')))
-        {
+        if (!empty($request->input('category'))) {
             $query->where('category_id', '=', $request->input('category'));
         }
 
-        if(!empty($request->input('payment')))
-        {
+        if (!empty($request->input('payment'))) {
             $query->where('payment_method', '=', $request->input('payment'));
         }
 
         $page   = Pagination::getTotalPage($query, $request);
-        if($page === false) {
+        if ($page === false) {
             return $this->NotFoundResponse();
         }
 
         $revenues = $query->with(['bankAccount:id,bank_name,holder_name', 'customer:id,name', 'category:id,name', 'paymentMethod:id,name'])
-                ->select('id', 'amount', 'description', 'date', 'customer_id', 'account_id', 'category_id', 'payment_method')
-                ->orderBy('date', 'desc')
-                ->skip($page['skip'])->take($page['limit'])
-                ->get();
+            ->select('id', 'amount', 'description', 'date', 'customer_id', 'account_id', 'category_id', 'payment_method')
+            ->orderBy('date', 'desc')
+            ->skip($page['skip'])->take($page['limit'])
+            ->get();
 
-        if($revenues->isEmpty()) {
+        if ($revenues->isEmpty()) {
             return $this->NotFoundResponse();
-        } 
+        }
 
         return $this->PaginationSuccess($revenues, $page['totalPage']);
     }
@@ -133,13 +126,12 @@ class RevenueController extends Controller
     public function create()
     {
 
-        if(\Auth::user()->can('create revenue'))
-        {
+        if (\Auth::user()->can('create revenue')) {
             $customers  = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend(__('Select customer'), null);
             $customers  = $customers->union(['new.customer' => __('Create new customer')]);
 
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type','=',1)->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
             $categories->prepend(__('Select category'), null);
             $categories = $categories->union(['new.product-category' => __('Create new category')]);
 
@@ -152,9 +144,7 @@ class RevenueController extends Controller
             $accounts   = $accounts->union(['new.bank-account' => __('Create new bank account')]);
 
             return view('revenue.create', compact('customers', 'categories', 'payments', 'accounts'));
-        }
-        else
-        {
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -162,20 +152,20 @@ class RevenueController extends Controller
 
     public function store(Request $request)
     {
-        if(\Auth::user()->can('create revenue'))
-        {
+        if (\Auth::user()->can('create revenue')) {
 
             $validator = Validator::make(
-                $request->all(), [
-                                   'date' => 'required',
-                                   'amount' => 'required',
-                                   'account_id' => 'required',
-                                   'category_id' => 'required',
-                                   'payment_method' => 'required',
-                                   'reference' => 'mimes:png,jpeg,jpg,pdf',
-                               ]
+                $request->all(),
+                [
+                    'date' => 'required',
+                    'amount' => 'required',
+                    'account_id' => 'required',
+                    'category_id' => 'required',
+                    'payment_method' => 'required',
+                    'reference' => 'mimes:png,jpeg,jpg,pdf',
+                ]
             );
-            if($validator->fails()) {
+            if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
 
                 return redirect()->back()->with('error', $messages->first());
@@ -192,7 +182,7 @@ class RevenueController extends Controller
             $revenue->description    = $request->input('description');
             $revenue->created_by     = \Auth::user()->creatorId();
 
-            if($request->hasFile('reference')){
+            if ($request->hasFile('reference')) {
                 $revenue->reference      = $this->UploadFile($request->file('reference'), 'reference');
             }
             $revenue->save();
@@ -209,7 +199,7 @@ class RevenueController extends Controller
             Transaction::addTransaction($revenue);
 
             $customer = Customer::where('id',  $request->input('customer_id'))->first();
-            if(!empty($customer)){
+            if (!empty($customer)) {
                 $payment          = new InvoicePayment();
                 $payment->name    = $customer['name'];
                 $payment->date    = $request->input('date');
@@ -218,33 +208,31 @@ class RevenueController extends Controller
 
                 try {
                     Mail::to($customer['email'])->send(new InvoicePaymentCreate($payment));
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $smtp_error = __('E-Mail has been not sent due to SMTP configuration');
                 }
             }
 
 
             return redirect()->route('revenue.index')->with('success', __('Revenue successfully created.') . ((isset($smtp_error)) ? '<br> <span class="text-danger">' . $smtp_error . '</span>' : ''));
-        }
-        else
-        {
+        } else {
             return $this->RedirectDenied();
         }
     }
 
-    public function show(Revenue $revenue){
+    public function show(Revenue $revenue)
+    {
         return view('revenue.show', compact('revenue'));
     }
 
     public function edit(Revenue $revenue)
     {
-        if(\Auth::user()->can('edit revenue'))
-        {
+        if (\Auth::user()->can('edit revenue')) {
             $customers  = Customer::where('created_by', '=', \Auth::user()->creatorId())->get()->pluck('name', 'id');
             $customers->prepend(__('Select customer'), null);
             $customers  = $customers->union(['new.customer' => __('Create new customer')]);
 
-            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type','=',1)->get()->pluck('name', 'id');
+            $categories = ProductServiceCategory::where('created_by', '=', \Auth::user()->creatorId())->where('type', '=', 1)->get()->pluck('name', 'id');
             $categories->prepend(__('Select category'), null);
             $categories = $categories->union(['new.product-category' => __('Create new category')]);
 
@@ -259,9 +247,7 @@ class RevenueController extends Controller
             $revenue->amount = $this->FloatToReadableNumber($revenue->amount);
 
             return view('revenue.edit', compact('customers', 'categories', 'payments', 'accounts', 'revenue'));
-        }
-        else
-        {
+        } else {
             return response()->json(['error' => __('Permission denied.')], 401);
         }
     }
@@ -269,26 +255,26 @@ class RevenueController extends Controller
 
     public function update(Request $request, Revenue $revenue)
     {
-        if(\Auth::user()->can('edit revenue')) {
+        if (\Auth::user()->can('edit revenue')) {
 
             $validator = \Validator::make(
-                $request->all(), [
-                                   'date' => 'required',
-                                   'amount' => 'required',
-                                   'account_id' => 'required',
-                                   'category_id' => 'required',
-                                   'payment_method' => 'required',
-                                   'reference' => 'mimes:png,jpeg,jpg,pdf',
-                               ]
+                $request->all(),
+                [
+                    'date' => 'required',
+                    'amount' => 'required',
+                    'account_id' => 'required',
+                    'category_id' => 'required',
+                    'payment_method' => 'required',
+                    'reference' => 'mimes:png,jpeg,jpg,pdf',
+                ]
             );
-            if($validator->fails())
-            {
+            if ($validator->fails()) {
                 $messages = $validator->getMessageBag();
                 return redirect()->back()->with('error', $messages->first());
             }
 
-            if($request->hasFile('reference')){
-                if($revenue->reference != 'nofile.svg'){
+            if ($request->hasFile('reference')) {
+                if ($revenue->reference != 'nofile.svg') {
                     $revenue->reference = $this->ReplaceFile($revenue->reference, $request->file('reference'), 'reference');
                 } else {
                     $revenue->reference = $this->UploadFile($request->file('reference'), 'reference');
@@ -298,7 +284,7 @@ class RevenueController extends Controller
             $amount = $this->ReadableNumberToFloat($request->input('amount'));
             $difference = $revenue->amount - $amount;
             $this->AddBalance($request->input('account_id'), $difference, $request->input('date'));
-            
+
             $revenue->date           = $request->input('date');
             $revenue->amount         = $amount;
             $revenue->account_id     = $request->input('account_id');
@@ -326,13 +312,13 @@ class RevenueController extends Controller
     public function destroy(Revenue $revenue)
     {
 
-        if(\Auth::user()->can('delete revenue')) {
-            if($revenue->created_by == \Auth::user()->creatorId()) {
-                if($revenue->reference != "nofile.svg"){
+        if (\Auth::user()->can('delete revenue')) {
+            if ($revenue->created_by == \Auth::user()->creatorId()) {
+                if ($revenue->reference != "nofile.svg") {
                     $this->DeleteFile($revenue->reference, 'reference');
                 }
 
-                $this->AddBalance($revenue->account_id, -($revenue->amount), $revenue->date);
+                $this->AddBalance($revenue->account_id, - ($revenue->amount), $revenue->date);
                 $revenue->delete();
                 $type = 'Payment';
                 $user = 'Customer';
@@ -347,8 +333,52 @@ class RevenueController extends Controller
         }
     }
 
-    public function export() {
-        if(Auth::user()->type == 'company'){
+    public function export(Request $request)
+    {
+        // global $query, $page;
+
+        $query = Revenue::where(
+            'created_by',
+            Auth::user()->creatorId()
+        );
+        if (!empty($request->filled('date'))) {
+            $date_range = explode(' - ', $request->input('date'));
+            $query->whereBetween('date', $date_range);
+        }
+
+        if (!empty($request->filled('customer'))) {
+            $query->where(
+                'customer_id',
+                '=',
+                $request->input('customer')
+            );
+        }
+        if (!empty($request->filled('account'))) {
+            $query->where(
+                'account_id',
+                '=',
+                $request->input('account')
+            );
+        }
+
+        if (!empty($request->input('category'))) {
+            $query->where(
+                'category_id',
+                '=',
+                $request->input('category')
+            );
+        }
+
+        if (!empty($request->input('payment'))) {
+            $query->where('payment_method', '=', $request->input('payment'));
+        }
+
+        $page   = Pagination::getTotalPage($query, $request);
+        if ($page === false) {
+            return $this->NotFoundResponse();
+        }
+
+        if (Auth::user()->type == 'company') {
             $revenue = new RevenueExport;
             // Decrypt MD5
             // decode json e
@@ -360,31 +390,35 @@ class RevenueController extends Controller
                 ->orderBy('date', 'desc')
                 ->skip($page['skip'])->take($page['limit'])
                 ->get();
-                $revenue->setRevenue($revenues);
-            return Excel::download(new RevenueExport, 'revenues.xlsx');
+            $revenues[0]['amount'] = 99999;
+            $revenue->setRevenue($revenues);
+            // dd($revenue);
+            return Excel::download($revenue, 'revenues.xlsx');
         } else {
             return $this->RedirectDenied();
         }
     }
 
-    public function import() {
-        if(Auth::user()->type == 'company'){
+    public function import()
+    {
+        if (Auth::user()->type == 'company') {
             return view('revenue.import');
         } else {
             return $this->RedirectDenied();
         }
     }
 
-    public function storeImport(Request $request) {
-        if(Auth::user()->type == 'company') {
+    public function storeImport(Request $request)
+    {
+        if (Auth::user()->type == 'company') {
             $validator = Validator::make($request->all(), [
                 'headings'      => 'required',
                 'path'          => 'required',
             ]);
 
-            if($validator->fails()) {
+            if ($validator->fails()) {
                 $message = '';
-                foreach($validator->errors()->all() as $error) {
+                foreach ($validator->errors()->all() as $error) {
                     $message .= "{$error} \n";
                 }
                 return response($message, 400);
@@ -397,35 +431,35 @@ class RevenueController extends Controller
                 'amount'        => in_array('amount', $input) ? 'amount' : null,
                 'account'       => in_array('bank_account', $input) ? 'bank_account' : null,
                 'category'      => in_array('category', $input) ? 'category' : null,
-                'payment_method'=> in_array('payment_method', $input) ? 'payment_method' : null,
+                'payment_method' => in_array('payment_method', $input) ? 'payment_method' : null,
                 'description'   => in_array('description', $input) ? 'description' : null,
                 'customer'      => in_array('customer_name', $input) ? 'customer_name' : null,
             ];
 
             $notFound = array_keys($headings, null, true);
 
-            if(count($notFound)) {
+            if (count($notFound)) {
                 $keys = ucwords(implode(', ', $notFound));
-                if(Storage::exists($request->input('path'))) {
+                if (Storage::exists($request->input('path'))) {
                     Storage::delete($request->input('path'));
                 }
                 return response()->json(['empty' => $keys, 'count' => count($notFound)], 400);
             }
 
-            if(Storage::exists($request->input('path'))) {
+            if (Storage::exists($request->input('path'))) {
                 try {
-                    Excel::import(new RevenueImport($headings, Auth::user()), storage_path('app/').$request->input('path'));
-                } catch(NoFileException $noData) {
+                    Excel::import(new RevenueImport($headings, Auth::user()), storage_path('app/') . $request->input('path'));
+                } catch (NoFileException $noData) {
                     $failed = $noData->getMessage();
                 } catch (Exception $e) {
                     $fails = $e->getMessage();
                 }
                 $output['message'] = __('Import success');
-                
-                if(!empty($fails)) {
+
+                if (!empty($fails)) {
                     $output['failed'] = $fails;
                 }
-                if(!empty($failed)) {
+                if (!empty($failed)) {
                     $output['failed'] = $failed;
                 }
 

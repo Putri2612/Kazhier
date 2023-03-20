@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use App\Traits\CanProcessNumber;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use IntlDateFormatter;
+use App\Models\Utility;
+use App\Traits\CanProcessNumber;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 
 class Utility extends Model
 {
@@ -13,13 +15,10 @@ class Utility extends Model
     public static function settings()
     {
         $data = DB::table('settings');
-        if(\Auth::check())
-        {
+        if (\Auth::check()) {
             $userId = \Auth::user()->creatorId();
             $data   = $data->where('created_by', '=', $userId);
-        }
-        else
-        {
+        } else {
             $data = $data->where('created_by', '=', 1);
         }
         $data     = $data->get();
@@ -56,8 +55,7 @@ class Utility extends Model
 
         ];
 
-        foreach($data as $row)
-        {
+        foreach ($data as $row) {
             $settings[$row->name] = $row->value;
         }
 
@@ -69,14 +67,16 @@ class Utility extends Model
         $dir     = base_path() . '/resources/lang/';
         $glob    = glob($dir . "*", GLOB_ONLYDIR);
         $arrLang = array_map(
-            function ($value) use ($dir){
+            function ($value) use ($dir) {
                 return str_replace($dir, '', $value);
-            }, $glob
+            },
+            $glob
         );
         $arrLang = array_map(
-            function ($value) use ($dir){
+            function ($value) use ($dir) {
                 return preg_replace('/[0-9]+/', '', $value);
-            }, $arrLang
+            },
+            $arrLang
         );
         $arrLang = array_filter($arrLang);
 
@@ -86,8 +86,7 @@ class Utility extends Model
     public static function getValByName($key)
     {
         $setting = Utility::settings();
-        if(!isset($setting[$key]) || empty($setting[$key]))
-        {
+        if (!isset($setting[$key]) || empty($setting[$key])) {
             $setting[$key] = '';
         }
 
@@ -98,28 +97,22 @@ class Utility extends Model
     {
         $envFile = app()->environmentFilePath();
         $str     = file_get_contents($envFile);
-        if(count($values) > 0)
-        {
-            foreach($values as $envKey => $envValue)
-            {
+        if (count($values) > 0) {
+            foreach ($values as $envKey => $envValue) {
                 $keyPosition       = strpos($str, "{$envKey}=");
                 $endOfLinePosition = strpos($str, "\n", $keyPosition);
                 $oldLine           = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
                 // If key does not exist, add it
-                if(!$keyPosition || !$endOfLinePosition || !$oldLine)
-                {
+                if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
                     $str .= "{$envKey}='{$envValue}'\n";
-                }
-                else
-                {
+                } else {
                     $str = str_replace($oldLine, "{$envKey}='{$envValue}'", $str);
                 }
             }
         }
         $str = substr($str, 0, -1);
         $str .= "\n";
-        if(!file_put_contents($envFile, $str))
-        {
+        if (!file_put_contents($envFile, $str)) {
             return false;
         }
 
@@ -212,19 +205,20 @@ class Utility extends Model
         return $settings["bill_prefix"] . sprintf("%05d", $number);
     }
 
-    public static function formatNumber($number) {
+    public static function formatNumber($number)
+    {
         return (new self)->FloatToReadableNumber($number);
     }
 
     static $dateformats = [
-        'numeric'   => [ IntlDateFormatter::SHORT, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
-        'short'     => [ IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
-        'long'      => [ IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'numeric'   => [IntlDateFormatter::SHORT, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'short'     => [IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'long'      => [IntlDateFormatter::LONG, IntlDateFormatter::NONE, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
     ];
 
     static $timeformats = [
-        'short'     => [ IntlDateFormatter::NONE, IntlDateFormatter::SHORT, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
-        'medium'    => [ IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
-        'long'      => [ IntlDateFormatter::NONE, IntlDateFormatter::LONG, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'short'     => [IntlDateFormatter::NONE, IntlDateFormatter::SHORT, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'medium'    => [IntlDateFormatter::NONE, IntlDateFormatter::MEDIUM, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
+        'long'      => [IntlDateFormatter::NONE, IntlDateFormatter::LONG, 'Asia/Jakarta', IntlDateFormatter::GREGORIAN],
     ];
 }
